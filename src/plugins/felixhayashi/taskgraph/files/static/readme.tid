@@ -1,5 +1,9 @@
 ! TW-Taskgraph
 
+WARNING BETA! CODE IS CHANGING CONSTANTLY.
+
+A FIRST DEMO [[here|http://wkpr.de/hosting/tmp/tw5/]] (may be outdated, broken or deleted)
+
 TW-Taskgraph is a [[TiddlyWiki|http://tiddlywiki.com/]] (TW5) plugin that allows you to link your wiki-topics (tiddlers) in order to create clickable graphs. By creating relations between your topics you can easily do the following:
 
 &nbsp;&nbsp;&nbsp;&nbsp; ✔ ''Create mindmaps'' and quickly manifest your ideas in tiddlers that open when nodes are clicked.<br />

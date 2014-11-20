@@ -378,6 +378,9 @@ exports.getClass = function(constrObj) {
     // restore the physics to allow the graph to render itself
     this.network.setOptions(this.graphOptions.physics);
     
+    //
+    this.hasNetworkStabilized = false;
+    
     // register the new data
     this.network.setData({
       nodes : this.nodes,
@@ -494,14 +497,10 @@ exports.getClass = function(constrObj) {
    * Called by vis when the graph has stabilized itself.
    */
   TaskGraphWidget.prototype.handleStabilizedEvent = function(properties) {  
-    
-    if($tw.taskgraph.opt.tw["disablePhysics"] === "true") {
-      console.debug("iterations before stabilized event: " + properties.iterations);
-      if(!this.preventNextStabilization) {
-        console.debug("will now disable physics");
-        this.network.setOptions({physics: {barnesHut: {gravitationalConstant: 0, centralGravity: 0, springConstant: 0}}});
-      }
-      this.preventNextStabilization = !this.preventNextStabilization;
+    if(!this.hasNetworkStabilized) {
+      console.debug("will now disable physics");
+      this.network.setOptions({physics: {barnesHut: {gravitationalConstant: 0, centralGravity: 0, springConstant: 0}}});
+      this.hasNetworkStabilized = true;
     }
   };
   

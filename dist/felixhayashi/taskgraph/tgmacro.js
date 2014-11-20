@@ -47,16 +47,6 @@ util functions.
       
         return utils.getBasename(arguments[1]);
         
-      case "id":
-      
-        var label = arguments[1];
-        
-        if(!$tw.wiki.tiddlerExists(label)) { // must be an edge then
-          var label = $tw.taskgraph.opt.tw.edgesPrefix + "/" + label;
-        }
-        
-        return $tw.wiki.getTiddler(label).fields.id;
-        
       case "option":
       
         var prop = $tw.taskgraph.opt;

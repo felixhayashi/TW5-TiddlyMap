@@ -108,7 +108,7 @@
     "direction": "UD",
     "layout": "hubsize"
   },
-  "freezeForStabilization": true,
+  "freezeForStabilization": false,
   "smoothCurves": {
     "enabled": true,
     "dynamic": false,

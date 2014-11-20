@@ -1,0 +1,55 @@
+.taskgraph_button .tc-drop-down {
+  font-size: 14px; }
+.taskgraph_button > button {
+  padding-left: 10px; }
+.taskgraph_button .tc-drop-down button {
+  width: 100%; }
+.taskgraph_button p p {
+  padding: 0px; }
+.taskgraph_button .explanation {
+  white-space: normal; }
+
+.taskgraph_graph {
+  border: 3px dotted lightgray;
+  padding: 2px;
+  width: calc(100% - 15px);
+  color: #666666; }
+  .taskgraph_graph .network-manipulationUI.edit.editmode {
+    height: 26px; }
+  .taskgraph_graph .network-manipulationDiv {
+    background: transparent; }
+  .taskgraph_graph .filterbar {
+    border: 1px solid #cccccc;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.15) inset;
+    padding: 1px 5px; }
+    .taskgraph_graph .filterbar .tc-drop-down {
+      background-color: #F3F3F3;
+      border: none;
+      min-width: 170px;
+      padding: 5px;
+      margin: 5px 0; }
+    .taskgraph_graph .filterbar button {
+      line-height: inherit;
+      color: #666666; }
+    .taskgraph_graph .filterbar > * {
+      display: inline-block; }
+    .taskgraph_graph .filterbar .separator:after {
+      color: lightgray;
+      margin: 3px;
+      content: " | "; }
+    .taskgraph_graph .filterbar .quickhelp {
+      background: transparent;
+      border: none;
+      border-left: 1px solid #cccccc;
+      color: slategrey;
+      float: right;
+      font-weight: bold;
+      margin: 6px; }
+    .taskgraph_graph .filterbar .tc-edit-add-tag .tc-add-tag-name input {
+      width: 70%; }
+    .taskgraph_graph .filterbar .tc-sidebar-header {
+      text-shadow: none; }
+    .taskgraph_graph .filterbar .tc-edit-tags {
+      border: none;
+      padding: inherit;
+      box-shadow: none; }

@@ -1,0 +1,6 @@
+<$button set=<<result>> setTo="1"><<confirmButtonLabel>>
+  <$action-sendmessage $message="tm-close-tiddler" />
+</$button>
+<$button set=<<result>> setTo=""><<cancelButtonLabel>>
+  <$action-sendmessage $message="tm-close-tiddler" />
+</$button>

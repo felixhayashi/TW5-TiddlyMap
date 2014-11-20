@@ -1,0 +1,97 @@
+.taskgraph_button {
+
+  .tc-drop-down {
+    font-size: 14px;
+  }
+  
+  >button {
+    padding-left: 10px;
+  }
+  
+  .tc-drop-down button {
+    width: 100%;
+  }
+ 
+  p p {
+    padding: 0px;
+  }
+  
+  .explanation {
+    white-space: normal;
+  }
+
+}
+
+$padding : 5px;
+$color: #666666;
+
+.taskgraph_graph {
+
+  border: 3px dotted lightgray;
+  padding: 2px;
+  width: calc(100% - 15px);
+  color: $color;
+  
+  .network-manipulationUI.edit.editmode {
+    height: 26px;
+  }
+  
+  .network-manipulationDiv {
+    background: transparent;
+  }
+  
+  .filterbar {
+  
+    border: 1px solid #cccccc;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.15) inset;
+    padding: 1px $padding;
+    
+    .tc-drop-down {
+        background-color: #F3F3F3;
+        border: none;
+        min-width: 170px;
+        padding: 5px;
+        margin: 5px 0;
+    }
+    
+    button {
+      line-height: inherit;
+      color: $color;
+    }
+  
+     >* {
+      display: inline-block;
+    }
+    
+    .separator:after {
+      color: lightgray;
+      margin: 3px;
+      content: " | ";
+    }
+    
+    .quickhelp {
+      background: transparent;
+      border: none;
+      border-left: 1px solid #cccccc;
+      color: slategrey;
+      float: right;
+      font-weight: bold;
+      margin: $padding+1;
+    }
+    
+    .tc-edit-add-tag .tc-add-tag-name input {
+      width: 70%;
+    }
+    
+    .tc-sidebar-header {
+      text-shadow: none;
+    }
+    
+    .tc-edit-tags {
+      border: none;
+      padding: inherit;
+      box-shadow: none;
+    }
+  }
+  
+}

@@ -1,0 +1,7 @@
+{ 
+  "field_nodeId" : "id",
+  "ticketMarker" : "ticket",
+  "disablePhysics" : "true",
+  "defaultViewBindingChoice" : "",
+  "debug" : 0
+}

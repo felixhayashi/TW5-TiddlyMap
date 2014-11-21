@@ -18,11 +18,19 @@ exports.getClass = function(constrObj) {
    */
   var TaskGraphWidget = function(parseTreeNode, options) {
     
+    // addEventListeners automatically binds "this" object to handler, thus, no need for .bind(this)
     this.addEventListeners([
-      {type: "tw-clone-view", handler: this.handleCloneView },
-      {type: "tw-create-view", handler: function() {} },
-      {type: "tw-delete-view", handler: function() {} },
+    
+      {type: "tw-clone-view", handler: function() {
+        var templateTObj = this.getCurView();
+        this.handleCreateView(templateTObj);
+      }},
+      {type: "tw-create-view", handler: function() {
+        this.handleCreateView(null);
+      }},
+      {type: "tw-delete-view", handler: this.handleDeleteView },
       {type: "tw-store-position", handler: this.handleStorePositions }
+      
     ]);
     
   };
@@ -393,73 +401,106 @@ exports.getClass = function(constrObj) {
     this.network.setOptions({ physics : this.graphOptions.physics });
     
   }
-  
+    
   /**
-   * This function will switch the current view reference of the
-   * view holder. If no viewRef is specified, the current view is
-   * simply updated.
-   * 
-   * @viewRef (optional) a reference (tiddler title) to a view
-   * @viewHolderRef (optional) a reference to the view holder that should be updated
+   * If a template is specified, create a snapshot from the given
+   * view (= a clone), otherwise, create an empty view. In any case
+   * a dialog is opened that asks the user how to name the view.
+   * The view is then registered as current view.
    */
-  TaskGraphWidget.prototype.setCurView = function(viewRef, viewHolderRef) {
+  TaskGraphWidget.prototype.handleCreateView = function(templateTObj) {
+
+    // TODO: option paths seriously need some refactoring!
+    var dialogSkeleton = this.wiki.getTiddler($tw.taskgraph.opt.tw.template.dialog.getViewName);
     
-    if(viewRef) {
-      if(!viewHolderRef) viewHolderRef = this.curViewHolderRef;
-      console.info("setting the value of view holder \"" + viewHolderRef + " to \"" + viewRef + "\"");
-      this.wiki.addTiddler(new $tw.Tiddler(
-        { title : viewHolderRef,
-          text : viewRef
-        }
-      ));
-    }
+    // used inside dialog and for the notification
+    var verb = (templateTObj ? "clone" : "create");
     
-    // register the new value; no need to update the adapter as this is done during refresh
-    this.curView = this.getCurView(true);
-  };
-  
-  /**
-   * If a snapshot is made from a view (= a clone) a dialog is opened
-   * that asks the user how to name the view. The view is then registered
-   * as current view.
-   */
-  TaskGraphWidget.prototype.handleCloneView = function(event) {
-    
-    var skeleton = this.wiki.getTiddler($tw.taskgraph.opt.tw.template.getViewName);
-    
-    this.openDialog(skeleton, {}, function(isConfirmed, outputTObj) {
+    this.openDialog(dialogSkeleton, { verb : verb }, function(isConfirmed, outputTObj) {
     
       var isSuccess = isConfirmed && outputTObj && outputTObj.fields.text;
     
       if(isSuccess) {
         
-        var existingView = this.wiki.getTiddler(outputTObj.fields.text);
-        
-        if(existingView) {
-          //TODO: create confirm dialog.
-          console.debug("the existing view \"" + this.utils.getBasename(existingView.fields.title) + "\" will overridden");
-        }
-        
+        var viewname = utils.getBasename(outputTObj.fields.text);
+                
         var fields = {};
-        fields.title =  $tw.taskgraph.opt.tw.viewsPrefix + "/" + dialogAnswerText;
+        fields.title =  $tw.taskgraph.opt.tw.prefix.views + "/" + viewname;
         fields[$tw.taskgraph.opt.tw.fields.viewMarker] = true;
         
-        this.wiki.addTiddler(new $tw.Tiddler(this.getCurView().fields, fields));
+        if(!templateTObj) {
+          // simply copy the body to get a transclude of graphBar
+          fields.text = this.curView.fields.text;
+        }
+        
+        this.wiki.addTiddler(new $tw.Tiddler(templateTObj, fields));
         
         this.setCurView(fields.title);
         
-        utils.notify("view cloned");
+        // past tense :)
+        utils.notify("view " + verb + "d");
         
       }
 
     }.bind(this));
-  }
+  };
+
+  TaskGraphWidget.prototype.handleDeleteView = function() {
+    
+    var tRef = this.getCurView().fields.title;
+    var viewname = utils.getBasename(tRef);
+    
+    if(viewname == "default") {
+      utils.notify("Thou shalt not kill the default view!");
+      return;
+    }
+    console.log("bla");
+    // regex is non-greedy
+    var filter = "[regexp:text[<\\$taskgraph.*?view=." + viewname + "..*?>]]";
+    console.log(filter);
+    var matches = utils.getMatches(filter);
+    console.log(matches);
+    if(matches.length) {
+      
+      var fields = {
+        count : matches.length.toString(),
+        filter : filter
+      };
+      var tRef = $tw.taskgraph.opt.tw.template.dialog.notAllowedToDeleteView;
+      var dialogSkeleton = this.wiki.getTiddler(tRef);
+      this.openDialog(dialogSkeleton, fields, null);
+
+      return;
+      
+    }
+
+    var message = "You are about to delete the view " + 
+                  "''" + viewname + "'' (no tiddler currently references this view).";
+                  
+    this.openStandardConfirmDialog(function(isConfirmed) {
+      if(!isConfirmed) return;
+      
+      var defaultViewTRef = $tw.taskgraph.opt.tw.prefix.views + "/default";
+      
+      // first, switch the view to the ever-existing default view
+      this.setCurView(defaultViewTRef);
+
+      // now delete the view and all tiddlers stored in its path (map, edge-filter etc.)
+      var filter = "[prefix[" + $tw.taskgraph.opt.tw.prefix.views + "/" + viewname + "]]";
+      utils.deleteTiddlers(utils.getMatches(filter));
+
+      // notify the user
+      utils.notify("view \"" + viewname + "\" deleted ");
+
+    }.bind(this), message);
+    
+  };
   
   /**
    * Called by vis when the user tries to delete a node or an edge.
    * @data { nodes: [selectedNodeIds], edges: [selectedEdgeIds] }
    */
-  TaskGraphWidget.prototype.handleDeleteEvent = function(data, callback) {
+  TaskGraphWidget.prototype.handleNetworkDeleteEvent = function(data, callback) {
     
     if(data.edges.length && !data.nodes.length) { // only deleting edges
       this.adapter.deleteEdgesFromStore(this.edges.get(data.edges));
@@ -553,7 +594,7 @@ exports.getClass = function(constrObj) {
         console.debug(properties);
         // TODO: use returnType option!
         var label = this.edges.get(properties.edges[0]).label;
-        var targetTitle = $tw.taskgraph.opt.tw["edgesPrefix"] + "/" + label;
+        var targetTitle = $tw.taskgraph.opt.tw.prefix.edges + "/" + label;
       
       }
       
@@ -592,7 +633,20 @@ exports.getClass = function(constrObj) {
     
   };
    
-
+  /**
+   * The view holder is a tiddler that stores a references to the current
+   * view. If the graph is not bound to a view by the user via an
+   * attribute, the default view holder is used. Otherwise, a temporary
+   * holder is created whose value is set to the view specified by the user.
+   * This way, the graph is independent from view changes made in a
+   * taskgraph editor.
+   * 
+   * This function will only calculate a new reference to the holder
+   * on first call (that is when no view holder is registered to "this".
+   * 
+   * @viewName the value of the view attribute specified in the widget
+   *     tags.
+   */
   TaskGraphWidget.prototype.getCurViewHolderRef = function(viewName) {
     
     // the viewholder is never recalculated once it exists
@@ -603,13 +657,20 @@ exports.getClass = function(constrObj) {
     // if given, try to retrieve the viewHolderRef by specified attribute
     if(viewName) {
       
+      console.log("user wants to bind " + viewName + " to graph");
+      
       // create a view holder that is exclusive for this graph
       
-      var viewRef = $tw.taskgraph.opt.tw.viewsPrefix + "/" + viewName;
-      if(this.wiki.getTiddler(viewRef)) {
-        var viewHolderRef = "$:/temp/taskgraph/viewHolder-" + vis.util.randomUUID();
+      var viewRef = $tw.taskgraph.opt.tw.prefix.views + "/" + viewName;
+      if(this.wiki.tiddlerExists(viewRef)) {
+        var viewHolderRef = $tw.taskgraph.opt.tw.prefix.localHolders + "/" + vis.util.randomUUID();
         console.debug("using an independent temporary view holder: \"" + viewHolderRef + "\"");
-        this.setCurView(viewRef, viewHolderRef);
+        
+        this.wiki.addTiddler(new $tw.Tiddler({ 
+          title : viewHolderRef,
+          text : viewRef
+        }));
+        
         return viewHolderRef;
       }
       
@@ -621,6 +682,29 @@ exports.getClass = function(constrObj) {
     
   };
   
+  /**
+   * This function will switch the current view reference of the
+   * view holder. If no viewRef is specified, the current view is
+   * simply updated.
+   * 
+   * @viewRef (optional) a reference (tiddler title) to a view
+   * @viewHolderRef (optional) a reference to the view holder that should be updated
+   */
+  TaskGraphWidget.prototype.setCurView = function(viewRef, viewHolderRef) {
+    
+    if(viewRef) {
+      if(!viewHolderRef) viewHolderRef = this.curViewHolderRef;
+      console.info("setting the value of view holder \"" + viewHolderRef + " to \"" + viewRef + "\"");
+      this.wiki.addTiddler(new $tw.Tiddler({ 
+        title : viewHolderRef,
+        text : viewRef
+      }));
+    }
+    
+    // register the new value; no need to update the adapter as this is done during refresh
+    this.curView = this.getCurView(true);
+  };
+  
   TaskGraphWidget.prototype.getCurView = function(isReextract, viewHolderRef) {
     
     // if already exists and not asked to reextract, use cached object...
@@ -630,9 +714,18 @@ exports.getClass = function(constrObj) {
     if(!viewHolderRef) viewHolderRef = this.getCurViewHolderRef();
     console.info("reextracting current view from \"" + viewHolderRef + "\"");
     
-    console.log(this.wiki.getTiddler(viewHolderRef));
-    
     var curViewRef = this.wiki.getTiddler(viewHolderRef).fields.text;
+    
+    console.log("the extracted view is");
+    console.log(curViewRef);
+    
+    if(!this.wiki.tiddlerExists(curViewRef)) {
+      console.log("Warning: View \"" + curViewRef + "\" doesn't exist. Default is used instead.");
+      //utils.notify("Warning: View \"" + curViewRef + "\" doesn't exist. Default is used instead.");
+      curViewRef = $tw.taskgraph.opt.tw.prefix.views + "/default";
+    }
+    
+    this.wiki.getTiddler(curViewRef)
     
     return this.wiki.getTiddler(curViewRef);
     
@@ -645,7 +738,7 @@ exports.getClass = function(constrObj) {
     // get a copy of the options
     var options = this.wiki.getTiddlerData("$:/plugins/felixhayashi/taskgraph/options/vis");
     
-    options.onDelete = this.handleDeleteEvent.bind(this);
+    options.onDelete = this.handleNetworkDeleteEvent.bind(this);
     options.onConnect = function(data, callback) {
       // we do not call the callback of the network as we handle it ourselves
       this.handleConnectionEvent(data);
@@ -672,7 +765,7 @@ exports.getClass = function(constrObj) {
           // whole view was changed
           "[field:title[" + this.getCurViewHolderRef() + "]] " +
           // maybe a new edgetype was created
-          "[prefix[" + $tw.taskgraph.opt.tw["edgesPrefix"] + "]] " +
+          "[prefix[" + $tw.taskgraph.opt.tw.prefix.edges + "]] " +
           // view property was changed
           "[field:title[" + this.getCurView().fields.title + "]] " +
           // everything that has to do with the editor

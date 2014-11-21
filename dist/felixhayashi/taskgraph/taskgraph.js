@@ -154,7 +154,8 @@ for the mode-dependent TaskGraphWidgets.
        
     console.info("will open a dialog for creating an edge");
     
-    var skeleton = this.wiki.getTiddler($tw.taskgraph.opt.tw.template.getEdgeType);
+    // TODO: option paths seriously need some refactoring!
+    var skeleton = this.wiki.getTiddler($tw.taskgraph.opt.tw.template.dialog.getEdgeType);
     var fields = {
       fromLabel : this.adapter.selectNodeFromStoreById(data.from).label,
       toLabel : this.adapter.selectNodeFromStoreById(data.to).label,
@@ -243,6 +244,8 @@ for the mode-dependent TaskGraphWidgets.
  
     // https://github.com/Jermolene/TiddlyWiki5/blob/master/boot/boot.js#L761
     var dialogTiddler = new $tw.Tiddler(skeleton, fields, dialogFields);
+    console.debug("A dialog will be opened based on the following tiddler:");
+    console.debug(dialogTiddler);
     
     // https://github.com/Jermolene/TiddlyWiki5/blob/master/boot/boot.js#L841
     this.wiki.addTiddler(dialogTiddler);
@@ -267,10 +270,7 @@ for the mode-dependent TaskGraphWidgets.
       utils.deleteTiddlers([dialogFields.title, dialogFields.output, dialogFields.result]);
       
     }.bind(this), true);
-        
-    console.debug("A dialog will be opened based on the following tiddler:");
-    console.debug(dialogTiddler);
-    
+            
     this.dispatchEvent({
       type: "tm-modal", param : dialogTiddler.fields.title, paramObject: dialogTiddler.fields
     }); 
@@ -279,17 +279,22 @@ for the mode-dependent TaskGraphWidgets.
   
   /**
    * Promts a dialog that will confront the user with making a tough choice :)
+   * @callback a function with the signature function(isConfirmed)
+   * @message an optional message
    */
-  TaskGraphWidget.prototype.openStandardConfirmDialog = function(callback) {
+  TaskGraphWidget.prototype.openStandardConfirmDialog = function(callback, message) {
   
-      this.openDialog(null, {
-        subtitle : "Really proceeed?",
-        text : "You must confirm in order to proceed.",
-        confirmButtonLabel: "Yes mom, I know what I'm doing!",
-        cancelButtonLabel: "Uuups, hell no!"
-      }, callback);
+    // TODO: option paths seriously need some refactoring!
+    var tRef = $tw.taskgraph.opt.tw.template.dialog.getConfirmation;
+    var dialogSkeletonTObj = this.wiki.getTiddler(tRef);
+    var vars = {
+      message : message,
+      confirmButtonLabel: "Yes mom, I know what I'm doing!",
+      cancelButtonLabel: "Uuups, hell no!"
+    };
     
-    }
+    this.openDialog(dialogSkeletonTObj, vars, callback);
+  };
   
   /**
    * Wrapper class which is similar to a Factory, except that it returns

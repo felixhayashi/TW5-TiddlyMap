@@ -40,18 +40,32 @@
         "title": "$:/plugins/felixhayashi/taskgraph/connectButton",
         "tags": [ "$:/tags/ViewToolbar", "$:/tags/EditToolbar" ]
     }},
+    
+    
+    
     {
-      "file": "dialogs/specify_relation.tid", "fields": {
+      "file": "dialogs/dialog_specify_relation.tid", "fields": {
         "title": "$:/plugins/felixhayashi/taskgraph/dialog/getEdgeType",
-        "subtitle" : "Please specify a relationship type",
-        "footer" : ""
+        "subtitle" : "Please specify a relationship type"
     }},
     {
-      "file": "dialogs/clone_view.tid", "fields": {
+      "file": "dialogs/dialog_specify_view_name.tid", "fields": {
         "title": "$:/plugins/felixhayashi/taskgraph/dialog/getViewName",
-        "subtitle" : "Cloning the current view",
-        "footer" : ""
+        "subtitle" : "Please specify a view name"
     }},
+    {
+      "file": "dialogs/dialog_confirm_choice.tid", "fields": {
+        "title": "$:/plugins/felixhayashi/taskgraph/dialog/getConfirmation",
+        "subtitle" : "You must confirm in order to proceed!"
+    }},
+    {
+      "file": "dialogs/dialog_cannot_delete_view.tid", "fields": {
+        "title": "$:/plugins/felixhayashi/taskgraph/dialog/notAllowedToDeleteView",
+        "subtitle" : "You cannot delete the view!"
+    }},
+    
+    
+    
     {
       "file": "standard_dialog_footer.tid", "fields": {
         "title": "$:/plugins/felixhayashi/taskgraph/dialog/standardFooter"

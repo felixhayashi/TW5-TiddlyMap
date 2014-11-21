@@ -119,7 +119,7 @@
   "maxVelocity": 30,
   "minVelocity": 0.1,
   "stabilize": true,
-  "stabilizationIterations": 5000,
+  "stabilizationIterations": 1000,
   "locale": "en_EN",
   "locales": {
     "en_EN": {

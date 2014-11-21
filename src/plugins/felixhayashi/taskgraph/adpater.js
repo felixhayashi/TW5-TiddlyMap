@@ -100,7 +100,7 @@ Adapter.prototype.createNode = function(position, taskgraph) {
 Adapter.prototype.insertEdgeIntoStore = function(edge) {
   
   var label = edge.label;
-  var storeRef = $tw.taskgraph.opt.tw.edgesPrefix + "/" + label;
+  var storeRef = $tw.taskgraph.opt.tw.prefix.edges + "/" + label;
     
   var records = this.wiki.getTiddlerData(storeRef, []);
   
@@ -274,7 +274,7 @@ Adapter.prototype.deleteEdgesFromStore = function(edges) {
     if(typeof edges[i] != "object") continue;
     
     var label = edges[i].label;
-    var storeRef = $tw.taskgraph.opt.tw.edgesPrefix + "/" + label;
+    var storeRef = $tw.taskgraph.opt.tw.prefix.edges + "/" + label;
     
     if(!(storeRef in prep)) {
       prep[storeRef] = {
@@ -373,7 +373,7 @@ Adapter.prototype.getCompiledEdgeFilter = function(doRecompile) {
   var filter = (function() {
     var filterComponents = [];
     // only tiddlers with this prefix
-    filterComponents.push("prefix[" + $tw.taskgraph.opt.tw.edgesPrefix + "]");
+    filterComponents.push("prefix[" + $tw.taskgraph.opt.tw.prefix.edges + "]");
     // no drafts
     filterComponents.push("!has[draft.of]");
     if(this.curView) {
@@ -384,7 +384,7 @@ Adapter.prototype.getCompiledEdgeFilter = function(doRecompile) {
         var tags = tObj.fields.tags;
         var consideredTags = tags ? tags : [];
         for(var i = 0; i < consideredTags.length; i++) {
-          filterComponents.push("!prefix[" + $tw.taskgraph.opt.tw.edgesPrefix + "/" + consideredTags[i] + "]"); // TODO: once jeremy added inverted features, turn this into the opposite
+          filterComponents.push("!prefix[" + $tw.taskgraph.opt.tw.prefix.edges + "/" + consideredTags[i] + "]"); // TODO: once jeremy added inverted features, turn this into the opposite
         }
       }
     }

@@ -64,15 +64,26 @@ say here is: do not require the caretaker!
       opt.tw.dialogStandardFooter = "$:/plugins/felixhayashi/taskgraph/dialog/standardFooter";
       
       // templates used e.g. for dialogs
+      // TODO only use prefix and append dialog name
       opt.tw.template = {};
-        opt.tw.template.getEdgeType = "$:/plugins/felixhayashi/taskgraph/dialog/getEdgeType";
-        opt.tw.template.getViewName = "$:/plugins/felixhayashi/taskgraph/dialog/getViewName";
+        opt.tw.template.dialog = {};
+          opt.tw.template.dialog.getEdgeType = "$:/plugins/felixhayashi/taskgraph/dialog/getEdgeType";
+          opt.tw.template.dialog.getViewName = "$:/plugins/felixhayashi/taskgraph/dialog/getViewName";
+          opt.tw.template.dialog.getConfirmation = "$:/plugins/felixhayashi/taskgraph/dialog/getConfirmation";
+          opt.tw.template.dialog.notAllowedToDeleteView = "$:/plugins/felixhayashi/taskgraph/dialog/notAllowedToDeleteView";
+          
+          
       
       // be careful! these prefixes are also used as paths!
-      opt.tw.edgesPrefix = "$:/plugins/felixhayashi/taskgraph/graph/edges";
-      opt.tw.viewsPrefix = "$:/plugins/felixhayashi/taskgraph/graph/views";
+      // !!! NO TRAILING SLASH EVER !!!
+      opt.tw.prefix = {}
+        opt.tw.prefix.edges = "$:/plugins/felixhayashi/taskgraph/graph/edges";
+        opt.tw.prefix.views = "$:/plugins/felixhayashi/taskgraph/graph/views";
+        opt.tw.prefix.localHolders = "$:/temp/taskgraph/holders"
+      
       
       opt.tw.defaultGraphViewHolder = "$:/plugins/felixhayashi/taskgraph/defaultGraphViewHolder";
+      
       
       opt.tw.graphBar = "$:/plugins/felixhayashi/taskgraph/ui/graphBar";
       
@@ -86,9 +97,9 @@ say here is: do not require the caretaker!
       
       // filters are mostly retrived from withing tiddlers via the taskgraph macro
       opt.tw.filters = {};
-        opt.tw.filters.allEdgesByLabel = "[prefix[" + opt.tw["edgesPrefix"] + "]removeprefix[" + opt.tw.edgesPrefix + "/]]";
+        opt.tw.filters.allEdgesByLabel = "[prefix[" + opt.tw.prefix.edges + "]removeprefix[" + opt.tw.prefix.edges + "/]]";
         opt.tw.filters.allViews = "[all[tiddlers+shadows]has[" + opt.tw.fields.viewMarker + "]]";
-        opt.tw.filters.allViewsByLabel = "[all[tiddlers+shadows]has[" + opt.tw.fields.viewMarker + "]removeprefix[" + opt.tw.viewsPrefix + "/]]";
+        opt.tw.filters.allViewsByLabel = "[all[tiddlers+shadows]has[" + opt.tw.fields.viewMarker + "]removeprefix[" + opt.tw.prefix.views + "/]]";
         
     return opt;
     

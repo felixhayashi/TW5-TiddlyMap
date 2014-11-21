@@ -4,14 +4,13 @@
 
 # Automatic cleanup of non-existant edges at startup
 # add isValidFieldName checks
-# use wiki.tiddlerExists() (see boot/boot.js) to check if (non-shadow) tiddler is in the system instead of wiki.getTiddler()
 # debug mode option in the config that enables debug messages
 # deleteting views
-# make relations system tiddlers
+
 
 !!!! Version 0.5.0
 
-# prevent that edges clutch together at the beginning.
+# prevent that edges clutch together at the beginning [ done: 2014-11-21 ] 
 # When a doubleclick on the canvas is traced, create a node exactly on that spot [ done: 2014-11-19 ]
 # Dropdown list of actions with icons that comply with tw's icons and meanings [ done: 2014-11-19 ]
 # Save positions on dragend event and update all graphs that use the same view [ done: 2014-11-18 ]
@@ -22,6 +21,7 @@
 # allow the user to bind new edges to a certain view during dialog [ done: 2014-11-20 ]
 # remember option for edge binding [ done: 2014-11-20 ]
 # edge filter with selectboxes [ done: 2014-11-20 ]
+# make relations system tiddlers that do not spam the user's namespace [ done: 2014-11-19 ]
 
 !!!! Version 0.4.0  [ released: 2014-11-10 ]
 

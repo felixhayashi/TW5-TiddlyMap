@@ -30,5 +30,5 @@ Views:
 
 <sup>[1]</sup> <small>Please note that the name of the relationship type is case sensitive.</small>
 <br />
-<sup>[2]</sup> <small>By selecting a particular view, you bind that edge to the view, which means the relationship is exclusively displayed in that view.</small>
+<sup>[2]</sup> <small>By selecting a particular view, you bind that edge to the view, which means the relationship is exclusively displayed in that view. Note, that if you chose a view which is not the current view, the edge will not be visible.</small>
 

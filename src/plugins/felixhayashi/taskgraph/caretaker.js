@@ -10,7 +10,7 @@ Since changes in configuration tiddlers are instantly acknowledged,
 the user does not need to refresh its browser (in theory :)).
 
 Like a caretaker in real life, nobody can communicate with him. He does
-all his work in the background without being every seen. What I want to
+all his work in the background without being ever seen. What I want to
 say here is: do not require the caretaker!
 
 \*/

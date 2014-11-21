@@ -743,7 +743,11 @@ exports.getClass = function(constrObj) {
       // we do not call the callback of the network as we handle it ourselves
       this.handleConnectionEvent(data);
     }.bind(this);
-           
+    
+    options.onAdd = function(data,callback) {
+      this.adapter.createNode(data, this);
+    }.bind(this);
+
     options.dataManipulation = {
         enabled : (this.getAttribute("editor") ? true : false),
         initiallyVisible : true

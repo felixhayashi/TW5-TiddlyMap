@@ -484,26 +484,19 @@ Adapter.prototype.storePositions = function(positions) {
  */
 Adapter.prototype.setupTiddler = function(tObj) {
   
-  console.debug("Trying to setup tiddler \"" + tObj.fields.title + "\"");
-  
   var modFields = undefined;
   
-  var idField = $tw.taskgraph.opt.tw.fields.id;
-  console.debug("Current id field is " + idField);    
+  var idField = $tw.taskgraph.opt.tw.fields.id; 
   if(!(idField in tObj.fields) || !tObj.fields[idField]) {
     modFields = modFields ? modFields : {};
-    console.debug("Automatically add an id");
     modFields[idField] = vis.util.randomUUID();
   }
   
   if(modFields) {
-    console.debug("Updating tiddler with fields:");
-    console.debug(modFields);
     var updatedTObj = new $tw.Tiddler(tObj, modFields);
     $tw.wiki.addTiddler(updatedTObj);
     return updatedTObj;
   } else  {
-    console.debug("Tiddler is already up to date");
     return tObj;
   }
   

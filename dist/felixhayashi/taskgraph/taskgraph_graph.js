@@ -97,8 +97,7 @@ exports.getClass = function(constrObj) {
           tiddler : { type : "string", value : this.getCurView().fields.title }
         },
         children : [{
-          type : "transclude",
-          tiddler : { type : "string", value : this.getCurView().fields.title }
+          type : "transclude"
         }]
     };
     
@@ -369,6 +368,8 @@ exports.getClass = function(constrObj) {
    */
   TaskGraphWidget.prototype.reloadGraphData = function(reloadOnlyEdges) {
     
+    console.log("reload graph data");
+    
     // update adapter
     this.adapter.setView(this.curView);
     
@@ -376,8 +377,8 @@ exports.getClass = function(constrObj) {
     if(!reloadOnlyEdges) { this.nodes = this.adapter.selectNodesFromStore(); }
     this.edges = this.adapter.selectEdgesFromStore();
     
-    // restore the physics to allow the graph to render itself
-    this.network.setOptions(this.graphOptions.physics);
+    //~ // restore the physics to allow the graph to render itself
+    //~ this.network.setOptions();
     
     //
     this.hasNetworkStabilized = false;
@@ -387,6 +388,9 @@ exports.getClass = function(constrObj) {
       nodes : this.nodes,
       edges : this.edges
     });
+    
+    // set options after setting the data!
+    this.network.setOptions({ physics : this.graphOptions.physics });
     
   }
   
@@ -500,7 +504,15 @@ exports.getClass = function(constrObj) {
   TaskGraphWidget.prototype.handleStabilizedEvent = function(properties) {  
     if(!this.hasNetworkStabilized) {
       console.debug("will now disable physics");
-      this.network.setOptions({physics: {barnesHut: {gravitationalConstant: 0, centralGravity: 0, springConstant: 0}}});
+      this.network.setOptions({
+        physics : {
+          barnesHut : {
+            gravitationalConstant: 0,
+            centralGravity: 0,
+            springConstant: 0
+          }
+        }
+      });
       this.hasNetworkStabilized = true;
     }
   };

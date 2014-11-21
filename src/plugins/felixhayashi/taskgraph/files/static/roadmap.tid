@@ -3,12 +3,9 @@
 !!!! Version 0.6.0
 
 # Automatic cleanup of non-existant edges at startup
-# add isValidFieldName checks
-# debug mode option in the config that enables debug messages
-# deleteting views
+# add isValidFieldName checks everywhere
 
-
-!!!! Version 0.5.0
+!!!! Version 0.5.0 [ released: 2014-11-21 ]
 
 # prevent that edges clutch together at the beginning [ done: 2014-11-21 ] 
 # When a doubleclick on the canvas is traced, create a node exactly on that spot [ done: 2014-11-19 ]
@@ -22,6 +19,9 @@
 # remember option for edge binding [ done: 2014-11-20 ]
 # edge filter with selectboxes [ done: 2014-11-20 ]
 # make relations system tiddlers that do not spam the user's namespace [ done: 2014-11-19 ]
+# allow deletion of views. [ done: 2014-11-21 ]
+# allow creating empty views (not just clones) [ done: 2014-11-21 ]
+# debug mode option in the config that enables debug messages [ done: 2014-11-21 ]
 
 !!!! Version 0.4.0  [ released: 2014-11-10 ]
 

@@ -118,7 +118,7 @@ say here is: do not require the caretaker!
       return "[" + filterComponents.join('') + "]";
     }).call(this);
     
-    console.log("caretaker-filter \"" + filter + "\"");
+    if($tw.taskgraph.opt.tw.debug) console.log("caretaker-filter \"" + filter + "\"");
     
     return $tw.wiki.compileFilter(filter);
 
@@ -126,12 +126,12 @@ say here is: do not require the caretaker!
 
   exports.startup = function() {
 
-    console.log("register namespace and globals");
-
     // create namespace
     $tw.taskgraph = {};
     // register options
     $tw.taskgraph.opt = getOptions();
+    
+    if($tw.taskgraph.opt.tw.debug) console.log("registered namespace and options");
     
     // Create an array to insert edge changes.
     //

@@ -114,8 +114,8 @@ Adapter.prototype.insertEdgeIntoStore = function(edge) {
   // deleting it and adding it later to the object again is more conveniant than deep copying the object
   delete edge.label
   
-  console.info("the following edge of type \"" + label + "\" will be inserted into the store  \"" + storeRef + "\"");
-  console.log(JSON.stringify(edge));
+  if($tw.taskgraph.opt.tw.debug) console.info("the following edge of type \"" + label + "\" will be inserted into the store  \"" + storeRef + "\"");
+  if($tw.taskgraph.opt.tw.debug) console.log(JSON.stringify(edge));
     
   // add edge to to array of existing edges
   records.push(edge);
@@ -150,7 +150,7 @@ Adapter.prototype.getEdgeChanges = function() {
    
   var edgeFilter = this.curView ? this.curView.fields.displayedRelation : undefined;
   
-  console.log("graph with edgeFilter " + edgeFilter + " requested to get informed about edge changes");
+  if($tw.taskgraph.opt.tw.debug) console.log("graph with edgeFilter " + edgeFilter + " requested to get informed about edge changes");
   
   var changes = [];
   for(; this.edgeChangePointer < $tw.taskgraph.edgeChanges.length; this.edgeChangePointer++) {
@@ -163,8 +163,8 @@ Adapter.prototype.getEdgeChanges = function() {
     
     if(matchesEdgeFilter && allowedInContext) {
       
-      console.log("reading edge change");
-      console.log(change);
+      if($tw.taskgraph.opt.tw.debug) console.log("reading edge change");
+      if($tw.taskgraph.opt.tw.debug) console.log(change);
       
       changes.push(change);
     }
@@ -260,8 +260,8 @@ Adapter.prototype.deleteEdgesFromStore = function(edges) {
 
   if(!edges || !edges.length) return;
   
-  console.info("the following edges will be deleted from store");
-  console.debug(edges);
+  if($tw.taskgraph.opt.tw.debug) console.info("the following edges will be deleted from store");
+  if($tw.taskgraph.opt.tw.debug) console.debug(edges);
       
   // prep object holds (1) the parsed JSON extracted from the store
   // and (2) the edges that are to be deleted
@@ -349,7 +349,7 @@ Adapter.prototype.getCompiledNodeFilter = function(doRecompile) {
     return "[" + filterComponents.join('') + "]";
   }).call(this);
   
-  console.debug("node-filter \"" + filter + "\" created" );
+  if($tw.taskgraph.opt.tw.debug) console.debug("node-filter \"" + filter + "\" created" );
   
   return this.wiki.compileFilter(filter);
 
@@ -391,7 +391,7 @@ Adapter.prototype.getCompiledEdgeFilter = function(doRecompile) {
     return "[" + filterComponents.join('') + "]";
   }).call(this);
   
-  console.debug("edge-filter \"" + filter + "\"" );
+  if($tw.taskgraph.opt.tw.debug) console.debug("edge-filter \"" + filter + "\"" );
   
   return this.wiki.compileFilter(filter);
 
@@ -463,11 +463,11 @@ Adapter.prototype.restorePositions = function(nodes) {
 Adapter.prototype.storePositions = function(positions) {
   
   if(!this.curView) {
-    console.warn("no view specified. will not store positions");
+    if($tw.taskgraph.opt.tw.debug) console.warn("no view specified. will not store positions");
     return;
   }
   
-  console.log("storing positions of \"" + this.curView.fields.title + "\"");
+  if($tw.taskgraph.opt.tw.debug) console.log("storing positions of \"" + this.curView.fields.title + "\"");
   
   var title = this.curView.fields.title + "/map";
   this.wiki.setTiddlerData(title, positions);

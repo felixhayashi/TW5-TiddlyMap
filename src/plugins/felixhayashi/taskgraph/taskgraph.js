@@ -83,7 +83,7 @@ for the mode-dependent TaskGraphWidgets.
    *    it himself. Defaults to true.
    */
   TaskGraphWidget.prototype.registerCallback = function(tiddlerTitle, callback, deleteOnCall) {
-    console.debug("the callback was registered for changes on \"" + tiddlerTitle + "\"");
+    if($tw.taskgraph.opt.tw.debug) console.debug("the callback was registered for changes on \"" + tiddlerTitle + "\"");
     this.dialogCallbacks[tiddlerTitle] = {
       execute : callback,
       deleteOnCall : (typeof deleteOnCall == "Boolean" ? deleteOnCall : true)
@@ -96,7 +96,7 @@ for the mode-dependent TaskGraphWidgets.
    */
   TaskGraphWidget.prototype.removeCallback = function(t) {
     if(t in this.dialogCallbacks) {
-      console.debug("callback for \"" + t + "\" will be deleted");
+      if($tw.taskgraph.opt.tw.debug) console.debug("callback for \"" + t + "\" will be deleted");
       delete this.dialogCallbacks[t];
     }
   }
@@ -113,7 +113,7 @@ for the mode-dependent TaskGraphWidgets.
   TaskGraphWidget.prototype.checkForCallbacks = function(changedTiddlers) {
     
     if(this.dialogCallbacks.length == 0) {
-      console.debug("no registered callbacks exist at the moment");
+      if($tw.taskgraph.opt.tw.debug) console.debug("no registered callbacks exist at the moment");
       return;
     }
     
@@ -124,7 +124,7 @@ for the mode-dependent TaskGraphWidgets.
       // TODO: better use tiddler.exists() function or how is it called?
       if(this.wiki.getTiddler(t)) {
         
-        console.debug("the callback for \"" + t + "\" will be executed");
+        if($tw.taskgraph.opt.tw.debug) console.debug("the callback for \"" + t + "\" will be executed");
         this.dialogCallbacks[t].execute(t);
         
         // a continue prevents deleting the callback
@@ -152,7 +152,7 @@ for the mode-dependent TaskGraphWidgets.
    */
   TaskGraphWidget.prototype.handleConnectionEvent = function(data, callback) {
        
-    console.info("will open a dialog for creating an edge");
+    if($tw.taskgraph.opt.tw.debug) console.info("will open a dialog for creating an edge");
     
     // TODO: option paths seriously need some refactoring!
     var skeleton = this.wiki.getTiddler($tw.taskgraph.opt.tw.template.dialog.getEdgeType);
@@ -163,7 +163,7 @@ for the mode-dependent TaskGraphWidgets.
       rememberViewBindingChoice : ($tw.taskgraph.opt.tw.defaultViewBindingChoice ? "true" : "false")
     };
     
-    console.log(fields);
+    if($tw.taskgraph.opt.tw.debug) console.log(fields);
     
     this.openDialog(skeleton, fields, function(isConfirmed, outputTObj) {
     
@@ -171,10 +171,10 @@ for the mode-dependent TaskGraphWidgets.
     
         if(isSuccess) {
           var text = outputTObj.fields.text;
-          console.debug("the edgetype is set to: " + text);        
+          if($tw.taskgraph.opt.tw.debug) console.debug("the edgetype is set to: " + text);        
           data.label = text;
           
-          console.log(outputTObj.fields);
+          if($tw.taskgraph.opt.tw.debug) console.log(outputTObj.fields);
           
           if(outputTObj.fields.view) {
             data.view = outputTObj.fields.view;
@@ -229,7 +229,7 @@ for the mode-dependent TaskGraphWidgets.
   */
   TaskGraphWidget.prototype.openDialog = function(skeleton, fields, callback) {
     
-    console.debug("creating a dialog");
+    if($tw.taskgraph.opt.tw.debug) console.debug("creating a dialog");
         
     var uuid = vis.util.randomUUID();
     var dialogFields = {
@@ -244,8 +244,8 @@ for the mode-dependent TaskGraphWidgets.
  
     // https://github.com/Jermolene/TiddlyWiki5/blob/master/boot/boot.js#L761
     var dialogTiddler = new $tw.Tiddler(skeleton, fields, dialogFields);
-    console.debug("A dialog will be opened based on the following tiddler:");
-    console.debug(dialogTiddler);
+    if($tw.taskgraph.opt.tw.debug) console.debug("A dialog will be opened based on the following tiddler:");
+    if($tw.taskgraph.opt.tw.debug) console.debug(dialogTiddler);
     
     // https://github.com/Jermolene/TiddlyWiki5/blob/master/boot/boot.js#L841
     this.wiki.addTiddler(dialogTiddler);
@@ -314,14 +314,14 @@ for the mode-dependent TaskGraphWidgets.
 
       var constrObj = new TaskGraphWidget(parseTreeNode, options);
       
-      console.debug("Require class for mode \"" + mode.value + "\"");
+      if($tw.taskgraph.opt.tw.debug) console.debug("Require class for mode \"" + mode.value + "\"");
       var TaskgraphMode = require("$:/plugins/felixhayashi/taskgraph/taskgraph_" + mode.value + ".js")
                            .getClass(constrObj);
       
       
-      console.warn("Initializing a taskgraph widget in mode \"" + mode.value + "\"");
+      if($tw.taskgraph.opt.tw.debug) console.warn("Initializing a taskgraph widget in mode \"" + mode.value + "\"");
       var modeObject = new TaskgraphMode(parseTreeNode, options);
-      console.info("Done initializing a taskgraph widget");
+      if($tw.taskgraph.opt.tw.debug) console.info("Done initializing a taskgraph widget");
             
       return modeObject;
       

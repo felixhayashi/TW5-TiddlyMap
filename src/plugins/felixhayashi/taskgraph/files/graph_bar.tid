@@ -41,7 +41,7 @@
     <div class="tc-drop-down">
       <$list filter=<<tgmacro "option" "tw.filters.allEdgesByLabel">> variable="item" >
         <$checkbox invert="true" tiddler=<<getEdgeFilterTRef>> tag=<<item>> >
-          Hide <<item>>
+          Hide "<<item>>"
         </$checkbox><br />
       </$list>
     </div>

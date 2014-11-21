@@ -63,6 +63,9 @@ say here is: do not require the caretaker!
       opt.tw.dialogResultPrefix = opt.tw.dialogPrefix + "result-";
       opt.tw.dialogStandardFooter = "$:/plugins/felixhayashi/taskgraph/dialog/standardFooter";
       
+      // if no edge label is specified, this is used as label
+      if(!opt.tw.unknownEdgeLabel) { opt.tw.unknownEdgeLabel = "?"; }
+      
       // templates used e.g. for dialogs
       // TODO only use prefix and append dialog name
       opt.tw.template = {};
@@ -91,8 +94,8 @@ say here is: do not require the caretaker!
       opt.tw.fields = {};
         // used to identify a tiddler as view.
         opt.tw.fields.viewMarker = "isview";
-        // used to identify a tiddler and used as node id. default value is taken from user options
         opt.tw.fields.id = (opt.tw.field_nodeId ? opt.tw.field_nodeId : "id");
+
         
       
       // filters are mostly retrived from withing tiddlers via the taskgraph macro

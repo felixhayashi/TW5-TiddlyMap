@@ -148,7 +148,7 @@ for the mode-dependent TaskGraphWidgets.
    * 
    * @data a javascript object that contains at least the properties
    *    "from", "to" and "label"
-   * @callback an optional function with the signature function(isSuccess);
+   * @callback an optional function with the signature function(isConfirmed);
    */
   TaskGraphWidget.prototype.handleConnectionEvent = function(data, callback) {
        
@@ -156,29 +156,38 @@ for the mode-dependent TaskGraphWidgets.
     
     // TODO: option paths seriously need some refactoring!
     var skeleton = this.wiki.getTiddler($tw.taskgraph.opt.tw.template.dialog.getEdgeType);
-    var fields = {
+    var vars = {
       fromLabel : this.adapter.selectNodeFromStoreById(data.from).label,
       toLabel : this.adapter.selectNodeFromStoreById(data.to).label,
       defaultViewBindingChoice : $tw.taskgraph.opt.tw.defaultViewBindingChoice,
       rememberViewBindingChoice : ($tw.taskgraph.opt.tw.defaultViewBindingChoice ? "true" : "false")
     };
     
-    if($tw.taskgraph.opt.tw.debug) console.log(fields);
+    if($tw.taskgraph.opt.tw.debug) console.log(vars);
     
-    this.openDialog(skeleton, fields, function(isConfirmed, outputTObj) {
+    this.openDialog(skeleton, vars, function(isConfirmed, outputTObj) {
     
-        var isSuccess = isConfirmed && outputTObj && outputTObj.fields.text;
-    
-        if(isSuccess) {
-          var text = outputTObj.fields.text;
-          if($tw.taskgraph.opt.tw.debug) console.debug("the edgetype is set to: " + text);        
-          data.label = text;
+        if(isConfirmed) {
           
-          if($tw.taskgraph.opt.tw.debug) console.log(outputTObj.fields);
+          var resultFields = {};
           
-          if(outputTObj.fields.view) {
-            data.view = outputTObj.fields.view;
-            if(outputTObj.fields.rememberViewBindingChoice) {
+          if(outputTObj) {
+            // copy fields (needs to be done as tObj are immutable)
+            for(var p in outputTObj.fields) {
+              resultFields[p] = outputTObj.fields[p];
+            }
+          }
+          
+          if(!resultFields.text) resultFields.text = $tw.taskgraph.opt.tw.unknownEdgeLabel;
+          
+          if($tw.taskgraph.opt.tw.debug) console.debug("the edgetype is set to: " + resultFields.text);        
+          data.label = resultFields.text;
+          
+          if($tw.taskgraph.opt.tw.debug) console.log(resultFields);
+          
+          if(resultFields.view) {
+            data.view = resultFields.view;
+            if(resultFields.rememberViewBindingChoice) {
               var twOptions = $tw.wiki.getTiddlerData("$:/plugins/felixhayashi/taskgraph/options/tw");
               twOptions.defaultViewBindingChoice = data.view;
               this.wiki.setTiddlerData("$:/plugins/felixhayashi/taskgraph/options/tw", twOptions);
@@ -191,7 +200,7 @@ for the mode-dependent TaskGraphWidgets.
         }
         
         if(typeof callback == "function") {
-          callback(isSuccess);
+          callback(isConfirmed);
         }
         
     }.bind(this));

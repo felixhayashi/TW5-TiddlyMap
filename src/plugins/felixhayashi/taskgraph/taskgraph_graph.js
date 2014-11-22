@@ -450,7 +450,7 @@ exports.getClass = function(constrObj) {
         this.setCurView(fields.title);
         
         // past tense :)
-        utils.notify("view " + verb + "d");
+        $tw.taskgraph.fn.notify("view " + verb + "d");
         
       }
 
@@ -463,7 +463,7 @@ exports.getClass = function(constrObj) {
     var viewname = utils.getBasename(tRef);
     
     if(viewname == "default") {
-      utils.notify("Thou shalt not kill the default view!");
+      $tw.taskgraph.fn.notify("Thou shalt not kill the default view!");
       return;
     }
     $tw.taskgraph.fn.console.log("bla");
@@ -502,7 +502,7 @@ exports.getClass = function(constrObj) {
       utils.deleteTiddlers(utils.getMatches(filter));
 
       // notify the user
-      utils.notify("view \"" + viewname + "\" deleted ");
+      $tw.taskgraph.fn.notify("view \"" + viewname + "\" deleted ");
 
     }.bind(this), message);
     
@@ -517,7 +517,7 @@ exports.getClass = function(constrObj) {
     if(data.edges.length && !data.nodes.length) { // only deleting edges
       this.adapter.deleteEdgesFromStore(this.edges.get(data.edges));
       callback(data);
-      utils.notify("edge" + (data.edges.length > 1 ? "s" : "") + " removed");
+      $tw.taskgraph.fn.notify("edge" + (data.edges.length > 1 ? "s" : "") + " removed");
     }
                         
     if(data.nodes.length) {
@@ -540,7 +540,7 @@ exports.getClass = function(constrObj) {
           this.adapter.deleteNodesFromStore(nodes);
           this.adapter.deleteEdgesFromStore(edges);
           
-          utils.notify("node" + (data.nodes.length > 1 ? "s" : "") + " removed");
+          $tw.taskgraph.fn.notify("node" + (data.nodes.length > 1 ? "s" : "") + " removed");
         
       }.bind(this));
     }     
@@ -550,7 +550,7 @@ exports.getClass = function(constrObj) {
     // this is a flag to tell the current graph not to update itself
     this.isResponsibleForMapModification = true;
     this.adapter.storePositions(this.network.getPositions());
-    utils.notify("positions stored");
+    $tw.taskgraph.fn.notify("positions stored");
   }
 
   /**
@@ -735,7 +735,7 @@ exports.getClass = function(constrObj) {
     
     if(!this.wiki.tiddlerExists(curViewRef)) {
       $tw.taskgraph.fn.console.log("Warning: View \"" + curViewRef + "\" doesn't exist. Default is used instead.");
-      //utils.notify("Warning: View \"" + curViewRef + "\" doesn't exist. Default is used instead.");
+      //$tw.taskgraph.fn.notify("Warning: View \"" + curViewRef + "\" doesn't exist. Default is used instead.");
       curViewRef = $tw.taskgraph.opt.tw.prefix.views + "/default";
     }
     

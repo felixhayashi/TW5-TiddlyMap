@@ -196,7 +196,7 @@ for the mode-dependent TaskGraphWidgets.
           
           // persist
           this.adapter.insertEdgeIntoStore(data);  
-          utils.notify("edge added");
+          $tw.taskgraph.fn.notify("edge added");
         }
         
         if(typeof callback == "function") {
@@ -268,7 +268,7 @@ for the mode-dependent TaskGraphWidgets.
         var outputTObj = this.wiki.getTiddler(dialogFields.output);
       } else {
         var outputTObj = null;
-        utils.notify("operation cancelled");
+        $tw.taskgraph.fn.notify("operation cancelled");
       }
       
       if(typeof callback == "function") {

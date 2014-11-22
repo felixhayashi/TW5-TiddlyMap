@@ -96,8 +96,6 @@ say here is: do not require the caretaker!
         opt.tw.fields.viewMarker = "isview";
         opt.tw.fields.id = (opt.tw.field_nodeId ? opt.tw.field_nodeId : "id");
 
-        
-      
       // filters are mostly retrived from withing tiddlers via the taskgraph macro
       opt.tw.filters = {};
         opt.tw.filters.allEdgesByLabel = "[prefix[" + opt.tw.prefix.edges + "]removeprefix[" + opt.tw.prefix.edges + "/]]";
@@ -114,12 +112,25 @@ say here is: do not require the caretaker!
   var getFunctions = function(opt) {
     
     var fn = {};
+    
+    var nirvana = function() { /* /dev/null */ };
+    
     if(opt.tw.debug) {
       fn.console = console;
     } else {
-      var f = function() { /* /dev/null */ };
-      fn.console = { log: f, debug: f, warn: f, error: f, info: f };
-    } 
+      
+      fn.console = {
+        log: nirvana,
+        debug: nirvana,
+        warn: nirvana,
+        error: nirvana,
+        info: nirvana
+      };
+      
+    }
+    
+    fn.notify = (opt.tw.notifications ? utils.notify : nirvana);
+    
     return fn;
     
   };

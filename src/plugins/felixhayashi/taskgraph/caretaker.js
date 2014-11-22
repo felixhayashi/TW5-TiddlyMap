@@ -106,7 +106,23 @@ say here is: do not require the caretaker!
         
     return opt;
     
-  }
+  };
+  
+  /**
+   * singletons like logger
+   */
+  var getFunctions = function(opt) {
+    
+    var fn = {};
+    if(opt.tw.debug) {
+      fn.console = console;
+    } else {
+      var f = function() { /* /dev/null */ };
+      fn.console = { log: f, debug: f, warn: f, error: f, info: f };
+    } 
+    return fn;
+    
+  };
   
   var getChangeFilter = function() {
     
@@ -121,20 +137,22 @@ say here is: do not require the caretaker!
       return "[" + filterComponents.join('') + "]";
     }).call(this);
     
-    if($tw.taskgraph.opt.tw.debug) console.log("caretaker-filter \"" + filter + "\"");
+    $tw.taskgraph.fn.console.log("caretaker-filter \"" + filter + "\"");
     
     return $tw.wiki.compileFilter(filter);
 
   };
 
   exports.startup = function() {
-
+    
     // create namespace
     $tw.taskgraph = {};
     // register options
     $tw.taskgraph.opt = getOptions();
+    // used for global functions
+    $tw.taskgraph.fn = getFunctions($tw.taskgraph.opt);
     
-    if($tw.taskgraph.opt.tw.debug) console.log("registered namespace and options");
+    $tw.taskgraph.fn.console.log("registered namespace and options");
     
     // Create an array to insert edge changes.
     //
@@ -162,8 +180,9 @@ say here is: do not require the caretaker!
       var matches = utils.getMatches(filter, changedTiddlers);
       if(!matches.length) return;
       
-      // rebuild options
+      // rebuild
       $tw.taskgraph.opt = getOptions();
+      $tw.taskgraph.fn = getFunctions($tw.taskgraph.opt);
       
     });
         

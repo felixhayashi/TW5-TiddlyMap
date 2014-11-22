@@ -88,18 +88,18 @@ for the mode-dependent TaskGraphWidgets.
       execute : callback,
       deleteOnCall : (typeof deleteOnCall == "Boolean" ? deleteOnCall : true)
     }
-  }
+  };
   
   /**
    * Removes the callback from the list of tiddler callbacks.
    * @see registerCallback
    */
-  TaskGraphWidget.prototype.removeCallback = function(t) {
-    if(t in this.dialogCallbacks) {
-      $tw.taskgraph.fn.console.debug("callback for \"" + t + "\" will be deleted");
-      delete this.dialogCallbacks[t];
+  TaskGraphWidget.prototype.removeCallback = function(tRef) {
+    if(tRef in this.dialogCallbacks) {
+      $tw.taskgraph.fn.console.debug("callback for \"" + tRef + "\" will be deleted");
+      delete this.dialogCallbacks[tRef];
     }
-  }
+  };
   
   /**
    * this method has to be implemented at the top of any widget's
@@ -117,22 +117,21 @@ for the mode-dependent TaskGraphWidgets.
       return;
     }
     
-    for(var t in changedTiddlers) {
+    for(var tRef in changedTiddlers) {
       
-      if(!(t in this.dialogCallbacks)) continue;
+      if(!(tRef in this.dialogCallbacks)) continue;
       
-      // TODO: better use tiddler.exists() function or how is it called?
-      if(this.wiki.getTiddler(t)) {
+      if(this.wiki.tiddlerExists(tRef)) {
         
-        $tw.taskgraph.fn.console.debug("the callback for \"" + t + "\" will be executed");
-        this.dialogCallbacks[t].execute(t);
+        $tw.taskgraph.fn.console.debug("the callback for \"" + tRef + "\" will be executed");
+        this.dialogCallbacks[tRef].execute(tRef);
         
         // a continue prevents deleting the callback
         if(!this.dialogCallbacks.deleteOnCall) continue;
         
       }
       
-      this.removeCallback(t);
+      this.removeCallback(tRef);
       
     }
   }

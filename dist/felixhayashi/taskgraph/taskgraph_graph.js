@@ -367,6 +367,9 @@ exports.getClass = function(constrObj) {
       this.network.on("stabilized", this.handleStabilizedEvent.bind(this));
     }
     
+    // repaint when sidebar is hidden
+    this.registerCallback("$:/state/sidebar", this.repaintGraph.bind(this), false);
+    
     this.network.on("dragEnd", function(properties) {
       if(properties.nodeIds.length) {
         this.handleStorePositions();
@@ -766,7 +769,7 @@ exports.getClass = function(constrObj) {
         enabled : (this.getAttribute("editor") ? true : false),
         initiallyVisible : true
     };
-    
+        
     options.navigation = {
        enabled : true
     };

@@ -105,7 +105,11 @@ exports.getClass = function(constrObj) {
           tiddler : { type : "string", value : this.getCurView().fields.title }
         },
         children : [{
-          type : "transclude"
+          type : "transclude",
+          attributes : {
+            tiddler : { type : "string", value : "$:/plugins/felixhayashi/taskgraph/ui/graphBar" }
+            //tiddler : { type : "string", value : "$:/core/ui/EditTemplate/tags" }
+          }
         }]
     };
     
@@ -209,6 +213,26 @@ exports.getClass = function(constrObj) {
     var result = utils.getMatches(this.refreshWidgetFilter, changedTiddlers);
     
     if(result.length) {
+      
+      //~ console.log(result);
+      //~ 
+      //~ if(result.indexOf("$:/temp/NewTagName") != -1) {
+        //~ 
+        //~ var tagInput = this.parentDomNode.getElementsByClassName("tc-edit-tags")[0]
+                           //~ .getElementsByTagName("input")[0];
+                           //~ 
+        //~ console.log("active Element");
+        //~ console.log(document.activeElement);
+        //~ console.log("has focus?");
+        //~ console.log(document.hasFocus());
+        //~ console.log("are the same?");
+        //~ console.log(tagInput == document.activeElement);
+                           //~ 
+        //~ if(tagInput == document.activeElement) {
+          //~ return false;
+        //~ }
+        //~ 
+      //~ }
       
       $tw.taskgraph.fn.console.info("the graphbar needs to refresh its widgets");
       
@@ -363,17 +387,29 @@ exports.getClass = function(constrObj) {
     
     // register events
     this.network.on("doubleClick", this.handleDoubleClickEvent.bind(this));
-    if($tw.taskgraph.opt.tw.disablePhysics) {
-      this.network.on("stabilized", this.handleStabilizedEvent.bind(this));
-    }
     
+    this.network.on("stabilized", this.handleStabilizedEvent.bind(this));
+        
     // repaint when sidebar is hidden
     this.registerCallback("$:/state/sidebar", this.repaintGraph.bind(this), false);
     
     this.network.on("dragEnd", function(properties) {
       if(properties.nodeIds.length) {
+        this.nodes.update({
+          id: properties.nodeIds[0],
+          allowedToMoveX: false,
+          allowedToMoveY: false
+        });
         this.handleStorePositions();
       }
+    }.bind(this));
+    
+    this.network.on('dragStart', function(properties) {
+      this.nodes.update({
+        id: properties.nodeIds[0],
+        allowedToMoveX: true,
+        allowedToMoveY: true
+      });
     }.bind(this));
     
     // position the graph
@@ -388,6 +424,11 @@ exports.getClass = function(constrObj) {
    * ATTENTION: Always be sure the adapter's setView is called
    * before the select is made. Otherwise the old view is used as
    * a basis for the select.
+   * 
+   * @see
+   *   - It is possible that the position of network stay the same after I call network.setData(newData);
+   *     https://github.com/almende/vis/issues/376
+   * 
    */
   TaskGraphWidget.prototype.reloadGraphData = function(reloadOnlyEdges) {
     
@@ -400,22 +441,15 @@ exports.getClass = function(constrObj) {
     if(!reloadOnlyEdges) { this.nodes = this.adapter.selectNodesFromStore(); }
     this.edges = this.adapter.selectEdgesFromStore();
     
-    //~ // restore the physics to allow the graph to render itself
-    //~ this.network.setOptions();
-    
-    //
+    // has to be set to disable allowMoveX and Y after stabilized event
     this.hasNetworkStabilized = false;
     
-    // register the new data
     this.network.setData({
       nodes : this.nodes,
       edges : this.edges
     });
-    
-    // set options after setting the data!
-    this.network.setOptions({ physics : this.graphOptions.physics });
-    
-  }
+        
+  };
     
   /**
    * If a template is specified, create a snapshot from the given
@@ -553,24 +587,33 @@ exports.getClass = function(constrObj) {
     // this is a flag to tell the current graph not to update itself
     this.isResponsibleForMapModification = true;
     this.adapter.storePositions(this.network.getPositions());
+    //this.network.storePositions();
     $tw.taskgraph.fn.notify("positions stored");
   }
 
   /**
    * Called by vis when the graph has stabilized itself.
+   * 
+   * ATTENTION: never store positions in a views map during stabilize
+   * as this will affect other graphs positions and will cause recursion!
+   * Storing positions inside vis' nodes is fine though
    */
-  TaskGraphWidget.prototype.handleStabilizedEvent = function(properties) {  
+  TaskGraphWidget.prototype.handleStabilizedEvent = function(properties) {
+    
     if(!this.hasNetworkStabilized) {
-      $tw.taskgraph.fn.console.debug("will now disable physics");
-      this.network.setOptions({
-        physics : {
-          barnesHut : {
-            gravitationalConstant: 0,
-            centralGravity: 0,
-            springConstant: 0
-          }
-        }
-      });
+      
+      var ids = this.nodes.getIds();
+      var updates = [];
+      for(var i = 0; i < ids.length; i++) {
+        updates.push({
+          id: ids[i],
+          allowedToMoveX: false,
+          allowedToMoveY: false
+        });
+      }
+      
+      this.nodes.update(updates);
+      
       this.hasNetworkStabilized = true;
     }
   };

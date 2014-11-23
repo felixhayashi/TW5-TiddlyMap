@@ -503,6 +503,8 @@ Adapter.prototype.setupTiddler = function(tObj) {
 };
 
 /**
+ * This will set the position of the node and prevent the node from moving
+ * 
  * @node an array representing a node
  * @pos x,y coordinates
  */
@@ -510,8 +512,8 @@ Adapter.prototype._addNodePosition = function(node, pos) {
 
   node.x = pos.x;
   node.y = pos.y;
-  node.allowedToMoveX = true;
-  node.allowedToMoveY = true;
+  node.allowedToMoveX = false;
+  node.allowedToMoveY = false;
   
   return node;
       

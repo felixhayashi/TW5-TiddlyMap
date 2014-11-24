@@ -68,11 +68,11 @@ utils.getMatches = function(filter, tRefs) {
 utils.isMatch = function(tiddler, filter) {
   tRef = (typeof tiddler == "string") ? tiddler : tiddler.fields.title;
   return (utils.getMatches(filter, [ tRef ]).length > 0);
-}
+};
 
 utils.getBasename = function(path) {
   return path.substring(path.lastIndexOf('/') + 1);
-}
+};
 
 /**
  * @see
@@ -84,6 +84,17 @@ utils.notify = function(message) {
     title : tRef, text : message
   }));
   $tw.notifier.display(tRef);
-}
+};
+
+utils.getDomNodePos = function(el) {
+  var pos = { x: 0, y: 0 };
+  while(true){
+    pos.x += el.offsetLeft;
+    pos.y += el.offsetTop;
+    if(el.offsetParent === null) break;
+    el = el.offsetParent;
+  }
+  return pos;
+};
 
 exports.utils = utils

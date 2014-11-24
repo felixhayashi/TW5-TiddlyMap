@@ -894,11 +894,10 @@ exports.getClass = function(constrObj) {
   TaskGraphWidget.prototype.maxEnlarge = function(container) {
 
     var windowHeight = window.innerHeight;
-    // https://developer.mozilla.org/en-US/docs/Web/API/element.getBoundingClientRect
-    var canvasOffset = container.getBoundingClientRect().y;
+    var canvasOffset = utils.getDomNodePos(container).y;
     var distanceBottom = 15; // in pixel
     var calculatedHeight = windowHeight - canvasOffset - distanceBottom;
-    
+    console.error(canvasOffset, "bla", container.getBoundingClientRect(), windowHeight, calculatedHeight);
     container.style["height"] = calculatedHeight + "px";
     
   };

@@ -1,0 +1,35 @@
+title: $:/plugins/felixhayashi/taskgraph/dialog/getEdgeType
+subtitle: You are about to connect "<<fromLabel>>" with "<<toLabel>>"
+
+\define getLabel()
+<$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
+\end
+
+''Type'': Please choose an existing relationship type from the list or specify a new one. <sup>[1]</sup>
+
+<!-- "One trap to be aware of is that the edit text widget cannot be used to edit a field of the tiddler that contains it. Each keypress results in the tiddler being re-rendered, which loses the cursor position within the text field." -->
+<$edit-text tiddler=<<output>> field="text" type="text" tag="input" default=""></$edit-text>
+<$select tiddler=<<output>> default="">
+  <option></option>
+    <$list filter=<<tgmacro "option" "tw.filters.allEdgesByLabel">> >
+      <!-- if no value element is specified text is used; see http://dev.w3.org/html5/spec-preview/the-option-element.html -->
+      <option value={{!!title}} >{{!!title}}</option>
+    </$list>
+</$select>
+
+''Scope'': In which view should this connection be visible? <sup>[2]</sup>
+
+Views:
+<$select tiddler=<<output>> field="view" default=<<defaultViewBindingChoice>> >
+   <option value="">all</option>
+   <$list filter=<<tgmacro "option" "tw.filters.allViewsByLabel">> >
+     <option value={{!!title}} >{{!!title}}</option>
+   </$list>
+</$select> <$checkbox tiddler=<<output>> field="rememberViewBindingChoice" default=<<rememberViewBindingChoice>> checked="true" unchecked="false">remember choice</$checkbox>
+
+---
+
+<sup>[1]</sup> <small>Please note that the name of the relationship type is case sensitive.</small>
+<br />
+<sup>[2]</sup> <small>By selecting a particular view, you bind that edge to the view, which means the relationship is exclusively displayed in that view. Note, that if you chose a view which is not the current view, the edge will not be visible.</small>
+

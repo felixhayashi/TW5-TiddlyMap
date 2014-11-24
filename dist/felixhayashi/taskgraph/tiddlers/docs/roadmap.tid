@@ -1,0 +1,70 @@
+title: $:/plugins/felixhayashi/taskgraph/roadmap
+
+!! Taskgraph
+
+!!!! Version 0.6.0
+
+# Automatic cleanup of non-existant edges at startup
+# add isValidFieldName checks everywhere
+
+!!!! Version 0.5.0 [ released: 2014-11-21 ]
+
+# prevent that edges clutch together at the beginning [ done: 2014-11-21 ] 
+# When a doubleclick on the canvas is traced, create a node exactly on that spot [ done: 2014-11-19 ]
+# Dropdown list of actions with icons that comply with tw's icons and meanings [ done: 2014-11-19 ]
+# Save positions on dragend event and update all graphs that use the same view [ done: 2014-11-18 ]
+# notification messages for important events [ done: 2014-11-18 ]
+# after a drop, the viewport gets automatically adjusted (zoomed and nodes centered) [ done: 2014-11-19 ]
+# confirmation for deleting nodes [ done: 2014-11-19 ]
+# deleted nodes are removed from storylist [ done: 2014-11-19 ]
+# allow the user to bind new edges to a certain view during dialog [ done: 2014-11-20 ]
+# remember option for edge binding [ done: 2014-11-20 ]
+# edge filter with selectboxes [ done: 2014-11-20 ]
+# make relations system tiddlers that do not spam the user's namespace [ done: 2014-11-19 ]
+# allow deletion of views. [ done: 2014-11-21 ]
+# allow creating empty views (not just clones) [ done: 2014-11-21 ]
+# debug mode option in the config that enables debug messages [ done: 2014-11-21 ]
+
+!!!! Version 0.4.0  [ released: 2014-11-10 ]
+
+# On doubleclick on the canvas, create a tiddler that automatically matches the current filter (view) [ done: 2014-11-10 ]
+
+!!!! Version 0.3.0 [ released: 2014-11-09 ]
+
+# Enhance the filterbar
+#* Create snapshots of the current views (filters) that can be loaded again [ done: 2014-11-09 ]
+# Embed graphs as widgets in tiddlers based on a saved view (filter) [ done: 2014-11-09 ]
+
+!!!! Version 0.2.0 [ released: 2014-11-07 ]
+
+# Mechanisms to create relationships between nodes (and tiddlers) 
+#* On a graph level:
+#** Draw an edge and select an //existing// edge-type [ done: 2014-10-28 ]
+#** Draw an edge and specify a new type via a textfield [ done: 2014-10-28 ]
+#* On a tiddler level:
+#** Create Edges via memory mechanism (without dragging): click "draw edge from here", wait, "click connect to this node" [ done: 2014-11-04 ]
+# Filterbar to filter the nodes displayed in the graph [ done: 2014-11-06 ]
+# Static graph mode [ done: 2014-11-07 ]
+
+!!!! Version 0.1.0 [ released on 2014-10-27 ]
+
+# Integration into the TW-GUI [ done: 2014-10-25 ]
+# Change node titles when tiddler title changes [ done: 2014-10-26 ]
+# open a node via double-click [ done: 2014-10-25 ]
+# redraw on resize [ done: 2014-10-26 ]
+
+!! Mindmap support
+
+# allow a single node to be marked as "topic". this node will be placed in the center and is given a special color.
+
+!! Ticket system
+
+# color node by importance (calculated e.g. by due date)
+
+!! Known bugs:
+
+# A selected node still listens for keyboard events (like delete button), even if it doesn't posses the focus
+# vis.util.randomUUID() does not produce standard compliant UUIDs; https://github.com/almende/vis/issues/432
+# ~~navigation uses html "id" instead of "class" which prohibits multiple graphs with navigation; https://github.com/almende/vis/issues/438~~ [ solved: 13.11.2014 ]
+# Plugin in connect-button mode loses focus when modal is displayed. (cur fix: at the moment the plugin wrapped around button in the ViewToolbar to track all changes)
+# Stabilization and graph freeze does not work well at the moment

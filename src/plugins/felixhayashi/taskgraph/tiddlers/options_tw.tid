@@ -1,3 +1,6 @@
+title: $:/plugins/felixhayashi/taskgraph/options/tw
+type: application/json
+
 { 
   "field_nodeId" : "id",
   "ticketMarker" : "ticket",

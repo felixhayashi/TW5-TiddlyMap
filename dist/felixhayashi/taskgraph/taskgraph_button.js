@@ -18,7 +18,7 @@ exports.getClass = function(constrObj) {
   var TaskGraphWidget = function(parseTreeNode, options) {
     
     this.addEventListeners([
-      { type: "tw-create-connection", handler: this.handleButtonConnection }
+      { type: "tm-create-connection", handler: this.handleButtonConnection }
     ]);  
 
   };

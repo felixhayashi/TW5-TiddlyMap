@@ -1,0 +1,10 @@
+title: $:/plugins/felixhayashi/taskgraph/dialog/getViewName
+subtitle : Please specify a view name
+
+You are about to <<verb>> a view. Please specify a view name. <sup>[1]</sup>
+
+Name: <$edit-text tiddler=<<output>> field="text" type="text" tag="input" default=""></$edit-text>
+
+---
+
+<sup>[1]</sup> <small>Attention: using the name of an existing view will overwrite it!</small>

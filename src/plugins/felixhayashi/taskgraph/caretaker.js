@@ -140,8 +140,6 @@ say here is: do not require the caretaker!
     
     var filter = (function() {
       var filterComponents = [];
-      // also shadow tiddlers
-      filterComponents.push("all[tiddlers+shadows]");
       // only tiddlers with this prefix
       filterComponents.push("prefix[$:/plugins/felixhayashi/taskgraph/options]");
       // no drafts
@@ -190,9 +188,6 @@ say here is: do not require the caretaker!
     var filter = getChangeFilter();
     
     $tw.wiki.addEventListener("change", function(changedTiddlers) {
-      
-      // disabled for now
-      return;
       
       var matches = utils.getMatches(filter, changedTiddlers);
       if(!matches.length) return;

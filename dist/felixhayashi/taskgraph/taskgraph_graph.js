@@ -21,15 +21,15 @@ exports.getClass = function(constrObj) {
     // addEventListeners automatically binds "this" object to handler, thus, no need for .bind(this)
     this.addEventListeners([
     
-      {type: "tw-clone-view", handler: function() {
+      {type: "tm-clone-view", handler: function() {
         var templateTObj = this.getCurView();
         this.handleCreateView(templateTObj);
       }},
-      {type: "tw-create-view", handler: function() {
+      {type: "tm-create-view", handler: function() {
         this.handleCreateView(null);
       }},
-      {type: "tw-delete-view", handler: this.handleDeleteView },
-      {type: "tw-store-position", handler: this.handleStorePositions }
+      {type: "tm-delete-view", handler: this.handleDeleteView },
+      {type: "tm-store-position", handler: this.handleStorePositions }
       
     ]);
     
@@ -228,43 +228,28 @@ exports.getClass = function(constrObj) {
    * current refreshWidgetFilter.
    */
   TaskGraphWidget.prototype.refreshGraphBar = function(changedTiddlers) {
-       
-    var result = utils.getMatches(this.refreshWidgetFilter, changedTiddlers);
     
-    if(result.length) {
+    var changedRelevantTiddlers = utils.getMatches(this.refreshWidgetFilter, changedTiddlers);
+    if(!changedRelevantTiddlers.length) return;
+    
+    var isViewSwitched = this.isViewSwitched(changedTiddlers);
+    
+    if(isViewSwitched) {
       
-      //~ console.log(result);
-      //~ 
-      //~ if(result.indexOf("$:/temp/NewTagName") != -1) {
-        //~ 
-        //~ var tagInput = this.parentDomNode.getElementsByClassName("tc-edit-tags")[0]
-                           //~ .getElementsByTagName("input")[0];
-                           //~ 
-        //~ console.log("active Element");
-        //~ console.log(document.activeElement);
-        //~ console.log("has focus?");
-        //~ console.log(document.hasFocus());
-        //~ console.log("are the same?");
-        //~ console.log(tagInput == document.activeElement);
-                           //~ 
-        //~ if(tagInput == document.activeElement) {
-          //~ return false;
-        //~ }
-        //~ 
-      //~ }
-      
-      this.logger("info", "The graphbar needs to refresh its widgets");
-      
-      // rebuild
+      // full rebuild
+      this.logger("info", "The graphbar needs a full refresh");
       this.removeChildDomNodes();
       this.rebuildChildWidgets();
       this.renderChildren(this.graphBarDomNode);
-      
       return true;
+      
+    } else {
+      
+      // let children decide for themselves
+      this.logger("info", "Propagate refresh to children");
+      return this.refreshChildren(changedTiddlers);
+      
     }
-    
-    // all good
-    return true;
     
   };
   

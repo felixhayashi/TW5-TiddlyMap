@@ -1,0 +1,5 @@
+caption: Taskgraph
+tags: $:/tags/SideBar
+title: $:/plugins/felixhayashi/taskgraph/editor
+
+<$taskgraph mode="graph" editor="true" object-id="editor" />

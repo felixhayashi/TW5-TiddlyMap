@@ -4,5 +4,5 @@
   "defaultViewBindingChoice" : "",
   "debug" : 1,
   "notifications" : 1,
-  "disablePhysics" : 0
+  "disablePhysics" : 1
 }

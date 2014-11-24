@@ -418,10 +418,16 @@ Adapter.prototype.selectNodesFromStore = function(filter, outputType) {
     
     // TODO: make function accept a tRef
     var curTiddler = this.setupTiddler(this.wiki.getTiddler(tiddlers[i]));
+    var id = curTiddler.fields[$tw.taskgraph.opt.tw.fields.id];
+    
+    if(id in nodes) {
+      utils.notify("The id of tiddler \"" + tiddlers[i] + "\" is already used by tiddler \"" + nodes[id].label + "\"");
+      continue;
+    }
     
     nodes.push({
-      id : curTiddler.fields[$tw.taskgraph.opt.tw.fields.id],
-      label : curTiddler.fields.title
+      id: id,
+      label: curTiddler.fields.title
     });
   }
   

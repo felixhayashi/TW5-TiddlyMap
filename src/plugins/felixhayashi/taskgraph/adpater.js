@@ -114,8 +114,8 @@ Adapter.prototype.insertEdgeIntoStore = function(edge) {
   // deleting it and adding it later to the object again is more conveniant than deep copying the object
   delete edge.label
   
-  $tw.taskgraph.fn.console.info("the following edge of type \"" + label + "\" will be inserted into the store  \"" + storeRef + "\"");
-  $tw.taskgraph.fn.console.log(JSON.stringify(edge));
+  $tw.taskgraph.fn.logger("info", "the following edge of type \"" + label + "\" will be inserted into the store  \"" + storeRef + "\"");
+  $tw.taskgraph.fn.logger("log", JSON.stringify(edge));
     
   // add edge to to array of existing edges
   records.push(edge);
@@ -150,7 +150,7 @@ Adapter.prototype.getEdgeChanges = function() {
    
   var edgeFilter = this.curView ? this.curView.fields.displayedRelation : undefined;
   
-  $tw.taskgraph.fn.console.log("graph with edgeFilter " + edgeFilter + " requested to get informed about edge changes");
+  $tw.taskgraph.fn.logger("log", "graph with edgeFilter " + edgeFilter + " requested to get informed about edge changes");
   
   var changes = [];
   for(; this.edgeChangePointer < $tw.taskgraph.edgeChanges.length; this.edgeChangePointer++) {
@@ -163,8 +163,8 @@ Adapter.prototype.getEdgeChanges = function() {
     
     if(matchesEdgeFilter && allowedInContext) {
       
-      $tw.taskgraph.fn.console.log("reading edge change");
-      $tw.taskgraph.fn.console.log(change);
+      $tw.taskgraph.fn.logger("log", "reading edge change");
+      $tw.taskgraph.fn.logger("log", change);
       
       changes.push(change);
     }
@@ -260,8 +260,8 @@ Adapter.prototype.deleteEdgesFromStore = function(edges) {
 
   if(!edges || !edges.length) return;
   
-  $tw.taskgraph.fn.console.info("the following edges will be deleted from store");
-  $tw.taskgraph.fn.console.debug(edges);
+  $tw.taskgraph.fn.logger("info", "the following edges will be deleted from store");
+  $tw.taskgraph.fn.logger("debug", edges);
       
   // prep object holds (1) the parsed JSON extracted from the store
   // and (2) the edges that are to be deleted
@@ -349,7 +349,7 @@ Adapter.prototype.getCompiledNodeFilter = function(doRecompile) {
     return "[" + filterComponents.join('') + "]";
   }).call(this);
   
-  $tw.taskgraph.fn.console.debug("node-filter \"" + filter + "\" created" );
+  $tw.taskgraph.fn.logger("debug", "Created the following node-filter \"" + filter + "\"");
   
   return this.wiki.compileFilter(filter);
 
@@ -379,8 +379,8 @@ Adapter.prototype.getCompiledEdgeFilter = function(doRecompile) {
     if(this.curView) {
       // if a view exists, allow only edges specified as to be displayed
       var tRef = this.curView.fields.title + "/filter/edges";
-      if(this.wiki.tiddlerExists(tRef)) {
-        var tObj = this.wiki.getTiddler(tRef);
+      var tObj = this.wiki.getTiddler(tRef);
+      if(tObj) {
         var tags = tObj.fields.tags;
         var consideredTags = tags ? tags : [];
         for(var i = 0; i < consideredTags.length; i++) {
@@ -391,7 +391,7 @@ Adapter.prototype.getCompiledEdgeFilter = function(doRecompile) {
     return "[" + filterComponents.join('') + "]";
   }).call(this);
   
-  $tw.taskgraph.fn.console.debug("edge-filter \"" + filter + "\"" );
+  $tw.taskgraph.fn.logger("debug", "Created the following edge-filter \"" + filter + "\"");
   
   return this.wiki.compileFilter(filter);
 
@@ -463,11 +463,11 @@ Adapter.prototype.restorePositions = function(nodes) {
 Adapter.prototype.storePositions = function(positions) {
   
   if(!this.curView) {
-    $tw.taskgraph.fn.console.warn("no view specified. will not store positions");
+    $tw.taskgraph.fn.logger("warn", "no view specified. will not store positions");
     return;
   }
   
-  $tw.taskgraph.fn.console.log("storing positions of \"" + this.curView.fields.title + "\"");
+  $tw.taskgraph.fn.logger("log", "storing positions of \"" + this.curView.fields.title + "\"");
   
   var title = this.curView.fields.title + "/map";
   this.wiki.setTiddlerData(title, positions);
@@ -503,7 +503,9 @@ Adapter.prototype.setupTiddler = function(tObj) {
 };
 
 /**
- * This will set the position of the node and prevent the node from moving
+ * This will set the position. If vis loads nodes with positions set
+ * it will prevent them from being moved once visible so this has
+ * to be taken care of later.
  * 
  * @node an array representing a node
  * @pos x,y coordinates
@@ -512,8 +514,6 @@ Adapter.prototype._addNodePosition = function(node, pos) {
 
   node.x = pos.x;
   node.y = pos.y;
-  node.allowedToMoveX = false;
-  node.allowedToMoveY = false;
   
   return node;
       

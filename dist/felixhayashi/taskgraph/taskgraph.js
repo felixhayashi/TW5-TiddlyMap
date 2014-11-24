@@ -83,7 +83,7 @@ for the mode-dependent TaskGraphWidgets.
    *    it himself. Defaults to true.
    */
   TaskGraphWidget.prototype.registerCallback = function(tiddlerTitle, callback, deleteOnCall) {
-    $tw.taskgraph.fn.console.debug("the callback was registered for changes on \"" + tiddlerTitle + "\"");
+    this.logger("debug", "A callback was registered for changes on \"" + tiddlerTitle + "\"");
     this.dialogCallbacks[tiddlerTitle] = {
       execute : callback,
       deleteOnCall : (typeof deleteOnCall == "Boolean" ? deleteOnCall : true)
@@ -96,7 +96,7 @@ for the mode-dependent TaskGraphWidgets.
    */
   TaskGraphWidget.prototype.removeCallback = function(tRef) {
     if(tRef in this.dialogCallbacks) {
-      $tw.taskgraph.fn.console.debug("callback for \"" + tRef + "\" will be deleted");
+      this.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
       delete this.dialogCallbacks[tRef];
     }
   };
@@ -113,7 +113,7 @@ for the mode-dependent TaskGraphWidgets.
   TaskGraphWidget.prototype.checkForCallbacks = function(changedTiddlers) {
     
     if(this.dialogCallbacks.length == 0) {
-      $tw.taskgraph.fn.console.debug("no registered callbacks exist at the moment");
+      this.logger("debug", "No registered callbacks exist at the moment");
       return;
     }
     
@@ -121,9 +121,9 @@ for the mode-dependent TaskGraphWidgets.
       
       if(!(tRef in this.dialogCallbacks)) continue;
       
-      if(this.wiki.tiddlerExists(tRef)) {
+      if(this.wiki.getTiddler(tRef)) {
         
-        $tw.taskgraph.fn.console.debug("the callback for \"" + tRef + "\" will be executed");
+        this.logger("debug", "A callback for \"" + tRef + "\" will be executed");
         this.dialogCallbacks[tRef].execute(tRef);
         
         // a continue prevents deleting the callback
@@ -151,7 +151,7 @@ for the mode-dependent TaskGraphWidgets.
    */
   TaskGraphWidget.prototype.handleConnectionEvent = function(data, callback) {
        
-    $tw.taskgraph.fn.console.info("will open a dialog for creating an edge");
+    this.logger("info", "will open a dialog for creating an edge");
     
     // TODO: option paths seriously need some refactoring!
     var skeleton = this.wiki.getTiddler($tw.taskgraph.opt.tw.template.dialog.getEdgeType);
@@ -162,7 +162,7 @@ for the mode-dependent TaskGraphWidgets.
       rememberViewBindingChoice : ($tw.taskgraph.opt.tw.defaultViewBindingChoice ? "true" : "false")
     };
     
-    $tw.taskgraph.fn.console.log(vars);
+    this.logger("log", vars);
     
     this.openDialog(skeleton, vars, function(isConfirmed, outputTObj) {
     
@@ -179,10 +179,10 @@ for the mode-dependent TaskGraphWidgets.
           
           if(!resultFields.text) resultFields.text = $tw.taskgraph.opt.tw.unknownEdgeLabel;
           
-          $tw.taskgraph.fn.console.debug("the edgetype is set to: " + resultFields.text);        
+          this.logger("debug", "the edgetype is set to: " + resultFields.text);        
           data.label = resultFields.text;
           
-          $tw.taskgraph.fn.console.log(resultFields);
+          this.logger("log", resultFields);
           
           if(resultFields.view) {
             data.view = resultFields.view;
@@ -237,7 +237,7 @@ for the mode-dependent TaskGraphWidgets.
   */
   TaskGraphWidget.prototype.openDialog = function(skeleton, fields, callback) {
     
-    $tw.taskgraph.fn.console.debug("creating a dialog");
+    this.logger("debug", "creating a dialog");
         
     var uuid = vis.util.randomUUID();
     var dialogFields = {
@@ -252,8 +252,8 @@ for the mode-dependent TaskGraphWidgets.
  
     // https://github.com/Jermolene/TiddlyWiki5/blob/master/boot/boot.js#L761
     var dialogTiddler = new $tw.Tiddler(skeleton, fields, dialogFields);
-    $tw.taskgraph.fn.console.debug("A dialog will be opened based on the following tiddler:");
-    $tw.taskgraph.fn.console.debug(dialogTiddler);
+    this.logger("debug", "A dialog will be opened based on the following tiddler:");
+    this.logger("debug", dialogTiddler);
     
     // https://github.com/Jermolene/TiddlyWiki5/blob/master/boot/boot.js#L841
     this.wiki.addTiddler(dialogTiddler);
@@ -305,6 +305,19 @@ for the mode-dependent TaskGraphWidgets.
   };
   
   /**
+   * Used for debugging
+   */
+  TaskGraphWidget.prototype.getObjectId = function() {
+    if(this.objectId) return this.objectId;
+    this.objectId = this.getAttribute("object-id");
+    return (this.objectId ? this.objectId : vis.util.randomUUID());
+  };
+  
+  TaskGraphWidget.prototype.logger = function(type, message) {
+    $tw.taskgraph.fn.logger(type, message, "@" + this.getObjectId().toUpperCase() + ": ");
+  };
+  
+  /**
    * Wrapper class which is similar to a Factory, except that it returns
    * an object directly via its constructor and not by a method. This is
    * because TW instanciates the exported object.
@@ -320,22 +333,23 @@ for the mode-dependent TaskGraphWidgets.
     
     if(mode && AVAILABLE_MODES.indexOf(mode.value) != -1) {
 
+      $tw.taskgraph.fn.logger("warn", "Initializing a taskgraph widget in mode \"" + mode.value + "\"");
+
       var constrObj = new TaskGraphWidget(parseTreeNode, options);
+
+      $tw.taskgraph.fn.logger("debug", "Require class for mode \"" + mode.value + "\"");
       
-      $tw.taskgraph.fn.console.debug("Require class for mode \"" + mode.value + "\"");
       var TaskgraphMode = require("$:/plugins/felixhayashi/taskgraph/taskgraph_" + mode.value + ".js")
                            .getClass(constrObj);
-      
-      
-      $tw.taskgraph.fn.console.warn("Initializing a taskgraph widget in mode \"" + mode.value + "\"");
+                           
       var modeObject = new TaskgraphMode(parseTreeNode, options);
-      $tw.taskgraph.fn.console.info("Done initializing a taskgraph widget");
+      $tw.taskgraph.fn.logger("info", "Done initializing a taskgraph widget");
             
       return modeObject;
       
     } else {
      
-      throw "Taskgraph mode \"" + mode.value + "\" not allowed.";
+      throw "Taskgraph does not have a mode \"" + mode.value + "\"";
       
     }
     

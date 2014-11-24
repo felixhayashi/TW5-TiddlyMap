@@ -113,22 +113,23 @@ say here is: do not require the caretaker!
     
     var fn = {};
     
-    var nirvana = function() { /* /dev/null */ };
-    
-    if(opt.tw.debug) {
-      fn.console = console;
-    } else {
+    var nirvana = function() { /* /dev/null */ }; 
+
+    if(opt.tw.debug && console) {
       
-      fn.console = {
-        log: nirvana,
-        debug: nirvana,
-        warn: nirvana,
-        error: nirvana,
-        info: nirvana
+      fn.logger = function(type, message, id) {
+        if(!message) return;
+        type = type.toLowerCase(), (type in console ? type : "debug");
+        if(id) {
+          console[type](id, message)
+        }
+        else {
+          console[type](message);
+        }
       };
       
-    }
-    
+    } else { fn.logger = nirvana }
+
     fn.notify = (opt.tw.notifications ? utils.notify : nirvana);
     
     return fn;
@@ -148,7 +149,7 @@ say here is: do not require the caretaker!
       return "[" + filterComponents.join('') + "]";
     }).call(this);
     
-    $tw.taskgraph.fn.console.log("caretaker-filter \"" + filter + "\"");
+    $tw.taskgraph.fn.logger("log", "Caretaker's filter: \"" + filter + "\"");
     
     return $tw.wiki.compileFilter(filter);
 
@@ -163,7 +164,8 @@ say here is: do not require the caretaker!
     // used for global functions
     $tw.taskgraph.fn = getFunctions($tw.taskgraph.opt);
     
-    $tw.taskgraph.fn.console.log("registered namespace and options");
+    $tw.taskgraph.fn.logger("warn", "Taskgraph's caretaker was started");
+    $tw.taskgraph.fn.logger("log", "Registered namespace and options");
     
     // Create an array to insert edge changes.
     //
@@ -188,8 +190,18 @@ say here is: do not require the caretaker!
     var filter = getChangeFilter();
     
     $tw.wiki.addEventListener("change", function(changedTiddlers) {
+      
+      // disabled for now
+      return;
+      
       var matches = utils.getMatches(filter, changedTiddlers);
       if(!matches.length) return;
+      
+      
+      $tw.taskgraph.fn.logger("warn", "@CARETAKER: These tiddlers changed");
+      $tw.taskgraph.fn.logger("debug", changedTiddlers);
+      $tw.taskgraph.fn.logger("warn", "@CARETAKER: These tiddlers trigger an option rebuild");
+      $tw.taskgraph.fn.logger("debug", matches);
       
       // rebuild
       $tw.taskgraph.opt = getOptions();

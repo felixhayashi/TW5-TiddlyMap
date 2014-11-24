@@ -37,10 +37,7 @@ util functions.
   };
 
   exports.run = function() {
-    
-    //~ $tw.taskgraph.fn.console.log("macro called with arguments");
-    //~ $tw.taskgraph.fn.console.log(arguments);
-    
+       
     switch(arguments[0]) {
       
       case "basename":
@@ -51,8 +48,7 @@ util functions.
       
         var prop = $tw.taskgraph.opt;
         var propertyPath = arguments[1].split(".");
-        //~ $tw.taskgraph.fn.console.log(propertyPath);
-        //~ $tw.taskgraph.fn.console.log(prop);
+
         for(var i = 0; i < propertyPath.length; i++) {
           if(typeof prop == "object" && propertyPath[i] in prop) {
             prop = prop[propertyPath[i]];

@@ -39,9 +39,9 @@ exports.getClass = function(constrObj) {
       
       if(fromTObj && toTObj) {
         
-        $tw.taskgraph.fn.console.info("User want's to create an edge from \"" +  fromTObj.fields.title + "\" to \"" +  toTObj.fields.title + "\"");
+        this.logger("info", "User want's to create an edge from \"" +  fromTObj.fields.title + "\" to \"" +  toTObj.fields.title + "\"");
       
-        $tw.taskgraph.fn.console.debug("setup the tiddlers to ensure they have an id field and a title");
+        this.logger("debug", "setup the tiddlers to ensure they have an id field and a title");
         // prepare tiddlers before 
         fromTObj = this.adapter.setupTiddler(fromTObj);
         toTObj = this.adapter.setupTiddler(toTObj);

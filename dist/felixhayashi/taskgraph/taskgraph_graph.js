@@ -49,8 +49,11 @@ exports.getClass = function(constrObj) {
     // remember the parent and add some classes
     this.registerParentDomNode(parent);
     
+    // register whether in editor mode or not
+    this.isEditorMode = this.getAttribute("editor");
+    
     // get the view-holder (contains the view-ref) and the current view
-    this.curViewHolderRef = this.getCurViewHolderRef(this.getAttribute("view"));
+    this.curViewHolderRef = this.getCurViewHolderRef();
     this.curView = this.getCurView(true, this.curViewHolderRef);
     
     // make sure the adapter is aware of the currently used view
@@ -64,7 +67,7 @@ exports.getClass = function(constrObj) {
     this.edges = this.adapter.selectEdgesFromStore();
     
     // first append the bar if we are in editor mode
-    if(this.getAttribute("editor")) {
+    if(this.isEditorMode) {
       this.initAndRenderGraphBar(parent);
     }
     
@@ -146,7 +149,7 @@ exports.getClass = function(constrObj) {
    */
   TaskGraphWidget.prototype.refresh = function(changedTiddlers) {
     
-    $tw.taskgraph.fn.console.log(changedTiddlers);
+    this.logger("log", changedTiddlers);
         
     // in any case, check for callbacks triggered by tiddlers
     this.checkForCallbacks(changedTiddlers);
@@ -156,7 +159,7 @@ exports.getClass = function(constrObj) {
 
     this.refreshGraph(changedTiddlers);
     
-    if(this.getAttribute("editor")) {
+    if(this.isEditorMode) {
       this.refreshGraphBar(changedTiddlers);
     }
 
@@ -170,7 +173,7 @@ exports.getClass = function(constrObj) {
   TaskGraphWidget.prototype.checkForViewChanges = function(changedTiddlers) {
     
     // TODO: turn all this stuff into a compiled filter!!
-    var isViewSwitched = (this.getCurViewHolderRef() in changedTiddlers);
+    var isViewSwitched = this.isViewSwitched(changedTiddlers);
     var isViewModified = (this.getCurView().fields.title in changedTiddlers);
     var isEdgeFilterModified = ((this.getCurView().fields.title + "/filter/edges") in changedTiddlers);
     
@@ -180,28 +183,44 @@ exports.getClass = function(constrObj) {
     
     if(isViewSwitched || isViewModified || isMapModifiedFromOutside) {
             
-      $tw.taskgraph.fn.console.info("view switched or modified!");
+      this.logger("warn", "View switched or modified");
       this.curView = this.getCurView(true);
       
       // recreate the widget filter
       this.refreshWidgetFilter = this.getRefreshWidgetFilter();
       
       // rebuild the graph
-      $tw.taskgraph.fn.console.debug("reload graph data");
-      
       this.reloadGraphData();
       
     } else if(isEdgeFilterModified) {
+      
+      this.logger("info", "Edge filter changed");
       
       var reloadOnlyEdges = true;
       this.reloadGraphData(reloadOnlyEdges);
       
     }
     
-    // in anycase reset isResponsibleForMapModification
+    // in anycase reset isResponsibleForMapModification to its default stat
     this.isResponsibleForMapModification = false;
     
   };
+  
+  TaskGraphWidget.prototype.isViewSwitched = function(changedTiddlers) {
+    var prefix = $tw.taskgraph.opt.tw.prefix.localHolders;
+    var isViewBound = (this.getCurViewHolderRef().indexOf(prefix) != -1);
+
+    if(isViewBound && !this.hasCheckedForViewSwitchBefore) {
+      // this is a special case where we want to prevent that a graph
+      // that was bound to a view has and has changed its view holder
+      // during initialization refreshes again.
+      this.hasCheckedForViewSwitchBefore = true;
+      // therefore we return false which means view was not switched
+      return false;
+    }
+    
+    return (this.getCurViewHolderRef() in changedTiddlers)
+  }
   
   /**
    * This method will ckeck if any tw-widget needs a refresh.
@@ -234,7 +253,7 @@ exports.getClass = function(constrObj) {
         //~ 
       //~ }
       
-      $tw.taskgraph.fn.console.info("the graphbar needs to refresh its widgets");
+      this.logger("info", "The graphbar needs to refresh its widgets");
       
       // rebuild
       this.removeChildDomNodes();
@@ -359,7 +378,7 @@ exports.getClass = function(constrObj) {
    */
   TaskGraphWidget.prototype.initAndRenderGraph = function(parent) {
     
-    $tw.taskgraph.fn.console.info("initializing and rendering the graph");
+    this.logger("info", "Initializing and rendering the graph");
     
     // create a div for the graph and register it
     this.graphDomNode = document.createElement("div");
@@ -391,31 +410,35 @@ exports.getClass = function(constrObj) {
     this.network.on("stabilized", this.handleStabilizedEvent.bind(this));
         
     // repaint when sidebar is hidden
-    this.registerCallback("$:/state/sidebar", this.repaintGraph.bind(this), false);
+    if(!this.isEditorMode) {
+      this.registerCallback("$:/state/sidebar", this.repaintGraph.bind(this), false);
+    }
     
     this.network.on("dragEnd", function(properties) {
       if(properties.nodeIds.length) {
-        this.nodes.update({
-          id: properties.nodeIds[0],
-          allowedToMoveX: false,
-          allowedToMoveY: false
-        });
+        if($tw.taskgraph.opt.tw.disablePhysics) {
+          this.setFreezeNodeById(properties.nodeIds[0], true);
+        }
         this.handleStorePositions();
       }
     }.bind(this));
     
     this.network.on('dragStart', function(properties) {
-      this.nodes.update({
-        id: properties.nodeIds[0],
-        allowedToMoveX: true,
-        allowedToMoveY: true
-      });
+      if($tw.taskgraph.opt.tw.disablePhysics) this.setFreezeNodeById(properties.nodeIds[0], false);
     }.bind(this));
     
     // position the graph
     this.repaintGraph();
     
   }
+  
+  TaskGraphWidget.prototype.setFreezeNodeById = function(id, doFreeze) {
+    this.nodes.update({
+      id: id,
+      allowedToMoveX: !doFreeze,
+      allowedToMoveY: !doFreeze
+    });
+  };
   
   /**
    * Replace the current set of nodes and edges of the graph with
@@ -432,7 +455,7 @@ exports.getClass = function(constrObj) {
    */
   TaskGraphWidget.prototype.reloadGraphData = function(reloadOnlyEdges) {
     
-    $tw.taskgraph.fn.console.log("reload graph data");
+    this.logger("log", "Reload graph data");
     
     // update adapter
     this.adapter.setView(this.curView);
@@ -503,12 +526,12 @@ exports.getClass = function(constrObj) {
       $tw.taskgraph.fn.notify("Thou shalt not kill the default view!");
       return;
     }
-    $tw.taskgraph.fn.console.log("bla");
+    this.logger("log", "bla");
     // regex is non-greedy
     var filter = "[regexp:text[<\\$taskgraph.*?view=." + viewname + "..*?>]]";
-    $tw.taskgraph.fn.console.log(filter);
+    this.logger("log", filter);
     var matches = utils.getMatches(filter);
-    $tw.taskgraph.fn.console.log(matches);
+    this.logger("log", matches);
     if(matches.length) {
       
       var fields = {
@@ -587,7 +610,6 @@ exports.getClass = function(constrObj) {
     // this is a flag to tell the current graph not to update itself
     this.isResponsibleForMapModification = true;
     this.adapter.storePositions(this.network.getPositions());
-    //this.network.storePositions();
     $tw.taskgraph.fn.notify("positions stored");
   }
 
@@ -600,24 +622,40 @@ exports.getClass = function(constrObj) {
    */
   TaskGraphWidget.prototype.handleStabilizedEvent = function(properties) {
     
-    if(!this.hasNetworkStabilized) {
-      
-      var ids = this.nodes.getIds();
-      var updates = [];
-      for(var i = 0; i < ids.length; i++) {
-        updates.push({
-          id: ids[i],
-          allowedToMoveX: false,
-          allowedToMoveY: false
-        });
-      }
-      
-      this.nodes.update(updates);
-      
+    if(this.hasNetworkStabilized) {
+      return;
+    } else {
       this.hasNetworkStabilized = true;
     }
+    
+    this.logger("log", "Network stabilized after " + properties.iterations + " iterations");
+
+    var doFreeze = $tw.taskgraph.opt.tw.disablePhysics;
+    this.setAllNodesFrozen(doFreeze);
+    
   };
   
+  TaskGraphWidget.prototype.setAllNodesFrozen = function(doFreeze) {
+
+    this.logger("log", "Fixing all nodes");
+
+    this.network.storePositions(); // does it matter if we put this before or after updates? yes, I guess.
+
+    var updates = [];
+    var ids = this.nodes.getIds();
+    for(var i = 0; i < ids.length; i++) {
+      
+      updates.push({
+        id: ids[i],
+        allowedToMoveX: !doFreeze,
+        allowedToMoveY: !doFreeze
+      });
+      
+    }
+    
+    this.nodes.update(updates);
+
+  };
     
   /**
    * This handler is registered at and called by the vis network event
@@ -631,9 +669,10 @@ exports.getClass = function(constrObj) {
    * click event.
    */
   TaskGraphWidget.prototype.handleDoubleClickEvent = function(properties) {
-        
-    // doubleclicked on an empty spot
-    if(!properties.nodes.length && !properties.edges.length) {
+    
+    if(!properties.nodes.length && !properties.edges.length) { // clicked on an empty spot
+      
+      if(!this.isEditorMode) return;
             
       this.adapter.createNode(properties.pointer.canvas, this);
       
@@ -641,8 +680,7 @@ exports.getClass = function(constrObj) {
       
        if(properties.nodes.length) { // clicked on a node
 
-        $tw.taskgraph.fn.console.info("doubleclicked on a node");
-        $tw.taskgraph.fn.console.debug(properties);
+        this.logger("debug", "Doubleclicked on a node");
 
         var id = properties.nodes[0];
         var targetTitle = this.nodes.get(id).label;
@@ -650,8 +688,8 @@ exports.getClass = function(constrObj) {
         
       } else if(properties.edges.length) { // clicked on an edge
         
-        $tw.taskgraph.fn.console.info("doubleclicked on an edge");
-        $tw.taskgraph.fn.console.debug(properties);
+        this.logger("debug", "Doubleclicked on an Edge");
+        
         // TODO: use returnType option!
         var label = this.edges.get(properties.edges[0]).label;
         var targetTitle = $tw.taskgraph.opt.tw.prefix.edges + "/" + label;
@@ -683,7 +721,7 @@ exports.getClass = function(constrObj) {
     }
     
     if(!this.network) {
-      $tw.taskgraph.fn.console.warn("graph has not been initialized yet");
+      this.logger("warn", "graph has not been initialized yet");
       return;
     }
     
@@ -704,41 +742,49 @@ exports.getClass = function(constrObj) {
    * This function will only calculate a new reference to the holder
    * on first call (that is when no view holder is registered to "this".
    * 
-   * @viewName the value of the view attribute specified in the widget
-   *     tags.
    */
-  TaskGraphWidget.prototype.getCurViewHolderRef = function(viewName) {
+  TaskGraphWidget.prototype.getCurViewHolderRef = function() {
     
     // the viewholder is never recalculated once it exists
     if(this.curViewHolderRef) return this.curViewHolderRef;
     
-    $tw.taskgraph.fn.console.info("retrieving or generating the view holder reference");
+    this.logger("info", "Retrieving or generating the view holder reference");
     
     // if given, try to retrieve the viewHolderRef by specified attribute
+    var viewName = this.getAttribute("view");
     if(viewName) {
       
-      $tw.taskgraph.fn.console.log("user wants to bind " + viewName + " to graph");
+      this.logger("log", "User wants to bind view \"" + viewName + "\" to graph");
       
       // create a view holder that is exclusive for this graph
       
       var viewRef = $tw.taskgraph.opt.tw.prefix.views + "/" + viewName;
-      if(this.wiki.tiddlerExists(viewRef)) {
-        var viewHolderRef = $tw.taskgraph.opt.tw.prefix.localHolders + "/" + vis.util.randomUUID();
-        $tw.taskgraph.fn.console.debug("using an independent temporary view holder: \"" + viewHolderRef + "\"");
+      if(this.wiki.getTiddler(viewRef)) {
         
+        this.curViewHolderRef = $tw.taskgraph.opt.tw.prefix.localHolders + "/" + vis.util.randomUUID();
+        this.logger("log", "Created an independent temporary view holder \"" + this.curViewHolderRef + "\"");
+        
+        // we do not use setCurView here because it would store and reload the view unnecessarily...
         this.wiki.addTiddler(new $tw.Tiddler({ 
-          title : viewHolderRef,
-          text : viewRef
+          title: this.curViewHolderRef,
+          text: viewRef
         }));
         
-        return viewHolderRef;
+        this.logger("log", "View \"" + viewRef + "\" inserted into independend holder");
+        
+      } else {
+        this.logger("log", "View \"" + viewName + "\" does not exist");
       }
       
     }
     
-    // if nothing has been returned yet, return the default
-    $tw.taskgraph.fn.console.debug("setting view holder to the global default");
-    return $tw.taskgraph.opt.tw["defaultGraphViewHolder"];
+    if(!this.curViewHolderRef) {
+      // if it hasn't been set yet, use the default
+      this.logger("log", "Returning default (global) view holder");
+      this.curViewHolderRef =  $tw.taskgraph.opt.tw.defaultGraphViewHolder;
+    }
+    
+    return this.curViewHolderRef;
     
   };
   
@@ -754,7 +800,7 @@ exports.getClass = function(constrObj) {
     
     if(viewRef) {
       if(!viewHolderRef) viewHolderRef = this.curViewHolderRef;
-      $tw.taskgraph.fn.console.info("setting the value of view holder \"" + viewHolderRef + " to \"" + viewRef + "\"");
+      this.logger("info", "Inserting view \"" + viewRef + "\" into holder \"" + viewHolderRef + "\"");
       this.wiki.addTiddler(new $tw.Tiddler({ 
         title : viewHolderRef,
         text : viewRef
@@ -772,28 +818,25 @@ exports.getClass = function(constrObj) {
     
     // otherwise reextract it
     if(!viewHolderRef) viewHolderRef = this.getCurViewHolderRef();
-    $tw.taskgraph.fn.console.info("reextracting current view from \"" + viewHolderRef + "\"");
     
     var curViewRef = this.wiki.getTiddler(viewHolderRef).fields.text;
     
-    $tw.taskgraph.fn.console.log("the extracted view is");
-    $tw.taskgraph.fn.console.log(curViewRef);
+    this.logger("info", "Retrieved view \"" + curViewRef + "\" from holder \"" + viewHolderRef + "\"");
     
-    if(!this.wiki.tiddlerExists(curViewRef)) {
-      $tw.taskgraph.fn.console.log("Warning: View \"" + curViewRef + "\" doesn't exist. Default is used instead.");
-      //$tw.taskgraph.fn.notify("Warning: View \"" + curViewRef + "\" doesn't exist. Default is used instead.");
-      curViewRef = $tw.taskgraph.opt.tw.prefix.views + "/default";
+    var curViewTObj = this.wiki.getTiddler(curViewRef);
+    
+    if(!curViewTObj) {
+      this.logger("log", "Warning: View \"" + curViewRef + "\" doesn't exist. Default is used instead.");
+      curViewTObj($tw.taskgraph.opt.tw.prefix.views + "/default");
     }
     
-    this.wiki.getTiddler(curViewRef)
-    
-    return this.wiki.getTiddler(curViewRef);
+    return curViewTObj;
     
   };
   
   TaskGraphWidget.prototype.getGraphOptions = function() {
     
-    // current vis options can be found at $tw.taskgraph.fn.console.log(this.network.constants);
+    // current vis options can be found at $tw.taskgraph.fn.logger("log", this.network.constants);
     
     // get a copy of the options
     var options = this.wiki.getTiddlerData("$:/plugins/felixhayashi/taskgraph/options/vis");
@@ -809,7 +852,7 @@ exports.getClass = function(constrObj) {
     }.bind(this);
 
     options.dataManipulation = {
-        enabled : (this.getAttribute("editor") ? true : false),
+        enabled : (this.isEditorMode ? true : false),
         initiallyVisible : true
     };
         
@@ -837,7 +880,7 @@ exports.getClass = function(constrObj) {
           // autocomplete while entering tag
           "[prefix[$:/state/popup/tags-auto-complete]]";
     
-    $tw.taskgraph.fn.console.debug("whether to refresh childwidgets is determined by this filter: " + filter);
+    this.logger("debug", "Whether to refresh childwidgets is determined by this filter: \"" + filter + "\"");
 
     var compiledFilter = this.wiki.compileFilter(filter);
     
@@ -845,10 +888,18 @@ exports.getClass = function(constrObj) {
 
   };
   
+  //~ TaskGraphWidget.prototype.reloadNodes = function() {
+    //~ var nodes this.adapter.selectNodesFromStore();
+//~ 
+  //~ };
+  //~ 
+  //~ TaskGraphWidget.prototype.setNodesFixed = function(isFixed) {
+    //~ var nodes this.adapter.selectNodesFromStore();
+  //~ };
   
   TaskGraphWidget.prototype.repaintGraph = function() {
     
-    $tw.taskgraph.fn.console.info("repainting the whole graph");
+    this.logger("info", "Repainting the whole graph");
     
     this.network.redraw();
     this.network.zoomExtent();

@@ -16,7 +16,7 @@ var utils = {};
  */
 utils.deleteTiddlers = function(tiddlers) {
   for(var i = 0; i < tiddlers.length; i++) {
-    if(!$tw.wiki.tiddlerExists(tiddlers[i])) { // doesn't exist
+    if(!$tw.wiki.getTiddler(tiddlers[i])) { // doesn't exist
       continue;
     }
     $tw.wiki.deleteTiddler(tiddlers[i]);
@@ -33,27 +33,27 @@ utils.deleteTiddlers = function(tiddlers) {
  */
 utils.getMatches = function(filter, tRefs) {
   
-    // use wiki as default source
-    var source = undefined;
-    
-    if(Array.isArray(tRefs)) {
-      source = function(iterator) {
-        for(var i = 0; i < tRefs.length; i++) {
-          var tObj = $tw.wiki.getTiddler(tRefs[i]);
-          iterator(tObj, tRefs[i]);
-        }
-      };
-    } else if(typeof tRefs == "object") {
-      source = function(iterator) {
-        for(t in tRefs) {
-          var tObj = $tw.wiki.getTiddler(t);
-          iterator(tObj, t);
-        }
-      };
-    }
+  // use wiki as default source
+  var source = undefined;
+  
+  if(Array.isArray(tRefs)) {
+    source = function(iterator) {
+      for(var i = 0; i < tRefs.length; i++) {
+        var tObj = $tw.wiki.getTiddler(tRefs[i]);
+        iterator(tObj, tRefs[i]);
+      }
+    };
+  } else if(typeof tRefs == "object") {
+    source = function(iterator) {
+      for(t in tRefs) {
+        var tObj = $tw.wiki.getTiddler(t);
+        iterator(tObj, t);
+      }
+    };
+  }
   
   if(typeof filter == "string") {
-    var filter = $tw.wiki.compileFilter(filter);
+    filter = $tw.wiki.compileFilter(filter);
   }
   
   return filter.call($tw.wiki, source);

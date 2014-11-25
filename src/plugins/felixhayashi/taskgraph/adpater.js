@@ -76,7 +76,7 @@ Adapter.prototype.createNode = function(position, taskgraph) {
 
     var node = {
       id : fields[$tw.taskgraph.opt.tw.fields.id],
-      label : fields.title
+      label : fields.label || fields.title
     };
     
     this._addNodePosition(node, position);
@@ -427,7 +427,7 @@ Adapter.prototype.selectNodesFromStore = function(filter, outputType) {
     
     nodes.push({
       id: id,
-      label: curTiddler.fields.title
+      label: curTiddler.fields.label || curTiddler.fields.title
     });
   }
   

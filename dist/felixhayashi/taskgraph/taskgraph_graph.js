@@ -337,7 +337,8 @@ exports.getClass = function(constrObj) {
       
       var data = {
           id : tObj.fields[$tw.taskgraph.opt.tw.fields.id],
-          label : tObj.fields.title
+          label : tObj.fields.label || tObj.fields.title,
+          name: tObj.fields.title 
       };
                 
       // if id is in deleteCandidate, remove it from the list, as it only got renamed!

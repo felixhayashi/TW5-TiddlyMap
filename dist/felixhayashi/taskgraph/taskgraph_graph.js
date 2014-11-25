@@ -908,7 +908,6 @@ exports.getClass = function(constrObj) {
     var canvasOffset = utils.getDomNodePos(container).y;
     var distanceBottom = 15; // in pixel
     var calculatedHeight = windowHeight - canvasOffset - distanceBottom;
-    console.error(canvasOffset, "bla", container.getBoundingClientRect(), windowHeight, calculatedHeight);
     container.style["height"] = calculatedHeight + "px";
     
   };

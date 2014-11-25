@@ -412,8 +412,6 @@ Adapter.prototype.selectNodes = function(filter, listTRef, outputType) {
   if(!filter) filter = this.nodeFilter;
   if(!listTRef && this.curView) listTRef = this.curView.fields.nodeListRef;
   
-  //~ console.error("matches at select", utils.getMatches(filter));
-  
   var nodes = [];
   // append nodes using the tiddlers returned by the filter
   this._pushAsNodes(utils.getMatches(filter), nodes);
@@ -449,7 +447,6 @@ Adapter.prototype._pushAsNodes = function(tRefs, nodes) {
   for(var i = 0; i < tRefs.length; i++) {
     
     if(!utils.tiddlerExists(tRefs[i])) {
-      console.error("doesnt exist", tRefs);
       continue;
     }
 

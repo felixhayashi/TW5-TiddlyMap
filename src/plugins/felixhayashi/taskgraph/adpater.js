@@ -1,529 +1,873 @@
 /*\
-title: $:/plugins/felixhayashi/taskgraph/adapter.js
+title: $:/plugins/felixhayashi/taskgraph/taskgraph_graph.js
 type: application/javascript
 module-type: library
-
-This library provides all the functions to interact with the TW as if
-it was a simple database for nodes and edges. It may be understood as an abstraction
-layer.
-
 \*/
 
 /**************************** IMPORTS ****************************/
 
-  var utils = require("$:/plugins/felixhayashi/taskgraph/utils.js").utils;
-  var vis = require("$:/plugins/felixhayashi/vis/vis.js");
+var utils = require("$:/plugins/felixhayashi/taskgraph/utils.js").utils;
+var vis = require("$:/plugins/felixhayashi/vis/vis.js");
   
 /***************************** CODE ******************************/
-
-/**
- * Everything that is related to retrieving or inserting nodes and edges is
- * handled by the adapter. It decides which data to return and bases its
- * decision on the existance of an (optionally) set graph-view.
- * 
- * @wiki an optional wiki object
- */
-var Adapter = function(wiki) {
   
-  this.wiki = wiki ? wiki : $tw.wiki;
-  
-  // set the pointer to the end of the update queue because
-  // if no update pointer exists yet, all update events up until
-  // now can be ignored.
-  // for further information see explanation in caretaker.js
-  this.edgeChangePointer = $tw.taskgraph.edgeChanges.length;
-};
-
-/**
- * Like a normal database view it filters the results.
- * @view is a tw-filter string or compiled filter
- */
-Adapter.prototype.setView = function(view) {
-  
-  // register view
-  this.curView = view;
-  
-  // recompile filters
-  this.nodeFilter = this.getCompiledNodeFilter(true);
-  this.edgeFilter = this.getCompiledEdgeFilter(true);
-  
-};
-
-/**
- * Create a new tiddler that gets a non-existant title and is opened
- * for edit. If a view is registered, the fields of the tiddler match
- * the current view. If arguments network and position are specified,
- * the node is also inserted directly into the graph at the given
- * position.
- * 
- * @position (optional) insert the node at position in network
- * @taskgraph a taskgraph instance of mode graph in which the node is inserted
- */
-Adapter.prototype.createNode = function(position, taskgraph) {
+exports.getClass = function(constrObj) {
     
-  var fields = {
-    title : this.wiki.generateNewTitle("New Node"),
-    tags : this.curView ? this.curView.fields.tags : []
+  /**
+   * Class TaskGraphWidget
+   */
+  var TaskGraphWidget = function(parseTreeNode, options) {
+    
+    // addEventListeners automatically binds "this" object to handler, thus, no need for .bind(this)
+    this.addEventListeners([
+    
+      {type: "tw-clone-view", handler: function() {
+        var templateTObj = this.getCurView();
+        this.handleCreateView(templateTObj);
+      }},
+      {type: "tw-create-view", handler: function() {
+        this.handleCreateView(null);
+      }},
+      {type: "tw-delete-view", handler: this.handleDeleteView },
+      {type: "tw-store-position", handler: this.handleStorePositions }
+      
+    ]);
+    
+  };
+  
+  // !! EXTENSION !!
+  TaskGraphWidget.prototype = constrObj;
+  // !! EXTENSION !!
+  
+  /**
+   * BE VERY CAREFUL WITH THE ORDER OF THE FUNCTION CALLS IN THIS FUNCTION
+   * @Override Widget.render():
+   * Method to render this widget into the DOM
+   */
+  TaskGraphWidget.prototype.render = function(parent, nextSibling) {
+    
+    // remember the parent and add some classes
+    this.registerParentDomNode(parent);
+    
+    // get the view-holder (contains the view-ref) and the current view
+    this.curViewHolderRef = this.getCurViewHolderRef(this.getAttribute("view"));
+    this.curView = this.getCurView(true, this.curViewHolderRef);
+    
+    // make sure the adapter is aware of the currently used view
+    this.adapter.setView(this.curView);
+    
+    // rehister the current widget filter
+    this.refreshWidgetFilter = this.getRefreshWidgetFilter();
+        
+    // create this object after the nodeFilter has been initialized
+    this.nodes = this.adapter.selectNodesFromStore();
+    this.edges = this.adapter.selectEdgesFromStore();
+    
+    // first append the bar if we are in editor mode
+    if(this.getAttribute("editor")) {
+      this.initAndRenderGraphBar(parent);
+    }
+    
+    // now initialise graph variables and render the graph
+    this.initAndRenderGraph(parent);
+    
+  };
+  
+  /**
+   * The graph bar is also called the filterbar or graphview. It contains
+   * several widgets that form a gui that allows the user to interact
+   * with the current graphview.
+   * @parent the dom node to be injected in.
+   */
+  TaskGraphWidget.prototype.initAndRenderGraphBar = function(parent) {
+    
+    this.graphBarDomNode = document.createElement("div");
+    $tw.utils.addClass(this.graphBarDomNode, "filterbar");
+    parent.appendChild(this.graphBarDomNode);
+    
+    this.rebuildChildWidgets();
+    this.renderChildren(this.graphBarDomNode);
   };
 
-  if($tw.taskgraph.opt.tw.fields.id != "title") {
-    fields.id = vis.util.randomUUID();
-  }
-
-  this.wiki.addTiddler(new $tw.Tiddler(fields));
-
-  if(position && taskgraph) {
-
-    var node = {
-      id : fields[$tw.taskgraph.opt.tw.fields.id],
-      label : fields.label || fields.title
+  /**
+   * Creates the widget tree and registers them
+   * @see
+   *   - [TW5] How to render widgets programmatically?
+   *     https://groups.google.com/forum/#!topic/tiddlywikidev/sJrblP4A0o4
+   */
+  TaskGraphWidget.prototype.rebuildChildWidgets = function() {
+    
+    // Construct the child widgets
+    
+    var body = {
+        type : "tiddler",
+        attributes : {
+          tiddler : { type : "string", value : this.getCurView().fields.title }
+        },
+        children : [{
+          type : "transclude",
+          attributes : {
+            tiddler : { type : "string", value : "$:/plugins/felixhayashi/taskgraph/ui/graphBar" }
+            //tiddler : { type : "string", value : "$:/core/ui/EditTemplate/tags" }
+          }
+        }]
     };
     
-    this._addNodePosition(node, position);
+    this.makeChildWidgets([body]);
+  };
+      
+  /**
+   * This function is called by the system to notify the widget about
+   * tiddler changes.
+   * 
+   * The changes are analyzed by several functions.
+   * 
+   * 1) checking for callbacks: some processes decided at runtime to 
+   * listen to changes of single tiddlers (for example dialogs waiting
+   * for results). So at first it is checked if a callback is triggered.
+   * 
+   * 2) checking for view changes: a view may be replaced (switched)
+   * or modified. This will result in recalculation of the graph.
+   * 
+   * 3) checking for graph refresh: does the graph need an update
+   * because nodes/edges have been modified, added or removed or the
+   * view has changed?
+   * 
+   * 4) checking for graphbar refresh: Did some widgets need a rerendering
+   * due to changes that affect the topbar (view switched or modified)?
+   * 
+   * @override Widget.refresh();
+   * @see
+   *   - [TW5] Plugin does not listen to changes
+   *     https://groups.google.com/d/msg/tiddlywikidev/hwtX59tKsIk/EWSG9glqCnsJ
+   * 
+   * TODO: return true, false to allow wrapper widgets
+   * 
+   */
+  TaskGraphWidget.prototype.refresh = function(changedTiddlers) {
     
-    taskgraph.nodes.update(node);
-  
-  }
-  
-  taskgraph.dispatchEvent({
-    type: "tm-edit-tiddler", param : fields.title
-  });
+    $tw.taskgraph.fn.console.log(changedTiddlers);
         
-  return fields.title;
-  
-};
+    // in any case, check for callbacks triggered by tiddlers
+    this.checkForCallbacks(changedTiddlers);
+    
+    // might alter the filter and trigger a rebuild
+    this.checkForViewChanges(changedTiddlers);
 
-/**
- * Store an edge with a given id in the TW.
- * @edge an edge an object that has at least a from, to and label property
- */
-Adapter.prototype.insertEdgeIntoStore = function(edge) {
-  
-  var label = edge.label;
-  var storeRef = $tw.taskgraph.opt.tw.prefix.edges + "/" + label;
+    this.refreshGraph(changedTiddlers);
     
-  var records = this.wiki.getTiddlerData(storeRef, []);
-  
-  // make sure the edge has an id and its not empty or undefined
-  // while from, to and type would sufficiently identify an edge, the
-  // id is needed to interact with vis in a comfortable way because vis
-  // ensures only that ids are unique in each dataset
-  if(!("id" in edge) || !edge.id) edge.id = vis.util.randomUUID();
-
-  // make sure the label is not stored as it is redundant
-  // deleting it and adding it later to the object again is more conveniant than deep copying the object
-  delete edge.label
-  
-  $tw.taskgraph.fn.logger("info", "the following edge of type \"" + label + "\" will be inserted into the store  \"" + storeRef + "\"");
-  $tw.taskgraph.fn.logger("log", JSON.stringify(edge));
-    
-  // add edge to to array of existing edges
-  records.push(edge);
-  
-  var additionalFields = {}
-  var storeTObj = this.wiki.getTiddler(storeRef);
-  if(!storeTObj || !storeTObj.fields.id) {
-    // give the edgestore an id to make it possible to trace name changes
-    additionalFields.id = vis.util.randomUUID();
-  }
-  
-  // uses JSON.stringify()
-  this.wiki.setTiddlerData(storeRef, records, additionalFields);
-  
-  // REASSIGN the label to the object immediately after inserting it
-  edge.label = label;
-  
-  $tw.taskgraph.edgeChanges.push({
-    type : "insert", edge : edge
-  });
-};
-
-/**
- * A function that is called every currently running graph instance
- * during its refresh(). The function will tell the graph about the
- * changes that occured in the edge pool. It will only return information
- * on changes that match the graphs edge-view.
- * 
- * For further architectural explanation see the comment in caretaker.js
- */
-Adapter.prototype.getEdgeChanges = function() {
-   
-  var edgeFilter = this.curView ? this.curView.fields.displayedRelation : undefined;
-  
-  $tw.taskgraph.fn.logger("log", "graph with edgeFilter " + edgeFilter + " requested to get informed about edge changes");
-  
-  var changes = [];
-  for(; this.edgeChangePointer < $tw.taskgraph.edgeChanges.length; this.edgeChangePointer++) {
-    var change = $tw.taskgraph.edgeChanges[this.edgeChangePointer];
-    
-    // either no filter is specified or "all" is specified or the filter matches the edges label
-    var matchesEdgeFilter = !edgeFilter || edgeFilter == "all" || change.edge.label == edgeFilter;
-    // if we are in a view and either the edge is non-exclusive or is exclusive to the current view
-    var allowedInContext = this.curView && (!change.edge.view || change.edge.view == utils.getBasename(this.curView.fields.title))
-    
-    if(matchesEdgeFilter && allowedInContext) {
-      
-      $tw.taskgraph.fn.logger("log", "reading edge change");
-      $tw.taskgraph.fn.logger("log", change);
-      
-      changes.push(change);
+    if(this.getAttribute("editor")) {
+      this.refreshGraphBar(changedTiddlers);
     }
-  }
-  return changes;
-};
-  
-/**
- * returns the edgesDataSet that corresponds to the given filter
- * @filter a filter (string or compiled)
- * @outputType optional, either "array" or "dataset" (default).
- */
-Adapter.prototype.selectEdgesFromStore = function(filter, outputType) {
 
-  if(!filter) filter = this.edgeFilter;
-
-  if(typeof filter == "string") {
-    var filter = this.wiki.compileFilter(filter);
-  }
+  };
   
-  var stores = filter.call(this.wiki);
-  
-  var result = [];
-
-  for(var i = 0; i < stores.length; i++) {
+  /**
+   * Function that has to be called before the graph or the childwidgets
+   * check for a refresh. It checks whether the view has been switched
+   * to another view or any changes have been made to the current view.
+   */
+  TaskGraphWidget.prototype.checkForViewChanges = function(changedTiddlers) {
     
-    // could also use this.wiki.getTiddlerData(stores[i])
-    var tObj = this.wiki.getTiddler(stores[i]);
-    var edges = JSON.parse(tObj.fields.text);
+    // TODO: turn all this stuff into a compiled filter!!
+    var isViewSwitched = (this.getCurViewHolderRef() in changedTiddlers);
+    var isViewModified = (this.getCurView().fields.title in changedTiddlers);
+    var isEdgeFilterModified = ((this.getCurView().fields.title + "/filter/edges") in changedTiddlers);
     
-    for(var j = 0; j < edges.length; j++) {
+    // was the map modified from outside?
+    var isMapModified = ((this.getCurView().fields.title + "/map") in changedTiddlers);
+    var isMapModifiedFromOutside = (isMapModified && !this.isResponsibleForMapModification);
+    
+    if(isViewSwitched || isViewModified || isMapModifiedFromOutside) {
+            
+      $tw.taskgraph.fn.console.info("view switched or modified!");
+      this.curView = this.getCurView(true);
       
-      if(this.curView) {
-        var viewName = utils.getBasename(this.curView.fields.title);
-        // do not consider edges that belong exclusively to one edge
-        if(edges[j].view && edges[j].view != viewName) continue;
+      // recreate the widget filter
+      this.refreshWidgetFilter = this.getRefreshWidgetFilter();
+      
+      // rebuild the graph
+      $tw.taskgraph.fn.console.debug("reload graph data");
+      
+      this.reloadGraphData();
+      
+    } else if(isEdgeFilterModified) {
+      
+      var reloadOnlyEdges = true;
+      this.reloadGraphData(reloadOnlyEdges);
+      
+    }
+    
+    // in anycase reset isResponsibleForMapModification
+    this.isResponsibleForMapModification = false;
+    
+  };
+  
+  /**
+   * This method will ckeck if any tw-widget needs a refresh.
+   * The decision whether or not to refresh is based on the 
+   * current refreshWidgetFilter.
+   */
+  TaskGraphWidget.prototype.refreshGraphBar = function(changedTiddlers) {
+       
+    var result = utils.getMatches(this.refreshWidgetFilter, changedTiddlers);
+    
+    if(result.length) {
+      
+      //~ console.log(result);
+      //~ 
+      //~ if(result.indexOf("$:/temp/NewTagName") != -1) {
+        //~ 
+        //~ var tagInput = this.parentDomNode.getElementsByClassName("tc-edit-tags")[0]
+                           //~ .getElementsByTagName("input")[0];
+                           //~ 
+        //~ console.log("active Element");
+        //~ console.log(document.activeElement);
+        //~ console.log("has focus?");
+        //~ console.log(document.hasFocus());
+        //~ console.log("are the same?");
+        //~ console.log(tagInput == document.activeElement);
+                           //~ 
+        //~ if(tagInput == document.activeElement) {
+          //~ return false;
+        //~ }
+        //~ 
+      //~ }
+      
+      $tw.taskgraph.fn.console.info("the graphbar needs to refresh its widgets");
+      
+      // rebuild
+      this.removeChildDomNodes();
+      this.rebuildChildWidgets();
+      this.renderChildren(this.graphBarDomNode);
+      
+      return true;
+    }
+    
+    // all good
+    return true;
+    
+  };
+  
+  /**
+   * Function to check if the graph needs a refresh.
+   * Nodes and edges may have been removed, added or modified.
+   * Every decision is based on the current view.
+   */
+  TaskGraphWidget.prototype.refreshGraph = function(changedTiddlers) {
+
+    // this array holds references to graphnodes that shall be removed
+    // because (1) the corresponding tiddlers do not match the view anymore
+    // or (2) the tiddlers cannot be traced anymore (either due to a
+    // delete of the tiddler or a rename while using non-id mode)
+    var deleteCandidates = [];
+    
+    for(var tRef in changedTiddlers) {
+      
+      if(this.wiki.isSystemTiddler(tRef)) {
+      
+        // did any change occur to an edgestore that is relevant for this view?
+        
+        var existEdgeChanges = utils.isMatch(tRef, this.adapter.getCompiledEdgeFilter());
+                
+        if(existEdgeChanges) {
+          // indeed. then get a list of changes
+          var changes = this.adapter.getEdgeChanges();
+          for(var i = 0; i < changes.length; i++) {
+            if(changes[i].type == "insert" || changes[i].type == "update") {
+              this.edges.update(changes[i].edge);
+            } else { // must be a delete then
+              this.edges.remove(changes[i].edge.id);
+            }
+          }
+        }
+        
+        continue;
+        
       }
       
-      // get the label from the edge store and assign it on the fly
-      edges[j].label = utils.getBasename(tObj.fields.title);
-      result.push(edges[j]);
+      // try to turn the tRef into a tObj
+      var tObj = this.wiki.getTiddler(tRef);
+      
+      if(!tObj) {
+
+        // no reference available: tiddler got deleted or renamed!
+        // We don't know if the tiddler was relevant for the graph or
+        // not, as we do not have access to its metadata.
+
+        // nodes will be deleted unless it is discovered that the
+        // corresponding tiddler only got renamed. Finding out
+        // whether a tiddler got renamed or not is only only possible,
+        // if the tiddler title is not used as id field.
+        
+        // extracting the label from the path to trace the node
+        var label = utils.getBasename(tRef);
+        // search dataset for nodes with the same **label**
+        var filter = function(node) { return node.label == label; }
+        var ids = this.nodes.getIds({ filter: filter });
+        deleteCandidates = deleteCandidates.concat(ids);
+        
+        continue;
+      }
+      
+      // Tiddler exists
+      
+      // we don't care about drafts
+      if(tObj.isDraft()) { continue; }
+
+      // check if tiddler is relevant for this graph
+      if(!utils.isMatch(tObj, this.adapter.getCompiledNodeFilter())) {
+        
+        // search the dataset for nodes with the same **id**
+        // because maybe was in the view before and isn't anymore
+        var id = tObj.fields[$tw.taskgraph.opt.tw.fields.id];
+        var filter = function(node) { return node.id == id; };
+        var ids = this.nodes.getIds({ filter: filter });
+        deleteCandidates = deleteCandidates.concat(ids);
+        
+        continue;
+      }
+      
+      // before adding the tiddler, make sure it has a proper id
+      tObj = this.adapter.setupTiddler(tObj);
+      
+      var data = {
+          id : tObj.fields[$tw.taskgraph.opt.tw.fields.id],
+          label : tObj.fields.label || tObj.fields.title,
+          name: tObj.fields.title
+      };
+                
+      // if id is in deleteCandidate, remove it from the list, as it only got renamed!
+      var index = deleteCandidates.indexOf(data.id);
+      if(index != -1) deleteCandidates.splice(index, 1);
+      
+      this.nodes.update(data);
+       
+    }
+    
+    // all remaining ids need to be removed
+    if(deleteCandidates.length > 0) {
+      this.nodes.remove(deleteCandidates);
+    }
+  }
+  
+  /**
+   * Rebuild the graph
+   * 
+   * @see
+   *   - http://visjs.org/docs/network.html
+   *   - http://visjs.org/docs/dataset.html
+   */
+  TaskGraphWidget.prototype.initAndRenderGraph = function(parent) {
+    
+    $tw.taskgraph.fn.console.info("initializing and rendering the graph");
+    
+    // create a div for the graph and register it
+    this.graphDomNode = document.createElement("div");
+    $tw.utils.addClass(this.graphDomNode, "vis-graph");
+    parent.appendChild(this.graphDomNode);
+    
+    // graph size issues
+    if(this.getAttribute("height")) {
+      this.graphDomNode.style["height"] = this.getAttribute("height");
+    } else {
+      // the listener removes itself if parentDomNode becomes an orphan
+      window.addEventListener("resize", this.handleResizeEvent.bind(this), false);
+      this.maxEnlarge(this.graphDomNode);
+    }
+
+    this.graphOptions = this.getGraphOptions();
+    
+    var graphData = {
+      nodes : this.nodes,
+      edges : this.edges
+    }
+    
+    // render the graph
+    this.network = new vis.Network(this.graphDomNode, graphData, this.graphOptions);
+    
+    // register events
+    this.network.on("doubleClick", this.handleDoubleClickEvent.bind(this));
+    
+    this.network.on("stabilized", this.handleStabilizedEvent.bind(this));
+        
+    // repaint when sidebar is hidden
+    this.registerCallback("$:/state/sidebar", this.repaintGraph.bind(this), false);
+    
+    this.network.on("dragEnd", function(properties) {
+      if(properties.nodeIds.length) {
+        this.nodes.update({
+          id: properties.nodeIds[0],
+          allowedToMoveX: false,
+          allowedToMoveY: false
+        });
+        this.handleStorePositions();
+      }
+    }.bind(this));
+    
+    this.network.on('dragStart', function(properties) {
+      this.nodes.update({
+        id: properties.nodeIds[0],
+        allowedToMoveX: true,
+        allowedToMoveY: true
+      });
+    }.bind(this));
+    
+    // position the graph
+    this.repaintGraph();
+    
+  }
+  
+  /**
+   * Replace the current set of nodes and edges of the graph with
+   * a fresh select.
+   * 
+   * ATTENTION: Always be sure the adapter's setView is called
+   * before the select is made. Otherwise the old view is used as
+   * a basis for the select.
+   * 
+   * @see
+   *   - It is possible that the position of network stay the same after I call network.setData(newData);
+   *     https://github.com/almende/vis/issues/376
+   * 
+   */
+  TaskGraphWidget.prototype.reloadGraphData = function(reloadOnlyEdges) {
+    
+    $tw.taskgraph.fn.console.log("reload graph data");
+    
+    // update adapter
+    this.adapter.setView(this.curView);
+    
+    // update the this-properties which are also accessed at some other places
+    if(!reloadOnlyEdges) { this.nodes = this.adapter.selectNodesFromStore(); }
+    this.edges = this.adapter.selectEdgesFromStore();
+    
+    // has to be set to disable allowMoveX and Y after stabilized event
+    this.hasNetworkStabilized = false;
+    
+    this.network.setData({
+      nodes : this.nodes,
+      edges : this.edges
+    });
+        
+  };
+    
+  /**
+   * If a template is specified, create a snapshot from the given
+   * view (= a clone), otherwise, create an empty view. In any case
+   * a dialog is opened that asks the user how to name the view.
+   * The view is then registered as current view.
+   */
+  TaskGraphWidget.prototype.handleCreateView = function(templateTObj) {
+
+    // TODO: option paths seriously need some refactoring!
+    var dialogSkeleton = this.wiki.getTiddler($tw.taskgraph.opt.tw.template.dialog.getViewName);
+    
+    // used inside dialog and for the notification
+    var verb = (templateTObj ? "clone" : "create");
+    
+    this.openDialog(dialogSkeleton, { verb : verb }, function(isConfirmed, outputTObj) {
+    
+      var isSuccess = isConfirmed && outputTObj && outputTObj.fields.text;
+    
+      if(isSuccess) {
+        
+        var viewname = utils.getBasename(outputTObj.fields.text);
+                
+        var fields = {};
+        fields.title =  $tw.taskgraph.opt.tw.prefix.views + "/" + viewname;
+        fields[$tw.taskgraph.opt.tw.fields.viewMarker] = true;
+        
+        if(!templateTObj) {
+          // simply copy the body to get a transclude of graphBar
+          fields.text = this.curView.fields.text;
+        }
+        
+        this.wiki.addTiddler(new $tw.Tiddler(templateTObj, fields));
+        
+        this.setCurView(fields.title);
+        
+        // past tense :)
+        $tw.taskgraph.fn.notify("view " + verb + "d");
+        
+      }
+
+    }.bind(this));
+  };
+
+  TaskGraphWidget.prototype.handleDeleteView = function() {
+    
+    var tRef = this.getCurView().fields.title;
+    var viewname = utils.getBasename(tRef);
+    
+    if(viewname == "default") {
+      $tw.taskgraph.fn.notify("Thou shalt not kill the default view!");
+      return;
+    }
+    $tw.taskgraph.fn.console.log("bla");
+    // regex is non-greedy
+    var filter = "[regexp:text[<\\$taskgraph.*?view=." + viewname + "..*?>]]";
+    $tw.taskgraph.fn.console.log(filter);
+    var matches = utils.getMatches(filter);
+    $tw.taskgraph.fn.console.log(matches);
+    if(matches.length) {
+      
+      var fields = {
+        count : matches.length.toString(),
+        filter : filter
+      };
+      var tRef = $tw.taskgraph.opt.tw.template.dialog.notAllowedToDeleteView;
+      var dialogSkeleton = this.wiki.getTiddler(tRef);
+      this.openDialog(dialogSkeleton, fields, null);
+
+      return;
+      
+    }
+
+    var message = "You are about to delete the view " + 
+                  "''" + viewname + "'' (no tiddler currently references this view).";
+                  
+    this.openStandardConfirmDialog(function(isConfirmed) {
+      if(!isConfirmed) return;
+      
+      var defaultViewTRef = $tw.taskgraph.opt.tw.prefix.views + "/default";
+      
+      // first, switch the view to the ever-existing default view
+      this.setCurView(defaultViewTRef);
+
+      // now delete the view and all tiddlers stored in its path (map, edge-filter etc.)
+      var filter = "[prefix[" + $tw.taskgraph.opt.tw.prefix.views + "/" + viewname + "]]";
+      utils.deleteTiddlers(utils.getMatches(filter));
+
+      // notify the user
+      $tw.taskgraph.fn.notify("view \"" + viewname + "\" deleted ");
+
+    }.bind(this), message);
+    
+  };
+  
+  /**
+   * Called by vis when the user tries to delete a node or an edge.
+   * @data { nodes: [selectedNodeIds], edges: [selectedEdgeIds] }
+   */
+  TaskGraphWidget.prototype.handleNetworkDeleteEvent = function(data, callback) {
+    
+    if(data.edges.length && !data.nodes.length) { // only deleting edges
+      this.adapter.deleteEdgesFromStore(this.edges.get(data.edges));
+      callback(data);
+      $tw.taskgraph.fn.notify("edge" + (data.edges.length > 1 ? "s" : "") + " removed");
+    }
+                        
+    if(data.nodes.length) {
+      
+      var fields = {
+        subtitle : "Please confirm your choice",
+        text: "By deleting a node you are also deleting the " +
+              "corresponding tiddler __and__ any edges connected " +
+              "to that node. Really proceed?"
+      };
+      
+      this.openDialog(null, fields, function(isConfirmed) {
+        
+        if(!isConfirmed) return; // callback({}) ?
+          
+          // get objects with labels and ids
+          var nodes = this.nodes.get(data.nodes);
+          var edges = this.edges.get(data.edges);
+          
+          this.adapter.deleteNodesFromStore(nodes);
+          this.adapter.deleteEdgesFromStore(edges);
+          
+          $tw.taskgraph.fn.notify("node" + (data.nodes.length > 1 ? "s" : "") + " removed");
+        
+      }.bind(this));
+    }     
+  }
+  
+  TaskGraphWidget.prototype.handleStorePositions = function() {
+    // this is a flag to tell the current graph not to update itself
+    this.isResponsibleForMapModification = true;
+    this.adapter.storePositions(this.network.getPositions());
+    //this.network.storePositions();
+    $tw.taskgraph.fn.notify("positions stored");
+  }
+
+  /**
+   * Called by vis when the graph has stabilized itself.
+   * 
+   * ATTENTION: never store positions in a views map during stabilize
+   * as this will affect other graphs positions and will cause recursion!
+   * Storing positions inside vis' nodes is fine though
+   */
+  TaskGraphWidget.prototype.handleStabilizedEvent = function(properties) {
+    
+    if(!this.hasNetworkStabilized) {
+      
+      var ids = this.nodes.getIds();
+      var updates = [];
+      for(var i = 0; i < ids.length; i++) {
+        updates.push({
+          id: ids[i],
+          allowedToMoveX: false,
+          allowedToMoveY: false
+        });
+      }
+      
+      this.nodes.update(updates);
+      
+      this.hasNetworkStabilized = true;
+    }
+  };
+  
+    
+  /**
+   * This handler is registered at and called by the vis network event
+   * system
+   * 
+   * @see
+   *   - Coordinates not passed on click/tap events within the properties object
+   *     https://github.com/almende/vis/issues/440
+   * 
+   * @properties a list of nodes and/or edges that correspond to the
+   * click event.
+   */
+  TaskGraphWidget.prototype.handleDoubleClickEvent = function(properties) {
+        
+    // doubleclicked on an empty spot
+    if(!properties.nodes.length && !properties.edges.length) {
+            
+      this.adapter.createNode(properties.pointer.canvas, this);
+      
+    } else {
+      
+       if(properties.nodes.length) { // clicked on a node
+
+        $tw.taskgraph.fn.console.info("doubleclicked on a node");
+        $tw.taskgraph.fn.console.debug(properties);
+
+        var id = properties.nodes[0];
+        var targetTitle = this.nodes.get(id).name || this.nodes.get(id).label;
+        //this.network.focusOnNode(properties.nodes[0], {});
+        
+      } else if(properties.edges.length) { // clicked on an edge
+        
+        $tw.taskgraph.fn.console.info("doubleclicked on an edge");
+        $tw.taskgraph.fn.console.debug(properties);
+        // TODO: use returnType option!
+        var label = this.edges.get(properties.edges[0]).label;
+        var targetTitle = $tw.taskgraph.opt.tw.prefix.edges + "/" + label;
+      
+      }
+      
+      // window.location.hash = node.label; is not the right way to do it
+      this.dispatchEvent({
+        type: "tm-navigate", navigateTo: targetTitle
+      }); 
             
     }
-  }
+    
+  };
   
-  return (outputType == "array" ? result : new vis.DataSet(result));
-  
-}
+  /**
+   * Listener will be removed if the parent is not part of the dom anymore
+   * 
+   * @see
+   *   - [TW5] Is there a destructor for widgets?
+   *     https://groups.google.com/d/topic/tiddlywikidev/yuQB1KwlKx8/discussion
+   *   - https://developer.mozilla.org/en-US/docs/Web/API/Node.contains
+   */
+  TaskGraphWidget.prototype.handleResizeEvent = function(event) {
 
-/**
- * This function will remove all tiddlers from the wiki that correspond
- * to this node in the graph. Drafts are also removed. The default
- * storylist is updated eventually.
- * 
- * @nodes is an array that contains node objects with their properties
- */
-Adapter.prototype.deleteNodesFromStore = function(nodes) {
-  
-  if(!nodes || !nodes.length) return;
-  
-  // array of tiddlers in the default storyList
-  var storyList = this.wiki.getTiddlerList("$:/StoryList");
-
-  for(var i = 0; i < nodes.length; i++) {
-    
-    var tRef = nodes[i].label;
-    var tDraftRef = this.wiki.findDraft(tRef);    
-    
-    utils.deleteTiddlers([ tRef, tDraftRef ]);
-    
-    if(storyList) {
-      // remove elements from storyList
-      storyList = storyList.filter(function(el) {
-        return (el != tRef && el != tDraftRef);
-      });
+    if(!document.body.contains(this.parentDomNode)) {
+      window.removeEventListener("resize", this.handleResizeEvent);
+      return;
     }
-  }
-  
-  if(storyList) {
-    // save story list again
-    var tObj = this.wiki.getTiddler("$:/StoryList");
-    this.wiki.addTiddler(new $tw.Tiddler(tObj, { list: storyList }));
-  }
-  
-}
+    
+    if(!this.network) {
+      $tw.taskgraph.fn.console.warn("graph has not been initialized yet");
+      return;
+    }
+    
+    this.maxEnlarge(this.graphDomNode);
 
-/**
- * optimized function to remove multiple edges from several stores.
- * @edges is an array that contains edge objects with the properties
- * from, to, label.
- */
-Adapter.prototype.deleteEdgesFromStore = function(edges) {
-
-  if(!edges || !edges.length) return;
-  
-  $tw.taskgraph.fn.logger("info", "the following edges will be deleted from store");
-  $tw.taskgraph.fn.logger("debug", edges);
+    this.repaintGraph();
+    
+  };
+   
+  /**
+   * The view holder is a tiddler that stores a references to the current
+   * view. If the graph is not bound to a view by the user via an
+   * attribute, the default view holder is used. Otherwise, a temporary
+   * holder is created whose value is set to the view specified by the user.
+   * This way, the graph is independent from view changes made in a
+   * taskgraph editor.
+   * 
+   * This function will only calculate a new reference to the holder
+   * on first call (that is when no view holder is registered to "this".
+   * 
+   * @viewName the value of the view attribute specified in the widget
+   *     tags.
+   */
+  TaskGraphWidget.prototype.getCurViewHolderRef = function(viewName) {
+    
+    // the viewholder is never recalculated once it exists
+    if(this.curViewHolderRef) return this.curViewHolderRef;
+    
+    $tw.taskgraph.fn.console.info("retrieving or generating the view holder reference");
+    
+    // if given, try to retrieve the viewHolderRef by specified attribute
+    if(viewName) {
       
-  // prep object holds (1) the parsed JSON extracted from the store
-  // and (2) the edges that are to be deleted
-  var prep = {};
-  
-  // first step: prepare
-  for(var i = 0; i < edges.length; i++) {
-    
-    // protect against null array-elements passed by vis
-    if(typeof edges[i] != "object") continue;
-    
-    var label = edges[i].label;
-    var storeRef = $tw.taskgraph.opt.tw.prefix.edges + "/" + label;
-    
-    if(!(storeRef in prep)) {
-      prep[storeRef] = {
-        edges : this.wiki.getTiddlerData(storeRef, []),
-        deleteCandidates : []
+      $tw.taskgraph.fn.console.log("user wants to bind " + viewName + " to graph");
+      
+      // create a view holder that is exclusive for this graph
+      
+      var viewRef = $tw.taskgraph.opt.tw.prefix.views + "/" + viewName;
+      if(this.wiki.tiddlerExists(viewRef)) {
+        var viewHolderRef = $tw.taskgraph.opt.tw.prefix.localHolders + "/" + vis.util.randomUUID();
+        $tw.taskgraph.fn.console.debug("using an independent temporary view holder: \"" + viewHolderRef + "\"");
+        
+        this.wiki.addTiddler(new $tw.Tiddler({ 
+          title : viewHolderRef,
+          text : viewRef
+        }));
+        
+        return viewHolderRef;
       }
+      
     }
     
-    prep[storeRef].deleteCandidates.push(edges[i]);
+    // if nothing has been returned yet, return the default
+    $tw.taskgraph.fn.console.debug("setting view holder to the global default");
+    return $tw.taskgraph.opt.tw["defaultGraphViewHolder"];
     
-    // also register each edge as delete
-    $tw.taskgraph.edgeChanges.push({
-      type : "delete",  edge : edges[i]
-    });
-    
-  }
+  };
   
-  // second step: delete edges
+  /**
+   * This function will switch the current view reference of the
+   * view holder. If no viewRef is specified, the current view is
+   * simply updated.
+   * 
+   * @viewRef (optional) a reference (tiddler title) to a view
+   * @viewHolderRef (optional) a reference to the view holder that should be updated
+   */
+  TaskGraphWidget.prototype.setCurView = function(viewRef, viewHolderRef) {
+    
+    if(viewRef) {
+      if(!viewHolderRef) viewHolderRef = this.curViewHolderRef;
+      $tw.taskgraph.fn.console.info("setting the value of view holder \"" + viewHolderRef + " to \"" + viewRef + "\"");
+      this.wiki.addTiddler(new $tw.Tiddler({ 
+        title : viewHolderRef,
+        text : viewRef
+      }));
+    }
+    
+    // register the new value; no need to update the adapter as this is done during refresh
+    this.curView = this.getCurView(true);
+  };
   
-  for(var storeRef in prep) {
+  TaskGraphWidget.prototype.getCurView = function(isReextract, viewHolderRef) {
     
-    var dcs = prep[storeRef].deleteCandidates; 
+    // if already exists and not asked to reextract, use cached object...
+    if(this.curView && !isReextract) return this.curView;
     
-    var filter = function(edge) {
-      for(var i = 0; i < dcs.length; i++) {
-        return edge.id != dcs[i].id;
-      }
+    // otherwise reextract it
+    if(!viewHolderRef) viewHolderRef = this.getCurViewHolderRef();
+    $tw.taskgraph.fn.console.info("reextracting current view from \"" + viewHolderRef + "\"");
+    
+    var curViewRef = this.wiki.getTiddler(viewHolderRef).fields.text;
+    
+    $tw.taskgraph.fn.console.log("the extracted view is");
+    $tw.taskgraph.fn.console.log(curViewRef);
+    
+    if(!this.wiki.tiddlerExists(curViewRef)) {
+      $tw.taskgraph.fn.console.log("Warning: View \"" + curViewRef + "\" doesn't exist. Default is used instead.");
+      //$tw.taskgraph.fn.notify("Warning: View \"" + curViewRef + "\" doesn't exist. Default is used instead.");
+      curViewRef = $tw.taskgraph.opt.tw.prefix.views + "/default";
+    }
+    
+    this.wiki.getTiddler(curViewRef)
+    
+    return this.wiki.getTiddler(curViewRef);
+    
+  };
+  
+  TaskGraphWidget.prototype.getGraphOptions = function() {
+    
+    // current vis options can be found at $tw.taskgraph.fn.console.log(this.network.constants);
+    
+    // get a copy of the options
+    var options = this.wiki.getTiddlerData("$:/plugins/felixhayashi/taskgraph/options/vis");
+    
+    options.onDelete = this.handleNetworkDeleteEvent.bind(this);
+    options.onConnect = function(data, callback) {
+      // we do not call the callback of the network as we handle it ourselves
+      this.handleConnectionEvent(data);
+    }.bind(this);
+    
+    options.onAdd = function(data,callback) {
+      this.adapter.createNode(data, this);
+    }.bind(this);
+
+    options.dataManipulation = {
+        enabled : (this.getAttribute("editor") ? true : false),
+        initiallyVisible : true
+    };
+        
+    options.navigation = {
+       enabled : true
     };
     
-    var updatedStore = prep[storeRef].edges.filter(filter);
+    return options;
     
-    // https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/wiki.js#L654
-    this.wiki.setTiddlerData(storeRef, updatedStore);
+  };
+  
+  TaskGraphWidget.prototype.getRefreshWidgetFilter = function() {
 
-  }    
+    var filter = 
+          // tag was added
+          "[field:title[$:/temp/NewTagName]] " +
+          // whole view was changed
+          "[field:title[" + this.getCurViewHolderRef() + "]] " +
+          // maybe a new edgetype was created
+          "[prefix[" + $tw.taskgraph.opt.tw.prefix.edges + "]] " +
+          // view property was changed
+          "[field:title[" + this.getCurView().fields.title + "]] " +
+          // everything that has to do with the editor
+          "[prefix[$:/temp/taskgraph/editor/]] " +
+          // autocomplete while entering tag
+          "[prefix[$:/state/popup/tags-auto-complete]]";
+    
+    $tw.taskgraph.fn.console.debug("whether to refresh childwidgets is determined by this filter: " + filter);
+
+    var compiledFilter = this.wiki.compileFilter(filter);
+    
+    return compiledFilter;
+
+  };
+  
+  
+  TaskGraphWidget.prototype.repaintGraph = function() {
+    
+    $tw.taskgraph.fn.console.info("repainting the whole graph");
+    
+    this.network.redraw();
+    this.network.zoomExtent();
+    
+  }
+  
+  TaskGraphWidget.prototype.maxEnlarge = function(container) {
+
+    var windowHeight = window.innerHeight;
+    // https://developer.mozilla.org/en-US/docs/Web/API/element.getBoundingClientRect
+    var canvasOffset = container.getBoundingClientRect().y;
+    var distanceBottom = 15; // in pixel
+    var calculatedHeight = windowHeight - canvasOffset - distanceBottom;
+    
+    container.style["height"] = calculatedHeight + "px";
+    
+  };
+  
+  return TaskGraphWidget;
+
 }
-
-// TODO: this function
-Adapter.prototype.removeObseleteEdges = function() {
-  var edgesDataSet = this.selectEdgesFromStore();
-  // an edge is obsolete if its id refers to a tiddler that does not exist anymore
-  
-}
-
-/**
- * This compiled filter is based on the current view, and other
- * considerations. The graph makes a decision, which nodes to display,
- * according to this filter.
- * 
- * see https://github.com/Jermolene/TiddlyWiki5/blob/master/editions/test/tiddlers/tests/test-filters.js
- * 
- * TODO: maybe also include a "limit" filterOperator?
- */
-Adapter.prototype.getCompiledNodeFilter = function(doRecompile) {
-  
-  if(!doRecompile && this.nodeFilter) return this.nodeFilter;
-  
-  var filter = (function() {
-    var filterComponents = [];
-    // no system tiddlers
-    filterComponents.push("!is[system]");
-    // no drafts
-    filterComponents.push("!has[draft.of]");
-    if(this.curView) {
-      // if a view exists, allow only tiddlers with tags specified in the view
-      var tags = this.curView.fields.tags;
-      var consideredTags = tags ? tags : [];
-      for(var i = 0; i < consideredTags.length; i++) {
-        filterComponents.push("tag[" + consideredTags[i] + "]");
-      }
-    }
-    return "[" + filterComponents.join('') + "]";
-  }).call(this);
-  
-  $tw.taskgraph.fn.logger("debug", "Created the following node-filter \"" + filter + "\"");
-  
-  return this.wiki.compileFilter(filter);
-
-};
-  
-/**
- * This compiled filter is based on the current view, and other
- * considerations. The graph makes a decision, which edges to display,
- * according to this filter.
- * 
- * @see
- *   - [TW5] compiled filter with titles doesn't work?
- *     https://groups.google.com/forum/#!topic/tiddlywikidev/WGR0hTRpZCA
- * 
- * TODO: At the moment only one or all edges may be filtered. Change this so more edges may be filtered at the same time.
- */
-Adapter.prototype.getCompiledEdgeFilter = function(doRecompile) {
-  
-  if(!doRecompile && this.edgeFilter) return this.edgeFilter;
-  
-  var filter = (function() {
-    var filterComponents = [];
-    // only tiddlers with this prefix
-    filterComponents.push("prefix[" + $tw.taskgraph.opt.tw.prefix.edges + "]");
-    // no drafts
-    filterComponents.push("!has[draft.of]");
-    if(this.curView) {
-      // if a view exists, allow only edges specified as to be displayed
-      var tRef = this.curView.fields.title + "/filter/edges";
-      var tObj = this.wiki.getTiddler(tRef);
-      if(tObj) {
-        var tags = tObj.fields.tags;
-        var consideredTags = tags ? tags : [];
-        for(var i = 0; i < consideredTags.length; i++) {
-          filterComponents.push("!prefix[" + $tw.taskgraph.opt.tw.prefix.edges + "/" + consideredTags[i] + "]"); // TODO: once jeremy added inverted features, turn this into the opposite
-        }
-      }
-    }
-    return "[" + filterComponents.join('') + "]";
-  }).call(this);
-  
-  $tw.taskgraph.fn.logger("debug", "Created the following edge-filter \"" + filter + "\"");
-  
-  return this.wiki.compileFilter(filter);
-
-};
-  
-/**
- * returns the nodesDataSet that corresponds to the given filter.
- * 
- * @outputType optional, either "array" or "dataset" (default).
- */
-Adapter.prototype.selectNodesFromStore = function(filter, outputType) {
-  
-  if(!filter) filter = this.nodeFilter;
-  
-  if(typeof filter == "string") {
-    var filter = this.wiki.compileFilter(filter);
-  }
-  
-  var tiddlers = filter.call(this.wiki);
-    
-  var nodes = [];
-  
-  for(var i = 0; i < tiddlers.length; i++) {
-    
-    // TODO: make function accept a tRef
-    var curTiddler = this.setupTiddler(this.wiki.getTiddler(tiddlers[i]));
-    var id = curTiddler.fields[$tw.taskgraph.opt.tw.fields.id];
-    
-    if(id in nodes) {
-      utils.notify("The id of tiddler \"" + tiddlers[i] + "\" is already used by tiddler \"" + nodes[id].label + "\"");
-      continue;
-    }
-    
-    nodes.push({
-      id: id,
-      label: curTiddler.fields.label || curTiddler.fields.title
-    });
-  }
-  
-  this.restorePositions(nodes);
-          
-  return (outputType == "array" ? nodes : new vis.DataSet(nodes));
-  
-};
-
-Adapter.prototype.selectNodeFromStoreById = function(id) {
-  var filter = "[field:" +
-                $tw.taskgraph.opt.tw.fields.id +
-                "[" + id + "]]"
-  return this.selectNodesFromStore(filter, "array")[0];
-};
-
-/**
- * This method will load the current view's map values into the nodes
- * @nodes an array of node-objects.
- */
-Adapter.prototype.restorePositions = function(nodes) {
-  
-  if(!this.curView) return;
-  
-  var ref = this.curView.fields.title + "/map";    
-  var map = this.wiki.getTiddlerData(ref, {});
-  
-  for(var i = 0; i < nodes.length; i++) {
-    if(nodes[i].id in map) {
-      this._addNodePosition(nodes[i], map[nodes[i].id]);
-    }
-  }
-}
-
-/**
- * This function will store the current positions into the views map.
- * @positions a hashmap with a nodes id as identifier and x, y properties
- */
-Adapter.prototype.storePositions = function(positions) {
-  
-  if(!this.curView) {
-    $tw.taskgraph.fn.logger("warn", "no view specified. will not store positions");
-    return;
-  }
-  
-  $tw.taskgraph.fn.logger("log", "storing positions of \"" + this.curView.fields.title + "\"");
-  
-  var title = this.curView.fields.title + "/map";
-  this.wiki.setTiddlerData(title, positions);
-    
-}
-
-/**
- * This method makes sure a Tiddler has all the necessary fields
- * that the plugin needs to work with it. This means particularly
- * that a Tiddler has a proper value in its designated id field.
- * The idField may be changed by the user and can also be the title
- * field. If the id field does not exist or doesn't have a value,
- * it will be created.
- */
-Adapter.prototype.setupTiddler = function(tObj) {
-  
-  var modFields = undefined;
-  
-  var idField = $tw.taskgraph.opt.tw.fields.id; 
-  if(!(idField in tObj.fields) || !tObj.fields[idField]) {
-    modFields = modFields ? modFields : {};
-    modFields[idField] = vis.util.randomUUID();
-  }
-  
-  if(modFields) {
-    var updatedTObj = new $tw.Tiddler(tObj, modFields);
-    $tw.wiki.addTiddler(updatedTObj);
-    return updatedTObj;
-  } else  {
-    return tObj;
-  }
-  
-};
-
-/**
- * This will set the position. If vis loads nodes with positions set
- * it will prevent them from being moved once visible so this has
- * to be taken care of later.
- * 
- * @node an array representing a node
- * @pos x,y coordinates
- */
-Adapter.prototype._addNodePosition = function(node, pos) {
-
-  node.x = pos.x;
-  node.y = pos.y;
-  
-  return node;
-      
-};
-
-// export
-exports.Adapter = Adapter

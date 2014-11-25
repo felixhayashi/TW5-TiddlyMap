@@ -92,7 +92,9 @@ say here is: do not require the caretaker!
       
       // all field (attribute names) that have special meanings for taskgraph are registered here
       opt.tw.fields = {};
-        // used to identify a tiddler as view.
+        // used to identify a tiddler being a view that visbile to the user.
+        // if a view tiddler is not tagged with this marker, it can still be used
+        // as view but won't show up 
         opt.tw.fields.viewMarker = "isview";
         opt.tw.fields.id = (opt.tw.field_nodeId ? opt.tw.field_nodeId : "id");
 

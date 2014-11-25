@@ -86,6 +86,10 @@ utils.notify = function(message) {
   $tw.notifier.display(tRef);
 };
 
+utils.tiddlerExists = function(tRef) {
+  return $tw.wiki.tiddlerExists(tRef) || $tw.wiki.isShadowTiddler(tRef);
+};
+
 utils.getDomNodePos = function(el) {
   var pos = { x: 0, y: 0 };
   while(true){

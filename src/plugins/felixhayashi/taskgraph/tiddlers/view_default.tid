@@ -1,3 +1,5 @@
-isview: true
 title: $:/plugins/felixhayashi/taskgraph/graph/views/default
+isview: true
+nodeListRef: $:/StoryList
+
 

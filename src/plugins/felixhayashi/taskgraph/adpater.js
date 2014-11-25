@@ -177,7 +177,7 @@ Adapter.prototype.getEdgeChanges = function() {
  * @filter a filter (string or compiled)
  * @outputType optional, either "array" or "dataset" (default).
  */
-Adapter.prototype.selectEdgesFromStore = function(filter, outputType) {
+Adapter.prototype.selectEdges = function(filter, outputType) {
 
   if(!filter) filter = this.edgeFilter;
 
@@ -314,7 +314,7 @@ Adapter.prototype.deleteEdgesFromStore = function(edges) {
 
 // TODO: this function
 Adapter.prototype.removeObseleteEdges = function() {
-  var edgesDataSet = this.selectEdgesFromStore();
+  var edgesDataSet = this.selectEdges();
   // an edge is obsolete if its id refers to a tiddler that does not exist anymore
   
 }
@@ -333,20 +333,21 @@ Adapter.prototype.getCompiledNodeFilter = function(doRecompile) {
   if(!doRecompile && this.nodeFilter) return this.nodeFilter;
   
   var filter = (function() {
-    var filterComponents = [];
-    // no system tiddlers
-    filterComponents.push("!is[system]");
-    // no drafts
-    filterComponents.push("!has[draft.of]");
+    var components = [];
+    components.push("!is[system]"); // no system tiddlers
+    components.push("!has[draft.of]"); // no drafts
     if(this.curView) {
       // if a view exists, allow only tiddlers with tags specified in the view
       var tags = this.curView.fields.tags;
       var consideredTags = tags ? tags : [];
       for(var i = 0; i < consideredTags.length; i++) {
-        filterComponents.push("tag[" + consideredTags[i] + "]");
+        components.push("tag[" + consideredTags[i] + "]");
       }
+      // allow a custom filter specified by user
+      var custFilter = this.curView.fields.customFilter;
+      if(!custFilter) custFilter = "";
     }
-    return "[" + filterComponents.join('') + "]";
+    return "[" + components.join('') + "] " + custFilter;
   }).call(this);
   
   $tw.taskgraph.fn.logger("debug", "Created the following node-filter \"" + filter + "\"");
@@ -371,11 +372,11 @@ Adapter.prototype.getCompiledEdgeFilter = function(doRecompile) {
   if(!doRecompile && this.edgeFilter) return this.edgeFilter;
   
   var filter = (function() {
-    var filterComponents = [];
+    var components = [];
     // only tiddlers with this prefix
-    filterComponents.push("prefix[" + $tw.taskgraph.opt.tw.prefix.edges + "]");
+    components.push("prefix[" + $tw.taskgraph.opt.tw.prefix.edges + "]");
     // no drafts
-    filterComponents.push("!has[draft.of]");
+    components.push("!has[draft.of]");
     if(this.curView) {
       // if a view exists, allow only edges specified as to be displayed
       var tRef = this.curView.fields.title + "/filter/edges";
@@ -384,11 +385,11 @@ Adapter.prototype.getCompiledEdgeFilter = function(doRecompile) {
         var tags = tObj.fields.tags;
         var consideredTags = tags ? tags : [];
         for(var i = 0; i < consideredTags.length; i++) {
-          filterComponents.push("!prefix[" + $tw.taskgraph.opt.tw.prefix.edges + "/" + consideredTags[i] + "]"); // TODO: once jeremy added inverted features, turn this into the opposite
+          components.push("!prefix[" + $tw.taskgraph.opt.tw.prefix.edges + "/" + consideredTags[i] + "]"); // TODO: once jeremy added inverted features, turn this into the opposite
         }
       }
     }
-    return "[" + filterComponents.join('') + "]";
+    return "[" + components.join('') + "]";
   }).call(this);
   
   $tw.taskgraph.fn.logger("debug", "Created the following edge-filter \"" + filter + "\"");
@@ -399,56 +400,139 @@ Adapter.prototype.getCompiledEdgeFilter = function(doRecompile) {
   
 /**
  * returns the nodesDataSet that corresponds to the given filter.
- * 
+ *
+ * @filter optional (only if a view has been registered) tw-filter.
+ * @listTRef an optional list-tiddler reference. If no reference is given,
+ *    it is still made an attempt it from the current view, which may have
+ *    been registered. FEATURE NOT FULLY IMPLEMENTED YET!
  * @outputType optional, either "array" or "dataset" (default).
  */
-Adapter.prototype.selectNodesFromStore = function(filter, outputType) {
+Adapter.prototype.selectNodes = function(filter, listTRef, outputType) {
   
   if(!filter) filter = this.nodeFilter;
+  if(!listTRef && this.curView) listTRef = this.curView.fields.nodeListRef;
   
-  if(typeof filter == "string") {
-    var filter = this.wiki.compileFilter(filter);
-  }
+  //~ console.error("matches at select", utils.getMatches(filter));
   
-  var tiddlers = filter.call(this.wiki);
-    
   var nodes = [];
-  
-  for(var i = 0; i < tiddlers.length; i++) {
-    
-    // TODO: make function accept a tRef
-    var curTiddler = this.setupTiddler(this.wiki.getTiddler(tiddlers[i]));
-    var id = curTiddler.fields[$tw.taskgraph.opt.tw.fields.id];
-    
-    if(id in nodes) {
-      utils.notify("The id of tiddler \"" + tiddlers[i] + "\" is already used by tiddler \"" + nodes[id].label + "\"");
-      continue;
-    }
-    
-    nodes.push({
-      id: id,
-      label: curTiddler.fields.title
-    });
-  }
-  
-  this.restorePositions(nodes);
-          
+  // append nodes using the tiddlers returned by the filter
+  this._pushAsNodes(utils.getMatches(filter), nodes);
+
+  // append nodes using the tiddlers specified in the list
+  //this._pushAsNodes(this.wiki.getTiddlerList(listTRef), nodes);
+  // if possible (inside a view), insert x, y
+  this._restorePositions(nodes);
+
   return (outputType == "array" ? nodes : new vis.DataSet(nodes));
   
 };
 
+/**
+ * Function to make it easy to retrieve a single node from store
+ */
 Adapter.prototype.selectNodeFromStoreById = function(id) {
   var filter = "[field:" +
                 $tw.taskgraph.opt.tw.fields.id +
                 "[" + id + "]]"
-  return this.selectNodesFromStore(filter, "array")[0];
+  return this.selectNodes(filter, null, "array")[0];
+};
+
+/**
+ * Helper function to create nodes from a set of tiddlers and append
+ * them to an existing array of nodes. Nodes that already exist are
+ * filtered out.
+ */
+Adapter.prototype._pushAsNodes = function(tRefs, nodes) {
+  
+  if(!nodes) nodes = [];
+  
+  for(var i = 0; i < tRefs.length; i++) {
+    
+    if(!utils.tiddlerExists(tRefs[i])) {
+      console.error("doesnt exist", tRefs);
+      continue;
+    }
+
+    // TODO: make function accept a tRef
+    var tObj = this.setupTiddler(this.wiki.getTiddler(tRefs[i]));
+    
+    var id = tObj.fields[$tw.taskgraph.opt.tw.fields.id];
+    
+    if(id in nodes) continue;
+    
+    nodes.push({ id: id, label: tRefs[i] });
+  
+  }
+  
+  return nodes;
+  
+};
+
+// returns an array of ids.
+// neighbours that already exist as nodes are not returned
+Adapter.prototype.selectNeighbours = function(nodeIds, edges) {
+
+  // TODO: make sure can be also called outside a view
+  // TODO: make sure only existing edges are returned
+  if(!edges) edges = this.selectEdges(this.edgeFilter, "array");
+
+  var neighbours = [];
+  // lib/DataSet.js#L585
+  for(var i = 0; i < nodeIds.length; i++) {
+    for(var j = 0; j < edges.length; j++) {
+      var edge = edges[j];
+      if(
+         edge.from == nodeIds[i] // node is the from-part of the edge
+         && (nodeIds.indexOf(edge.to) == -1) // edge.to is not in the set itself
+         && (neighbours.indexOf(edge.to) == -1) // not added to neighbours yet
+      ) { 
+        neighbours.push(edge.to);
+      } else if(
+         edge.to == nodeIds[i] // node is the to-part of the edge
+         && (nodeIds.indexOf(edge.from) == -1) // not in the set itself
+         && (neighbours.indexOf(edge.from) == -1) // not added to neighbours yet
+      ) {
+        neighbours.push(edge.from);
+      }
+    }
+  }
+  return neighbours;
+};
+
+//~ Adapter.prototype.isNeighbour = function(node, nodes, edges) {
+  //~ if(!edges) edges = this.selectEdges(this.edgeFilter, "array");
+  //~ 
+  //~ // if the node is part 
+  //~ 
+//~ };
+
+/**
+ * This function will return true if an edge exists.
+ * An edge is regarded as existent, if it an edge with the same
+ * from, to exists, regardless if the edge ids are different.
+ * 
+ * @edge an edge an object that has at least a from, to property
+ */
+Adapter.prototype.doesEdgeExist = function(edge) {
+  var storeRef = $tw.taskgraph.opt.tw.prefix.edges + "/" + edge.label;
+  var edges = this.wiki.getTiddlerData(storeRef);
+  // edgetype does not yet exist so edge neither exists
+  if(!edges) return false;
+  for(var i = 0; i < edges.length; i++) {
+    var doesExist = (edge.from == edges[i].from && edge.to == edges[i].to);
+    if(doesExist) {
+      $tw.taskgraph.fn.console.info("edge exists already");
+      return true;
+    }
+  }
+  return false;
 };
 
 /**
  * This method will load the current view's map values into the nodes
  * @nodes an array of node-objects.
  */
-Adapter.prototype.restorePositions = function(nodes) {
+Adapter.prototype._restorePositions = function(nodes) {
   
   if(!this.curView) return;
   

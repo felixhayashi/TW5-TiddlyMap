@@ -1,0 +1,5 @@
+title: $:/plugins/felixhayashi/taskgraph/graph/views/search
+customFilter: [!is[system]search{$:/temp/search}limit[250]]
+tags: $:/shouldnotmatch
+refreshOnChange: $:/temp/search
+displayNeighbours: true

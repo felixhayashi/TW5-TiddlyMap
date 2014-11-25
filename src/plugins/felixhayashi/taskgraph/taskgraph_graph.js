@@ -63,8 +63,10 @@ exports.getClass = function(constrObj) {
     this.refreshWidgetFilter = this.getRefreshWidgetFilter();
         
     // create this object after the nodeFilter has been initialized
-    this.nodes = this.adapter.selectNodesFromStore();
-    this.edges = this.adapter.selectEdgesFromStore();
+    this.nodes = this.adapter.selectNodes();
+    this.addNeighbours(this.nodes);
+    
+    this.edges = this.adapter.selectEdges();
     
     // first append the bar if we are in editor mode
     if(this.isEditorMode) {
@@ -173,6 +175,7 @@ exports.getClass = function(constrObj) {
   TaskGraphWidget.prototype.checkForViewChanges = function(changedTiddlers) {
     
     // TODO: turn all this stuff into a compiled filter!!
+    var isRefreshTriggered = (this.getCurView().fields.refreshOnChange in changedTiddlers);
     var isViewSwitched = this.isViewSwitched(changedTiddlers);
     var isViewModified = (this.getCurView().fields.title in changedTiddlers);
     var isEdgeFilterModified = ((this.getCurView().fields.title + "/filter/edges") in changedTiddlers);
@@ -181,7 +184,7 @@ exports.getClass = function(constrObj) {
     var isMapModified = ((this.getCurView().fields.title + "/map") in changedTiddlers);
     var isMapModifiedFromOutside = (isMapModified && !this.isResponsibleForMapModification);
     
-    if(isViewSwitched || isViewModified || isMapModifiedFromOutside) {
+    if(isViewSwitched || isViewModified || isMapModifiedFromOutside || isRefreshTriggered) {
             
       this.logger("warn", "View switched or modified");
       this.curView = this.getCurView(true);
@@ -446,8 +449,11 @@ exports.getClass = function(constrObj) {
     this.adapter.setView(this.curView);
     
     // update the this-properties which are also accessed at some other places
-    if(!reloadOnlyEdges) { this.nodes = this.adapter.selectNodesFromStore(); }
-    this.edges = this.adapter.selectEdgesFromStore();
+    if(!reloadOnlyEdges) { 
+      this.nodes = this.adapter.selectNodes();
+      this.addNeighbours(this.nodes);      
+    }
+    this.edges = this.adapter.selectEdges();
     
     // has to be set to disable allowMoveX and Y after stabilized event
     this.hasNetworkStabilized = false;
@@ -458,6 +464,20 @@ exports.getClass = function(constrObj) {
     });
         
   };
+  
+  TaskGraphWidget.prototype.addNeighbours = function(nodes) {
+    var isDisplayNeighbours = this.curView.fields.displayNeighbours;
+    if(isDisplayNeighbours) {
+      var ids = this.nodes.getIds();
+      var neighbours = this.adapter.selectNeighbours(ids);
+      updates = [];
+      for(var i = 0; i < neighbours.length; i++) {
+        updates.push(this.adapter.selectNodeFromStoreById(neighbours[i]));
+      }
+      this.nodes.update(updates);
+    }
+  };
+  
     
   /**
    * If a template is specified, create a snapshot from the given
@@ -872,15 +892,6 @@ exports.getClass = function(constrObj) {
     return compiledFilter;
 
   };
-  
-  //~ TaskGraphWidget.prototype.reloadNodes = function() {
-    //~ var nodes this.adapter.selectNodesFromStore();
-//~ 
-  //~ };
-  //~ 
-  //~ TaskGraphWidget.prototype.setNodesFixed = function(isFixed) {
-    //~ var nodes this.adapter.selectNodesFromStore();
-  //~ };
   
   TaskGraphWidget.prototype.repaintGraph = function() {
     

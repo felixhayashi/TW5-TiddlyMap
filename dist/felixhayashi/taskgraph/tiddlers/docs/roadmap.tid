@@ -22,6 +22,7 @@ End user:
 # Introduced private edge mode [ done: 2014-12-14 ]
 # Views may be renamed [ done: 2014-12-14 ]
 # New sweet button mechanism to connect tiddlers! [ done: 2014-12-14 ]
+# A user needs to click before the graph can be used [ done: 2014-12-14 ]
 
 More technical:
 

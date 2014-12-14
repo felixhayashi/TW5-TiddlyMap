@@ -2,6 +2,7 @@ title: $:/plugins/felixhayashi/taskgraph/options/vis
 type: application/json
 
 {
+  "clickToUse": true,
   "nodes": {
     "mass": 1,
     "radiusMin": 10,

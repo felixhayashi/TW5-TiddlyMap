@@ -54,8 +54,8 @@ exports.getClass = function(constrObj) {
     
     // @TODO: clean this up
     if(this.view.getLabel() === "button-search") {
-      var filter = "[search{$:/temp/connect-button-search}limit[10]]" +
-                   "[[" + this.getVariable("currentTiddler") + "]]";
+      var filter = "[search{$:/temp/connect-button-search}!is[system]limit[10]]" +
+                   "[field:title[" + this.getVariable("currentTiddler") + "]]";
       this.view.setNodeFilter(filter);
     }
     
@@ -178,7 +178,7 @@ exports.getClass = function(constrObj) {
       this.refreshEditorBar(changedTiddlers, viewModifications);
     }
     
-    this.logger("debug", "Done with refresh");
+    //this.logger("debug", "Done with refresh");
 
   };
   
@@ -258,7 +258,7 @@ exports.getClass = function(constrObj) {
     if(this.isViewSwitched(changedTiddlers) || viewModifications.length) {
       
       // full rebuild
-      this.logger("info", "The graphbar needs a full refresh");
+      //this.logger("info", "The graphbar needs a full refresh");
       this.removeChildDomNodes();
       this.rebuildChildWidgets();
       this.renderChildren(this.graphBarDomNode);
@@ -267,7 +267,7 @@ exports.getClass = function(constrObj) {
     } else {
       
       // let children decide for themselves
-      this.logger("info", "Propagate refresh to childwidgets");
+      //this.logger("info", "Propagate refresh to childwidgets");
       return this.refreshChildren(changedTiddlers);
       
     }
@@ -285,11 +285,13 @@ exports.getClass = function(constrObj) {
   TaskGraphWidget.prototype.checkForGraphUpdates = function(changedTiddlers) {
             
     var nodeFilter = this.getView().getNodeFilter("compiled");
+    
     var matchingChangedNodes = utils.getMatches(nodeFilter, Object.keys(changedTiddlers));
                                   
     // check for updated or modified nodes that match the filter
     if(matchingChangedNodes.length) {
       
+      this.logger("info", "modified nodes", matchingChangedNodes);
       this.rebuildGraph();
       return;
       
@@ -298,7 +300,7 @@ exports.getClass = function(constrObj) {
       // check for nodes that do not match the filter anymore
       for(var tRef in changedTiddlers) {
         if(this.graphData.nodesByLabel[tRef]) {
-          
+          this.logger("info", "obsolete node", matchingChangedNodes);
           this.rebuildGraph();
           return;
           
@@ -310,7 +312,8 @@ exports.getClass = function(constrObj) {
     var changedEdgestores = utils.getMatches(edgeFilter, Object.keys(changedTiddlers));
     
     if(changedEdgestores.length) {
-          
+      
+      this.logger("info", "changed edge stores", changedEdgestores);
       this.rebuildGraph();
       return;
     
@@ -591,7 +594,7 @@ exports.getClass = function(constrObj) {
    */    
   TaskGraphWidget.prototype.setNodesMoveable = function(ids, isMoveable) {
 
-    this.logger("log", "Nodes", ids, "can move:", isMoveable);
+    //this.logger("log", "Nodes", ids, "can move:", isMoveable);
 
     var updates = [];
     for(var i = 0; i < ids.length; i++) {

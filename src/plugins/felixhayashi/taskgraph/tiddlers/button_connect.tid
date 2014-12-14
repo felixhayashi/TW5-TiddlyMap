@@ -1,41 +1,26 @@
 tags: $:/tags/ViewToolbar $:/tags/EditToolbar
 title: $:/plugins/felixhayashi/taskgraph/connectButton
 
-<$taskgraph mode="button"><$button class="tc-btn-invisible" popup=<<qualify "$:/state/connect">> >{{$:/plugins/felixhayashi/taskgraph/icon}}</$button>
-
-<$reveal position="below" type="popup" state=<<qualify "$:/state/connect">> >
-
-<div class="tc-drop-down">
-
-''From'' <$button class="" set="$:/temp/connectFromRef" setTo={{!!title}} >◉ This Tiddler</$button>
-
-⇢ Current value: ❲{{$:/temp/connectFromRef}}❳
-
- ''To'' <$button class="" set="$:/temp/connectToRef" setTo={{!!title}} >◉ This Tiddler</$button>
-
-⇢ Current value: ❲{{$:/temp/connectToRef}}❳
-
-<$reveal position="below" type="nomatch" state="$:/temp/connectToRef" text="" >
-  <$reveal position="below" type="nomatch" state="$:/temp/connectFromRef" text="" >
-  
-    ---
-
-    ''Edgetype''
-    <$button message="tm-create-connection">Proceed</$button>
-
-  </$reveal>
+<$reveal type="nomatch" state=<<qualify "$:/temp/state">> text="show">
+  <$button class="tc-btn-invisible" set=<<qualify "$:/temp/state">> setTo="show">
+    {{$:/plugins/felixhayashi/taskgraph/icon}}
+  </$button>
 </$reveal>
-
----
-
-<p class="explanation">
-  <small>
-    You can always close this window and switch between Tiddlers, the values will stay until you create the connection. Also note that you can create the connection types via the textfield.
-  </small>
-</p>
-
-</div>
+<$reveal type="match" state=<<qualify "$:/temp/state">> text="show">
+  <$button class="tc-btn-invisible" set=<<qualify "$:/temp/state">> setTo="hide">
+    {{$:/plugins/felixhayashi/taskgraph/icon}}
+  </$button>
+  <div class="taskgraph_button">
+    <div class="tc-block-dropdown">
+      Search: <$edit-text tiddler="$:/temp/connect-button-search" tag="input" default="" />
+      
+      <$taskgraph
+          mode="graph"
+          editor="vis"
+          object-id="button-connect"
+          height="250px"
+          view="button-search" />
+    </div>
+  </div>
 
 </$reveal>
-
-</$taskgraph>

@@ -37,11 +37,7 @@ var ViewAbstraction = function(view, isCreate) {
   // start building paths
   this.path = utils.getEmptyMap();
   this.path.config = this._getConfigPath(view);
-  
-  if(this.path.config == null) {
-    throw "Taskgraph: Cannot translate view constructor param \"" + view + "\"";
-  }
-      
+        
   if(isCreate) {
     this._createView();
   } else if(!this.exists()) {
@@ -194,6 +190,9 @@ ViewAbstraction.prototype.getRoot = function() {
  * @return {string} The label (name) of the view.
  */
 ViewAbstraction.prototype.getLabel = function() {
+
+  if(!this.exists()) return; // TODO not nice
+  
   return utils.getBasename(this.path.config);
 };
 
@@ -228,7 +227,6 @@ ViewAbstraction.prototype.rename = function(newLabel) {
     if(!tObj) continue;
     
     this.path[index] = this.path[index].replace(oldLabel, newLabel);
-    console.log(oldLabel, newLabel, this.path[index]);
     this.wiki.addTiddler(new $tw.Tiddler(tObj, { title : this.path[index] }));
     this.wiki.deleteTiddler(tObj.fields.title);
     
@@ -372,9 +370,9 @@ ViewAbstraction.prototype.getEdgeStoreLocation = function() {
 ViewAbstraction.prototype.getAllEdgesFilterExpr = function(isOnlyLabels) {
   
   var appendix = (isOnlyLabels
-                  ? "removeprefix[" + this.getEdgeStoreLocation() + "]"
+                  ? "removeprefix[" + this.getEdgeStoreLocation() + "/]"
                   : "");
-                  
+                            
   return "[prefix[" + this.getEdgeStoreLocation() + "]" + appendix + "]";
   
 };

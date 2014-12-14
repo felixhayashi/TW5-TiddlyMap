@@ -5,14 +5,19 @@ title: $:/plugins/felixhayashi/taskgraph/ui/graphBar
 <!-- ===== View Switcher ======================================== -->
 
 <div>
-  View: 
-  <$select tiddler=<<var.ref.viewHolder>> field="text" default=<<var.ref.view>> >
-     <$list filter=<<tgmacro "option" "filter.allViews">> >
-       <option value={{!!title}}>
-         <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
-        </option>
-     </$list>
-  </$select>
+  View:
+  <$reveal type="match" text="false" default=<<var.isViewBound>> >
+    <$select tiddler=<<var.ref.viewHolder>> field="text" default=<<var.ref.view>> >
+       <$list filter=<<tgmacro "option" "filter.allViews">> >
+         <option value={{!!title}}>
+           <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
+          </option>
+       </$list>
+    </$select>
+  </$reveal>
+  <$reveal type="match" text="true" default=<<var.isViewBound>> >
+    <<var.viewLabel>>
+  </$reveal>
 
   <$button popup="$:/temp/taskgraph/editor/showactions">{{$:/core/images/menu-button}}</$button>
 
@@ -84,4 +89,3 @@ title: $:/plugins/felixhayashi/taskgraph/ui/graphBar
   </$reveal>
 
 </div>
-

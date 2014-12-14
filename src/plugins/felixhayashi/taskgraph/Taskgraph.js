@@ -154,12 +154,12 @@ for the mode-dependent TaskGraphWidgets.
        
     this.logger("info", "Opening a dialog for creating an edge");
 
-    var edgeFilterExpr = this.mode === "graph"
-                         ? this.getView().getAllEdgesFilterExpr(true) // true => byLabel
-                         : this.opt.filter.allSharedEdgesByLabel;
+    var edgeFilterExpr = (this.mode === "graph"
+                          ? this.getView().getAllEdgesFilterExpr(true) // true => byLabel
+                          : this.opt.filter.allSharedEdgesByLabel);
 
     var vars = {
-      isShowScopeOption: (this.mode === "button"),
+      isShowScopeOption: String(this.mode === "button"),
       edgeFilterExpr: edgeFilterExpr,
       fromLabel: this.adapter.selectNodeById(data.from).label,
       toLabel: this.adapter.selectNodeById(data.to).label,

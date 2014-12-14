@@ -275,6 +275,10 @@ Adapter.prototype.selectNodesByReference = function(tiddlers, options) {
   var result = utils.getEmptyMap();
   for(var i = 0; i < tiddlers.length; i++) {
     
+    if(this.wiki.isSystemTiddler(tiddlers[i])) {
+      continue;
+    }
+    
     var tObj = this.setupTiddler(tiddlers[i]);
     
     if(!tObj) continue;
@@ -282,7 +286,9 @@ Adapter.prototype.selectNodesByReference = function(tiddlers, options) {
     var id = tObj.fields[this.opt.field.nodeId];
     
     // make sure dublicates don't make it into the result set
-    if(result[id]) continue;
+    if(result[id]) {
+      continue;
+    }
 
     var node = utils.getEmptyMap();
     if(typeof protoNode === "object") {
@@ -378,7 +384,7 @@ Adapter.prototype.selectNodesByIds = function(nodeIds, options) {
 
   // transform into a hashmap with all values being true
   nodeIds = utils.getExistenceMap(nodeIds);
-    
+  
   var result = utils.getEmptyMap();
   var allTiddlers = this.wiki.allTitles();
   var idField = this.opt.field.nodeId;
@@ -390,8 +396,12 @@ Adapter.prototype.selectNodesByIds = function(nodeIds, options) {
       var tObj = this.wiki.getTiddler(allTiddlers[i]);
       var id = tObj.fields[idField];
       
+      if(tObj.isDraft() || this.wiki.isSystemTiddler(allTiddlers[i])) {
+        continue;
+      }
+      
       if(nodeIds[id]) {
-        
+
         var node = utils.getEmptyMap();
         if(typeof protoNode === "object") {
           node = $tw.utils.extendDeepCopy(node, protoNode);
@@ -426,10 +436,12 @@ Adapter.prototype.selectNodesByIds = function(nodeIds, options) {
  */
 Adapter.prototype.selectNodeById = function(id, options) {
   
-  if(typeof options !== "object") options = utils.getEmptyMap();
+  if(typeof options !== "object") {
+    options = utils.getEmptyMap();
+  }
+  
   options.outputType = "hashmap"; // overwrite option
   var result = this.selectNodesByIds([ id ], options);
-  
   return result[id];
   
 };
@@ -594,7 +606,9 @@ Adapter.prototype.storePositions = function(positions, view) {
  */
 Adapter.prototype.setupTiddler = function(tiddler) {
 
-  var tObj = utils.getTiddler(tiddler);
+  // ALWAYS reload from store to avoid setting wrong ids on tiddler
+  // being in the role of from and to at the same time
+  var tObj = this.wiki.getTiddler(utils.getTiddlerReference(tiddler));
   if(!tObj) return;
   
   var idField = this.opt.field.nodeId; 

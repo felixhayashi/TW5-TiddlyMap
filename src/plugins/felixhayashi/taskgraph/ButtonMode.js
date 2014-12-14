@@ -16,11 +16,9 @@ exports.getClass = function(constrObj) {
    * This is the Button-version of the TaskGraphWidget.
    */
   var TaskGraphWidget = function(parseTreeNode, options) {
-    
     this.addEventListeners([
       { type: "tm-create-connection", handler: this.handleButtonConnection }
     ]);  
-
   };
   
   // !! EXTENSION !!
@@ -29,8 +27,8 @@ exports.getClass = function(constrObj) {
   
   TaskGraphWidget.prototype.handleButtonConnection = function(event) {
 
-    var fromRefHolder = this.wiki.getTiddler("$:/temp/connectFromRef");
-    var toRefHolder = this.wiki.getTiddler("$:/temp/connectToRef");
+    var search = this.wiki.getTiddler("$:/temp/fromSearch");
+    var toRefHolder = this.wiki.getTiddler("$:/temp/toSearch");
     
     if(fromRefHolder && toRefHolder && fromRefHolder.fields.text && toRefHolder.fields.text){
       
@@ -81,7 +79,7 @@ exports.getClass = function(constrObj) {
    */
   TaskGraphWidget.prototype.refresh = function(changedTiddlers) {
     this.checkForCallbacks(changedTiddlers);
-    this.refreshSelf();
+    return this.refreshChildren(changedTiddlers);
   }
 
   return TaskGraphWidget;

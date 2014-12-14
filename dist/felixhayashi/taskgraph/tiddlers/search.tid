@@ -2,4 +2,4 @@ title: $:/plugins/felixhayashi/taskgraph/search
 caption: Graph
 tags: $:/tags/SearchResults
 
-<$taskgraph mode="graph" view="search"></$taskgraph>
+<$taskgraph mode="graph" view="search" object-id="search"></$taskgraph>

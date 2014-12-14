@@ -52,11 +52,18 @@ exports.getClass = function(constrObj) {
     this.viewHolderRef = this.getViewHolderRef();
     this.view = this.getView();
     
+    // @TODO: clean this up
+    if(this.view.getLabel() === "button-search") {
+      var filter = "[search{$:/temp/connect-button-search}limit[10]]" +
+                   "[[" + this.getVariable("currentTiddler") + "]]";
+      this.view.setNodeFilter(filter);
+    }
+    
     // register whether in editor mode or not
-    this.isEditorMode = this.getAttribute("editor");
+    this.editorMode = this.getAttribute("editor");
     
     // first append the bar if we are in editor mode
-    if(this.isEditorMode) {
+    if(this.editorMode) {
       this.initAndRenderEditorBar(parent);
     }
         
@@ -89,8 +96,11 @@ exports.getClass = function(constrObj) {
    */
   TaskGraphWidget.prototype.rebuildChildWidgets = function() {
     
+    if(this.editorMode === "vis") return;
+    
     // register variables
     this.setVariable("var.viewLabel", this.getView().getLabel());
+    this.setVariable("var.isViewBound", String(this.isViewBound()));
     this.setVariable("var.ref.view", this.getView().getRoot());
     this.setVariable("var.ref.viewHolder", this.getViewHolderRef());
     this.setVariable("var.ref.edgeFilter", this.getView().getPaths().edgeFilter);
@@ -163,7 +173,7 @@ exports.getClass = function(constrObj) {
             
     }
     
-    if(this.isEditorMode) {
+    if(this.editorMode) {
       // in any case give child widgets a chance to refresh
       this.refreshEditorBar(changedTiddlers, viewModifications);
     }
@@ -340,7 +350,7 @@ exports.getClass = function(constrObj) {
     this.network = new vis.Network(this.graphDomNode, dummyData, this.graphOptions);
                 
     // repaint when sidebar is hidden
-    if(!this.isEditorMode) {
+    if(!this.editorMode) {
       this.registerCallback("$:/state/sidebar", this.repaintGraph.bind(this), false);
     }
     
@@ -403,7 +413,7 @@ exports.getClass = function(constrObj) {
     }.bind(this);
 
     options.dataManipulation = {
-        enabled : (this.isEditorMode ? true : false),
+        enabled : (this.editorMode ? true : false),
         initiallyVisible : true
     };
         
@@ -537,7 +547,6 @@ exports.getClass = function(constrObj) {
   TaskGraphWidget.prototype.handleEditNodeFilter = function() {
 
     var fields = {
-      view: this.getView().getLabel,
       prettyFilter: this.getView().getPrettyNodeFilterExpr()
     };
     
@@ -614,7 +623,7 @@ exports.getClass = function(constrObj) {
     
     if(!properties.nodes.length && !properties.edges.length) { // clicked on an empty spot
       
-      if(!this.isEditorMode) return;
+      if(!this.editorMode) return;
       
       this.openDialog(this.opt.ref.nodeNameDialog, null, function(isConfirmed, outputTObj) {
         if(isConfirmed) {
@@ -800,6 +809,10 @@ exports.getClass = function(constrObj) {
     
     this.network.redraw();
     this.network.zoomExtent();
+    
+    //~ this.network.moveTo({
+      //~ ...
+    //~ });
     
   }
   

@@ -100,7 +100,7 @@ say here is: do not require the caretaker!
     if(!opt.misc) opt.misc = utils.getEmptyMap();
     
     // if no edge label is specified, this is used as label
-    opt.misc.unknownEdgeLabel = "<noname>";
+    opt.misc.unknownEdgeLabel = "(!noname!)";
 
     // some popular filters (usually used from within tiddlers via tgmacro)
     if(!opt.filter) opt.filter = utils.getEmptyMap();

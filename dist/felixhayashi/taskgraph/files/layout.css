@@ -1,9 +1,10 @@
-.taskgraph_button .tc-drop-down {
-  font-size: 14px; }
+.taskgraph_button .tc-block-dropdown {
+  font-size: 12px;
+  margin-left: -210px;
+  padding: 5px;
+  width: 400px; }
 .taskgraph_button > button {
   padding-left: 10px; }
-.taskgraph_button .tc-drop-down button {
-  width: 100%; }
 .taskgraph_button p p {
   padding: 0px; }
 .taskgraph_button .explanation {

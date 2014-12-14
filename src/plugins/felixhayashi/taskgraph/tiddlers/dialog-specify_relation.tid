@@ -29,7 +29,10 @@ subtitle: You are about to connect "<<fromLabel>>" with "<<toLabel>>"
      <$list filter=<<tgmacro "option" "filter.allViewsByLabel">> >
        <option value={{!!title}} >{{!!title}}</option>
      </$list>
-  </$select> <$checkbox tiddler=<<output>> field="rememberViewBindingChoice" default=<<rememberViewBindingChoice>> checked="true" unchecked="false">remember choice</$checkbox>
+  </$select>
+  <$checkbox tiddler=<<output>> field="rememberViewBindingChoice" default=<<rememberViewBindingChoice>> checked="true" unchecked="false">
+    remember choice
+  </$checkbox>
   
   <sup>[2]</sup> <small>By selecting a particular view, you bind that edge to the view, which means the relationship is exclusively displayed in that view.</small>
   

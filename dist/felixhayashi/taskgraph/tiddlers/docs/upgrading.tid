@@ -1,0 +1,16 @@
+title: $:/plugins/felixhayashi/taskgraph/docs/upgrading
+subtitle: Upgrading
+
+!! This is a beta so things might break
+
+Here is some information what changed in which version and how to regain your data again.
+
+!!!! Version 0.6.0
+
+!!!!! Filters
+
+//Where is my tag filter?//
+
+The view does not use tags anymore as filters but offers you a textfield
+instead where you can enter your custom tw-filter. This means you have
+to add the tags to the filter again.

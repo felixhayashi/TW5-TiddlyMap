@@ -1,0 +1,668 @@
+/*\
+
+title: $:/plugins/felixhayashi/taskgraph/adapter.js
+type: application/javascript
+module-type: library
+
+\*/
+
+/**************************** IMPORTS ****************************/
+
+  var utils = require("$:/plugins/felixhayashi/taskgraph/utils.js").utils;
+  var ViewAbstraction = require("$:/plugins/felixhayashi/taskgraph/view_abstraction.js").ViewAbstraction;
+  var vis = require("$:/plugins/felixhayashi/vis/vis.js");
+  
+/***************************** CODE ******************************/
+
+/**
+ * This library provides all the functions to interact with the TW as if
+ * it was a simple database for nodes and edges. It may be understood as an abstraction
+ * layer.
+ * 
+ * Everything that is related to retrieving or inserting nodes and edges is
+ * handled by the adapter.
+ * 
+ * @constructor
+ * @param {object} wiki - An optional wiki object
+ */
+var Adapter = function(wiki) {
+  
+  this.wiki = wiki ? wiki : $tw.wiki;
+  
+  // create shortcuts
+  this.opt = $tw.taskgraph.opt;
+  this.logger = $tw.taskgraph.logger;
+  
+};
+  
+/**
+ * Persist an edge with at least a given id, from and to label
+ * in the TW.
+ * 
+ * If an edge is lacking an id, it will be created. The reason to give
+ * edges an id instead of merely relying on from, to and the type to
+ * identify an edge is twofold: First, the same vector (from, to) may
+ * exist multiple times, second, the id is needed to interact with vis
+ * in a comfortable way because vis ensures only that ids are unique
+ * in each dataset.
+ * 
+ * @param {Edge} edge - The edge to be saved
+ * @param {View} [view] - An optional view to determine which prefix to use.
+ */
+Adapter.prototype.insertEdge = function(edge, view) {
+  
+  if(typeof edge !== "object" || !edge.from || !edge.to) return;
+  
+  view = new ViewAbstraction(view);
+  
+  var label = (edge.label
+               ? edge.label
+               : this.opt.misc.unknownEdgeLabel);
+              
+  var storeRef = view.getEdgeStoreLocation() + "/" + label;
+  var records = this.wiki.getTiddlerData(storeRef, []);
+  
+  this.logger("info", "Inserting edge into store  \"" + storeRef + "\"", edge);
+  
+  // clone edge and remove label of clone 
+  var edgeCopy = $tw.utils.deepCopy(edge);
+  delete edgeCopy.label;
+
+  if(edgeCopy.id) { // try to replace
+    var key = utils.keyOfItemWithProperty(records, "id", edgeCopy.id);
+    if(typeof key === "undefined") { // didn't work -> id is user provided
+      key = records.length;
+    }
+  } else {
+    edgeCopy.id = utils.genUUID();
+    var key = records.length;
+  }
+  
+  records[key] = edgeCopy;
+  
+  this.wiki.setTiddlerData(storeRef, records);
+  
+  // register change
+  $tw.taskgraph.edgeChanges.push({
+    type : "insert", edge : edge
+  });
+  
+};
+    
+/**
+ * Returns a set of edges that corresponds to the given filter.
+ *
+ * @param {TiddlyWikiFilter} filter - The filter to apply.
+ * @param {Hashmap} [options] - An optional options object.
+ * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectEdgesByLabel}.
+ * @return {EdgeCollection} A collection of a type specified in the options.
+ */
+Adapter.prototype.selectEdgesByFilter = function(filter, options) {
+  
+  var stores = utils.getMatches(filter);
+  var labels = [];
+  for(var i = 0; i < stores.length; i++) {
+    labels.push(utils.getBasename(stores[i]));
+  }
+  
+  return this.selectEdgesByLabel(labels, options);
+  
+};
+
+/**
+ * Returns a set of edges where the edge labels match the labels
+ * specified.
+ *
+ * @param {array<string>} labels - A set of labels (just the labels
+ *     without any edge prefixes).
+ * @param {Hashmap} [options] - An optional options object.
+ * @param {CollectionTypeString} [options.outputType="dataset"] - The result type.
+ * @param {View} [options.view] - A view that is used to filter private edges.
+ * @return {EdgeCollection} A collection of a type specified in the options.
+ */
+Adapter.prototype.selectEdgesByLabel = function(labels, options) {
+  
+  if(typeof options !== "object") options = utils.getEmptyMap();
+
+  var view = new ViewAbstraction(options.view);
+  var storePrefix = view.getEdgeStoreLocation();            
+  var result = utils.getEmptyMap();
+  for(var i = 0; i < labels.length; i++) {
+    var storeTRef = storePrefix + "/" + labels[i];
+    
+    if(!utils.tiddlerExists(storeTRef)) continue;
+
+    var edges = this.wiki.getTiddlerData(storeTRef);
+    for(var j = 0; j < edges.length; j++) {
+      
+      if(labels[i] !== this.opt.misc.unknownEdgeLabel) { // has a name
+        // use edge store label as edge label
+        edges[j].label = labels[i];
+      }
+      
+      result[edges[j].id] = edges[j];
+
+    }
+  }
+  
+  return utils.convert(result, options.outputType);
+  
+};
+
+/**
+ * Selects edges that are connected to nodes in a set either by
+ * their from-part or by their to-part.
+ * 
+ * @param {NodeCollection} nodes - A set of nodes.
+ * @param {Hashmap} [options] - An optional options object.
+ * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectEdgesByFilter}.
+ * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#filterEdgesByEndpoints}.
+ * @return {EdgeCollection} A collection of a type specified in the options.
+ */
+Adapter.prototype.selectEdgesByEndpoints = function(nodes, options) {
+
+  if(typeof options !== "object") options = utils.getEmptyMap();
+
+  var view = new ViewAbstraction(options.view);
+  
+  // if no view is supplied, use global filter
+  var edgeFilter = (view.exists()
+                    ? options.view.getEdgeFilter("compiled")
+                    : this.opt.filter.allSharedEdges);
+  
+  var edges = this.selectEdgesByFilter(edgeFilter, {
+    outputType: "array",
+    view: view
+  });
+  
+  return this.filterEdgesByEndpoints(edges, nodes, options);
+
+};
+
+/**
+ * This function will return a set of edges, which only contains edges that
+ * possess endpoints ("from" or "to") which are contained in the nodes set.
+ * 
+ * @param {EdgeCollection} edges - The edges to filter.
+ * @param {NodeCollection} nodes - The endpoints.
+ * @param {Hashmap} [options] - An optional options object.
+ * @param {"=1"|">=1"|"=2"} [options.endpointsInSet=">=1"] - How many endpoints
+ *     do have to match for the edge to be accepted? Per default, at least one
+ *     edge has to match. Setting `endpointsInSet` to "=1" or "=2" means exactly
+ *     one or respectively two endpoints have to match.
+ * @param {CollectionTypeString} [options.outputType="dataset"] - The result type.
+ * @return {EdgeCollection} A collection of a type specified in the options.
+ */
+Adapter.prototype.filterEdgesByEndpoints = function(edges, nodes, options) {
+
+  if(typeof options !== "object") options = utils.getEmptyMap();
+  
+  edges = utils.convert(edges, "array");
+
+  var re = /^(=1|>=1|=2)$/;
+  
+  var filter = (re.test(options.endpointsInSet)
+                ? options.endpointsInSet
+                : ">=1");
+  
+  var exists = utils.getExistenceMap(nodes); 
+  
+  var result = utils.getEmptyMap();
+  for(var i = 0; i < edges.length; i++) {
+    var edge = edges[i];
+
+    switch(filter) {
+      case "=2":
+        isMatch = exists[edge.from];
+        break;
+      case ">=1":
+        isMatch = (exists[edge.from] || exists[edge.to]);
+        break;
+      case "=1":
+        isMatch = (exists[edge.from] !== exists[edge.to]); // XOR
+        break;
+      default:
+        isMatch = false;
+    }
+    
+    if(isMatch) result[edge.id] = edge;
+    
+  }
+  
+  return utils.convert(result, options.outputType);
+  
+}
+
+/**
+ * Returns a set of nodes that corresponds to the given filter.
+ *
+ * @param {TiddlyWikiFilter} filter - The filter to use.
+ * @param {Hashmap} [options] - An optional options object.
+ * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectNodesByReference}.
+ * @return {NodeCollection} A collection of a type specified in the options.
+ */
+Adapter.prototype.selectNodesByFilter = function(filter, options) {
+  
+  var matches = utils.getMatches(filter);
+  return this.selectNodesByReference(matches, options);
+
+};
+
+/**
+ * Returns a set of nodes that corresponds to a set of tiddlers.
+ * 
+ * @param {TiddlerCollection} tiddlers - The tiddlers that represent the nodes
+ * @param {Hashmap} [options] - An optional options object.
+ * @param {CollectionTypeString} [options.outputType="dataset"] - The result type.
+ * @param {View} [options.view] - A viewname used to retrieve positions
+ * @param {Hashmap} [options.addProperties] - a hashmap
+ *     containing properties to be added to each node.
+ *     For example:
+ * 
+ *     {
+ *       group: "g1",
+ *       color: "red"
+ *     }
+ * 
+ * @return {NodeCollection} A collection of a type specified in the options.
+ */
+Adapter.prototype.selectNodesByReference = function(tiddlers, options) {
+
+  if(typeof options !== "object") options = utils.getEmptyMap();
+
+  var protoNode = options.addProperties;
+  
+  var result = utils.getEmptyMap();
+  for(var i = 0; i < tiddlers.length; i++) {
+    
+    var tObj = this.setupTiddler(tiddlers[i]);
+    
+    if(!tObj) continue;
+    
+    var id = tObj.fields[this.opt.field.nodeId];
+    
+    // make sure dublicates don't make it into the result set
+    if(result[id]) continue;
+
+    var node = utils.getEmptyMap();
+    if(typeof protoNode === "object") {
+      node = $tw.utils.extendDeepCopy(node, protoNode);
+    }
+
+    node.id = id;
+    node.label = tObj.fields.title;
+
+    result[id] = node;  
+  }
+  
+  if(options.view) {
+    this._restorePositions(result, options.view);
+  }
+    
+  return utils.convert(result, options.outputType);
+  
+};
+
+/**
+ * This function will return all direct non-dublicate neighbours 
+ * with respect to the given set of nodes. If a node is a direct
+ * neighbour of another node in the set and also cointained in the
+ * set itself, it won't be added to the result set.
+ * 
+ * To calculated any degree of neighbourship, simple call this function
+ * on its own result set.
+ * 
+ * @param {NodeCollection} nodes - The nodes whose neighbours will be retrieved.
+ * @param {Hashmap} [options] - An optional options object.
+ * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectEdgesByFilter}.
+ * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectNodesByIds}.
+ * @param {EdgeCollection} [options.edges] - A collection of edges that may be
+ *     provided as source instead of considering all edges in the system.
+ *     The `view` option will not have an effect then.
+ * @return {NodeCollection} A collection of neighbour nodes
+ */
+Adapter.prototype.selectNeighbours = function(nodes, options) {
+  
+  if(typeof options !== "object") options = utils.getEmptyMap();
+
+  if(options.edges) {
+    var edges = this.filterEdgesByEndpoints(options.edges, nodes, {
+      outputType: "array",
+      endpointsInSet: "=1"
+    });
+  } else {
+    var edges = this.selectEdgesByEndpoints(nodes, {
+      outputType: "array",
+      view: options.view,
+      endpointsInSet: "=1"
+    });
+  }
+
+  var exists = utils.getExistenceMap(nodes);
+  var neighbourIds = utils.getEmptyMap();
+  for(var i = 0; i < edges.length; i++) {
+    
+    // opposite is neighbour
+    var key = (exists[edges[i].from] ? edges[i].to : edges[i].from)
+    neighbourIds[key] = true;
+    
+  }
+  
+  return this.selectNodesByIds(neighbourIds, options);
+  
+};
+
+/**
+ * Retrieve nodes based on the a list of ids that corrspond to tiddlers
+ * id fields.
+ * 
+ * @param {Array.<Id>|Hashmap.<Id, *>|vis.Dataset} nodeIds - The ids of the tiddlers
+ *     that represent the nodes.
+ * @param {Hashmap} [options] - An optional options object.
+ * @param {CollectionTypeString} [options.outputType="dataset"] - The result type.
+ * @param {View} [options.view] - A viewname used to retrieve positions
+ * @param {Hashmap} [options.addProperties] - a hashmap
+ *     containing properties to be added to each node.
+ *     For example:
+ * 
+ *     {
+ *       group: "g1",
+ *       color: "red"
+ *     }
+ * 
+ * @return {NodeCollection} A collection of a type specified in the options.
+ */
+Adapter.prototype.selectNodesByIds = function(nodeIds, options) {
+  
+  if(typeof options !== "object") options = utils.getEmptyMap();
+
+  // transform into a hashmap with all values being true
+  nodeIds = utils.getExistenceMap(nodeIds);
+    
+  var result = utils.getEmptyMap();
+  var allTiddlers = this.wiki.allTitles();
+  var idField = this.opt.field.nodeId;
+  var protoNode = options.addProperties;
+  
+  for(var id in nodeIds) {
+    for(var i = 0; i < allTiddlers.length; i++) {
+      
+      var tObj = this.wiki.getTiddler(allTiddlers[i]);
+      var id = tObj.fields[idField];
+      
+      if(nodeIds[id]) {
+        
+        var node = utils.getEmptyMap();
+        if(typeof protoNode === "object") {
+          node = $tw.utils.extendDeepCopy(node, protoNode);
+        }
+
+        node.id = id;
+        node.label = tObj.fields.title;     
+
+        result[id] = node;
+
+      }
+    }
+  }
+  
+  if(options.view) {
+    this._restorePositions(result, options.view);
+  }
+  
+  return utils.convert(result, options.outputType);
+  
+};
+
+/**
+ * Select a single node by id.
+ * 
+ * @param {Id} id - A node's id
+ * @param {Hashmap} [options] - An optional options object.
+ * @param {Hashmap} [options.!! PARTLY INHERITED !!]
+ *     Except from the outputType option, all options
+ *     are inherited from {@link Adapter#selectNodesByIds}.
+ * @return {Node|undefined} A node or nothing.
+ */
+Adapter.prototype.selectNodeById = function(id, options) {
+  
+  if(typeof options !== "object") options = utils.getEmptyMap();
+  options.outputType = "hashmap"; // overwrite option
+  var result = this.selectNodesByIds([ id ], options);
+  
+  return result[id];
+  
+};
+
+/**
+ * This function will remove all tiddlers from the wiki that correspond
+ * to a node in the collection. Drafts are also removed. The default
+ * storylist is updated eventually.
+ * 
+ * @param {NodeCollection} nodes - A collection of nodes.
+ */
+Adapter.prototype.deleteNodesFromStore = function(nodes) {
+
+  if(!nodes) return;
+  
+  var idField = this.opt.field.nodeId;
+  var allTiddlers = this.wiki.allTitles();
+  var deleteCandidates = [];
+  var nodeIds = utils.getExistenceMap(nodes);
+  
+  // identify tiddlers to delete
+  for(var id in nodeIds) {
+    for(var i = 0; i < allTiddlers.length; i++) {
+      var tRefs = utils.getTiddlersWithProperty(idField, id, {
+        isIncludeDrafts: true,
+        isReturnRef: true,
+        tiddlers: allTiddlers
+      });
+      deleteCandidates = deleteCandidates.concat(tRefs);
+    }
+  }
+  
+  var storyList = this.wiki.getTiddlerList("$:/StoryList");
+  if(storyList.length) {
+
+    // remove elements from the default storyList
+    storyList = storyList.filter(function(tRef) {
+      return deleteCandidates.indexOf(tRef) == -1;
+    });
+
+    // save it again
+    var tObj = this.wiki.getTiddler("$:/StoryList");
+    this.wiki.addTiddler(new $tw.Tiddler(tObj, { list: storyList }));
+  }
+  
+  // delete tiddlers
+  utils.deleteTiddlers(deleteCandidates);
+  
+};
+
+Adapter.prototype.deleteEdgeFromStore = function(edge, view) {
+  
+  if(!edge) return;
+  
+  var label = (edge.label ? edge.label : this.opt.misc.unknownEdgeLabel); 
+  var view = new ViewAbstraction(view);
+  var storeRef = view.getEdgeStoreLocation() + "/" + label;
+  var storeData = this.wiki.getTiddlerData(storeRef, []);
+  
+  this.logger("info", "Edge with label \"" + label + "\" will be deleted: " + edge);
+  
+  var key = utils.keyOfItemWithProperty(storeData, "id", edge.id);
+  if(key != null) { // neither undefined nor null
+    storeData.splice(key, 1);
+    this.wiki.setTiddlerData(storeRef, storeData);
+    
+    // register change
+    $tw.taskgraph.edgeChanges.push({
+      type : "delete", edge : edge
+    });
+  }
+
+};
+
+/**
+ * Removes multiple edges from several stores.
+ * 
+ * @param {EdgeCollection} edges - The edges to be deleted
+ */
+Adapter.prototype.deleteEdgesFromStore = function(edges, view) {
+    
+  edges = utils.convert(edges, "array");
+  
+  for(var i = 0; i < edges.length; i++) {
+    this.deleteEdgeFromStore(edges[i], view);
+  }
+  
+};
+
+/**
+ * Function to create or abstract a view from outside.
+ * 
+ * @param {View} view - The view.
+ * @result {ViewAbstraction}
+ */
+Adapter.prototype.getView = function(view, isCreate) {
+  
+  return new ViewAbstraction(view, isCreate);
+  
+};
+
+/**
+ * Create a view with a given label (name).
+ * 
+ * @param {string} [label="My View"] - The name of the view (__not__ a TiddlerReference).
+ * @return {ViewAbstraction} The newly created view.
+ */
+Adapter.prototype.createView = function(label) {
+    
+    if(typeof label !== "string" || label === "") {
+      label = "My view";
+    }
+    var tRef = this.wiki.generateNewTitle(this.opt.path.views + "/" + label);
+        
+    return new ViewAbstraction(tRef, true);
+
+};
+  
+/**
+ * This method will load the current view's map values into the nodes
+ * 
+ * @param {object} nodes A hashmap of node-objects.
+ */
+Adapter.prototype._restorePositions = function(nodes, view) {
+
+  view = new ViewAbstraction(view);
+  
+  if(!view.exists()) return;
+  
+  var positions = view.getPositions();
+  for(var id in nodes) {
+    // hOP needs to be called here since tw created the object and we
+    // cannot anticipate the names.
+    if(utils.hasOwnProp(positions, id)) {
+      nodes[id].x = positions[id].x;
+      nodes[id].y = positions[id].y;
+    }
+  }
+  
+};
+
+/**
+ * This function will store the positions into the sprecified view.
+ * 
+ * @param {object} positions A hashmap ids as keys and x, y properties as values
+ * @param {ViewAbstraction|Tiddler|string} 
+ */
+Adapter.prototype.storePositions = function(positions, view) {
+  
+  view = new ViewAbstraction(view);
+  view.setPositions(positions);
+    
+}
+
+/**
+ * This method makes sure a Tiddler has all the necessary fields
+ * that the plugin needs to work with it. This means particularly
+ * that a Tiddler has a proper value in its designated id field.
+ * The idField may be changed by the user and can also be the title
+ * field. If the id field does not exist or doesn't have a value,
+ * it will be created.
+ */
+Adapter.prototype.setupTiddler = function(tiddler) {
+
+  var tObj = utils.getTiddler(tiddler);
+  if(!tObj) return;
+  
+  var idField = this.opt.field.nodeId; 
+  if(!tObj.fields[idField]) {
+    var fields = utils.getEmptyMap();
+    fields[idField] = utils.genUUID();
+    tObj = new $tw.Tiddler(tObj, fields);
+    $tw.wiki.addTiddler(tObj);
+  }
+  
+  return tObj;
+  
+};
+
+/**
+ * Create a new tiddler that gets a non-existant title and is opened
+ * for edit. If a view is registered, the fields of the tiddler match
+ * the current view. If arguments network and position are specified,
+ * the node is also inserted directly into the graph at the given
+ * position.
+ * 
+ * @param {object} node A node object to be inserted
+ * @param {string|null} view An optional view to which the node is tried to fit to.
+ * @param {object|null} options An optional options object.
+ *     Options include:
+ *       - editNodeOnCreate: True, if the node should be opened in edit
+ *         mode after it was created, false otherwise. Overwrites the
+ *         global default
+ *       - view: a viewname used to set positions and register the node to
+ */
+Adapter.prototype.insertNode = function(node, options) {
+  
+  if(typeof options !== "object") options = utils.getEmptyMap();
+  
+  if(typeof node !== "object") {
+    node = utils.getEmptyMap();
+  }
+  
+  if(typeof node.label !== "string") {
+    node.label = "New node";
+  }
+  
+  if(!node.id) {
+    node.id = utils.genUUID();
+  }
+  
+  var fields = utils.getEmptyMap();
+  fields.title = this.wiki.generateNewTitle(node.label);
+  fields[this.opt.field.nodeId] = node.id;
+    
+  if(options.view) {
+
+    var view = new ViewAbstraction(options.view);
+    
+    // maybe save positions
+    view.setNodePosition(node);
+
+    // make the view match the new node
+    var filter = "[field:" + this.opt.field.nodeId + "[" + node.id + "]]";
+    view.appendToNodeFilter(filter);
+    
+  }
+  
+  this.wiki.addTiddler(new $tw.Tiddler(fields));
+          
+  return node;
+  
+};
+
+// export
+exports.Adapter = Adapter

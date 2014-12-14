@@ -1,20 +1,26 @@
+title: $:/plugins/felixhayashi/taskgraph/docs/help
 subtitle: Help
-title: $:/plugins/felixhayashi/taskgraph/help
+
+<$list filter="[all[shadows]prefix[$:/plugins/felixhayashi/taskgraph/docs/help/]]">
+
+! {{!!subtitle}}
+{{!!text}}
+
+</$list>
 
 ! Basic principles
 
 !! Graph-views
 
-Views determine which nodes and edges are selected in order to draw the graph. In its core, views are tw-filters. You can modify a view by selecting it in the taskgraph editor and changing the filter properties via the form elements in the editor-bar. If you want to keep your current view you may create a snapshot that can be named and saved then. All snapshots of views are independent from each other and modifying one will not effect the other.
+Views determine which nodes and edges are selected in order to draw the graph. In its core, views are tw-filters. You can modify a view by selecting it in the taskgraph editor and changing the filter properties via the form elements in the editor-bar.
 
-You can use the name of the snapshot to embed graphs in your tiddlers.
+You can use the name of a view to embed graphs in your tiddlers. All changes are instantly reflected in each graph that uses the view.
 
 ```
 <$taskgraph mode="graph" height="300px" view="YOURVIEWNAME"></$taskgraph>
 ```
 
-You may always modify a view-snapshot and changes are instantly reflected in each graph that uses the view.
-
+If you want you graph to act like an editor, set `editor="true"`.
 
 !!! Node-Views and Edge-Views
 
@@ -24,7 +30,7 @@ Node-views and edge-views are the two components that make up each graph-view. N
 
 Tiddlers (including their relationships) may be shared by different graphs and thus a tiddler-update may affect multiple graphs at once - same goes for adding relations - if the filters (views) are not disjunct. 
 
-if you don't want that, make sure tiddlers exclusively match a single filter.
+if you don't want that, make sure tiddlers exclusively match a single filter and change your edge mode.
 
 Generally, it is regarded as best practice to group tiddlers you want to be displayed together in a graph by using a certain tag that delimites the group and which may be used as filter component in the view.
 
@@ -38,7 +44,7 @@ Your workflow could be as follows:
 # Start creating relationships by using the menu functions in the editor
 #* Alternatively you can use the taskgraph button at the top of each tw-tiddler to link tiddlers and thus create edges.
 
-Also note: all manipulation of snapshots is done in the main window.
+Also note: Any view manipulation is done in the main editor window (or in any graph declared as editor).
 
 ! Plugin details
 
@@ -46,10 +52,10 @@ Also note: all manipulation of snapshots is done in the main window.
 
 !!! Representation and storage of nodes
 
-Each node in a graph corresponds to a tw-tiddler. A node is stored by storing the corresponding tiddler. If you click on a node, it will open that tiddler. Information, which node is displayed at what position in the graph is stored in a map-store that is owned and referenced by the view, thus, each view has its own map-store.
+Each node in a graph corresponds to a tw-tiddler. A node is stored by storing the corresponding tiddler. If you click on a node, it will open that tiddler. Information, which node is displayed at what position in the graph is stored in a position-store that is owned and referenced by the view, thus, each view has its own positioning information.
 
 !!! Representation and storage of edges
 
 Not every edge you draw is stored in a separate tiddler. Instead edges with the same name (= the same type) are stored in a single JSON-tiddler called an edge-store. Why? Imagine you would create hundred of edges (relations) that are all named "depends on". It would spam the wiki to store each edge as a tiddler. Also, this way, if you want to rename all edges at once, you simple rename the caption used by the edge store and it will apply for all edges kept in the store.
 
-
+If you operate in //private edge mode//, all created edges are stored under the views root.

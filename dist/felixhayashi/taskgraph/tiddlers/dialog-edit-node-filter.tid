@@ -1,0 +1,16 @@
+title: $:/plugins/felixhayashi/taskgraph/dialog/editNodeFilter
+subtitle : Filter Editor
+
+<div id="node-filter-dialog">
+
+  <$edit-text tag="textarea" tiddler=<<output>> field="text" default=<<prettyFilter>> autoHeight="no" />
+
+  <div id="filter-tips">
+
+  Tips for creating a node filter:
+
+  * A new line is equivalent to an "or".
+  * New to filters? Read this [[introduction|http://tiddlywiki.com/#Introduction%20to%20Filters]].
+
+  </div>
+</div>

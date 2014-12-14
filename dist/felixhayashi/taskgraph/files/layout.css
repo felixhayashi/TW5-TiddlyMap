@@ -9,6 +9,25 @@
 .taskgraph_button .explanation {
   white-space: normal; }
 
+.tc-modal-wrapper .tc-modal-header {
+  padding-top: 0px;
+  padding-bottom: 0px; }
+  .tc-modal-wrapper .tc-modal-header h3 {
+    line-height: 10px; }
+.tc-modal-wrapper .tc-modal-footer {
+  padding-top: 0px;
+  padding-bottom: 0px; }
+
+#node-filter-dialog #filter-tips {
+  font-size: 0.8em; }
+#node-filter-dialog textarea {
+  height: 100px;
+  max-height: 300px;
+  overflow: auto;
+  width: 100%;
+  font-size: 11px;
+  font-family: "Courier New", Courier, monospace; }
+
 .taskgraph_graph {
   border: 3px dotted lightgray;
   padding: 2px;
@@ -28,6 +47,18 @@
       min-width: 170px;
       padding: 5px;
       margin: 5px 0; }
+      .taskgraph_graph .filterbar .tc-drop-down button {
+        padding: 0px; }
+    .taskgraph_graph .filterbar [hidden] {
+      display: none; }
+    .taskgraph_graph .filterbar .tc-block-dropdown {
+      width: 370px;
+      min-width: 370px;
+      padding: 5px;
+      margin: 15px 0 0 -370px; }
+      .taskgraph_graph .filterbar .tc-block-dropdown a {
+        display: inline;
+        padding: 0px; }
     .taskgraph_graph .filterbar button {
       line-height: inherit;
       color: #666666; }

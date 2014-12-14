@@ -1,11 +1,33 @@
-title: $:/plugins/felixhayashi/taskgraph/roadmap
+title: $:/plugins/felixhayashi/taskgraph/docs/roadmap
+subtitle: Roadmap
 
 !! Taskgraph
 
-!!!! Version 0.6.0
 
 # Automatic cleanup of non-existant edges at startup
 # add isValidFieldName checks everywhere
+
+!!!! Version 0.6.0
+
+End user:
+
+# Nodes in view can be filtered via any tw-filter [ done: 2014-12-04 ]
+# Pretty-printed Node Filter separating filter operands via new lines [ done: 2014-12-10 ]
+# Nodes can be named immediately without opened in edit mode [ done: 2014-12-12 ]
+# Physics mode is now toggled per view [ done: 2014-12-12 ]
+# Option to display immediate neighbours of a graph [ done: 2014-12-12 ]
+# More compact editor layout [ done: 2014-12-12 ]
+# Correcting an existing edge (Vis: "Edit Edge") [ done: 2014-12-13 ]
+# No-name edges are created when no name is specified [ done: 2014-12-13 ]
+# Introduced private edge mode [ done: 2014-12-14 ]
+# Views may be renamed [ done: 2014-12-14 ]
+
+More technical:
+
+# New uuid RFC4122, version 4 ID compliant generator (as suggested by pmario) [ done: 2014-12-03 ]
+# Code docs are now published at the github repo via JSDoc [ done: 2014-12-04 ]
+# Adapter is now available in the js environment via $tw.taskgraph.adapter [ done: 2014-12-01 ]
+# Overhaul of the whole API [ done: 2014-12-12 ]
 
 !!!! Version 0.5.0 [ released: 2014-11-21 ]
 
@@ -63,8 +85,7 @@ title: $:/plugins/felixhayashi/taskgraph/roadmap
 
 !! Known bugs:
 
-# A selected node still listens for keyboard events (like delete button), even if it doesn't posses the focus
-# vis.util.randomUUID() does not produce standard compliant UUIDs; https://github.com/almende/vis/issues/432
-# ~~navigation uses html "id" instead of "class" which prohibits multiple graphs with navigation; https://github.com/almende/vis/issues/438~~ [ solved: 13.11.2014 ]
 # Plugin in connect-button mode loses focus when modal is displayed. (cur fix: at the moment the plugin wrapped around button in the ViewToolbar to track all changes)
-# Stabilization and graph freeze does not work well at the moment
+# A selected node still listens for keyboard events (like delete button), even if it doesn't posses the focus
+# ~~navigation uses html "id" instead of "class" which prohibits multiple graphs with navigation; https://github.com/almende/vis/issues/438 [ solved in version 0.5.0 ]
+# Stabilization and graph freeze does not work well at the moment [ solved in version 0.5.0 ]

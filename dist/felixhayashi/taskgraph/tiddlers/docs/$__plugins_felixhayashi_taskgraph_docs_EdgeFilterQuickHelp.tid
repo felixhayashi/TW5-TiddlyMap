@@ -1,0 +1,13 @@
+created: 20141214005604244
+modified: 20141214011703258
+tags: 
+title: $:/plugins/felixhayashi/taskgraph/docs/help/EdgeFilterQuickHelp
+type: text/vnd.tiddlywiki
+subtitle: The Edge Filter Menu
+
+{{EdgeFilter.png}}
+
+"""
+With the help of the edge filter you can decide, which edges to display in the view.
+Be aware that the available edges shown correspond to your current [[edge mode|$:/plugins/felixhayashi/taskgraph/docs/help/ViewActionQuickHelp]].
+"""

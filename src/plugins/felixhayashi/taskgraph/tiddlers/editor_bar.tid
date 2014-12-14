@@ -1,58 +1,87 @@
 title: $:/plugins/felixhayashi/taskgraph/ui/graphBar
 
-\define getEdgeFilterTRef() $(currentTiddler)$/filter/edges
+\define showEdgeField() show-$(curEdgeId)$
+
+<!-- ===== View Switcher ======================================== -->
 
 <div>
   View: 
-  <!-- tiddler="<outputdest>" this is where a change in select is written -->
-  <$select tiddler=<<tgmacro "option" "tw.defaultGraphViewHolder">> field="text" default={{!!title}} >
-     <$list filter=<<tgmacro "option" "tw.filters.allViews">> >
+  <$select tiddler=<<var.ref.viewHolder>> field="text" default=<<var.ref.view>> >
+     <$list filter=<<tgmacro "option" "filter.allViews">> >
        <option value={{!!title}}>
          <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
         </option>
      </$list>
   </$select>
-</div>  
 
-<span class="separator" />
-
-<div>
-  
-  Actions:
   <$button popup="$:/temp/taskgraph/editor/showactions">{{$:/core/images/menu-button}}</$button>
 
   <$reveal type="popup" position="below" state="$:/temp/taskgraph/editor/showactions">
     <div class="tc-drop-down">
-      <$button class="tc-btn-invisible" message="tm-create-view">{{$:/core/images/new-button}} create empty view</$button>
-      <$button class="tc-btn-invisible" message="tm-clone-view">{{$:/core/images/clone-button}} clone view</$button>
-      <$button class="tc-btn-invisible" message="tm-delete-view">{{$:/core/images/delete-button}} delete view</$button>
-      <$button class="tc-btn-invisible" message="tm-store-position">{{$:/core/images/globe}} save positions</$button>
+      <$button class="tc-btn-invisible" message="tm-modal" param="$:/plugins/felixhayashi/taskgraph/docs/help/ViewActionQuickHelp">{{$:/core/images/info-button}} quick help</$button>
+      <hr />
+      <$button class="tc-btn-invisible" message="tm-create-view">{{$:/core/images/new-button}} Create empty view</$button>
+      <$button class="tc-btn-invisible" message="tm-rename-view">{{$:/core/images/tag-button}} Rename view</$button>
+      <$button class="tc-btn-invisible" message="tm-delete-view">{{$:/core/images/delete-button}} Delete view</$button>
+      <$button class="tc-btn-invisible" message="tm-store-position">{{$:/core/images/globe}} Save positions</$button>
+      <hr />
+      <$checkbox field="config-physics_mode" checked="true" unchecked="false" default="false">
+        Enable floating nodes
+      </$checkbox><br/>
+      <$checkbox field="config-private_edge_mode" checked="true" unchecked="false" default="false">
+        Private Edge Mode
+      </$checkbox>
     </div>
   </$reveal>
 
 </div>
 
+<!-- ===== Edge Filter ========================================== -->
+
 <span class="separator" />
 
 <div>
   
-  Disable edges:
+  Edge Filter:
   <$button popup="$:/temp/taskgraph/editor/filteredges">{{$:/core/images/menu-button}}</$button>
 
   <$reveal type="popup" position="below" state="$:/temp/taskgraph/editor/filteredges">
     <div class="tc-drop-down">
-      <$list filter=<<tgmacro "option" "tw.filters.allEdgesByLabel">> variable="item" >
-        <$checkbox invert="true" tiddler=<<getEdgeFilterTRef>> tag=<<item>> >
-          Hide "<<item>>"
-        </$checkbox><br />
+      <$button class="tc-btn-invisible" message="tm-modal" param="$:/plugins/felixhayashi/taskgraph/docs/help/EdgeFilterQuickHelp">{{$:/core/images/info-button}} quick help</$button>
+      <hr />
+      <$list filter=<<var.edgeFilterExpr>> >
+        <$set name="curEdgeId" value={{!!id}}>
+        <$checkbox tiddler=<<var.ref.edgeFilter>> field=<<showEdgeField>> checked="true" unchecked="false" default="true">
+          <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
+        </$checkbox>
+        <br />
+        </$set>
       </$list>
     </div>
   </$reveal>
 
 </div>
 
+<!-- ===== Node Filter ========================================== -->
+
 <span class="separator" />
 
-Node Filter: <$transclude tiddler="$:/core/ui/EditTemplate/tags" />
+<div>
 
-<$button class="quickhelp" message="tm-modal" param="$:/plugins/felixhayashi/taskgraph/help">quick help</$button>
+  Node Filter:
+  <$button popup="$:/temp/taskgraph/editor/state/nodeFilterActions">{{$:/core/images/menu-button}}</$button>
+
+  <$reveal type="popup" position="below" state="$:/temp/taskgraph/editor/state/nodeFilterActions">
+    <div class="tc-drop-down">
+      <$button class="tc-btn-invisible" message="tm-modal" param="$:/plugins/felixhayashi/taskgraph/docs/help/NodeFilterQuickHelp">{{$:/core/images/info-button}} quick help</$button>
+      <hr />
+      <$button class="tc-btn-invisible" message="tm-edit-node-filter">{{$:/core/images/edit-button}} Edit filter</$button>
+      <hr />
+      <$checkbox field="config-display_neighbours" checked="true" unchecked="false" default="false">
+        Show neighbours
+      </$checkbox>
+    </div>
+  </$reveal>
+
+</div>
+

@@ -1,16 +1,20 @@
 title: $:/plugins/felixhayashi/taskgraph/docs/upgrading
 subtitle: Upgrading
 
-!! This is a beta so things might break
+This is a beta so things might break. Here is some information what changed in which version and how to regain your data again.
 
-Here is some information what changed in which version and how to regain your data again.
+!! Version 0.6.0
 
-!!!! Version 0.6.0
-
-!!!!! Filters
+!!! Filters
 
 //Where is my tag filter?//
 
 The view does not use tags anymore as filters but offers you a textfield
 instead where you can enter your custom tw-filter. This means you have
 to add the tags to the filter again.
+
+!!! Edges
+
+//Why are my private edges public now?//
+
+This is a side effect as I completely changed the way private edges work. Sorry, you need to rebuild your edges again if you want them to be private.

@@ -1,2 +1,2 @@
 title: $:/plugins/felixhayashi/taskgraph/graph/views/search/filter/nodes
-filter: [!is[system]search{$:/temp/search}limit[10]] [fields:title[$:/temp/search]]
+filter: [!is[system]search{$:/temp/search}limit[10]] [field:title[$:/temp/search]]

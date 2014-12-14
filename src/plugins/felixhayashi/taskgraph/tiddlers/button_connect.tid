@@ -20,6 +20,8 @@ title: $:/plugins/felixhayashi/taskgraph/connectButton
           object-id="button-connect"
           height="250px"
           view="button-search" />
+          
+      <small>The current tiddler is always displayed, no matter what you search! So search for another tiddler and link the nodes via //Add Edge//.</small>
     </div>
   </div>
 

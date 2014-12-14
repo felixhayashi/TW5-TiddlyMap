@@ -55,7 +55,8 @@ exports.getClass = function(constrObj) {
     // @TODO: clean this up
     if(this.view.getLabel() === "button-search") {
       var filter = "[search{$:/temp/connect-button-search}!is[system]limit[10]]" +
-                   "[field:title[" + this.getVariable("currentTiddler") + "]]";
+                   "[field:title[" + this.getVariable("currentTiddler") + "]]" +
+                   "[field:title[$:/temp/connect-button-search]]";
       this.view.setNodeFilter(filter);
     }
     

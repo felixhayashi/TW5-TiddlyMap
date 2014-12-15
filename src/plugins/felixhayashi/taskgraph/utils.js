@@ -573,7 +573,9 @@ utils.getArrayValuesAsHashmapKeys = function(arr) {
 utils.getTiddlersWithProperty = function(fieldName, value, options) {
   
   if(typeof options !== "object") options = utils.getEmptyMap();
-  if(!options.tiddlers) options.tiddlers = $tw.wiki.allTitles();
+  if(!options.tiddlers) {
+    options.tiddlers = $tw.wiki.allTitles();
+  }
   
   var result = [];
   var isReturnRef = options.isReturnRef;

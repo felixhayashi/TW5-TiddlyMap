@@ -2,4 +2,4 @@ title: $:/plugins/felixhayashi/taskgraph/searchVisualizer
 caption: Graph
 tags: $:/tags/SearchResults
 
-<$taskgraph view="search" object-id="search_visualizer"></$taskgraph>
+<$taskgraph view="search" click-to-use="false" object-id="search_visualizer"></$taskgraph>

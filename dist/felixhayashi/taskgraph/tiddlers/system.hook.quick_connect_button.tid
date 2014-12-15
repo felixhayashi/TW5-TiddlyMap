@@ -10,20 +10,19 @@ title: $:/plugins/felixhayashi/taskgraph/misc/quickConnectButton
   <$button class="tc-btn-invisible" set=<<qualify "$:/temp/state">> setTo="hide">
     {{$:/plugins/felixhayashi/taskgraph/icon}}
   </$button>
-  <div class="taskgraph_button">
-    <div class="tc-block-dropdown">
-      <p>
-        Search:
-        <$edit-text tiddler="$:/temp/felixhayashi/taskgraph/quick_connect_search" tag="input" default="" />
-      </p>
-      <hr />
-      <$taskgraph editor="vis" object-id="quick_connect" height="250px" view="quick_connect" />
-      <hr />
-      <p>    
-        <b>Please note:</b>
-        The current tiddler is always displayed in the graph!
-      </p>
-    </div>
+
+  <div class="quick-connect tc-block-dropdown">
+    <p>
+      Search:
+      <$edit-text tiddler="$:/temp/felixhayashi/taskgraph/quick_connect_search" tag="input" default="" />
+    </p>
+    <hr />
+    <$taskgraph editor="vis" click-to-use="false" object-id="quick_connect" height="250px" view="quick_connect" />
+    <hr />
+    <p>    
+      <b>Please note:</b>
+      The current tiddler is always displayed in the graph!
+    </p>
   </div>
 
 </$reveal>

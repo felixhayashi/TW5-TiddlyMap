@@ -64,6 +64,12 @@ module-type: widget
     this.parentDomNode = parent;
     if(!$tw.utils.hasClass(parent, "taskgraph")) {
       $tw.utils.addClass(parent, "taskgraph");
+      if(this.getAttribute("click-to-use") !== "false") {
+        $tw.utils.addClass(parent, "click-to-use");
+      }
+      if(this.getAttribute("class")) {
+        $tw.utils.addClass(parent, this.getAttribute("class"));
+      }
     }
   }
   
@@ -698,8 +704,8 @@ module-type: widget
        enabled : true
     };
     
-    //options.clickToUse = true;
-    
+    options.clickToUse = (this.getAttribute("click-to-use") !== "false");
+        
     return options;
     
   };

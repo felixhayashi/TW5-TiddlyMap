@@ -1,6 +1,6 @@
-.taskgraph_button {
+.quick-connect {
 
-  .tc-block-dropdown {
+  &.tc-block-dropdown {
     font-size: 12px;
     right: 50px;
     padding: 5px;
@@ -10,7 +10,7 @@
   }
   
   hr {
-    color: #d6d9d8
+    color: #d6d9d8;
   }
   
   >button {
@@ -67,37 +67,38 @@ $color: #666666;
 }
 
 .taskgraph {
-
-  .network-frame {
-    
-    &:not(.vis-active) {
-      cursor: pointer;
-      
-      &:hover:before {
-        box-shadow: 10px 10px 5px lightgray;
-        color: gray;
-        background: white;
-        content: "Click to use";
-        font-size: 18px;
-        font-weight: bold;
-        left: 50%;
-        margin-left: -100px;
-        position: absolute;
-        text-align: center;
-        top: 105px;
-        width: 200px;
-        z-index: 2000;
-        padding: 5px;
-      }
-      
-    }
-  }
-
   border: 3px dotted lightgray;
   padding: 2px;
   width: calc(100% - 15px);
   color: $color;
   
+  &.click-to-use {
+
+    .network-frame {
+      
+      &:not(.vis-active) {
+        cursor: pointer;
+        
+        &:hover:before {
+          box-shadow: 10px 10px 5px lightgray;
+          color: gray;
+          background: white;
+          content: "Click to use";
+          font-size: 18px;
+          font-weight: bold;
+          left: 50%;
+          margin-left: -100px;
+          position: absolute;
+          text-align: center;
+          top: 50px;
+          width: 200px;
+          z-index: 2000;
+          padding: 5px;
+        }
+      }
+    }
+  }
+
   .network-manipulationUI.edit.editmode {
     height: 26px;
   }

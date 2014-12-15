@@ -1,17 +1,17 @@
-.taskgraph_button .tc-block-dropdown {
+.quick-connect.tc-block-dropdown {
   font-size: 12px;
   right: 50px;
   padding: 5px;
   width: 500px;
   white-space: normal;
   line-height: 1em; }
-.taskgraph_button hr {
+.quick-connect hr {
   color: #d6d9d8; }
-.taskgraph_button > button {
+.quick-connect > button {
   padding-left: 10px; }
-.taskgraph_button p p {
+.quick-connect p p {
   padding: 0px; }
-.taskgraph_button .explanation {
+.quick-connect .explanation {
   white-space: normal; }
 
 .tc-modal-wrapper .tc-modal-header {
@@ -38,9 +38,9 @@
   padding: 2px;
   width: calc(100% - 15px);
   color: #666666; }
-  .taskgraph .network-frame:not(.vis-active) {
+  .taskgraph.click-to-use .network-frame:not(.vis-active) {
     cursor: pointer; }
-    .taskgraph .network-frame:not(.vis-active):hover:before {
+    .taskgraph.click-to-use .network-frame:not(.vis-active):hover:before {
       box-shadow: 10px 10px 5px lightgray;
       color: gray;
       background: white;
@@ -51,7 +51,7 @@
       margin-left: -100px;
       position: absolute;
       text-align: center;
-      top: 105px;
+      top: 50px;
       width: 200px;
       z-index: 2000;
       padding: 5px; }

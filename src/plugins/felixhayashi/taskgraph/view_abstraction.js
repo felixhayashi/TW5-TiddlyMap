@@ -522,13 +522,13 @@ ViewAbstraction.prototype.setPositions = function(positions) {
   
   $tw.taskgraph.logger("log", "Storing positions in view \"" + this.getLabel() + "\"");
   
-  if(typeof positions != "object") return;
+  if(typeof positions !== "object") return;
   
-  if(this.positions) {
-    // make sure we don't lose old positions. Therefore overwrite
-    // the current positions with the updates and save it into the updates.
-    positions = $tw.utils.extend(this.positions, positions);
-  }
+  //~ if(this.positions) {
+    //~ // make sure we don't lose old positions. Therefore overwrite
+    //~ // the current positions with the updates and save it into the updates.
+    //~ positions = $tw.utils.extend(this.positions, positions);
+  //~ }
   
   this.wiki.setTiddlerData(this.path.map, positions);
   

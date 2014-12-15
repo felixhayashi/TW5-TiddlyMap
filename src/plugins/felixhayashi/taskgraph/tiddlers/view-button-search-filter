@@ -1,2 +1,0 @@
-title: $:/plugins/felixhayashi/taskgraph/graph/views/button-search/filter/nodes
-filter: [search{$:/temp/connect-button-search}limit[10]]

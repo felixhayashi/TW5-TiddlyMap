@@ -1,0 +1,5 @@
+title: $:/plugins/felixhayashi/taskgraph/searchVisualizer
+caption: Graph
+tags: $:/tags/SearchResults
+
+<$taskgraph view="search" object-id="search_visualizer"></$taskgraph>

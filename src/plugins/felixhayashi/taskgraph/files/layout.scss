@@ -2,9 +2,15 @@
 
   .tc-block-dropdown {
     font-size: 12px;
-    margin-left: -210px;
+    right: 50px;
     padding: 5px;
-    width: 400px;
+    width: 500px;
+    white-space: normal;
+    line-height: 1em;
+  }
+  
+  hr {
+    color: #d6d9d8
   }
   
   >button {
@@ -60,7 +66,32 @@ $color: #666666;
         
 }
 
-.taskgraph_graph {
+.taskgraph {
+
+  .network-frame {
+    
+    &:not(.vis-active) {
+      cursor: pointer;
+      
+      &:hover:before {
+        box-shadow: 10px 10px 5px lightgray;
+        color: gray;
+        background: white;
+        content: "Click to use";
+        font-size: 18px;
+        font-weight: bold;
+        left: 50%;
+        margin-left: -100px;
+        position: absolute;
+        text-align: center;
+        top: 105px;
+        width: 200px;
+        z-index: 2000;
+        padding: 5px;
+      }
+      
+    }
+  }
 
   border: 3px dotted lightgray;
   padding: 2px;
@@ -73,12 +104,14 @@ $color: #666666;
   
   .network-manipulationDiv {
     background: transparent;
+    padding: 3px 0;
+    height: 35px;
   }
   
   .filterbar {
     
-    border: 1px solid #cccccc;
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.15) inset;
+    background: #d6d9d8;
+    border-bottom: 1px solid lightgray;
     padding: 1px $padding;
     
     .tc-drop-down {
@@ -115,7 +148,7 @@ $color: #666666;
       color: $color;
     }
   
-     >* {
+     > * {
       display: inline-block; // TODO: this is too rigorous
     }
     

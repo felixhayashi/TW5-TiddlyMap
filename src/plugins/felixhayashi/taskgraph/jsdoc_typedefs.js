@@ -31,7 +31,7 @@
  * @property {string} [view] - An optional viewname to which the edge is
  *     bound to.
  * 
- * An edge connects nodes in a vis.Dataset.
+ * An edge connects nodes in a vis.Network.
  */
  
 /**
@@ -41,7 +41,7 @@
  * @property {string} label - The label of the node that will be displayed
  *     in the rendered graph.
  * 
- * This object is used by the vis.Dataset.
+ * This object is used by the vis.Network.
  */
  
 /**

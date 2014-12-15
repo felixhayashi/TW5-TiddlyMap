@@ -579,7 +579,7 @@ utils.getTiddlersWithProperty = function(fieldName, value, options) {
   var isReturnRef = options.isReturnRef;
   var keys = Object.keys(options.tiddlers);
   for(var i = 0; i < keys.length; i++) {
-    var tObj = utils.getTiddler(tiddlers[keys[i]]);
+    var tObj = utils.getTiddler(options.tiddlers[keys[i]]);
     if(tObj.fields[fieldName] === value) {
       result.push(isReturnRef ? tObj.fields.title : tObj);
       if(options.isIncludeDrafts) {

@@ -625,6 +625,8 @@ module-type: widget
       window.addEventListener("resize", this.handleResizeEvent.bind(this), false);
       this.maxEnlarge(this.graphDomNode);
     }
+    
+    window.addEventListener("click", this.handleClickEvent.bind(this), false);
 
     this.graphOptions = this.getGraphOptions();
 
@@ -976,6 +978,25 @@ module-type: widget
 
     this.repaintGraph();
     
+  };
+  
+  /**
+   * used to prevent nasty deletion as edges are not unselected when leaving vis
+   */
+  TaskGraphWidget.prototype.handleClickEvent = function(event) {
+
+    if(!document.body.contains(this.parentDomNode)) {
+      window.removeEventListener("click", this.handleClickEvent);
+      return;
+    }
+    
+    if(this.network) {
+      var element = document.elementFromPoint(event.clientX, event.clientY);
+      if(!this.parentDomNode.contains(element)) {
+        this.network.selectNodes([]);
+      }
+    }
+
   };
    
   /**

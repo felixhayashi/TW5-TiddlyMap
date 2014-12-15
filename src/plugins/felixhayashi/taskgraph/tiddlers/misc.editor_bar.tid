@@ -54,10 +54,10 @@ title: $:/plugins/felixhayashi/taskgraph/misc/advancedEditorBar
     <div class="tc-drop-down">
       <$button class="tc-btn-invisible" message="tm-modal" param="$:/plugins/felixhayashi/taskgraph/docs/help/EdgeFilterQuickHelp">{{$:/core/images/info-button}} quick help</$button>
       <hr />
-      <$list filter=<<var.edgeFilterExpr>> ><<var.edgeFilterExpr>>
+      <$list filter=<<var.edgeFilterExpr>> >
         <$set name="curEdgeId" value={{!!id}}>
         <$checkbox tiddler=<<var.ref.edgeFilter>> field=<<showEdgeField>> checked="true" unchecked="false" default="true">
-          <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} /><<showEdgeField>>
+          <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
         </$checkbox>
         <br />
         </$set>

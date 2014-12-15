@@ -2,4 +2,4 @@ caption: Taskgraph
 tags: $:/tags/SideBar
 title: $:/plugins/felixhayashi/taskgraph/hook/editor
 
-<$taskgraph editor="advanced" object-id="main_editor" />
+<$taskgraph editor="advanced" object-id="main_editor" click-to-use="false" />

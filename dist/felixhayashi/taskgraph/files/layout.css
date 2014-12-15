@@ -14,14 +14,16 @@
 .quick-connect .explanation {
   white-space: normal; }
 
-.tc-modal-wrapper .tc-modal-header {
-  padding-top: 0px;
-  padding-bottom: 0px; }
-  .tc-modal-wrapper .tc-modal-header h3 {
-    line-height: 10px; }
-.tc-modal-wrapper .tc-modal-footer {
-  padding-top: 0px;
-  padding-bottom: 0px; }
+.tc-modal-wrapper {
+  z-index: 1010; }
+  .tc-modal-wrapper .tc-modal-header {
+    padding-top: 0px;
+    padding-bottom: 0px; }
+    .tc-modal-wrapper .tc-modal-header h3 {
+      line-height: 10px; }
+  .tc-modal-wrapper .tc-modal-footer {
+    padding-top: 0px;
+    padding-bottom: 0px; }
 
 #node-filter-dialog #filter-tips {
   font-size: 0.8em; }

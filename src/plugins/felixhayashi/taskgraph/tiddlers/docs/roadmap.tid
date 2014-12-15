@@ -6,6 +6,7 @@ subtitle: Roadmap
 
 # Automatic cleanup of non-existant edges at startup
 # add isValidFieldName checks everywhere
+# Allow the use of captions to be displayed as node labels instead of tiddler names
 
 !!!! Version 0.6.0
 

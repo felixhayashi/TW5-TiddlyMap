@@ -341,7 +341,7 @@ module-type: widget
   
   TaskGraphWidget.prototype.handleSpecialViews = function() {
     
-    if(this.view.getLabel() === "quick_connect") {
+    if(this.view.getLabel() === "quick_connect") { // TODO: should I use objectId or view label??
       var output = "$:/temp/felixhayashi/taskgraph/quick_connect_search";
       var filter = "[search{" + output + "}!is[system]limit[10]]"
                    //~ + "[field:title[" + this.getVariable("currentTiddler") + "]]" // see getGraphData
@@ -470,7 +470,7 @@ module-type: widget
     
     this.graphData = this.getGraphData(true);
     
-    if(this.objectId === "quick_connect") { // special case
+    if(this.view.getLabel() === "quick_connect") { // special case
       var nodes = this.adapter.selectNodesByReference([ this.getVariable("currentTiddler") ], {
         outputType: "array",
         addProperties: {
@@ -716,7 +716,8 @@ module-type: widget
 
     options.dataManipulation = {
         enabled : (this.editorMode ? true : false),
-        initiallyVisible : true
+        initiallyVisible : (this.view.getLabel() !== "quick_connect"
+                            && this.view.getLabel() !== "search_visualizer")
     };
         
     options.navigation = {

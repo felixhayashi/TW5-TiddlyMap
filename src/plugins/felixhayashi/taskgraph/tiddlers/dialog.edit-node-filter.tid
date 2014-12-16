@@ -9,6 +9,10 @@ subtitle : Filter Editor
 
   Tips for creating a node filter:
 
+  * """
+  <b>Warning:</b> Never use filters that are selectors (e.g. "[all[tiddlers]]")! Seriously!
+  Use filters that really __are__ filters such as "[!is[system]]" etc. See this [[discussion|https://groups.google.com/d/msg/tiddlywikidev/aCRvcsVwfU8/FGsG1EOBUOQJ]].
+  """
   * A new line is equivalent to an "or".
   * New to filters? Read this [[introduction|http://tiddlywiki.com/#Introduction%20to%20Filters]].
 

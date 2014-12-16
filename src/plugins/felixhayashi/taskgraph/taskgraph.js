@@ -343,9 +343,9 @@ module-type: widget
     
     if(this.view.getLabel() === "quick_connect") {
       var output = "$:/temp/felixhayashi/taskgraph/quick_connect_search";
-      var filter = "[search{" + output + "}!is[system]limit[10]]" +
-                   "[field:title[" + this.getVariable("currentTiddler") + "]]" +
-                   "[field:title[" + output + "]]";
+      var filter = "[search{" + output + "}!is[system]limit[10]]"
+                   //~ + "[field:title[" + this.getVariable("currentTiddler") + "]]" // see getGraphData
+                   + "[field:title[" + output + "]]";
       this.view.setNodeFilter(filter);
     }
     
@@ -469,8 +469,25 @@ module-type: widget
     this.hasNetworkStabilized = false;
     
     this.graphData = this.getGraphData(true);
-    this.network.setData(this.graphData);
     
+    if(this.objectId === "quick_connect") { // special case
+      var nodes = this.adapter.selectNodesByReference([ this.getVariable("currentTiddler") ], {
+        outputType: "array",
+        addProperties: {
+          x: 0,
+          y: 0,
+          borderWidth: 3,
+          color: {
+            background: "#E6B293",
+            border: "#FFFF73"
+          }
+        }
+      });
+      this.graphData.nodes.update(nodes);
+    }
+    
+    this.network.setData(this.graphData);
+        
   };
   
   // changes global state

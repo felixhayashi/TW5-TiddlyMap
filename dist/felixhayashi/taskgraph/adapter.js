@@ -306,7 +306,7 @@ Adapter.prototype.selectNodesByReference = function(tiddlers, options) {
     node.id = id;
     node.label = tObj.fields.title;
 
-    result[id] = node;  
+    result[id] = node;
   }
   
   if(options.view) {

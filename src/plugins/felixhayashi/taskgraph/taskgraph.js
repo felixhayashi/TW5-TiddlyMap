@@ -344,7 +344,7 @@ module-type: widget
     if(this.view.getLabel() === "quick_connect") { // TODO: should I use objectId or view label??
       var output = "$:/temp/felixhayashi/taskgraph/quick_connect_search";
       var filter = "[search{" + output + "}!is[system]limit[10]]"
-                   //~ + "[field:title[" + this.getVariable("currentTiddler") + "]]" // see getGraphData
+                   //+ "[field:title[" + this.getVariable("currentTiddler") + "]]" // see getGraphData()
                    + "[field:title[" + output + "]]";
       this.view.setNodeFilter(filter);
     }
@@ -469,23 +469,7 @@ module-type: widget
     this.hasNetworkStabilized = false;
     
     this.graphData = this.getGraphData(true);
-    
-    if(this.view.getLabel() === "quick_connect") { // special case
-      var nodes = this.adapter.selectNodesByReference([ this.getVariable("currentTiddler") ], {
-        outputType: "array",
-        addProperties: {
-          x: 0,
-          y: 0,
-          borderWidth: 3,
-          color: {
-            background: "#E6B293",
-            border: "#FFFF73"
-          }
-        }
-      });
-      this.graphData.nodes.update(nodes);
-    }
-    
+        
     this.network.setData(this.graphData);
         
   };
@@ -504,6 +488,22 @@ module-type: widget
       view: this.getView(),
       endpointsInSet: ">=1" // ">=1" used to calculate neighbours
     });
+    
+    if(this.view.getLabel() === "quick_connect") { // special case
+      var curNode = this.adapter.selectNodesByReference([ this.getVariable("currentTiddler") ], {
+        outputType: "array",
+        addProperties: {
+          x: 0,
+          y: 0,
+          borderWidth: 1,
+          color: {
+            background: "#E6B293",
+            border: "#FF6700"
+          }
+        }
+      });
+      nodes.update(curNode);
+    }
       
     if(this.getView().isConfEnabled("display_neighbours")) {
       var neighbours = this.adapter.selectNeighbours(nodes, {

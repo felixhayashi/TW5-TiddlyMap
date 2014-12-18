@@ -59,7 +59,8 @@
       top: 50px;
       width: 200px;
       z-index: 2000;
-      padding: 5px; }
+      padding: 5px;
+      pointer-events: none; }
   .taskgraph .network-manipulationUI.edit.editmode {
     height: 26px; }
   .taskgraph .network-manipulationDiv {

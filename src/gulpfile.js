@@ -7,14 +7,11 @@ var gulp = require("gulp");
 var gutil = require("gulp-util");
 var sass = require("gulp-sass");
 var addsrc = require("gulp-add-src"); // https://github.com/gulpjs/gulp/issues/396
-var addsrc = require("gulp-uglify");
+var uglify = require("gulp-uglify");
 var esprima = require('gulp-esprima');
 var debug = require('gulp-debug');
-//~ var jsdoc = require("gulp-jsdoc");
-
-// non gulp
 var del = require("del"); // rm -rf
-//var jsdoc = require("jsdoc");
+//~ var jsdoc = require("gulp-jsdoc"); // not maintained!
 
 /********************************************************************
  * Tasks
@@ -33,7 +30,7 @@ gulp.task("clean", function (cb) {
 gulp.task("compile", ["clean"], function () {
 
   // copy everything that doesn't need further processing
-  gulp.src(["plugins/**", "!plugins/**/*.scss"])
+  gulp.src(["plugins/**", "!plugins/**/*.scss", "!plugins/**/*.js"])
     .pipe(gulp.dest("../dist/"));
     
   // compile styles
@@ -41,12 +38,16 @@ gulp.task("compile", ["clean"], function () {
     .pipe(sass({ style: "expanded" }))
     .pipe(gulp.dest("../dist/"));
     
+  // uglify js
+  gulp.src("plugins/**/*.js")
+    .pipe(uglify({ preserveComments: "some" }))
+    .pipe(gulp.dest("../dist/"));
+    
 });
 
 gulp.task("create docs", ["clean"], function () {
 
-  //~ gulp.src([ "plugins/felixhayashi/taskgraph/jsdoc_typedefs.js" ])
-    //~ .pipe(jsdoc("../docs/"));
+  // ...
     
 });
 

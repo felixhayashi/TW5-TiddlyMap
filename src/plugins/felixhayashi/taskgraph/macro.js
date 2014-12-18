@@ -7,6 +7,8 @@ In connection with taskgraph, this macro allows us to access some
 needed information from within tiddlers as well as to execute some
 util functions.
 
+@preserve
+
 \*/
 (function(){
   

@@ -6,7 +6,10 @@
   white-space: normal;
   line-height: 1em; }
 .quick-connect hr {
-  color: #d6d9d8; }
+  border: 0;
+  height: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
 .quick-connect > button {
   padding-left: 10px; }
 .quick-connect p p {
@@ -38,7 +41,7 @@
 .taskgraph {
   border: 3px dotted lightgray;
   padding: 2px;
-  width: calc(100% - 15px);
+  width: 100%;
   color: #666666; }
   .taskgraph.click-to-use .network-frame:not(.vis-active) {
     cursor: pointer; }

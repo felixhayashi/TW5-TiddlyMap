@@ -38,7 +38,7 @@ module-type: widget
     this.opt = $tw.taskgraph.opt;
     
     // key (a tiddler) -> callback (called when tiddler changes)
-    this.dialogCallbacks = utils.getEmptyMap();
+    this.callbacks = utils.getEmptyMap();
         
     // https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/widgets/widget.js#L211
     this.computeAttributes();
@@ -89,7 +89,7 @@ module-type: widget
    */
   TaskGraphWidget.prototype.registerCallback = function(tRef, callback, isDeleteOnCall) {
     this.logger("debug", "A callback was registered for changes of \"" + tRef + "\"");
-    this.dialogCallbacks[tRef] = {
+    this.callbacks[tRef] = {
       execute : callback,
       isDeleteOnCall : (typeof isDeleteOnCall == "Boolean" ? isDeleteOnCall : true)
     }
@@ -101,9 +101,9 @@ module-type: widget
    * @see TaskGraphWidget#registerCallback
    */
   TaskGraphWidget.prototype.removeCallback = function(tRef) {
-    if(this.dialogCallbacks[tRef]) {
+    if(this.callbacks[tRef]) {
       this.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
-      delete this.dialogCallbacks[tRef];
+      delete this.callbacks[tRef];
     }
   };
   
@@ -118,22 +118,22 @@ module-type: widget
    */
   TaskGraphWidget.prototype.checkForCallbacks = function(changedTiddlers) {
     
-    if(this.dialogCallbacks.length == 0) {
+    if(this.callbacks.length == 0) {
       this.logger("debug", "No registered callbacks exist at the moment");
       return;
     }
     
     for(var tRef in changedTiddlers) {
             
-      if(!this.dialogCallbacks[tRef]) continue;
+      if(!this.callbacks[tRef]) continue;
       
       if(this.wiki.getTiddler(tRef)) {
         
         this.logger("debug", "A callback for \"" + tRef + "\" will be executed");
-        this.dialogCallbacks[tRef].execute(tRef);
+        this.callbacks[tRef].execute(tRef);
         
         // a continue prevents deleting the callback
-        if(!this.dialogCallbacks.isDeleteOnCall) continue;
+        if(!this.callbacks.isDeleteOnCall) continue;
         
       }
       

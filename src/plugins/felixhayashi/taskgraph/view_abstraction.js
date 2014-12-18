@@ -254,6 +254,10 @@ ViewAbstraction.prototype.rename = function(newLabel) {
   }
   
   var oldLabel = this.getLabel();
+  
+  if(oldLabel === newLabel) {
+    return;
+  }
 
   for(index in this.path) {
     

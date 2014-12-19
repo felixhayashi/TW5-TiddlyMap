@@ -473,7 +473,10 @@ module-type: widget
     this.graphData = this.getGraphData(true);
         
     this.network.setData(this.graphData, this.preventNextRepaint); // true => disableStart
-        
+    
+    //~ this.network.moveTo({offset: { x: 0, y: 0}, position: { x: 0, y: 0}, scale: 0.3});
+    
+    //this.network.moveTo({scale: 2});
   };
   
   // changes global state
@@ -683,7 +686,7 @@ module-type: widget
         
   };
   
-  TaskGraphWidget.prototype.handleReconnectEdge = function(updatedEdge, callback) {
+  TaskGraphWidget.prototype.handleReconnectEdge = function(updatedEdge) {
 
     var edge = this.graphData.edges.get(updatedEdge.id);
     $tw.utils.extend(edge, updatedEdge);
@@ -702,12 +705,19 @@ module-type: widget
     
     // get a copy of the options
     var options = this.wiki.getTiddlerData(this.opt.ref.visOptions);
-    
-    options.onDelete = this.handleRemoveElement.bind(this);
-    options.onConnect = this.handleConnectionEvent.bind(this);
-    options.onAdd = function(data, callback) { this.insertNode(data); }.bind(this);
-
-    options.onEditEdge = this.handleReconnectEdge.bind(this);
+        
+    options.onDelete = function(data, callback) {
+      this.handleRemoveElement(data);
+    }.bind(this);
+    options.onConnect = function(data, callback) {
+      this.handleConnectionEvent(data);
+    }.bind(this);
+    options.onAdd = function(data, callback) {
+      this.insertNode(data);
+    }.bind(this);
+    options.onEditEdge = function(data, callback) {
+      this.handleReconnectEdge(data);
+    }.bind(this);
 
     options.dataManipulation = {
         enabled : (this.editorMode ? true : false),
@@ -803,17 +813,19 @@ module-type: widget
   
   /**
    * Called by vis when the user tries to delete a node or an edge.
-   * @data { nodes: [selectedNodeIds], edges: [selectedEdgeIds] }
+   * 
+   * @param {Object} elements - An object containing the elements to be removed.
+   * @param {Array<Id>} elements.nodes - Removed edges.
+   * @param {Array<Id>} elements.edges - Removed nodes.
    */
-  TaskGraphWidget.prototype.handleRemoveElement = function(data, callback) {
+  TaskGraphWidget.prototype.handleRemoveElement = function(elements) {
     
-    if(data.edges.length && !data.nodes.length) { // only deleting edges
-      this.adapter.deleteEdgesFromStore(this.graphData.edges.get(data.edges), this.getView());
-      callback(data);
-      $tw.taskgraph.notify("edge" + (data.edges.length > 1 ? "s" : "") + " removed");
+    if(elements.edges.length && !elements.nodes.length) { // only deleting edges
+      this.adapter.deleteEdgesFromStore(this.graphData.edges.get(elements.edges), this.getView());
+      $tw.taskgraph.notify("edge" + (elements.edges.length > 1 ? "s" : "") + " removed");
     }
                         
-    if(data.nodes.length) {
+    if(elements.nodes.length) {
       
       var fields = {
         subtitle : "Please confirm your choice",
@@ -827,13 +839,13 @@ module-type: widget
         if(!isConfirmed) return; // callback({}) ?
           
           // get objects with labels and ids
-          var nodes = this.graphData.nodes.get(data.nodes);
-          var edges = this.graphData.edges.get(data.edges);
+          var nodes = this.graphData.nodes.get(elements.nodes);
+          var edges = this.graphData.edges.get(elements.edges);
           
           this.adapter.deleteNodesFromStore(nodes);
           this.adapter.deleteEdgesFromStore(edges, this.getView());
           
-          $tw.taskgraph.notify("node" + (data.nodes.length > 1 ? "s" : "") + " removed");
+          $tw.taskgraph.notify("node" + (elements.nodes.length > 1 ? "s" : "") + " removed");
         
       });
     }     
@@ -1132,7 +1144,9 @@ module-type: widget
     this.logger("info", "Repainting the whole graph");
     
     this.network.redraw();
-    this.network.zoomExtent();
+    //this.network.moveTo({scale: 0.5});
+    this.network.zoomExtent(null, true);
+    
     
     //~ this.network.moveTo({
       //~ ...

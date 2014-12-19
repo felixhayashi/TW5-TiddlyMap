@@ -63,9 +63,7 @@ Adapter.prototype.insertEdge = function(edge, view) {
               
   var storeRef = view.getEdgeStoreLocation() + "/" + label;
   var records = this.wiki.getTiddlerData(storeRef, []);
-  
-  this.logger("info", "Inserting edge into store  \"" + storeRef + "\"", edge);
-    
+      
   // temporarely remove label
   delete edge.label;
 
@@ -78,6 +76,8 @@ Adapter.prototype.insertEdge = function(edge, view) {
     edge.id = utils.genUUID();
     var key = records.length;
   }
+  
+  this.logger("info", "Inserting edge into store  \"" + storeRef + "\"", edge);
   
   records[key] = edge;
   

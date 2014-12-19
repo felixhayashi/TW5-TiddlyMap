@@ -472,7 +472,7 @@ module-type: widget
     
     this.graphData = this.getGraphData(true);
         
-    this.network.setData(this.graphData);
+    this.network.setData(this.graphData, this.preventNextRepaint); // true => disableStart
         
   };
   
@@ -683,6 +683,19 @@ module-type: widget
         
   };
   
+  TaskGraphWidget.prototype.handleReconnectEdge = function(updatedEdge, callback) {
+
+    var edge = this.graphData.edges.get(updatedEdge.id);
+    $tw.utils.extend(edge, updatedEdge);
+    
+    this.adapter.deleteEdgesFromStore([
+      { id: edge.id, label: edge.label }
+    ], this.getView());
+    
+    this.adapter.insertEdge(edge, this.getView());
+    
+  };
+  
   TaskGraphWidget.prototype.getGraphOptions = function() {
     
     // current vis options can be found at $tw.taskgraph.logger("log", this.network.constants);
@@ -691,30 +704,10 @@ module-type: widget
     var options = this.wiki.getTiddlerData(this.opt.ref.visOptions);
     
     options.onDelete = this.handleRemoveElement.bind(this);
-    options.onConnect = function(edge, callback) {
-      // we do not call the callback of the network as we handle it ourselves
-      this.handleConnectionEvent(edge);
-    }.bind(this);
-    
-    options.onAdd = function(node, callback) {
-      this.adapter.insertNode(node, {
-        view: this.getView(),
-        editNodeOnCreate: false
-      });
-    }.bind(this);
+    options.onConnect = this.handleConnectionEvent.bind(this);
+    options.onAdd = function(data, callback) { this.insertNode(data); }.bind(this);
 
-    options.onEditEdge = function(updatedEdge, callback) {
-
-      var edge = this.graphData.edges.get(updatedEdge.id);
-      $tw.utils.extend(edge, updatedEdge);
-      
-      this.adapter.deleteEdgesFromStore([
-        { id: edge.id, label: edge.label }
-      ], this.getView());
-      
-      this.adapter.insertEdge(edge, this.getView());
-      
-    }.bind(this);
+    options.onEditEdge = this.handleReconnectEdge.bind(this);
 
     options.dataManipulation = {
         enabled : (this.editorMode ? true : false),
@@ -914,6 +907,14 @@ module-type: widget
     this.graphData.nodes.update(updates);
 
   };
+
+  TaskGraphWidget.prototype.insertNode = function(node) {
+    this.preventNextRepaint = true;
+    this.adapter.insertNode(node, {
+      view: this.getView(),
+      editNodeOnCreate: false
+    });
+  };
     
   /**
    * This handler is registered at and called by the vis network event
@@ -936,10 +937,7 @@ module-type: widget
         if(isConfirmed) {
           var node = properties.pointer.canvas;
           node.label = (outputTObj ? outputTObj.fields.text : "New Node");
-          this.adapter.insertNode(node, {
-            view: this.getView(),
-            editNodeOnCreate: false
-          });
+          this.insertNode(node);
         }
       });
       

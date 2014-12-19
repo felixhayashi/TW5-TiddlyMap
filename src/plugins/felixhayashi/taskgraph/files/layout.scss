@@ -83,6 +83,10 @@ $color: #666666;
       &:not(.vis-active) {
         cursor: pointer;
         
+        .network-navigation {
+          display: none;
+        }
+        
         &:hover:before {
           box-shadow: 10px 10px 5px lightgray;
           color: gray;

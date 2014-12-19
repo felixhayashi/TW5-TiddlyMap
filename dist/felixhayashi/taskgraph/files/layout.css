@@ -45,6 +45,8 @@
   color: #666666; }
   .taskgraph.click-to-use .network-frame:not(.vis-active) {
     cursor: pointer; }
+    .taskgraph.click-to-use .network-frame:not(.vis-active) .network-navigation {
+      display: none; }
     .taskgraph.click-to-use .network-frame:not(.vis-active):hover:before {
       box-shadow: 10px 10px 5px lightgray;
       color: gray;

@@ -474,8 +474,16 @@ module-type: widget
         
     this.network.setData(this.graphData, this.preventNextRepaint); // true => disableStart
     
-    //~ this.network.moveTo({offset: { x: 0, y: 0}, position: { x: 0, y: 0}, scale: 0.3});
+    // reset
+    this.preventNextRepaint = false;
+       
+    //var center = this.network.getCenterCoordinates();
+    //console.log("center", center);
     
+    //this.network.moveTo({position: center, scale: 0.8});
+    //this.network.redraw();
+    //this.network.moveTo({scale: 0.5});
+    //this.network.zoomExtent(null, true);
     //this.network.moveTo({scale: 2});
   };
   
@@ -664,7 +672,7 @@ module-type: widget
     // register events
     
     this.network.on("doubleClick", this.handleDoubleClickEvent.bind(this));
-    
+   
     this.network.on("stabilized", this.handleStabilizedEvent.bind(this));
     
     this.network.on('dragStart', function(properties) {
@@ -683,6 +691,10 @@ module-type: widget
         
     // finally create and register the data and rebuild the graph
     this.rebuildGraph();
+    
+    // fix until zoomExtent() works
+    var center = this.network.getCenterCoordinates();
+    this.network.moveTo({position: center, scale: 0.8});
         
   };
   
@@ -1145,8 +1157,7 @@ module-type: widget
     
     this.network.redraw();
     //this.network.moveTo({scale: 0.5});
-    this.network.zoomExtent(null, true);
-    
+    this.network.zoomExtent();
     
     //~ this.network.moveTo({
       //~ ...

@@ -2,12 +2,12 @@
   "title": "$:/plugins/felixhayashi/taskgraph",
   "description": "Create clickable graphs and mindmaps by simply linking your tiddlers!",
   "author": "Felix Küppers",
-  "version": "0.6.1+138",
-  "released": "Sat, 20 Dec 2014 20:56:20 +0100",
+  "version": "0.6.1+165",
+  "released": "Sun, 21 Dec 2014 00:01:29 +0100",
   "core-version": ">=5.1.5",
   "source": "https://github.com/felixhayashi/tw-taskgraph",
   "type": "application/json",
   "plugin-type": "plugin",
-  "list": "docs/readme docs/license docs/help",
+  "list": "docs/readme docs/license docs/help config/taskgraph config/vis",
   "dependents": "$:/plugins/felixhayashi/vis"
 }

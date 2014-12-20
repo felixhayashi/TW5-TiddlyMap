@@ -285,30 +285,11 @@ Adapter.prototype.selectNodesByReference = function(tiddlers, options) {
   var result = utils.getEmptyMap();
   for(var i = 0; i < tiddlers.length; i++) {
     
-    if(this.wiki.isSystemTiddler(tiddlers[i])) {
-      continue;
+    var node = this._createNode(tiddlers[i], protoNode);
+    if(node) {
+      result[node.id] = node;
     }
-    
-    var tObj = this.setupTiddler(tiddlers[i]);
-    
-    if(!tObj) continue;
-    
-    var id = tObj.fields[this.opt.field.nodeId];
-    
-    // make sure dublicates don't make it into the result set
-    if(result[id]) {
-      continue;
-    }
-
-    var node = utils.getEmptyMap();
-    if(typeof protoNode === "object") {
-      node = $tw.utils.extendDeepCopy(node, protoNode);
-    }
-
-    node.id = id;
-    node.label = tObj.fields.title;
-
-    result[id] = node;
+        
   }
   
   if(options.view) {
@@ -316,6 +297,36 @@ Adapter.prototype.selectNodesByReference = function(tiddlers, options) {
   }
     
   return utils.convert(result, options.outputType);
+  
+};
+
+Adapter.prototype._createNode = function(tiddler, protoNode) {
+
+  if(!tiddler || utils.isDraft(tiddler)) {
+    return; // silently ignore
+  }
+
+  var tObj = this.setupTiddler(tiddler);
+  
+  if(!tObj) { // cannot ignore this
+    throw "Taskgraph: Cannot create node from tiddler \"" + tiddler + "\"";
+  }
+  
+  var node = utils.getEmptyMap();
+  
+  // assign label
+  node.label = utils.getLabel(tObj, this.opt.field.nodeLabel);
+  
+  // allow override
+  if(typeof protoNode === "object") {
+    node = $tw.utils.extendDeepCopy(node, protoNode);
+  }
+  
+  // force these fields
+  node.id = tObj.fields[this.opt.field.nodeId];
+  node.ref = tObj.fields.title;
+  
+  return node;
   
 };
 
@@ -407,26 +418,12 @@ Adapter.prototype.selectNodesByIds = function(nodeIds, options) {
   for(var id in nodeIds) {
     for(var i = 0; i < allTiddlers.length; i++) {
       
-      var tObj = this.wiki.getTiddler(allTiddlers[i]);
-      var id = tObj.fields[idField];
+      var node = this._createNode(allTiddlers[i], protoNode);
       
-      if(tObj.isDraft() || this.wiki.isSystemTiddler(allTiddlers[i])) {
-        continue;
+      if(node && nodeIds[node.id]) { // valid and contained in set
+        result[node.id] = node;
       }
       
-      if(nodeIds[id]) {
-
-        var node = utils.getEmptyMap();
-        if(typeof protoNode === "object") {
-          node = $tw.utils.extendDeepCopy(node, protoNode);
-        }
-
-        node.id = id;
-        node.label = tObj.fields.title;     
-
-        result[id] = node;
-
-      }
     }
   }
   
@@ -621,7 +618,8 @@ Adapter.prototype.storePositions = function(positions, view) {
 Adapter.prototype.setupTiddler = function(tiddler) {
 
   // ALWAYS reload from store to avoid setting wrong ids on tiddler
-  // being in the role of from and to at the same time
+  // being in the role of from and to at the same time.  
+  // Therefore, do not use utils.getTiddler(tiddler)!
   var tObj = this.wiki.getTiddler(utils.getTiddlerReference(tiddler));
   if(!tObj) return;
   
@@ -660,18 +658,19 @@ Adapter.prototype.insertNode = function(node, options) {
     node = utils.getEmptyMap();
   }
   
-  if(typeof node.label !== "string") {
-    node.label = "New node";
-  }
-  
   if(!node.id) {
     node.id = utils.genUUID();
   }
   
   var fields = utils.getEmptyMap();
-  fields.title = this.wiki.generateNewTitle(node.label);
+  var label = (node.label ? node.label : "New node");
+  fields.title = this.wiki.generateNewTitle(label);
   fields[this.opt.field.nodeId] = node.id;
-    
+  
+  // title might has changed after generateNewTitle()
+  node.label = fields.title;
+  node.ref = fields.title;
+  
   if(options.view) {
 
     var view = new ViewAbstraction(options.view);

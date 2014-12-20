@@ -4,6 +4,7 @@ tags:
 title: $:/plugins/felixhayashi/taskgraph/docs/help/NodeFilterQuickHelp
 type: text/vnd.tiddlywiki
 subtitle: The Node Filter Menu
+caption: The Node Filter Menu
 
 {{NodeFilter.png}}
 

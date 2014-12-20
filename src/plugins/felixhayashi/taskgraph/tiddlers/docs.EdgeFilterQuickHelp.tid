@@ -1,9 +1,10 @@
 created: 20141214005604244
 modified: 20141214011703258
 tags: 
-title: $:/plugins/felixhayashi/taskgraph/docs/help/EdgeFilterQuickHelp
+title: $:/plugins/felixhayashi/taskgraph/docs/help/edgeFilterQuickHelp
 type: text/vnd.tiddlywiki
 subtitle: The Edge Filter Menu
+caption: The Edge Filter Menu
 
 {{EdgeFilter.png}}
 

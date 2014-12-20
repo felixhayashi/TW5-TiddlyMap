@@ -111,7 +111,7 @@ module-type: widget
     this.opt = $tw.taskgraph.opt;
     
     // key (a tiddler) -> callback (called when tiddler changes)
-    this.dialogCallbacks = utils.getEmptyMap();
+    this.callbacks = utils.getEmptyMap();
         
     // https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/widgets/widget.js#L211
     this.computeAttributes();
@@ -162,7 +162,7 @@ module-type: widget
    */
   TaskGraphWidget.prototype.registerCallback = function(tRef, callback, isDeleteOnCall) {
     this.logger("debug", "A callback was registered for changes of \"" + tRef + "\"");
-    this.dialogCallbacks[tRef] = {
+    this.callbacks[tRef] = {
       execute : callback,
       isDeleteOnCall : (typeof isDeleteOnCall == "Boolean" ? isDeleteOnCall : true)
     }
@@ -174,9 +174,9 @@ module-type: widget
    * @see TaskGraphWidget#registerCallback
    */
   TaskGraphWidget.prototype.removeCallback = function(tRef) {
-    if(this.dialogCallbacks[tRef]) {
+    if(this.callbacks[tRef]) {
       this.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
-      delete this.dialogCallbacks[tRef];
+      delete this.callbacks[tRef];
     }
   };
   
@@ -191,22 +191,22 @@ module-type: widget
    */
   TaskGraphWidget.prototype.checkForCallbacks = function(changedTiddlers) {
     
-    if(this.dialogCallbacks.length == 0) {
+    if(this.callbacks.length == 0) {
       this.logger("debug", "No registered callbacks exist at the moment");
       return;
     }
     
     for(var tRef in changedTiddlers) {
             
-      if(!this.dialogCallbacks[tRef]) continue;
+      if(!this.callbacks[tRef]) continue;
       
       if(this.wiki.getTiddler(tRef)) {
         
         this.logger("debug", "A callback for \"" + tRef + "\" will be executed");
-        this.dialogCallbacks[tRef].execute(tRef);
+        this.callbacks[tRef].execute(tRef);
         
         // a continue prevents deleting the callback
-        if(!this.dialogCallbacks.isDeleteOnCall) continue;
+        if(!this.callbacks.isDeleteOnCall) continue;
         
       }
       
@@ -224,12 +224,12 @@ module-type: widget
    * edgetype. If that operation was successful, each graph will instantly
    * be aware of the change as it listens to tiddler changes.
    * 
-   * @param {Edge} data - A javascript object that contains at least
+   * @param {Edge} edge - A javascript object that contains at least
    *    the properties "from", "to" and "label"
    * @param {function} [callback] - A function with the signature
    *    function(isConfirmed);
    */
-  TaskGraphWidget.prototype.handleConnectionEvent = function(data, callback) {
+  TaskGraphWidget.prototype.handleConnectionEvent = function(edge, callback) {
        
     this.logger("info", "Opening a dialog for creating an edge");
 
@@ -237,8 +237,8 @@ module-type: widget
 
     var vars = {
       edgeFilterExpr: edgeFilterExpr,
-      fromLabel: this.adapter.selectNodeById(data.from).label,
-      toLabel: this.adapter.selectNodeById(data.to).label
+      fromLabel: this.adapter.selectNodeById(edge.from).label,
+      toLabel: this.adapter.selectNodeById(edge.to).label
     };
     
     this.openDialog(this.opt.ref.edgeTypeDialog, vars, function(isConfirmed, outputTObj) {
@@ -247,13 +247,13 @@ module-type: widget
         
         var text = utils.getText(outputTObj);
         
-        data.label = (text &amp;&amp; text !== this.opt.misc.unknownEdgeLabel
+        edge.label = (text &amp;&amp; text !== this.opt.misc.unknownEdgeLabel
                       ? text
                       : this.opt.misc.unknownEdgeLabel);
         
-        this.logger("debug", "The edgetype is set to: " + data.label);
+        this.logger("debug", "The edgetype is set to: " + edge.label);
 
-        this.adapter.insertEdge(data, this.getView());  
+        this.adapter.insertEdge(edge, this.getView());  
         $tw.taskgraph.notify("edge added");
         
       }
@@ -545,8 +545,19 @@ module-type: widget
     
     this.graphData = this.getGraphData(true);
         
-    this.network.setData(this.graphData);
-        
+    this.network.setData(this.graphData, this.preventNextRepaint); // true => disableStart
+    
+    // reset
+    this.preventNextRepaint = false;
+       
+    //var center = this.network.getCenterCoordinates();
+    //console.log("center", center);
+    
+    //this.network.moveTo({position: center, scale: 0.8});
+    //this.network.redraw();
+    //this.network.moveTo({scale: 0.5});
+    //this.network.zoomExtent(null, true);
+    //this.network.moveTo({scale: 2});
   };
   
   // changes global state
@@ -596,7 +607,7 @@ module-type: widget
     var graphData = {
       edges: edges,
       nodes: nodes,
-      nodesByLabel: utils.getLookupTable(nodes, "label")
+      nodesByRef: utils.getLookupTable(nodes, "ref")
     };
     
     return graphData;
@@ -671,7 +682,7 @@ module-type: widget
       
       // check for nodes that do not match the filter anymore
       for(var tRef in changedTiddlers) {
-        if(this.graphData.nodesByLabel[tRef]) {
+        if(this.graphData.nodesByRef[tRef]) {
           this.logger("info", "obsolete node", matchingChangedNodes);
           this.rebuildGraph();
           return;
@@ -734,7 +745,7 @@ module-type: widget
     // register events
     
     this.network.on("doubleClick", this.handleDoubleClickEvent.bind(this));
-    
+   
     this.network.on("stabilized", this.handleStabilizedEvent.bind(this));
     
     this.network.on('dragStart', function(properties) {
@@ -753,7 +764,24 @@ module-type: widget
         
     // finally create and register the data and rebuild the graph
     this.rebuildGraph();
+    
+    // fix until zoomExtent() works
+    var center = this.network.getCenterCoordinates();
+    this.network.moveTo({position: center, scale: 0.8});
         
+  };
+  
+  TaskGraphWidget.prototype.handleReconnectEdge = function(updatedEdge) {
+
+    var edge = this.graphData.edges.get(updatedEdge.id);
+    $tw.utils.extend(edge, updatedEdge);
+    
+    this.adapter.deleteEdgesFromStore([
+      { id: edge.id, label: edge.label }
+    ], this.getView());
+    
+    this.adapter.insertEdge(edge, this.getView());
+    
   };
   
   TaskGraphWidget.prototype.getGraphOptions = function() {
@@ -762,31 +790,18 @@ module-type: widget
     
     // get a copy of the options
     var options = this.wiki.getTiddlerData(this.opt.ref.visOptions);
-    
-    options.onDelete = this.handleRemoveElement.bind(this);
-    options.onConnect = function(edge, callback) {
-      // we do not call the callback of the network as we handle it ourselves
-      this.handleConnectionEvent(edge);
+        
+    options.onDelete = function(data, callback) {
+      this.handleRemoveElement(data);
     }.bind(this);
-    
-    options.onAdd = function(node, callback) {
-      this.adapter.insertNode(node, {
-        view: this.getView(),
-        editNodeOnCreate: false
-      });
+    options.onConnect = function(data, callback) {
+      this.handleConnectionEvent(data);
     }.bind(this);
-
-    options.onEditEdge = function(updatedEdge, callback) {
-
-      var edge = this.graphData.edges.get(updatedEdge.id);
-      $tw.utils.extend(edge, updatedEdge);
-      
-      this.adapter.deleteEdgesFromStore([
-        { id: edge.id, label: edge.label }
-      ], this.getView());
-      
-      this.adapter.insertEdge(edge, this.getView());
-      
+    options.onAdd = function(data, callback) {
+      this.insertNode(data);
+    }.bind(this);
+    options.onEditEdge = function(data, callback) {
+      this.handleReconnectEdge(data);
     }.bind(this);
 
     options.dataManipulation = {
@@ -883,17 +898,19 @@ module-type: widget
   
   /**
    * Called by vis when the user tries to delete a node or an edge.
-   * @data { nodes: [selectedNodeIds], edges: [selectedEdgeIds] }
+   * 
+   * @param {Object} elements - An object containing the elements to be removed.
+   * @param {Array&lt;Id>} elements.nodes - Removed edges.
+   * @param {Array&lt;Id>} elements.edges - Removed nodes.
    */
-  TaskGraphWidget.prototype.handleRemoveElement = function(data, callback) {
+  TaskGraphWidget.prototype.handleRemoveElement = function(elements) {
     
-    if(data.edges.length &amp;&amp; !data.nodes.length) { // only deleting edges
-      this.adapter.deleteEdgesFromStore(this.graphData.edges.get(data.edges), this.getView());
-      callback(data);
-      $tw.taskgraph.notify("edge" + (data.edges.length > 1 ? "s" : "") + " removed");
+    if(elements.edges.length &amp;&amp; !elements.nodes.length) { // only deleting edges
+      this.adapter.deleteEdgesFromStore(this.graphData.edges.get(elements.edges), this.getView());
+      $tw.taskgraph.notify("edge" + (elements.edges.length > 1 ? "s" : "") + " removed");
     }
                         
-    if(data.nodes.length) {
+    if(elements.nodes.length) {
       
       var fields = {
         subtitle : "Please confirm your choice",
@@ -907,13 +924,13 @@ module-type: widget
         if(!isConfirmed) return; // callback({}) ?
           
           // get objects with labels and ids
-          var nodes = this.graphData.nodes.get(data.nodes);
-          var edges = this.graphData.edges.get(data.edges);
+          var nodes = this.graphData.nodes.get(elements.nodes);
+          var edges = this.graphData.edges.get(elements.edges);
           
           this.adapter.deleteNodesFromStore(nodes);
           this.adapter.deleteEdgesFromStore(edges, this.getView());
           
-          $tw.taskgraph.notify("node" + (data.nodes.length > 1 ? "s" : "") + " removed");
+          $tw.taskgraph.notify("node" + (elements.nodes.length > 1 ? "s" : "") + " removed");
         
       });
     }     
@@ -987,6 +1004,14 @@ module-type: widget
     this.graphData.nodes.update(updates);
 
   };
+
+  TaskGraphWidget.prototype.insertNode = function(node) {
+    this.preventNextRepaint = true;
+    this.adapter.insertNode(node, {
+      view: this.getView(),
+      editNodeOnCreate: false
+    });
+  };
     
   /**
    * This handler is registered at and called by the vis network event
@@ -1008,11 +1033,8 @@ module-type: widget
       this.openDialog(this.opt.ref.nodeNameDialog, null, function(isConfirmed, outputTObj) {
         if(isConfirmed) {
           var node = properties.pointer.canvas;
-          node.label = (outputTObj ? outputTObj.fields.text : "New Node");
-          this.adapter.insertNode(node, {
-            view: this.getView(),
-            editNodeOnCreate: false
-          });
+          node.label = utils.getText(outputTObj);
+          this.insertNode(node);
         }
       });
       
@@ -1023,7 +1045,7 @@ module-type: widget
         this.logger("debug", "Doubleclicked on a node");
 
         var id = properties.nodes[0];
-        var targetTitle = this.graphData.nodes.get(id).label;
+        var tRef = this.graphData.nodes.get(id).ref;
         //this.network.focusOnNode(properties.nodes[0], {});
         
       } else if(properties.edges.length) { // clicked on an edge
@@ -1035,13 +1057,13 @@ module-type: widget
         var label = (edge.label
                      ? edge.label
                      : this.opt.misc.unknownEdgeLabel);
-        var targetTitle = this.getView().getEdgeStoreLocation() + "/" + label;
+        var tRef = this.getView().getEdgeStoreLocation() + "/" + label;
       
       }
       
-      // window.location.hash = node.label; is not the right way to do it
+      // window.location.hash = node.ref; is not the right way to do it
       this.dispatchEvent({
-        type: "tm-navigate", navigateTo: targetTitle
+        type: "tm-navigate", navigateTo: tRef
       }); 
             
     }
@@ -1207,6 +1229,7 @@ module-type: widget
     this.logger("info", "Repainting the whole graph");
     
     this.network.redraw();
+    //this.network.moveTo({scale: 0.5});
     this.network.zoomExtent();
     
     //~ this.network.moveTo({
@@ -1252,7 +1275,7 @@ module-type: widget
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha11</a>
-		on 2014-12-18T15:14:37+01:00 using the <a
+		on 2014-12-21T00:02:36+01:00 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

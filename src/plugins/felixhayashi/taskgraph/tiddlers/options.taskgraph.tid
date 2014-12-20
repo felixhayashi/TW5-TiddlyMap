@@ -3,8 +3,8 @@ type: application/json
 
 { 
   "field_nodeId": "id",
+  "field_nodeLabel": "caption",
   "tag_ticket": "ticket",
-  "defaultViewBindingChoice" : "",
   "debug": true,
   "notifications": true,
   "editNodeOnCreate": false

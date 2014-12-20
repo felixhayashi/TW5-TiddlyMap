@@ -23,7 +23,7 @@ title: $:/plugins/felixhayashi/taskgraph/misc/advancedEditorBar
 
   <$reveal type="popup" position="below" state=<<qualify "$:/temp/taskgraph/editor/showactions">> >
     <div class="tc-drop-down">
-      <$button class="tc-btn-invisible" message="tm-modal" param="$:/plugins/felixhayashi/taskgraph/docs/help/ViewActionQuickHelp">{{$:/core/images/info-button}} quick help</$button>
+      <$button class="tc-btn-invisible" message="tm-modal" param="$:/plugins/felixhayashi/taskgraph/docs/help/viewActionQuickHelp">{{$:/core/images/info-button}} quick help</$button>
       <hr />
       <$button class="tc-btn-invisible" message="tm-create-view">{{$:/core/images/new-button}} Create empty view</$button>
       <$button class="tc-btn-invisible" message="tm-rename-view">{{$:/core/images/tag-button}} Rename view</$button>
@@ -50,7 +50,9 @@ title: $:/plugins/felixhayashi/taskgraph/misc/advancedEditorBar
   <$button popup=<<qualify "$:/temp/taskgraph/editor/filteredges">> >{{$:/core/images/menu-button}}</$button>
   <$reveal type="popup" position="below" state=<<qualify "$:/temp/taskgraph/editor/filteredges">> >
     <div class="tc-drop-down">
-      <$button class="tc-btn-invisible" message="tm-modal" param="$:/plugins/felixhayashi/taskgraph/docs/help/EdgeFilterQuickHelp">{{$:/core/images/info-button}} quick help</$button>
+      <$button class="tc-btn-invisible">{{$:/core/images/info-button}} quick help
+        <$action-sendmessage $message="tm-modal" $param="$:/plugins/felixhayashi/taskgraph/docs/help/viewActionQuickHelp" />
+      </$button>
       <hr />
       <$list filter=<<var.edgeFilterExpr>> >
         <$set name="curEdgeId" value={{!!id}}>

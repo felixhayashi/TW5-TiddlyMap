@@ -98,6 +98,21 @@ utils.getExistenceMap = function(ids) {
 };
 
 /**
+ * @param {Tiddler} tiddler
+ * @param {string} aliasField - A tiddler field that contains an
+ *     alternative title (e.g. "caption").
+ * @return {string|undefined} If the `aliasField` exists and is not
+ *     empty, the value of the `aliasField` otherwise the tiddler's
+ *     title or undefined if the tiddler doesn't exist.
+ */
+utils.getLabel = function(tiddler, aliasField) {
+  var tObj = utils.getTiddler(tiddler);
+  return (tObj && tObj.fields[aliasField]
+          ? tObj.fields[aliasField]
+          : tObj.fields.title);
+};
+
+/**
  * Transforms a collection of a certain type into a collection of
  * another type.
  * 
@@ -441,13 +456,15 @@ utils.hasElements = function(obj) {
 
 utils.isDraft = function(tiddler) {
 
-  return utils.getTiddler(tRef) && utils.getTiddler(tRef).isDraft();
+  return (utils.getTiddler(tiddler) && utils.getTiddler(tiddler).isDraft());
 
 };
 
 utils.getText = function(tiddler, defaultText) {
   
-  if(!defaultText) defaultText = "";
+  if(!defaultText) {
+    defaultText = "";
+  }
   var tObj = utils.getTiddler(tiddler);
   return (tObj ? tObj.fields.text : defaultText);
   

@@ -1,9 +1,10 @@
 created: 20141214011718596
 modified: 20141214013549964
 tags: 
-title: $:/plugins/felixhayashi/taskgraph/docs/help/ViewActionQuickHelp
+title: $:/plugins/felixhayashi/taskgraph/docs/help/viewActionQuickHelp
 type: text/vnd.tiddlywiki
 subtitle: The View Action Menu
+caption: The View Action Menu
 
 {{ViewActions.png}}
 

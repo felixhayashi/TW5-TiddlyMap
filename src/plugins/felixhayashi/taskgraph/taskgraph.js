@@ -151,12 +151,12 @@ module-type: widget
    * edgetype. If that operation was successful, each graph will instantly
    * be aware of the change as it listens to tiddler changes.
    * 
-   * @param {Edge} data - A javascript object that contains at least
+   * @param {Edge} edge - A javascript object that contains at least
    *    the properties "from", "to" and "label"
    * @param {function} [callback] - A function with the signature
    *    function(isConfirmed);
    */
-  TaskGraphWidget.prototype.handleConnectionEvent = function(data, callback) {
+  TaskGraphWidget.prototype.handleConnectionEvent = function(edge, callback) {
        
     this.logger("info", "Opening a dialog for creating an edge");
 
@@ -164,8 +164,8 @@ module-type: widget
 
     var vars = {
       edgeFilterExpr: edgeFilterExpr,
-      fromLabel: this.adapter.selectNodeById(data.from).label,
-      toLabel: this.adapter.selectNodeById(data.to).label
+      fromLabel: this.adapter.selectNodeById(edge.from).label,
+      toLabel: this.adapter.selectNodeById(edge.to).label
     };
     
     this.openDialog(this.opt.ref.edgeTypeDialog, vars, function(isConfirmed, outputTObj) {
@@ -174,13 +174,13 @@ module-type: widget
         
         var text = utils.getText(outputTObj);
         
-        data.label = (text && text !== this.opt.misc.unknownEdgeLabel
+        edge.label = (text && text !== this.opt.misc.unknownEdgeLabel
                       ? text
                       : this.opt.misc.unknownEdgeLabel);
         
-        this.logger("debug", "The edgetype is set to: " + data.label);
+        this.logger("debug", "The edgetype is set to: " + edge.label);
 
-        this.adapter.insertEdge(data, this.getView());  
+        this.adapter.insertEdge(edge, this.getView());  
         $tw.taskgraph.notify("edge added");
         
       }
@@ -534,7 +534,7 @@ module-type: widget
     var graphData = {
       edges: edges,
       nodes: nodes,
-      nodesByLabel: utils.getLookupTable(nodes, "label")
+      nodesByRef: utils.getLookupTable(nodes, "ref")
     };
     
     return graphData;
@@ -609,7 +609,7 @@ module-type: widget
       
       // check for nodes that do not match the filter anymore
       for(var tRef in changedTiddlers) {
-        if(this.graphData.nodesByLabel[tRef]) {
+        if(this.graphData.nodesByRef[tRef]) {
           this.logger("info", "obsolete node", matchingChangedNodes);
           this.rebuildGraph();
           return;
@@ -960,7 +960,7 @@ module-type: widget
       this.openDialog(this.opt.ref.nodeNameDialog, null, function(isConfirmed, outputTObj) {
         if(isConfirmed) {
           var node = properties.pointer.canvas;
-          node.label = (outputTObj ? outputTObj.fields.text : "New Node");
+          node.label = utils.getText(outputTObj);
           this.insertNode(node);
         }
       });
@@ -972,7 +972,7 @@ module-type: widget
         this.logger("debug", "Doubleclicked on a node");
 
         var id = properties.nodes[0];
-        var targetTitle = this.graphData.nodes.get(id).label;
+        var tRef = this.graphData.nodes.get(id).ref;
         //this.network.focusOnNode(properties.nodes[0], {});
         
       } else if(properties.edges.length) { // clicked on an edge
@@ -984,13 +984,13 @@ module-type: widget
         var label = (edge.label
                      ? edge.label
                      : this.opt.misc.unknownEdgeLabel);
-        var targetTitle = this.getView().getEdgeStoreLocation() + "/" + label;
+        var tRef = this.getView().getEdgeStoreLocation() + "/" + label;
       
       }
       
-      // window.location.hash = node.label; is not the right way to do it
+      // window.location.hash = node.ref; is not the right way to do it
       this.dispatchEvent({
-        type: "tm-navigate", navigateTo: targetTitle
+        type: "tm-navigate", navigateTo: tRef
       }); 
             
     }

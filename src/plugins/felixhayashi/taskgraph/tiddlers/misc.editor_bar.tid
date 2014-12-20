@@ -16,12 +16,12 @@ title: $:/plugins/felixhayashi/taskgraph/misc/advancedEditorBar
     </$select>
   </$reveal>
   <$reveal type="match" text="true" default=<<var.isViewBound>> >
-    <<var.viewLabel>>
+    <b><<var.viewLabel>></b>
   </$reveal>
 
-  <$button popup="$:/temp/taskgraph/editor/showactions">{{$:/core/images/menu-button}}</$button>
+  <$button popup=<<qualify "$:/temp/taskgraph/editor/showactions">> >{{$:/core/images/menu-button}}</$button>
 
-  <$reveal type="popup" position="below" state="$:/temp/taskgraph/editor/showactions">
+  <$reveal type="popup" position="below" state=<<qualify "$:/temp/taskgraph/editor/showactions">> >
     <div class="tc-drop-down">
       <$button class="tc-btn-invisible" message="tm-modal" param="$:/plugins/felixhayashi/taskgraph/docs/help/ViewActionQuickHelp">{{$:/core/images/info-button}} quick help</$button>
       <hr />
@@ -46,11 +46,9 @@ title: $:/plugins/felixhayashi/taskgraph/misc/advancedEditorBar
 <span class="separator" />
 
 <div>
-  
   Edge Filter:
-  <$button popup="$:/temp/taskgraph/editor/filteredges">{{$:/core/images/menu-button}}</$button>
-
-  <$reveal type="popup" position="below" state="$:/temp/taskgraph/editor/filteredges">
+  <$button popup=<<qualify "$:/temp/taskgraph/editor/filteredges">> >{{$:/core/images/menu-button}}</$button>
+  <$reveal type="popup" position="below" state=<<qualify "$:/temp/taskgraph/editor/filteredges">> >
     <div class="tc-drop-down">
       <$button class="tc-btn-invisible" message="tm-modal" param="$:/plugins/felixhayashi/taskgraph/docs/help/EdgeFilterQuickHelp">{{$:/core/images/info-button}} quick help</$button>
       <hr />
@@ -72,11 +70,9 @@ title: $:/plugins/felixhayashi/taskgraph/misc/advancedEditorBar
 <span class="separator" />
 
 <div>
-
   Node Filter:
-  <$button popup="$:/temp/taskgraph/editor/state/nodeFilterActions">{{$:/core/images/menu-button}}</$button>
-
-  <$reveal type="popup" position="below" state="$:/temp/taskgraph/editor/state/nodeFilterActions">
+  <$button popup=<<qualify "$:/temp/taskgraph/editor/state/nodeFilterActions">> >{{$:/core/images/menu-button}}</$button>
+  <$reveal type="popup" position="below" state=<<qualify "$:/temp/taskgraph/editor/state/nodeFilterActions">> >
     <div class="tc-drop-down">
       <$button class="tc-btn-invisible" message="tm-modal" param="$:/plugins/felixhayashi/taskgraph/docs/help/NodeFilterQuickHelp">{{$:/core/images/info-button}} quick help</$button>
       <hr />

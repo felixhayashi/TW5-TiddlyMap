@@ -122,7 +122,7 @@ $color: #666666;
     
     background: #d6d9d8;
     border-bottom: 1px solid lightgray;
-    padding: 1px $padding;
+    padding: 3px $padding;
     
     .tc-drop-down {
         background-color: #F3F3F3;
@@ -163,7 +163,7 @@ $color: #666666;
     }
     
     .separator:after {
-      color: lightgray;
+      color: "#BDBFBF";
       margin: 3px;
       content: " | ";
     }

@@ -72,7 +72,7 @@
   .taskgraph .filterbar {
     background: #d6d9d8;
     border-bottom: 1px solid lightgray;
-    padding: 1px 5px; }
+    padding: 3px 5px; }
     .taskgraph .filterbar .tc-drop-down {
       background-color: #F3F3F3;
       border: none;
@@ -97,7 +97,7 @@
     .taskgraph .filterbar > * {
       display: inline-block; }
     .taskgraph .filterbar .separator:after {
-      color: lightgray;
+      color: "#BDBFBF";
       margin: 3px;
       content: " | "; }
     .taskgraph .filterbar .quickhelp {

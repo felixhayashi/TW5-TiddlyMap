@@ -20,7 +20,10 @@ You can use the name of a view to embed graphs in your tiddlers. All changes are
 <$taskgraph mode="graph" height="300px" view="YOURVIEWNAME"></$taskgraph>
 ```
 
-If you want you graph to act like an editor, set `editor="true"`.
+If you want you graph to act like an editor, set
+
+* `editor="vis"`: this will show the vis menu
+* or `editor="advanced"`: this will show all menus.
 
 !!! Node-Views and Edge-Views
 

@@ -1,12 +1,12 @@
 created: 20141221140636352
-modified: 20141221140846794
+modified: 20141221144054742
 tags: 
 title: ★ The Big Picture ★
 type: text/x-markdown
 
 # TW-Taskgraph
 
-**Warning:** Taskgraph is cool but unstable. Just play with it, don't use it! In case you really want to use it now, make sure to always check back to [this site](http://wkpr.de/hosting/tmp/tw5/taskgraph/) to see whether your version is up-to-date as updates and bugfixes come quick! For any bug you discover, please create an issue at [github.com](|https://github.com/felixhayashi/tw-taskgraph/issues).
+**Warning:** Taskgraph is cool but unstable. Just play with it, don't use it! In case you really want to use it now, make sure to always check back to the [official demo site](http://wkpr.de/hosting/tmp/tw5/taskgraph/) to see whether your version is up-to-date as updates and bugfixes come quick! For any bug you discover, please create an issue at [github.com](|https://github.com/felixhayashi/tw-taskgraph/issues).
 
 TW-Taskgraph is a [TiddlyWiki](http://tiddlywiki.com/) (TW5) plugin that allows you to link your wiki-topics (tiddlers) in order to create *clickable graphs*. By creating relations between your topics you can easily do the following:
 

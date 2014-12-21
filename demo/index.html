@@ -257,6 +257,8 @@ Error message and password prompt
 
 <li>Vis.js</li>
 
+<li>★ The Big Picture ★</li>
+
 </ul>
 </p>
 
@@ -9949,7 +9951,7 @@ Error message and password prompt
     }
 }</pre>
 </div>
-<div author="Felix Küppers" core-version="&gt;=5.1.5" dependents="$:/plugins/felixhayashi/vis" description="Create clickable graphs and mindmaps by simply linking your tiddlers!" list="docs/readme docs/license docs/help config/taskgraph config/vis" plugin-type="plugin" released="Sun, 21 Dec 2014 00:01:29 +0100" source="https://github.com/felixhayashi/tw-taskgraph" title="$:/plugins/felixhayashi/taskgraph" type="application/json" version="0.6.1+165">
+<div author="Felix Küppers" core-version="&gt;=5.1.5" dependents="$:/plugins/felixhayashi/vis" description="Create clickable graphs and mindmaps by simply linking your tiddlers!" list="docs/readme docs/license docs/help config/taskgraph config/vis" plugin-type="plugin" released="Sun, 21 Dec 2014 15:19:25 +0100" source="https://github.com/felixhayashi/tw-taskgraph" title="$:/plugins/felixhayashi/taskgraph" type="application/json" version="0.6.1+171">
 <pre>{
     &quot;tiddlers&quot;: {
         &quot;$:/plugins/felixhayashi/taskgraph/adapter.js&quot;: {
@@ -10916,7 +10918,7 @@ to add the tags to the filter again.
 This is a side effect as I completely changed the way private edges work. Sorry, you need to rebuild your edges again if you want them to be private.
 </pre>
 </div>
-<div created="20141217201950735" id="04CCC27E-A88B-4CE2-93C8-914D8D65BD46" modified="20141217215813257" tags="component" title="Adapter" type="text/vnd.tiddlywiki">
+<div created="20141217201950735" id="04CCC27E-A88B-4CE2-93C8-914D8D65BD46" modified="20141221132938118" tags="component" title="Adapter" type="text/vnd.tiddlywiki">
 <pre>This library provides all the functions to interact with the TW as if it was a simple database for nodes and edges. It may be understood as an abstraction layer.
 
 Everything that is related to retrieving or inserting nodes and edges is handled by the adapter.
@@ -10935,6 +10937,7 @@ var options = { view: myView };
 $tw.taskgraph.adapter.insertNode(node, options);
 ```
 
+For more information visit the [[api docs site|http://wkpr.de/hosting/tmp/tw5/taskgraph/api/index.html]].
 </pre>
 </div>
 <div created="20141217202002474" id="BD22EBE1-3189-421F-BB0C-3DFF9D4FBF98" modified="20141217203238374" tags="component" title="Caretaker" type="text/vnd.tiddlywiki">
@@ -11011,7 +11014,7 @@ Alternatively, you can show the whole editor bar via:
 <pre>//This is a sample task for the TaskManagementExample//
 </pre>
 </div>
-<div created="20141217161104178" creator="@felixhayashi" id="63EA2EE9-F821-44F7-A706-E1F973F7C6E0" modified="20141220172109390" modifier="@felixhayashi" title="GettingStarted" type="text/vnd.tiddlywiki">
+<div created="20141217161104178" creator="@felixhayashi" id="63EA2EE9-F821-44F7-A706-E1F973F7C6E0" modified="20141221141330699" modifier="@felixhayashi" title="GettingStarted" type="text/vnd.tiddlywiki">
 <pre>|!Current Taskgraph version |{{ version || plugin }} |
 |!Version's build date |{{ released || plugin }} |
 
@@ -11019,9 +11022,9 @@ Alternatively, you can show the whole editor bar via:
 
 Hi, this is a demo site of tw-taskgraph.
 
-See [[Version History]] for a list of features and to understand what tw-taskgraph can do for you. To understand the basic concepts behind taskgraph check out the [[Help|$:/plugins/felixhayashi/taskgraph/docs/help]]. Instructions on how to install the plugin can be found [[here|How to install a plugin?]].
+See the [[version history|Version History]] for a list of existing features and [[overview|★ The Big Picture ★]] to understand what tw-taskgraph can do for you. To understand the basic concepts behind taskgraph check out the [[help topics|$:/plugins/felixhayashi/taskgraph/docs/help]]. Instructions on how to install the plugin can be found [[here|How to install a plugin?]].
 
-''Warning:'' Taskgraph is cool but unstable. Just play with it, don't use it! In case you really want to use it now, make sure to always check back to this site to see whether your version is up-to-date as updates and bugfixes come quick! For any bug you discover, please create an issue at [[github|https://github.com/felixhayashi/tw-taskgraph/issues]].
+''Warning:'' Taskgraph is cool but unstable. Just play with it, don't use it! In case you really want to use it now, make sure to always check back to this site to see whether your version is up-to-date as updates and bugfixes come quick! For any bug you discover, please create an issue at [[github.com|https://github.com/felixhayashi/tw-taskgraph/issues]].
 
 By using this plugin you agree to the product's [[License Terms|$:/plugins/felixhayashi/taskgraph/docs/license]] (BSD License). </pre>
 </div>
@@ -11172,13 +11175,51 @@ The [[TiddlyWiki|http://tiddlywiki.com/]] project is a flourishing community pro
 <div created="20141217194700139" id="BE07716E-E5AB-480A-B228-9E24357EBC88" modified="20141218215005110" title="Version History" type="text/vnd.tiddlywiki">
 <pre>&lt;&lt;tabs &quot;[tag[ReleaseNote]!sort[created]]&quot; &quot;Actively developed&quot; &quot;$:/state/tab&quot; &quot;tc-vertical&quot; &quot;ReleaseTemplate&quot;&gt;&gt;</pre>
 </div>
-<div created="20141217202058601" id="46F1FDF7-0517-44B8-8593-30DDA1DAE459" modified="20141217203228416" tags="component" title="ViewAbstraction" type="text/vnd.tiddlywiki">
-<pre></pre>
+<div created="20141217202058601" id="46F1FDF7-0517-44B8-8593-30DDA1DAE459" modified="20141221132946733" tags="component" title="ViewAbstraction" type="text/vnd.tiddlywiki">
+<pre>For more information visit the [[api docs site|http://wkpr.de/hosting/tmp/tw5/taskgraph/api/index.html]].</pre>
 </div>
 <div created="20141217202218989" id="D0B54F1D-8D7A-4C2E-9490-D3DF8866A6EC" modified="20141217210714011" tags="component" title="Vis.js" type="text/vnd.tiddlywiki">
 <pre>For graph visualization and manipulation, tw-taskgraph draws upon the popular open-source [[vis.js|http://visjs.org/]] library. It is actively developed by [[Almende B.V|http://almende.com]].
 
 //The library is designed to be easy to use, handle large amounts of dynamic data, and enable manipulation of the data// -- [[visjs.org|http://visjs.org/]]
+</pre>
+</div>
+<div created="20141221140636352" modified="20141221140846794" tags="" title="★ The Big Picture ★" type="text/x-markdown">
+<pre># TW-Taskgraph
+
+**Warning:** Taskgraph is cool but unstable. Just play with it, don't use it! In case you really want to use it now, make sure to always check back to [this site](http://wkpr.de/hosting/tmp/tw5/taskgraph/) to see whether your version is up-to-date as updates and bugfixes come quick! For any bug you discover, please create an issue at [github.com](|https://github.com/felixhayashi/tw-taskgraph/issues).
+
+TW-Taskgraph is a [TiddlyWiki](http://tiddlywiki.com/) (TW5) plugin that allows you to link your wiki-topics (tiddlers) in order to create *clickable graphs*. By creating relations between your topics you can easily do the following:
+
+* **Create mindmaps** and quickly manifest your ideas in tiddlers (wiki entries).
+* **Create task-dependency graphs** to organize and describe your tasks.
+* **Visualize your topic structures** to get an immediate grasp of topics and relations.
+
+In general you may **create, visualize and describe any network-structure** you have in mind.
+
+# How it works
+
+TW-Taskgraph combines the strength of two open-source projects:
+
+**⤍ The TiddlyWiki Project**
+
+&gt; TiddlyWiki has bought unprecedented freedom to people to keep their precious information under their own control
+&gt; - [tiddlywiki.com]([http://tiddlywiki.com]/#TiddlyWiki)
+
+The TiddlyWiki project is a flourishing community project under the lead of its original inventor Jeremy Ruston (@Jermolene). Put in simple words, TiddlyWiki is a highly interactive wiki stored in a single file that can be used for:
+
+* Personal note taking
+* Project documentation and management
+* To create whole encyclopedias
+
+
+**⤍ The Vis.js Project**
+
+For graph visualization and manipulation, tw-taskgraph draws upon the popular open-source [vis.js](http://visjs.org/) library - *a dynamic, browser based visualization library* actively developed and maintained by a team of enthusiastic developers working at [Almende B.V](|http://almende.com).
+
+&gt; The library is designed to be easy to use, handle large amounts of dynamic data, and enable manipulation of the data
+&gt;  - [visjs.org](|http://visjs.org/)
+
 </pre>
 </div>
 

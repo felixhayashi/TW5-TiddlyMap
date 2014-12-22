@@ -28,6 +28,11 @@
     padding-top: 0px;
     padding-bottom: 0px; }
 
+/*
+body {
+  background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/taskgraph/media/surface.png!!type}} text={{$:/plugins/felixhayashi/taskgraph/media/surface.png}}/>'));
+}
+*/
 #node-filter-dialog #filter-tips {
   font-size: 0.8em; }
 #node-filter-dialog textarea {

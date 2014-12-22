@@ -53,6 +53,12 @@
 $padding : 5px;
 $color: #666666;
 
+/*
+body {
+  background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/taskgraph/media/surface.png!!type}} text={{$:/plugins/felixhayashi/taskgraph/media/surface.png}}/>'));
+}
+*/
+
 #node-filter-dialog {
 
   #filter-tips {

@@ -6,7 +6,7 @@ type: text/vnd.tiddlywiki
 subtitle: The Node Filter Menu
 caption: The Node Filter Menu
 
-{{NodeFilter.png}}
+{{$:/plugins/felixhayashi/taskgraph/media/NodeFilter.png}}
 
 Node-views and edge-views are the two components that make up each graph-view. Node views allow you to filter the nodes displayed on the graph, while edge-views let you decide, which particular edge-types to display.
 

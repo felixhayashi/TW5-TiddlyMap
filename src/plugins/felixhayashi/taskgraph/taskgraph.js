@@ -57,24 +57,7 @@ module-type: widget
   // !! EXTENSION !!
   TaskGraphWidget.prototype = new Widget();
   // !! EXTENSION !!
-        
-  /**
-   * Add some classes to give the user a chance to apply some css
-   * to different graph modes.
-   */
-  TaskGraphWidget.prototype.registerParentDomNode = function(parent) {
-    this.parentDomNode = parent;
-    if(!$tw.utils.hasClass(parent, "taskgraph")) {
-      $tw.utils.addClass(parent, "taskgraph");
-      if(this.getAttribute("click-to-use") !== "false") {
-        $tw.utils.addClass(parent, "click-to-use");
-      }
-      if(this.getAttribute("class")) {
-        $tw.utils.addClass(parent, this.getAttribute("class"));
-      }
-    }
-  }
-  
+          
   /**
    * The callback mechanism allows to dynamically listen to tiddler
    * changes without hardcoding a change-check for a tiddler name
@@ -332,14 +315,29 @@ module-type: widget
     this.editorMode = this.getAttribute("editor");
     
     // first append the bar if we are in editor mode
-    if(this.editorMode === "advanced") {
-      this.initAndRenderEditorBar(parent);
-    }
+    this.initAndRenderEditorBar(parent);
         
     // now initialise graph variables and render the graph
     this.initAndRenderGraph(parent);
     
   };
+  
+  /**
+   * Add some classes to give the user a chance to apply some css
+   * to different graph modes.
+   */
+  TaskGraphWidget.prototype.registerParentDomNode = function(parent) {
+    this.parentDomNode = parent;
+    if(!$tw.utils.hasClass(parent, "taskgraph")) {
+      $tw.utils.addClass(parent, "taskgraph");
+      if(this.getAttribute("click-to-use") !== "false") {
+        $tw.utils.addClass(parent, "click-to-use");
+      }
+      if(this.getAttribute("class")) {
+        $tw.utils.addClass(parent, this.getAttribute("class"));
+      }
+    }
+  }
   
   TaskGraphWidget.prototype.handleSpecialViews = function() {
     
@@ -362,12 +360,17 @@ module-type: widget
    */
   TaskGraphWidget.prototype.initAndRenderEditorBar = function(parent) {
     
-    this.graphBarDomNode = document.createElement("div");
-    $tw.utils.addClass(this.graphBarDomNode, "filterbar");
-    parent.appendChild(this.graphBarDomNode);
+    if(this.editorMode === "advanced") {
     
-    this.rebuildChildWidgets();
-    this.renderChildren(this.graphBarDomNode);
+      this.graphBarDomNode = document.createElement("div");
+      $tw.utils.addClass(this.graphBarDomNode, "filterbar");
+      parent.appendChild(this.graphBarDomNode);
+      
+      this.rebuildChildWidgets();
+      this.renderChildren(this.graphBarDomNode);
+      
+    }
+    
   };
 
   /**
@@ -377,34 +380,33 @@ module-type: widget
    */
   TaskGraphWidget.prototype.rebuildChildWidgets = function() {
     
-    if(this.editorMode === "vis") {
-      return;
-    }
+    if(this.editorMode === "advanced") {
     
-    // register variables
-    this.setVariable("var.viewLabel", this.getView().getLabel());
-    this.setVariable("var.isViewBound", String(this.isViewBound()));
-    this.setVariable("var.ref.view", this.getView().getRoot());
-    this.setVariable("var.ref.viewHolder", this.getViewHolderRef());
-    this.setVariable("var.ref.edgeFilter", this.getView().getPaths().edgeFilter);
-    this.setVariable("var.edgeFilterExpr", this.view.getAllEdgesFilterExpr());
-    
-    // Construct the child widget tree
-    var body = {
-      type : "tiddler",
-      attributes : {
-        tiddler : { type : "string", value : this.getView().getRoot() }
-      },
-      children : [{
-        type : "transclude",
+      // register variables
+      this.setVariable("var.viewLabel", this.getView().getLabel());
+      this.setVariable("var.isViewBound", String(this.isViewBound()));
+      this.setVariable("var.ref.view", this.getView().getRoot());
+      this.setVariable("var.ref.viewHolder", this.getViewHolderRef());
+      this.setVariable("var.ref.edgeFilter", this.getView().getPaths().edgeFilter);
+      this.setVariable("var.edgeFilterExpr", this.view.getAllEdgesFilterExpr());
+      
+      // Construct the child widget tree
+      var body = {
+        type : "tiddler",
         attributes : {
-          tiddler : { type : "string", value : this.opt.ref.graphBar }
-        }
-      }]
-    };
-        
-    this.makeChildWidgets([body]);
-    
+          tiddler : { type : "string", value : this.getView().getRoot() }
+        },
+        children : [{
+          type : "transclude",
+          attributes : {
+            tiddler : { type : "string", value : this.opt.ref.graphBar }
+          }
+        }]
+      };
+          
+      this.makeChildWidgets([body]);
+      
+    }
   };
       
   /**
@@ -463,6 +465,10 @@ module-type: widget
 
   };
   
+  /**
+   * param {NodeCollection} [nodes] - An optional set of nodes to use
+   * instead of the set created according to the nodes filter.
+   */
   TaskGraphWidget.prototype.rebuildGraph = function() {
     
     this.logger("debug", "Rebuilding graph");
@@ -472,53 +478,67 @@ module-type: widget
     
     this.graphData = this.getGraphData(true);
         
-    this.network.setData(this.graphData, this.preventNextRepaint); // true => disableStart
+    this.network.setData({ nodes: this.graphData.nodes, edges: this.graphData.edges }, this.preventNextRepaint); // true => disableStart
+    
+    //~ if(this.hasStartedDiving()) {
+      //~ var zoomExtendsElement = this.parentDomNode.getElementsByClassName("network-navigation zoomExtends");
+      //~ if(zoomExtends.length) {
+        //~ zoomExtends[0].parentNode.appendChild(
+      //~ }
+    //~ }
     
     // reset
     this.preventNextRepaint = false;
+    this.lastNodeDoubleClicked = null;
        
-    //var center = this.network.getCenterCoordinates();
-    //console.log("center", center);
-    
-    //this.network.moveTo({position: center, scale: 0.8});
-    //this.network.redraw();
-    //this.network.moveTo({scale: 0.5});
-    //this.network.zoomExtent(null, true);
-    //this.network.moveTo({scale: 2});
   };
   
-  // changes global state
+  TaskGraphWidget.prototype.hasStartedDiving = function() {
+    return (this.lastNodeDoubleClicked && this.getView().isConfEnabled("node_diving"));
+  }
+  
+  /**
+   * param {boolean} isRebuild
+   * param {NodeCollection} [nodes] - An optional set of nodes to use
+   *     instead of the set created according to the nodes filter. Supplying
+   *     a nodes collection will always recreate the cache despite the value
+   *     of `isRebuild`.
+   */
   TaskGraphWidget.prototype.getGraphData = function(isRebuild) {
       
-    if(!isRebuild && this.graphData) return this.graphData;
-      
-    var nodeFilter = this.getView().getNodeFilter("expression");
-    var nodes = this.adapter.selectNodesByFilter(nodeFilter, {
-      view: this.getView()
-    });
+    if(!isRebuild && this.graphData) {
+      return this.graphData;
+    }
+    
+    if(this.hasStartedDiving()) {
+      this.lastNodeDoubleClicked.group = "special";
+      var nodes = new vis.DataSet([ this.lastNodeDoubleClicked ]);
+    } else {      
+      var nodeFilter = this.getView().getNodeFilter("compiled");
+      var nodes = this.adapter.selectNodesByFilter(nodeFilter, {
+        view: this.getView()
+      });
+    }
     
     var edges = this.adapter.selectEdgesByEndpoints(nodes, {
       view: this.getView(),
       endpointsInSet: ">=1" // ">=1" used to calculate neighbours
     });
     
-    if(this.view.getLabel() === "quick_connect") { // special case
+    if(this.view.getLabel() === "quick_connect") { // special case; ugly solved!
       var curNode = this.adapter.selectNodesByReference([ this.getVariable("currentTiddler") ], {
         outputType: "array",
         addProperties: {
-          x: 0,
-          y: 0,
-          borderWidth: 1,
-          color: {
-            background: "#E6B293",
-            border: "#FF6700"
-          }
+          group: "special",
+          x: 1, // WARNING VIS BUG: never use 0 as coordinate!
+          y: 1
         }
       });
+      
       nodes.update(curNode);
     }
       
-    if(this.getView().isConfEnabled("display_neighbours")) {
+    if(this.getView().isConfEnabled("display_neighbours") || this.hasStartedDiving()) {
       var neighbours = this.adapter.selectNeighbours(nodes, {
         edges: edges,
         outputType: "array",
@@ -968,11 +988,15 @@ module-type: widget
     } else {
       
        if(properties.nodes.length) { // clicked on a node
-
-        this.logger("debug", "Doubleclicked on a node");
-
-        var id = properties.nodes[0];
-        var tRef = this.graphData.nodes.get(id).ref;
+         
+        var node = this.graphData.nodes.get(properties.nodes[0]);
+        this.logger("debug", "Doubleclicked on node", node);        
+        this.lastNodeDoubleClicked = node;
+        var tRef = node.ref;
+        
+        if(this.getView().isConfEnabled("node_diving")) {
+          this.rebuildGraph();
+        }
         //this.network.focusOnNode(properties.nodes[0], {});
         
       } else if(properties.edges.length) { // clicked on an edge

@@ -6,7 +6,7 @@ type: text/vnd.tiddlywiki
 subtitle: The View Action Menu
 caption: The View Action Menu
 
-{{ViewActions.png}}
+{{$:/plugins/felixhayashi/taskgraph/media/ViewActions.png}}
 
 ; View selection
 : """
@@ -41,7 +41,7 @@ caption: The View Action Menu
   cool, but if you are a rather serious person, you want to disable this.
   -or not? I don't know.
   """
-  ; Private Edge Mode
+; Private edge mode
 : """
   If you enable this, all edges created in your editor editor will __exclusively__ belong
   to this particular view/graph. This means you won't see any globally shared edges in
@@ -49,4 +49,10 @@ caption: The View Action Menu
   This mode is only useful if you are truly creating an isolated graph. However keep in
   mind that you can display private and shared edges at the same time so private edges will
   always stay private and the public edges always public.
+  """
+; Node diving mode
+: """
+  Ever dreamed of clicking on a node of your graph and the graph starts displaying exclusively
+  the node and all its neighbours? Then clicking on a neighbour, it only displays this neighbour
+  and all the neighbours of this neighbour? This is what this configuration does.
   """

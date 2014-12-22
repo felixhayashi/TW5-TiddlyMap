@@ -6,7 +6,7 @@ type: text/vnd.tiddlywiki
 subtitle: The Edge Filter Menu
 caption: The Edge Filter Menu
 
-{{EdgeFilter.png}}
+{{$:/plugins/felixhayashi/taskgraph/media/EdgeFilter.png}}
 
 """
 With the help of the edge filter you can decide, which edges to display in the view.

@@ -32,7 +32,7 @@ type: application/json
     "widthMin": 1,
     "widthMax": 15,
     "width": 1,
-    "widthSelectionMultiplier": 2,
+    "widthSelectionMultiplier": 4,
     "hoverWidth": 1.5,
     "style": "arrow",
     "color": {
@@ -52,6 +52,13 @@ type: application/json
     "inheritColor": "from"
   },
   "groups": {
+    "special": {
+      "borderWidth": 1,
+      "color": {
+        "background": "#E6B293",
+        "border": "#FF6700"
+      }
+    },
     "neighbours": {
       "shape": "box",
       "radius": 5,

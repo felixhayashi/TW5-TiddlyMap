@@ -34,7 +34,10 @@ title: $:/plugins/felixhayashi/taskgraph/misc/advancedEditorBar
         Enable floating nodes
       </$checkbox><br/>
       <$checkbox field="config-private_edge_mode" checked="true" unchecked="false" default="false">
-        Private Edge Mode
+        Private edge mode
+      </$checkbox><br/>
+      <$checkbox field="config-node_diving" checked="true" unchecked="false" default="false">
+        Node diving mode
       </$checkbox>
     </div>
   </$reveal>

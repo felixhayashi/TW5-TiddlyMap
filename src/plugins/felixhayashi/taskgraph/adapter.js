@@ -302,10 +302,12 @@ Adapter.prototype.selectNodesByReference = function(tiddlers, options) {
 
 Adapter.prototype._createNode = function(tiddler, protoNode) {
 
-  if(!tiddler || utils.isDraft(tiddler)) {
+  var tiddler = utils.getTiddler(tiddler);
+
+  if(!tiddler || tiddler.isDraft() || this.wiki.isSystemTiddler(tiddler.fields.title)) {
     return; // silently ignore
   }
-
+  
   var tObj = this.setupTiddler(tiddler);
   
   if(!tObj) { // cannot ignore this

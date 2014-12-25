@@ -330,6 +330,8 @@ ViewAbstraction.prototype.setNodeFilter = function(expr) {
     title: this.path.nodeFilter,
     filter: expr.replace("\n", " ")
   }));
+  
+  this.logger("debug","Node filter set to", expr);
 
   // rebuild filter now and prevent another rebuild at refresh
   this.nodeFilter = this.getNodeFilter(null, true);
@@ -381,6 +383,14 @@ ViewAbstraction.prototype.appendToNodeFilter = function(filter) {
   
   var filter = this.getNodeFilter("expression") + " " + filter;
   this.setNodeFilter(filter);
+  
+};
+
+ViewAbstraction.prototype.addNodeToView = function(node) {
+  
+  var filter = "[field:" + this.opt.field.nodeId + "[" + node.id + "]]";
+  this.appendToNodeFilter(filter);
+  this.setNodePosition(node);
   
 };
 

@@ -26,6 +26,7 @@ say here is: do not require the caretaker!
   
   // Export name and synchronous status
   exports.name = "taskgraph-setup";
+  exports.platforms = ["browser"];
   exports.after = ["startup"];
   exports.before = ["rootwidget"];
   exports.synchronous = true;
@@ -177,6 +178,14 @@ say here is: do not require the caretaker!
     
     // build and integrate functions that depend on the options
     attachFunctions($tw.taskgraph, $tw.taskgraph.opt);
+    
+    // I know it's ugly to track the mouse like this but I need the coordinates
+    // as the tw-event does not pass me these
+    $tw.taskgraph.curMouse = {};
+    document.addEventListener('drop', function(event){ 
+        $tw.taskgraph.mouseDropPos.x = event.clientX,
+        $tw.taskgraph.mouseDropPos.y = event.clientY
+    }, false);
     
     
     // attach the adapter

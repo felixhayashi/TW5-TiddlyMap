@@ -285,7 +285,7 @@ Adapter.prototype.selectNodesByReference = function(tiddlers, options) {
   var result = utils.getEmptyMap();
   for(var i = 0; i < tiddlers.length; i++) {
     
-    var node = this._createNode(tiddlers[i], protoNode);
+    var node = this.createNode(tiddlers[i], protoNode);
     if(node) {
       result[node.id] = node;
     }
@@ -300,7 +300,7 @@ Adapter.prototype.selectNodesByReference = function(tiddlers, options) {
   
 };
 
-Adapter.prototype._createNode = function(tiddler, protoNode) {
+Adapter.prototype.createNode = function(tiddler, protoNode) {
 
   var tiddler = utils.getTiddler(tiddler);
 
@@ -420,7 +420,7 @@ Adapter.prototype.selectNodesByIds = function(nodeIds, options) {
   for(var id in nodeIds) {
     for(var i = 0; i < allTiddlers.length; i++) {
       
-      var node = this._createNode(allTiddlers[i], protoNode);
+      var node = this.createNode(allTiddlers[i], protoNode);
       
       if(node && nodeIds[node.id]) { // valid and contained in set
         result[node.id] = node;
@@ -676,13 +676,7 @@ Adapter.prototype.insertNode = function(node, options) {
   if(options.view) {
 
     var view = new ViewAbstraction(options.view);
-    
-    // maybe save positions
-    view.setNodePosition(node);
-
-    // make the view match the new node
-    var filter = "[field:" + this.opt.field.nodeId + "[" + node.id + "]]";
-    view.appendToNodeFilter(filter);
+    view.addNodeToView(node);
     
   }
   

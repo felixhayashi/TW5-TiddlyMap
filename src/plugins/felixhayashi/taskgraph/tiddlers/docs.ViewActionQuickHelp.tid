@@ -52,7 +52,9 @@ caption: The View Action Menu
   """
 ; Node diving mode
 : """
-  Ever dreamed of clicking on a node of your graph and the graph starts displaying exclusively
-  the node and all its neighbours? Then clicking on a neighbour, it only displays this neighbour
-  and all the neighbours of this neighbour? This is what this configuration does.
+  Ever dreamed of exploring you tiddlywiki by clicking through a network of nodes?
+  With this option enabled, clicking on a node of your graph will force the graph
+  to exclusively the clicked node and all its neighbours. At the same time the click
+  opens the corresponding tiddler in your storyview. To stop //diving//, click on this
+  graph button {{$:/plugins/felixhayashi/taskgraph/media/surface.png}}.
   """

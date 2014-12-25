@@ -43,14 +43,20 @@ module-type: widget
     // https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/widgets/widget.js#L211
     this.computeAttributes();
     
-    // addEventListeners automatically binds "this" object to handler, thus, no need for .bind(this)
-    this.addEventListeners([
-      {type: "tm-create-view", handler: function() { this.handleCreateView(null); }},
-      {type: "tm-rename-view", handler: this.handleRenameView },
-      {type: "tm-delete-view", handler: this.handleDeleteView },
-      {type: "tm-store-position", handler: this.handleStorePositions },
-      {type: "tm-edit-node-filter", handler: this.handleEditNodeFilter }
-    ]);
+    // register whether in editor mode or not
+    this.editorMode = this.getAttribute("editor");
+    
+    if(this.editorMode) {
+      // addEventListeners automatically binds "this" object to handler, thus, no need for .bind(this)
+      this.addEventListeners([
+        {type: "tm-create-view", handler: function() { this.handleCreateView(null); }},
+        {type: "tm-rename-view", handler: this.handleRenameView },
+        {type: "tm-delete-view", handler: this.handleDeleteView },
+        {type: "tm-store-position", handler: this.handleStorePositions },
+        {type: "tm-edit-node-filter", handler: this.handleEditNodeFilter },
+        {type: "tm-import-tiddlers", handler: this.handleImportTiddlers }
+      ]);
+    }
 
   };
   
@@ -310,10 +316,7 @@ module-type: widget
     
     // some views are system views with special meaning 
     this.handleSpecialViews();
-    
-    // register whether in editor mode or not
-    this.editorMode = this.getAttribute("editor");
-    
+        
     // first append the bar if we are in editor mode
     this.initAndRenderEditorBar(parent);
         
@@ -341,11 +344,12 @@ module-type: widget
   
   TaskGraphWidget.prototype.handleSpecialViews = function() {
     
-    if(this.view.getLabel() === "quick_connect") { // TODO: should I use objectId or view label??
-      var output = "$:/temp/felixhayashi/taskgraph/quick_connect_search";
-      var filter = "[search{" + output + "}!is[system]limit[10]]"
-                   //+ "[field:title[" + this.getVariable("currentTiddler") + "]]" // see getGraphData()
-                   + "[field:title[" + output + "]]";
+    if(this.view.getLabel() === "quick_connect") {
+      var tRef = "$:/temp/felixhayashi/taskgraph/quick_connect_search";
+      this.wiki.setText(tRef, "text", null, ""); // clear
+      var filter = "[search{" + tRef + "}!is[system]limit[10]]" + // search
+                   "[field:title[" + this.getVariable("currentTiddler") + "]]" + // always
+                   "[field:title[" + tRef + "]]"; // react to changes
       this.view.setNodeFilter(filter);
     }
     
@@ -366,7 +370,7 @@ module-type: widget
       $tw.utils.addClass(this.graphBarDomNode, "filterbar");
       parent.appendChild(this.graphBarDomNode);
       
-      this.rebuildChildWidgets();
+      this.rebuildEditorBar();
       this.renderChildren(this.graphBarDomNode);
       
     }
@@ -378,7 +382,7 @@ module-type: widget
    * 
    * @see https://groups.google.com/forum/#!topic/tiddlywikidev/sJrblP4A0o4
    */
-  TaskGraphWidget.prototype.rebuildChildWidgets = function() {
+  TaskGraphWidget.prototype.rebuildEditorBar = function() {
     
     if(this.editorMode === "advanced") {
     
@@ -392,14 +396,14 @@ module-type: widget
       
       // Construct the child widget tree
       var body = {
-        type : "tiddler",
-        attributes : {
-          tiddler : { type : "string", value : this.getView().getRoot() }
+        type: "tiddler",
+        attributes: {
+          tiddler: { type: "string", value: this.getView().getRoot() }
         },
-        children : [{
-          type : "transclude",
-          attributes : {
-            tiddler : { type : "string", value : this.opt.ref.graphBar }
+        children: [{
+          type: "transclude",
+          attributes: {
+            tiddler: { type: "string", value: this.opt.ref.graphBar }
           }
         }]
       };
@@ -448,13 +452,13 @@ module-type: widget
     
     } else if(viewModifications.length) {
       
-      this.logger("warn", "View modified");
+      this.logger("warn", "View modified", viewModifications);
       this.rebuildGraph();
       
     } else {
       
       // check for changes that effect the graph on an element level
-      this.checkForGraphUpdates(changedTiddlers);
+      this.refreshGraph(changedTiddlers);
             
     }
     
@@ -479,18 +483,9 @@ module-type: widget
     this.graphData = this.getGraphData(true);
         
     this.network.setData({ nodes: this.graphData.nodes, edges: this.graphData.edges }, this.preventNextRepaint); // true => disableStart
-    
-    //~ if(this.hasStartedDiving()) {
-      //~ var zoomExtendsElement = this.parentDomNode.getElementsByClassName("network-navigation zoomExtends");
-      //~ if(zoomExtends.length) {
-        //~ zoomExtends[0].parentNode.appendChild(
-      //~ }
-    //~ }
-    
+        
     // reset
-    this.preventNextRepaint = false;
-    this.lastNodeDoubleClicked = null;
-       
+    this.preventNextRepaint = false;       
   };
   
   TaskGraphWidget.prototype.hasStartedDiving = function() {
@@ -590,7 +585,7 @@ module-type: widget
       //this.logger("info", "The graphbar needs a full refresh");
       this.removeChildDomNodes();
       // update all variables and build the tree
-      this.rebuildChildWidgets();
+      this.rebuildEditorBar();
       this.renderChildren(this.graphBarDomNode);
       return true;
       
@@ -612,7 +607,7 @@ module-type: widget
    * 3. An edge that matches the edge filter has been added or removed.
    * 
    */
-  TaskGraphWidget.prototype.checkForGraphUpdates = function(changedTiddlers) {
+  TaskGraphWidget.prototype.refreshGraph = function(changedTiddlers) {
             
     var nodeFilter = this.getView().getNodeFilter("compiled");
     
@@ -662,10 +657,20 @@ module-type: widget
     
     this.logger("info", "Initializing and rendering the graph");
     
-    // create a div for the graph and register it
-    this.graphDomNode = document.createElement("div");
+    
+    if(this.editorMode) {
+      // we do **not** register this child via this.children.push(dropZoneWidget);
+      // as this would cause the graph to be destroyed on the next refreshWidgets
+      var dropZoneWidget = this.makeChildWidget({ type: "dropzone" });
+      dropZoneWidget.render(parent); 
+      this.graphDomNode = dropZoneWidget.findFirstDomNode();
+    } else {
+      this.graphDomNode = document.createElement("div");
+      parent.appendChild(this.graphDomNode);
+    }
+    
     $tw.utils.addClass(this.graphDomNode, "vis-graph");
-    parent.appendChild(this.graphDomNode);
+    //parent.appendChild(this.graphDomNode);
     
     // graph size issues
     if(this.getAttribute("height")) {
@@ -702,12 +707,20 @@ module-type: widget
     }.bind(this));
     
     this.network.on("dragEnd", function(properties) {
-      if(properties.nodeIds.length) {
+      if(properties.nodeIds.length && !this.hasStartedDiving()) {
         var mode = this.getView().isConfEnabled("physics_mode");
         this.setNodesMoveable([ properties.nodeIds[0] ], mode);
         this.handleStorePositions();
       }
     }.bind(this));
+    
+    this.addGraphButtons({
+      "surface": function() {
+        this.lastNodeDoubleClicked = null;
+        this.setGraphButtonEnabled("surface", false);
+        this.rebuildGraph();
+      }
+    });
         
     // finally create and register the data and rebuild the graph
     this.rebuildGraph();
@@ -717,6 +730,8 @@ module-type: widget
     this.network.moveTo({position: center, scale: 0.8});
         
   };
+  
+  
   
   TaskGraphWidget.prototype.handleReconnectEdge = function(updatedEdge) {
 
@@ -883,6 +898,41 @@ module-type: widget
     }     
   }
   
+  TaskGraphWidget.prototype.handleImportTiddlers = function(event) {
+    
+    //var pos = this.network.DOMtoCanvas($tw.taskgraph.mouseDropPos);
+    var pos = this.network.getCenterCoordinates();
+    var tiddlers = JSON.parse(event.param);
+        
+    for(var i = 0; i < tiddlers.length; i++) {
+      var tObj = this.wiki.getTiddler(tiddlers[i].title);
+      
+      if(!tObj) {
+        this.notify("Cannot integrate foreign tiddler");
+        return;
+      }
+      
+      if(utils.isMatch(tObj, this.getView().getNodeFilter("compiled"))) { // no dublicates
+        this.notify("Node already exists");
+        continue;
+      }
+      
+      var node = this.adapter.createNode(tObj, {
+        //~ x: ((i * 20) + pos.x), // if more than one, create some space
+        //~ y: pos.y,
+      });
+      
+      if(node) { // only tiddlers that already exist in the wiki
+        
+        //this.preventNextRepaint = true;
+        this.getView().addNodeToView(node);
+        this.rebuildGraph();
+        
+      }
+    }
+    
+  };
+  
   TaskGraphWidget.prototype.handleStorePositions = function() {
     this.adapter.storePositions(this.network.getPositions(), this.getView());
     $tw.taskgraph.notify("positions stored");
@@ -919,7 +969,6 @@ module-type: widget
     
     this.logger("log", "Network stabilized after " + properties.iterations + " iterations");
 
-    this.network.storePositions(); // does it matter if we put this before setter? yes, I guess.
     this.setNodesMoveable(this.graphData.nodes.getIds(),
                           this.getView().isConfEnabled("physics_mode"));
     
@@ -936,6 +985,8 @@ module-type: widget
   TaskGraphWidget.prototype.setNodesMoveable = function(ids, isMoveable) {
 
     //this.logger("log", "Nodes", ids, "can move:", isMoveable);
+    
+    this.network.storePositions(); // does it matter if we put this before setter? yes, I guess.
 
     var updates = [];
     for(var i = 0; i < ids.length; i++) {
@@ -975,7 +1026,9 @@ module-type: widget
     
     if(!properties.nodes.length && !properties.edges.length) { // clicked on an empty spot
       
-      if(!this.editorMode) return;
+      if(!this.editorMode) {
+        return;
+      }
       
       this.openDialog(this.opt.ref.nodeNameDialog, null, function(isConfirmed, outputTObj) {
         if(isConfirmed) {
@@ -996,8 +1049,9 @@ module-type: widget
         
         if(this.getView().isConfEnabled("node_diving")) {
           this.rebuildGraph();
+          this.network.focusOnNode(node);
+          this.setGraphButtonEnabled("surface", true);
         }
-        //this.network.focusOnNode(properties.nodes[0], {});
         
       } else if(properties.edges.length) { // clicked on an edge
         
@@ -1180,12 +1234,7 @@ module-type: widget
     this.logger("info", "Repainting the whole graph");
     
     this.network.redraw();
-    //this.network.moveTo({scale: 0.5});
     this.network.zoomExtent();
-    
-    //~ this.network.moveTo({
-      //~ ...
-    //~ });
     
   }
   
@@ -1196,6 +1245,25 @@ module-type: widget
     var distanceBottom = 10; // in pixel
     var calculatedHeight = windowHeight - canvasOffset - distanceBottom;
     container.style["height"] = calculatedHeight + "px";
+    
+  };
+  
+  TaskGraphWidget.prototype.setGraphButtonEnabled = function(name, enable) {
+    var className = "network-navigation taskgraph-button " + name;
+    var b = this.parentDomNode.getElementsByClassName(className)[0];
+    $tw.utils.toggleClass(b, "enabled", enable);
+  }; 
+
+  TaskGraphWidget.prototype.addGraphButtons = function(buttonEvents) {
+    
+    var parent = this.parentDomNode.getElementsByClassName("vis network-frame")[0];
+    
+    for(var name in buttonEvents) {
+      var div = document.createElement("div");
+      div.className = "network-navigation taskgraph-button " + name;
+      div.addEventListener("click", buttonEvents[name].bind(this), false);
+      parent.appendChild(div);
+    }
     
   };
   

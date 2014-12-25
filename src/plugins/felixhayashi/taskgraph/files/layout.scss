@@ -1,202 +1,225 @@
-.quick-connect {
+html { // used to increase css importance
 
-  &.tc-block-dropdown {
-    font-size: 12px;
-    right: 50px;
-    padding: 5px;
-    width: 500px;
-    white-space: normal;
-    line-height: 1em;
-  }
-  
-  hr {
-    border: 0;
-    height: 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-  }
-  
-  >button {
-    padding-left: 10px;
-  }
-   
-  p p {
-    padding: 0px;
-  }
-  
-  .explanation {
-    white-space: normal;
-  }
+  .quick-connect {
 
-}
-
-.tc-modal-wrapper {
-  z-index: 1010; // fix this in core?
-
-  .tc-modal-header {
-    padding-top: 0px;
-    padding-bottom: 0px;
-    
-    h3 {
-      line-height: 10px;
+    &.tc-drop-down {
+      font-size: 0.5em;
+      right: 50px;
+      padding: 5px;
+      width: 200px;
+      white-space: normal;
+      line-height: 1em;
     }
     
-  }
-
-  .tc-modal-footer {
-    padding-top: 0px;
-    padding-bottom: 0px;
-  }
-}
-
-
-$padding : 5px;
-$color: #666666;
-
-/*
-body {
-  background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/taskgraph/media/surface.png!!type}} text={{$:/plugins/felixhayashi/taskgraph/media/surface.png}}/>'));
-}
-*/
-
-#node-filter-dialog {
-
-  #filter-tips {
-    font-size: 0.8em;
-  }
-
-  textarea {
-    height: 100px;
-    max-height: 300px;
-    overflow: auto;
-    width: 100%;
-    font-size: 11px;
-    font-family: "Courier New", Courier, monospace;
-  }
-        
-}
-
-.taskgraph {
-  border: 3px dotted lightgray;
-  padding: 2px;
-  width: 100%;
-  color: $color;
-  
-  &.click-to-use {
-
-    .network-frame {
+    hr {
+      border: 0;
+      height: 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .tc-btn-invisible {
+      @extend a;
+      width: auto;
+    }
+    
+    a {
+      display: inline;
+      padding: 0;
+      color: #5778d8;
+      background: transparent;
       
-      &:not(.vis-active) {
-        cursor: pointer;
+      &:hover {
+        background: transparent;
+        color: #5778d8;
+        text-decoration: underline;
+      }
+    }
+    
+    >button {
+      padding-left: 10px;
+    }
+
+  }
+
+  .tc-modal-wrapper {
+    z-index: 1010; // fix this in core?
+
+    .tc-modal-header {
+      padding-top: 0px;
+      padding-bottom: 0px;
+      
+      h3 {
+        line-height: 10px;
+      }
+      
+    }
+
+    .tc-modal-footer {
+      padding-top: 0px;
+      padding-bottom: 0px;
+    }
+  }
+
+
+  $padding : 5px;
+  $color: #666666;
+
+  /*
+  body {
+    background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/taskgraph/media/surface.png!!type}} text={{$:/plugins/felixhayashi/taskgraph/media/surface.png}}/>'));
+  }
+  */
+
+  #node-filter-dialog {
+
+    #filter-tips {
+      font-size: 0.8em;
+    }
+
+    textarea {
+      height: 100px;
+      max-height: 300px;
+      overflow: auto;
+      width: 100%;
+      font-size: 11px;
+      font-family: "Courier New", Courier, monospace;
+    }
+          
+  }
+
+  .taskgraph {
+    border: 3px dotted lightgray;
+    padding: 2px;
+    width: 100%;
+    color: $color;
+    
+    &.click-to-use {
+
+      .network-frame {
         
-        .network-navigation {
-          display: none;
-        }
-        
-        &:hover:before {
-          box-shadow: 10px 10px 5px lightgray;
-          color: gray;
-          background: white;
-          content: "Click to use";
-          font-size: 18px;
-          font-weight: bold;
-          left: 50%;
-          margin-left: -100px;
-          position: absolute;
-          text-align: center;
-          top: 50px;
-          width: 200px;
-          z-index: 2000;
-          padding: 5px;
-          pointer-events: none;
+        &:not(.vis-active) {
+          cursor: pointer;
+          
+          .network-navigation {
+            display: none;
+          }
+          
+          &:hover:before {
+            box-shadow: 10px 10px 5px lightgray;
+            color: gray;
+            background: white;
+            content: "Click to use";
+            font-size: 18px;
+            font-weight: bold;
+            left: 50%;
+            margin-left: -100px;
+            position: absolute;
+            text-align: center;
+            top: 50px;
+            width: 200px;
+            z-index: 2000;
+            padding: 5px;
+            pointer-events: none;
+          }
         }
       }
     }
-  }
+    
+    .network-frame {
+      .taskgraph-button { 
+        &.surface.enabled {
+          bottom: 90px;
+          right: 15px;
+          background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/taskgraph/media/surface.png}} />'));
+        }
+      }
+    }
 
-  .network-manipulationUI.edit.editmode {
-    height: 26px;
-  }
-  
-  .network-manipulationDiv {
-    background: transparent;
-    padding: 3px 0;
-    height: 35px;
-  }
-  
-  .filterbar {
-    
-    background: #d6d9d8;
-    border-bottom: 1px solid lightgray;
-    padding: 3px $padding;
-    
-    .tc-drop-down {
-        background-color: #F3F3F3;
-        border: none;
-        min-width: 170px;
-        padding: $padding;
-        margin: 5px 0;
-        
-        button {
-          padding : 0px;
-        }
+    .network-manipulationUI.edit.editmode {
+      height: 26px;
     }
     
-    [hidden] {
-      display: none;
-    }
-    
-    .tc-block-dropdown {
-      width: 370px;
-      min-width: 370px;
-      padding: $padding;
-      margin: 15px 0 0 -370px;
-              
-        a {
-          display: inline;
-          padding : 0px;
-        }
-      
-    }
-    
-    button {
-      line-height: inherit;
-      color: $color;
-    }
-  
-     > * {
-      display: inline-block; // TODO: this is too rigorous
-    }
-    
-    .separator:after {
-      color: "#BDBFBF";
-      margin: 3px;
-      content: " | ";
-    }
-    
-    .quickhelp {
+    .network-manipulationDiv {
       background: transparent;
-      border: none;
-      border-left: 1px solid #cccccc;
-      color: slategrey;
-      float: right;
-      font-weight: bold;
-      margin: $padding+1;
+      padding: 3px 0;
+      height: 35px;
     }
     
-    .tc-edit-add-tag .tc-add-tag-name input {
-      width: 70%;
+    .filterbar {
+      
+      background: #d6d9d8;
+      border-bottom: 1px solid lightgray;
+      padding: 3px $padding;
+      
+      .tc-drop-down {
+          background-color: #F3F3F3;
+          border: none;
+          min-width: 170px;
+          padding: $padding;
+          margin: 5px 0;
+          
+          button {
+            padding : 0px;
+          }
+      }
+      
+      [hidden] {
+        display: none;
+      }
+      
+      .tc-block-dropdown {
+        width: 370px;
+        min-width: 370px;
+        padding: $padding;
+        margin: 15px 0 0 -370px;
+                
+          a {
+            display: inline;
+            padding : 0px;
+          }
+        
+      }
+      
+      button {
+        line-height: inherit;
+        color: $color;
+      }
+    
+       > * {
+        display: inline-block; // TODO: this is too rigorous
+      }
+      
+      .separator:after {
+        color: "#BDBFBF";
+        margin: 3px;
+        content: " | ";
+      }
+      
+      .quickhelp {
+        background: transparent;
+        border: none;
+        border-left: 1px solid #cccccc;
+        color: slategrey;
+        float: right;
+        font-weight: bold;
+        margin: $padding+1;
+      }
+      
+      .tc-edit-add-tag .tc-add-tag-name input {
+        width: 70%;
+      }
+      
+      .tc-sidebar-header {
+        text-shadow: none;
+      }
+      
+      .tc-edit-tags {
+        border: none;
+        padding: inherit;
+        box-shadow: none;
+      }
     }
     
-    .tc-sidebar-header {
-      text-shadow: none;
-    }
-    
-    .tc-edit-tags {
-      border: none;
-      padding: inherit;
-      box-shadow: none;
-    }
   }
-  
 }

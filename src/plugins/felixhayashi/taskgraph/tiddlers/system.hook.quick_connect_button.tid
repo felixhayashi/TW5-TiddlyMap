@@ -1,28 +1,26 @@
-tags: $:/tags/ViewToolbar $:/tags/EditToolbar
+tags: $:/tags/ViewToolbar
 title: $:/plugins/felixhayashi/taskgraph/misc/quickConnectButton
 
-<$reveal type="nomatch" state=<<qualify "$:/temp/state">> text="show">
-  <$button class="tc-btn-invisible" set=<<qualify "$:/temp/state">> setTo="show">
-    {{$:/plugins/felixhayashi/taskgraph/icon}}
-  </$button>
-</$reveal>
-<$reveal type="match" state=<<qualify "$:/temp/state">> text="show">
-  <$button class="tc-btn-invisible" set=<<qualify "$:/temp/state">> setTo="hide">
-    {{$:/plugins/felixhayashi/taskgraph/icon}}
-  </$button>
+<$button class="tc-btn-invisible" popup=<<qualify "$:/temp/taskgraph/">>>
+  {{$:/plugins/felixhayashi/taskgraph/icon}}
+</$button>
 
-  <div class="quick-connect tc-block-dropdown">
-    <p>
-      Search:
-      <$edit-text tiddler="$:/temp/felixhayashi/taskgraph/quick_connect_search" tag="input" default="" />
-    </p>
-    <hr />
-    <$taskgraph editor="vis" click-to-use="false" object-id="quick_connect" height="250px" view="quick_connect" />
-    <hr />
-    <p>    
-      <b>Please note:</b>
-      The current tiddler is always displayed in the graph!
-    </p>
-  </div>
+<$reveal animate="yes" type="popup" position="belowleft" state=<<qualify "$:/temp/taskgraph/">> >
+<div class="tc-drop-down quick-connect">
 
+  {{$:/core/images/import-button}} ''Add this node''
+
+  Simply drag'n'drop <$link to=<<currentTiddler>>>this link</$link> on a graph editor to add
+  it to an existing view.
+
+  ---
+
+  {{$:/plugins/felixhayashi/taskgraph/icon}} ''Link this node''
+
+  You may link this node with any other node, just open this
+  <$button class="tc-btn-invisible">connection wizard
+    <$action-sendmessage $message="tm-modal" $param="$:/plugins/felixhayashi/taskgraph/misc/connection_wizard" currentTiddler={{!!title}} />
+  </$button>.
+
+</div>
 </$reveal>

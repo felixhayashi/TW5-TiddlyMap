@@ -1,0 +1,18 @@
+title: $:/plugins/felixhayashi/taskgraph/misc/connection_wizard
+subtitle: Connection Wizard
+
+"""
+Please go on connecting <<currentTiddler>> with any tiddler of your choice.
+Just type in the name of the tiddler you want to link in the search field. <sup>[1]</sup>
+"""
+
+Search:
+<$edit-text tiddler="$:/temp/felixhayashi/taskgraph/quick_connect_search" tag="input" default="" />
+
+---
+
+<$taskgraph editor="vis" click-to-use="false" object-id="quick_connect" height="250px" view="quick_connect"></$taskgraph>
+
+---
+
+<sup>[1]</sup> <small>The current tiddler is highlighted in the graph.</small>

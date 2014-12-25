@@ -1,123 +1,132 @@
-.quick-connect.tc-block-dropdown {
-  font-size: 12px;
-  right: 50px;
-  padding: 5px;
-  width: 500px;
-  white-space: normal;
-  line-height: 1em; }
-.quick-connect hr {
-  border: 0;
-  height: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
-.quick-connect > button {
-  padding-left: 10px; }
-.quick-connect p p {
-  padding: 0px; }
-.quick-connect .explanation {
-  white-space: normal; }
-
-.tc-modal-wrapper {
-  z-index: 1010; }
-  .tc-modal-wrapper .tc-modal-header {
-    padding-top: 0px;
-    padding-bottom: 0px; }
-    .tc-modal-wrapper .tc-modal-header h3 {
-      line-height: 10px; }
-  .tc-modal-wrapper .tc-modal-footer {
-    padding-top: 0px;
-    padding-bottom: 0px; }
-
-/*
-body {
-  background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/taskgraph/media/surface.png!!type}} text={{$:/plugins/felixhayashi/taskgraph/media/surface.png}}/>'));
-}
-*/
-#node-filter-dialog #filter-tips {
-  font-size: 0.8em; }
-#node-filter-dialog textarea {
-  height: 100px;
-  max-height: 300px;
-  overflow: auto;
-  width: 100%;
-  font-size: 11px;
-  font-family: "Courier New", Courier, monospace; }
-
-.taskgraph {
-  border: 3px dotted lightgray;
-  padding: 2px;
-  width: 100%;
-  color: #666666; }
-  .taskgraph.click-to-use .network-frame:not(.vis-active) {
-    cursor: pointer; }
-    .taskgraph.click-to-use .network-frame:not(.vis-active) .network-navigation {
-      display: none; }
-    .taskgraph.click-to-use .network-frame:not(.vis-active):hover:before {
-      box-shadow: 10px 10px 5px lightgray;
-      color: gray;
-      background: white;
-      content: "Click to use";
-      font-size: 18px;
-      font-weight: bold;
-      left: 50%;
-      margin-left: -100px;
-      position: absolute;
-      text-align: center;
-      top: 50px;
-      width: 200px;
-      z-index: 2000;
-      padding: 5px;
-      pointer-events: none; }
-  .taskgraph .network-manipulationUI.edit.editmode {
-    height: 26px; }
-  .taskgraph .network-manipulationDiv {
-    background: transparent;
-    padding: 3px 0;
-    height: 35px; }
-  .taskgraph .filterbar {
-    background: #d6d9d8;
-    border-bottom: 1px solid lightgray;
-    padding: 3px 5px; }
-    .taskgraph .filterbar .tc-drop-down {
-      background-color: #F3F3F3;
-      border: none;
-      min-width: 170px;
-      padding: 5px;
-      margin: 5px 0; }
-      .taskgraph .filterbar .tc-drop-down button {
-        padding: 0px; }
-    .taskgraph .filterbar [hidden] {
-      display: none; }
-    .taskgraph .filterbar .tc-block-dropdown {
-      width: 370px;
-      min-width: 370px;
-      padding: 5px;
-      margin: 15px 0 0 -370px; }
-      .taskgraph .filterbar .tc-block-dropdown a {
-        display: inline;
-        padding: 0px; }
-    .taskgraph .filterbar button {
-      line-height: inherit;
-      color: #666666; }
-    .taskgraph .filterbar > * {
-      display: inline-block; }
-    .taskgraph .filterbar .separator:after {
-      color: "#BDBFBF";
-      margin: 3px;
-      content: " | "; }
-    .taskgraph .filterbar .quickhelp {
+html {
+  /*
+  body {
+    background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/taskgraph/media/surface.png!!type}} text={{$:/plugins/felixhayashi/taskgraph/media/surface.png}}/>'));
+  }
+  */ }
+  html .quick-connect.tc-drop-down {
+    font-size: 0.5em;
+    right: 50px;
+    padding: 5px;
+    width: 200px;
+    white-space: normal;
+    line-height: 1em; }
+  html .quick-connect hr {
+    border: 0;
+    height: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+  html .quick-connect .tc-btn-invisible {
+    width: auto; }
+  html .quick-connect a, html .quick-connect .tc-btn-invisible {
+    display: inline;
+    padding: 0;
+    color: #5778d8;
+    background: transparent; }
+    html .quick-connect a:hover, html .quick-connect .tc-btn-invisible:hover {
       background: transparent;
-      border: none;
-      border-left: 1px solid #cccccc;
-      color: slategrey;
-      float: right;
-      font-weight: bold;
-      margin: 6px; }
-    .taskgraph .filterbar .tc-edit-add-tag .tc-add-tag-name input {
-      width: 70%; }
-    .taskgraph .filterbar .tc-sidebar-header {
-      text-shadow: none; }
-    .taskgraph .filterbar .tc-edit-tags {
-      border: none;
-      padding: inherit;
-      box-shadow: none; }
+      color: #5778d8;
+      text-decoration: underline; }
+  html .quick-connect > button {
+    padding-left: 10px; }
+  html .tc-modal-wrapper {
+    z-index: 1010; }
+    html .tc-modal-wrapper .tc-modal-header {
+      padding-top: 0px;
+      padding-bottom: 0px; }
+      html .tc-modal-wrapper .tc-modal-header h3 {
+        line-height: 10px; }
+    html .tc-modal-wrapper .tc-modal-footer {
+      padding-top: 0px;
+      padding-bottom: 0px; }
+  html #node-filter-dialog #filter-tips {
+    font-size: 0.8em; }
+  html #node-filter-dialog textarea {
+    height: 100px;
+    max-height: 300px;
+    overflow: auto;
+    width: 100%;
+    font-size: 11px;
+    font-family: "Courier New", Courier, monospace; }
+  html .taskgraph {
+    border: 3px dotted lightgray;
+    padding: 2px;
+    width: 100%;
+    color: #666666; }
+    html .taskgraph.click-to-use .network-frame:not(.vis-active) {
+      cursor: pointer; }
+      html .taskgraph.click-to-use .network-frame:not(.vis-active) .network-navigation {
+        display: none; }
+      html .taskgraph.click-to-use .network-frame:not(.vis-active):hover:before {
+        box-shadow: 10px 10px 5px lightgray;
+        color: gray;
+        background: white;
+        content: "Click to use";
+        font-size: 18px;
+        font-weight: bold;
+        left: 50%;
+        margin-left: -100px;
+        position: absolute;
+        text-align: center;
+        top: 50px;
+        width: 200px;
+        z-index: 2000;
+        padding: 5px;
+        pointer-events: none; }
+    html .taskgraph .network-frame .taskgraph-button.surface.enabled {
+      bottom: 90px;
+      right: 15px;
+      background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/taskgraph/media/surface.png}} />); }
+    html .taskgraph .network-manipulationUI.edit.editmode {
+      height: 26px; }
+    html .taskgraph .network-manipulationDiv {
+      background: transparent;
+      padding: 3px 0;
+      height: 35px; }
+    html .taskgraph .filterbar {
+      background: #d6d9d8;
+      border-bottom: 1px solid lightgray;
+      padding: 3px 5px; }
+      html .taskgraph .filterbar .tc-drop-down {
+        background-color: #F3F3F3;
+        border: none;
+        min-width: 170px;
+        padding: 5px;
+        margin: 5px 0; }
+        html .taskgraph .filterbar .tc-drop-down button {
+          padding: 0px; }
+      html .taskgraph .filterbar [hidden] {
+        display: none; }
+      html .taskgraph .filterbar .tc-block-dropdown {
+        width: 370px;
+        min-width: 370px;
+        padding: 5px;
+        margin: 15px 0 0 -370px; }
+        html .taskgraph .filterbar .tc-block-dropdown a, html .taskgraph .filterbar .tc-block-dropdown .quick-connect .tc-btn-invisible, html .quick-connect .taskgraph .filterbar .tc-block-dropdown .tc-btn-invisible {
+          display: inline;
+          padding: 0px; }
+      html .taskgraph .filterbar button {
+        line-height: inherit;
+        color: #666666; }
+      html .taskgraph .filterbar > * {
+        display: inline-block; }
+      html .taskgraph .filterbar .separator:after {
+        color: "#BDBFBF";
+        margin: 3px;
+        content: " | "; }
+      html .taskgraph .filterbar .quickhelp {
+        background: transparent;
+        border: none;
+        border-left: 1px solid #cccccc;
+        color: slategrey;
+        float: right;
+        font-weight: bold;
+        margin: 6px; }
+      html .taskgraph .filterbar .tc-edit-add-tag .tc-add-tag-name input {
+        width: 70%; }
+      html .taskgraph .filterbar .tc-sidebar-header {
+        text-shadow: none; }
+      html .taskgraph .filterbar .tc-edit-tags {
+        border: none;
+        padding: inherit;
+        box-shadow: none; }

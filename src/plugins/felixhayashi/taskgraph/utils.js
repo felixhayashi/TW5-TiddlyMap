@@ -21,7 +21,8 @@ var vis = require("$:/plugins/felixhayashi/vis/vis.js");
  * A utilities class that contains universally used helper functions
  * to abbreviate code and make my life easier.
  * 
- * @see Other utilities are found here {@link https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/utils/utils.js}
+ * @see Dom utilities {@link https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/utils/*}
+ * 
  * @namespace
  */
 var utils = {};
@@ -307,7 +308,7 @@ utils.getMatches = function(filter, tiddlers, isReturnObjects) {
  */
 utils.isMatch = function(tiddler, filter) {
   
-  var tRef = getTiddlerReference(tiddler);
+  var tRef = utils.getTiddlerReference(tiddler);
   return (utils.getMatches(filter, [ tRef ]).length > 0);
   
 };

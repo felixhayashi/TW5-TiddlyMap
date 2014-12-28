@@ -52,9 +52,9 @@ caption: The View Action Menu
   """
 ; Node diving mode
 : """
-  Ever dreamed of exploring you tiddlywiki by clicking through a network of nodes?
+  Ever dreamed of exploring your tiddlywiki by clicking through a network of nodes?
   With this option enabled, clicking on a node of your graph will force the graph
-  to exclusively the clicked node and all its neighbours. At the same time the click
+  to exclusively display the clicked node and its neighbours. At the same time the click
   opens the corresponding tiddler in your storyview. To stop //diving//, click on this
   graph button {{$:/plugins/felixhayashi/taskgraph/media/surface.png}}.
   """

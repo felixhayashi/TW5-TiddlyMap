@@ -73,7 +73,7 @@ html {
         z-index: 2000;
         padding: 5px;
         pointer-events: none; }
-    html .taskgraph .network-frame .taskgraph-button.surface.enabled {
+    html .taskgraph .vis-graph .network-frame .taskgraph-button.surface.enabled {
       bottom: 90px;
       right: 15px;
       background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/taskgraph/media/surface.png}} />); }

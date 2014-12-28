@@ -1,4 +1,4 @@
 title: $:/plugins/felixhayashi/taskgraph/graph/views/search
 config-display_neighbours: true
-config-enable_physics: true
+config-physics_mode: true
 config-node_diving: true

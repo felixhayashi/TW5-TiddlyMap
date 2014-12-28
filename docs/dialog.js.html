@@ -1,4 +1,77 @@
-/*\
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>TW-Taskgraph Source: dialog.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.spacelab.css">
+
+</head>
+
+<body>
+<div class="container-fluid">
+	<div class="navbar navbar-fixed-top navbar-inverse">
+		<div class="navbar-inner">
+			<a class="brand" href="index.html">TW-Taskgraph</a>
+			<ul class="nav">
+				
+				<li class="dropdown">
+					<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="utils.html">utils</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+				<li class="dropdown">
+					<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="Adapter.html">Adapter</a>
+						</li>
+						
+						<li>
+							<a href="ViewAbstraction.html">ViewAbstraction</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+			</ul>
+		</div>
+	</div>
+
+	<div class="row-fluid">
+
+		
+			<div class="span12">
+				
+				<div id="main">
+					
+
+
+		<h1 class="page-title">Source: dialog.js</h1>
+    
+<section>
+	<article>
+		<pre
+			class="sunlight-highlight-javascript linenums">/*\
 
 title: $:/plugins/felixhayashi/taskgraph/taskgraph.js
 type: application/javascript
@@ -18,11 +91,9 @@ module-type: widget
   /**************************** IMPORTS ****************************/
    
   var Widget = require("$:/core/modules/widgets/widget.js").widget;
-  var ViewAbstraction = require("$:/plugins/felixhayashi/taskgraph/view_abstraction.js").ViewAbstraction;
-  var CallbackRegistry = require("$:/plugins/felixhayashi/taskgraph/callback_registry.js").CallbackRegistry;
-  var DialogManager = require("$:/plugins/felixhayashi/taskgraph/dialog_manager.js").DialogManager;
   var utils = require("$:/plugins/felixhayashi/taskgraph/utils.js").utils;
   var vis = require("$:/plugins/felixhayashi/vis/vis.js");
+  var ViewAbstraction = require("$:/plugins/felixhayashi/taskgraph/view_abstraction.js").ViewAbstraction;
 
   /***************************** CODE ******************************/
         
@@ -33,14 +104,13 @@ module-type: widget
     
     // Main initialisation inherited from widget.js
     this.initialise(parseTreeNode, options);
-    
+        
     // create shortcuts and aliases
     this.adapter = $tw.taskgraph.adapter;
     this.opt = $tw.taskgraph.opt;
     
     // key (a tiddler) -> callback (called when tiddler changes)
-    this.callbackRegistry = new CallbackRegistry();
-    this.dialogManager = new DialogManager(this, this.callbackRegistry);
+    this.callbacks = utils.getEmptyMap();
         
     // https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/widgets/widget.js#L211
     this.computeAttributes();
@@ -65,7 +135,78 @@ module-type: widget
   // !! EXTENSION !!
   TaskGraphWidget.prototype = new Widget();
   // !! EXTENSION !!
+          
+  /**
+   * The callback mechanism allows to dynamically listen to tiddler
+   * changes without hardcoding a change-check for a tiddler name
+   * in the refresh function.
+   * 
+   * @param [TiddlerReference] tRef - A tiddler whose change triggers
+   *     the callback.
+   * @param {function} callback - A function that is called when the
+   *     tiddler has changed.
+   * @param {boolean} [deleteOnCall=true] - True if to delete the
+   *     callback once it has been called, false otherwise.
+   */
+  TaskGraphWidget.prototype.registerCallback = function(tRef, callback, isDeleteOnCall) {
     
+    this.logger("debug", "A callback was registered for changes of \"" + tRef + "\"");
+    this.callbacks[tRef] = {
+      execute : callback.bind(this),
+      isDeleteOnCall : (typeof isDeleteOnCall == "Boolean" ? isDeleteOnCall : true)
+    };
+    
+  };
+  
+  /**
+   * Removes the callback from the list of tiddler callbacks.
+   * 
+   * @see TaskGraphWidget#registerCallback
+   */
+  TaskGraphWidget.prototype.removeCallback = function(tRef) {
+    
+    if(this.callbacks[tRef]) {
+      this.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
+      delete this.callbacks[tRef];
+    }
+    
+  };
+  
+  /**
+   * this method has to be implemented at the top of the refresh method.
+   * It checks for changed tiddlers that have
+   * registered callbacks. If `deleteOnCall` was specified during
+   * registration of the callback, the callback will be deleted
+   * automatically.
+   * 
+   * @see TaskGraphWidget#registerCallback
+   */
+  TaskGraphWidget.prototype.checkOnCallbacks = function(changedTiddlers) {
+    
+    if(this.callbacks.length == 0) {
+      this.logger("debug", "No registered callbacks exist at the moment");
+      return;
+    }
+    
+    for(var tRef in changedTiddlers) {
+            
+      if(!this.callbacks[tRef]) continue;
+      
+      if(this.wiki.getTiddler(tRef)) {
+        
+        this.logger("debug", "A callback for \"" + tRef + "\" will be executed");
+        this.callbacks[tRef].execute(tRef);
+        
+        // a continue prevents deleting the callback
+        if(!this.callbacks.isDeleteOnCall) continue;
+        
+      }
+      
+      this.removeCallback(tRef);
+    }
+    
+  };
+  
   /**
    * This handler will open a dialog in which the user specifies an
    * edgetype to use to create an edge between to nodes.
@@ -90,12 +231,12 @@ module-type: widget
       toLabel: this.adapter.selectNodeById(edge.to).label
     };
     
-    this.dialogManager.open(this.opt.ref.edgeTypeDialog, vars, function(isConfirmed, outputTObj) {
+    this.openDialog(this.opt.ref.edgeTypeDialog, vars, function(isConfirmed, outputTObj) {
     
       if(isConfirmed) {
         
         var text = utils.getText(outputTObj);
-        edge.label = (text && text !== this.opt.misc.unknownEdgeLabel
+        edge.label = (text &amp;&amp; text !== this.opt.misc.unknownEdgeLabel
                       ? text
                       : this.opt.misc.unknownEdgeLabel);
 
@@ -108,6 +249,91 @@ module-type: widget
       }
         
     });
+    
+  };
+  
+  /**
+  * This function opens a dialog based on a skeleton and some fields and eventually
+  * calls a callback once the dialog is closed. The callback contains an indicator
+  * whether the dialog subject was confirmed or the operation cancelled. In any
+  * case the output tiddler is passed to the callback. Each dialog may write its
+  * changes to this tiddler in order to store the dialog result and make it available
+  * to the callback.
+  * 
+  * How does it work?
+  * 
+  * The output of the dialog process is stored in a temporary tiddler that is only known
+  * to the current instance of the dialog. This way it is ensured that only the dialog process
+  * that created the temporary tiddler will retrieve the result. Now we are able to
+  * provide unambigous and unique correspondance to dialog callbacks.
+      
+  * Any dialog output is stored in a unique output-tiddler. Once there is a result,
+  * a new result tiddler is created with indicators how to interpret the output.
+  * The result tiddler can be understood as exit code that is independent of the output.
+  * It is the result tiddler that triggers the dialog callback that was registered before.
+  * the output is then read immediately from the output-tiddler.
+  * 
+  * @param {$tw.Tiddler} skeleton - A skeleton tObj that is used as the dialog body
+  * @param {Hashmap} [fields] - More fields that can be added.
+  * @param {string} [fields.subtitle] - More fields that can be added. All
+  *     properties of fields will be accessible as variables in the modal
+  * @param {string} [fields.cancelButtonLabel] - The label of the cancel button.
+  * @param {string} [fields.confirmButtonLabel] - The label of the confirm button.
+  * @param {function} [callback] - A function with the signature
+  *     function(isConfirmed, outputTObj). `outputTObj` contains data
+  *     produced by the dialog (can be undefined even if confirmed!).
+  *     Be careful: the tiddler that outputTObj represents is deleted immediately.
+  */
+  TaskGraphWidget.prototype.openDialog = function(skeleton, fields, callback) {
+            
+    skeleton = utils.getTiddler(skeleton);
+    
+    var path = this.opt.path.dialogs + "/" + utils.genUUID();
+    var dialogFields = {
+      title : path,
+      output : path + "/output",
+      result : path + "/result",
+      footer : this.wiki.getTiddler(this.opt.ref.dialogStandardFooter).fields.text
+    };
+    
+    if(!fields || !fields.confirmButtonLabel) {
+      dialogFields.confirmButtonLabel = "Okay";
+    }
+    if(!fields || !fields.cancelButtonLabel) {
+      dialogFields.cancelButtonLabel = "Cancel";
+    }
+ 
+    // https://github.com/Jermolene/TiddlyWiki5/blob/master/boot/boot.js#L761
+    var dialogTiddler = new $tw.Tiddler(skeleton, fields, dialogFields);
+    this.logger("debug", "A dialog will be opened based on the following tiddler:", dialogTiddler);
+    
+    // https://github.com/Jermolene/TiddlyWiki5/blob/master/boot/boot.js#L841
+    this.wiki.addTiddler(dialogTiddler);
+
+    this.registerCallback(dialogFields.result, function(t) {
+
+      var triggerTObj = this.wiki.getTiddler(t);
+      var isConfirmed = triggerTObj.fields.text;
+      
+      if(isConfirmed) {
+        var outputTObj = this.wiki.getTiddler(dialogFields.output);
+      } else {
+        var outputTObj = null;
+        $tw.taskgraph.notify("operation cancelled");
+      }
+      
+      if(typeof callback == "function") {
+        callback.call(this, isConfirmed, outputTObj);
+      }
+      
+      // close and remove the tiddlers
+      utils.deleteTiddlers([dialogFields.title, dialogFields.output, dialogFields.result]);
+      
+    }, true);
+            
+    this.dispatchEvent({
+      type: "tm-modal", param : dialogTiddler.fields.title, paramObject: dialogTiddler.fields
+    }); 
     
   };
   
@@ -126,7 +352,7 @@ module-type: widget
       cancelButtonLabel: "Uuups, hell no!"
     };
     
-    this.dialogManager.open(this.opt.ref.confirmationDialog, vars, callback);
+    this.openDialog(this.opt.ref.confirmationDialog, vars, callback);
   };
     
   TaskGraphWidget.prototype.logger = function(type, message /*, more stuff*/) {
@@ -166,9 +392,6 @@ module-type: widget
         
     // now initialise graph variables and render the graph
     this.initAndRenderGraph(parent);
-    
-    // register this graph at the caretaker's graph registry
-    $tw.taskgraph.registry.push(this);
     
   };
   
@@ -285,7 +508,7 @@ module-type: widget
   TaskGraphWidget.prototype.refresh = function(changedTiddlers) {
         
     // in any case, check for callbacks triggered by tiddlers
-    this.callbackRegistry.handleChanges(changedTiddlers);
+    this.checkOnCallbacks(changedTiddlers);
     
     var isViewSwitched = this.isViewSwitched(changedTiddlers);
     var viewModifications = this.getView().refresh(changedTiddlers);
@@ -334,15 +557,7 @@ module-type: widget
   };
   
   TaskGraphWidget.prototype.hasStartedDiving = function() {
-    return (this.lastNodeDoubleClicked && this.getView().isConfEnabled("node_diving"));
-  }
-  
-  /**
-   * Warning: Do not change this functionname as it is used by the
-   * caretaker's routinely checkups.
-   */
-  TaskGraphWidget.prototype.getContainer = function() {
-    return this.parentDomNode;
+    return (this.lastNodeDoubleClicked &amp;&amp; this.getView().isConfEnabled("node_diving"));
   }
   
   /**
@@ -354,7 +569,7 @@ module-type: widget
    */
   TaskGraphWidget.prototype.getGraphData = function(isRebuild) {
       
-    if(!isRebuild && this.graphData) {
+    if(!isRebuild &amp;&amp; this.graphData) {
       return this.graphData;
     }
     
@@ -533,8 +748,7 @@ module-type: widget
     } else {
       // the listener removes itself if parentDomNode becomes an orphan
       window.addEventListener("resize", this.handleResizeEvent.bind(this), false);
-      // resize now
-      this.maxEnlargeGraphContainer();
+      this.maxEnlargeGraph();
     }
     
     window.addEventListener("click", this.handleClickEvent.bind(this), false);
@@ -548,15 +762,17 @@ module-type: widget
                 
     // repaint when sidebar is hidden
     if(!this.editorMode) {
-      this.callbackRegistry.add("$:/state/sidebar", this.repaintGraph.bind(this), false);
+      this.registerCallback("$:/state/sidebar", this.repaintGraph, false);
     }
     
-    // listen to refresh-trigger changes if trigger is provided
-    if(utils.tiddlerExists(this.getAttribute("refresh-trigger"))) {
-      this.callbackRegistry.add(this.getAttribute("refresh-trigger"), function() {
+    // repaint if trigger has changed
+    var trigger = this.getAttribute("refresh-trigger");
+    console.log("trigger", trigger);
+    if(utils.tiddlerExists(trigger)) {
+      this.registerCallback(this.getAttribute("refresh-trigger"), function() {
         this.lastNodeDoubleClicked = null; // quits diving mode
         this.rebuildGraph();
-      }.bind(this), false);
+      }, false);
     }
     
     // register events
@@ -606,7 +822,7 @@ module-type: widget
     options.dataManipulation = {
         enabled : (this.editorMode ? true : false),
         initiallyVisible : (this.view.getLabel() !== "quick_connect"
-                            && this.view.getLabel() !== "search_visualizer")
+                            &amp;&amp; this.view.getLabel() !== "search_visualizer")
     };
         
     options.navigation = {
@@ -625,7 +841,7 @@ module-type: widget
    */
   TaskGraphWidget.prototype.handleCreateView = function() {
     
-    this.dialogManager.open(this.opt.ref.viewNameDialog, null, function(isConfirmed, outputTObj) {
+    this.openDialog(this.opt.ref.viewNameDialog, null, function(isConfirmed, outputTObj) {
     
       if(isConfirmed) {
         var view = this.adapter.createView(utils.getText(outputTObj));
@@ -643,7 +859,7 @@ module-type: widget
       return;
     }
     
-    this.dialogManager.open(this.opt.ref.viewNameDialog, null, function(isConfirmed, outputTObj) {
+    this.openDialog(this.opt.ref.viewNameDialog, null, function(isConfirmed, outputTObj) {
     
       if(isConfirmed) {
         this.view.rename(utils.getText(outputTObj));
@@ -664,7 +880,7 @@ module-type: widget
     }
     
     // regex is non-greedy
-    var filter = "[regexp:text[<\\$taskgraph.*?view=." + viewname + "..*?>]]";
+    var filter = "[regexp:text[&lt;\\$taskgraph.*?view=." + viewname + "..*?>]]";
     var matches = utils.getMatches(filter);
     
     if(matches.length) {
@@ -674,7 +890,7 @@ module-type: widget
         filter : filter
       };
 
-      this.dialogManager.open(this.opt.ref.notAllowedToDeleteViewDialog, fields, null);
+      this.openDialog(this.opt.ref.notAllowedToDeleteViewDialog, fields, null);
 
       return;
       
@@ -712,12 +928,12 @@ module-type: widget
    * Called by vis when the user tries to delete a node or an edge.
    * 
    * @param {Object} elements - An object containing the elements to be removed.
-   * @param {Array<Id>} elements.nodes - Removed edges.
-   * @param {Array<Id>} elements.edges - Removed nodes.
+   * @param {Array&lt;Id>} elements.nodes - Removed edges.
+   * @param {Array&lt;Id>} elements.edges - Removed nodes.
    */
   TaskGraphWidget.prototype.handleRemoveElement = function(elements) {
     
-    if(elements.edges.length && !elements.nodes.length) { // only deleting edges
+    if(elements.edges.length &amp;&amp; !elements.nodes.length) { // only deleting edges
       this.adapter.deleteEdgesFromStore(this.graphData.edges.get(elements.edges), this.getView());
       $tw.taskgraph.notify("edge" + (elements.edges.length > 1 ? "s" : "") + " removed");
     }
@@ -731,7 +947,7 @@ module-type: widget
               "to that node. Really proceed?"
       };
       
-      this.dialogManager.open(null, fields, function(isConfirmed) {
+      this.openDialog(null, fields, function(isConfirmed) {
         
         if(!isConfirmed) return; // callback({}) ?
           
@@ -754,7 +970,7 @@ module-type: widget
     var pos = this.network.getCenterCoordinates();
     var tiddlers = JSON.parse(event.param);
         
-    for(var i = 0; i < tiddlers.length; i++) {
+    for(var i = 0; i &lt; tiddlers.length; i++) {
       var tObj = this.wiki.getTiddler(tiddlers[i].title);
       
       if(!tObj) {
@@ -794,7 +1010,7 @@ module-type: widget
       prettyFilter: this.getView().getPrettyNodeFilterExpr()
     };
     
-    this.dialogManager.open(this.opt.ref.editNodeFilter, fields, function(isConfirmed, outputTObj) {
+    this.openDialog(this.opt.ref.editNodeFilter, fields, function(isConfirmed, outputTObj) {
       if(isConfirmed) {
         this.getView().setNodeFilter(utils.getText(outputTObj));
       }
@@ -835,7 +1051,7 @@ module-type: widget
     this.network.storePositions(); // does it matter if we put this before setter? yes, I guess.
 
     var updates = [];
-    for(var i = 0; i < ids.length; i++) {
+    for(var i = 0; i &lt; ids.length; i++) {
       
       updates.push({
         id: ids[i],
@@ -870,13 +1086,13 @@ module-type: widget
    */
   TaskGraphWidget.prototype.handleDoubleClickEvent = function(properties) {
     
-    if(!properties.nodes.length && !properties.edges.length) { // clicked on an empty spot
+    if(!properties.nodes.length &amp;&amp; !properties.edges.length) { // clicked on an empty spot
       
       if(!this.editorMode) {
         return;
       }
       
-      this.dialogManager.open(this.opt.ref.nodeNameDialog, null, function(isConfirmed, outputTObj) {
+      this.openDialog(this.opt.ref.nodeNameDialog, null, function(isConfirmed, outputTObj) {
         if(isConfirmed) {
           var node = properties.pointer.canvas;
           node.label = utils.getText(outputTObj);
@@ -896,12 +1112,14 @@ module-type: widget
         if(this.getView().isConfEnabled("node_diving")) {
           this.setGraphButtonEnabled("surface", true);
           var time = 2000;
-          
-          this.preventNextRepaint = true;
-          this.rebuildGraph();
-          this.network.zoomExtent({
-            duration: time
+          this.network.moveTo({
+            scale: 1.1,
+            position: node,
+            animation: {
+              duration: time
+            }  
           });
+          window.setTimeout(this.rebuildGraph.bind(this), time);
         }
         
       } else if(properties.edges.length) { // clicked on an edge
@@ -936,19 +1154,19 @@ module-type: widget
    */
   TaskGraphWidget.prototype.handleResizeEvent = function(event) {
 
-    if(this.network) {
-      this.maxEnlargeGraphContainer(); // resize container
-      this.repaintGraph(); // redraw graph
+    if(!document.body.contains(this.parentDomNode)) {
+      window.removeEventListener("resize", this.handleResizeEvent);
+      return;
     }
     
-  };
-  
-  /**
-   * called from outside.
-   */
-  TaskGraphWidget.prototype.destruct = function() {
-    window.removeEventListener("resize", this.handleResizeEvent);
-    this.network.destroy();
+    if(!this.network) { // has not been initialized yet!
+      return;
+    }
+    
+    this.maxEnlargeGraph();
+
+    this.repaintGraph();
+    
   };
   
   /**
@@ -974,11 +1192,11 @@ module-type: widget
    * Called by vis when the dragging of a node(s) has ended.
    * @param {Object} properties - A vis object containing event-related
    *     information.
-   * @param {Array<Id>} properties.nodeIds - Array of ids of the nodes
+   * @param {Array&lt;Id>} properties.nodeIds - Array of ids of the nodes
    *     that were being dragged.
    */
   TaskGraphWidget.prototype.handleNodeDragEnd = function(properties) {
-    if(properties.nodeIds.length && !this.hasStartedDiving()) {
+    if(properties.nodeIds.length &amp;&amp; !this.hasStartedDiving()) {
       var mode = this.getView().isConfEnabled("physics_mode");
       this.setNodesMoveable([ properties.nodeIds[0] ], mode);
       this.handleStorePositions();
@@ -989,7 +1207,7 @@ module-type: widget
    * Called by vis when a node is being dragged.
    * @param {Object} properties - A vis object containing event-related
    *     information.
-   * @param {Array<Id>} properties.nodeIds - Array of ids of the nodes
+   * @param {Array&lt;Id>} properties.nodeIds - Array of ids of the nodes
    *     that are being dragged.
    */
   TaskGraphWidget.prototype.handleNodeDragStart = function(properties) {
@@ -1091,7 +1309,7 @@ module-type: widget
    */
   TaskGraphWidget.prototype.getView = function(isRebuild) {
     
-    if(!isRebuild && this.view) {
+    if(!isRebuild &amp;&amp; this.view) {
       return this.view;
     }
     
@@ -1121,14 +1339,13 @@ module-type: widget
    * This will make the container dom element stretch to the bottom
    * of the page.
    */
-  TaskGraphWidget.prototype.maxEnlargeGraphContainer = function() {
+  TaskGraphWidget.prototype.maxEnlargeGraph = function() {
 
     var windowHeight = window.innerHeight;
-    var canvasOffset = utils.getDomNodePos(this.graphDomNode).y;
+    var canvasOffset = utils.getDomNodePos(this.parentDomNode).y;
     var distanceBottom = this.getAttribute("bottom-spacing", "10px");
     var calculatedHeight = (windowHeight - canvasOffset) + "px";
-    
-    this.graphDomNode.style["height"] = "calc(" + calculatedHeight + " - " + distanceBottom + ")";
+    this.parentDomNode.style["height"] = "calc(" + calculatedHeight + " - " + distanceBottom + ")";
     
   };
   
@@ -1150,7 +1367,7 @@ module-type: widget
    * This function will create the dom elements for all taskgraph-vis
    * buttons and register the event listeners.
    * 
-   * @param {Object<string, function>} buttonEvents - The label of the
+   * @param {Object&lt;string, function>} buttonEvents - The label of the
    *     button that is used as css class and the click handler.
    */
   TaskGraphWidget.prototype.addGraphButtons = function(buttonEvents) {
@@ -1172,3 +1389,105 @@ module-type: widget
   
 })();
 
+</pre>
+	</article>
+</section>
+
+
+
+
+
+				</div>
+
+				<div class="clearfix"></div>
+				<footer>
+					
+					
+		<span class="copyright">
+		Copyright © 2014 FelixHayashi
+		</span>
+					<br />
+					
+		<span class="jsdoc-message">
+		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha11</a>
+		on 2014-12-27T20:45:31+01:00 using the <a
+			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		</span>
+				</footer>
+			</div>
+
+			
+			<br clear="both">
+		</div>
+
+	</div>
+	<!--<script src="scripts/sunlight.js"></script>-->
+	<script src="scripts/docstrap.lib.js"></script>
+	<script src="scripts/bootstrap-dropdown.js"></script>
+	<script src="scripts/toc.js"></script>
+
+	<script>
+		$( function () {
+			$( "[id*='$']" ).each( function () {
+				var $this = $( this );
+
+				$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+			} );
+
+			$( "#toc" ).toc( {
+				anchorName  : function ( i, heading, prefix ) {
+					return $( heading ).attr( "id" ) || ( prefix + i );
+				},
+				selectors   : "h1,h2,h3,h4",
+				showAndHide : false,
+				scrollTo    : "100px"
+			} );
+
+			$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+			$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+			$( '.dropdown-toggle' ).dropdown();
+//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+			$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+				var $this = $( this );
+
+				var example = $this.find( "code" );
+				exampleText = example.html();
+				var lang = /{@lang (.*?)}/.exec( exampleText );
+				if ( lang && lang[1] ) {
+					exampleText = exampleText.replace( lang[0], "" );
+					example.html( exampleText );
+					lang = lang[1];
+				} else {
+					lang = "javascript";
+				}
+
+				if ( lang ) {
+
+					$this
+						.addClass( "sunlight-highlight-" + lang )
+						.addClass( "linenums" )
+						.html( example.html() );
+
+				}
+			} );
+
+			Sunlight.highlightAll( {
+				lineNumbers : true,
+				showMenu : true,
+				enableDoclinks : true
+			} );
+		} );
+	 </script>
+
+
+
+	<!--Navigation and Symbol Display-->
+	
+
+
+	<!--Google Analytics-->
+	
+
+</body>
+</html>

@@ -18,11 +18,12 @@ module-type: widget
   /**************************** IMPORTS ****************************/
    
   var Widget = require("$:/core/modules/widgets/widget.js").widget;
+  var ViewAbstraction = require("$:/plugins/felixhayashi/taskgraph/view_abstraction.js").ViewAbstraction;
+  var CallbackRegistry = require("$:/plugins/felixhayashi/taskgraph/callback_registry.js").CallbackRegistry;
+  var DialogManager = require("$:/plugins/felixhayashi/taskgraph/dialog_manager.js").DialogManager;
   var utils = require("$:/plugins/felixhayashi/taskgraph/utils.js").utils;
   var vis = require("$:/plugins/felixhayashi/vis/vis.js");
-  var ViewAbstraction = require("$:/plugins/felixhayashi/taskgraph/view_abstraction.js").ViewAbstraction;
-  
-  
+
   /***************************** CODE ******************************/
         
   /**
@@ -32,13 +33,14 @@ module-type: widget
     
     // Main initialisation inherited from widget.js
     this.initialise(parseTreeNode, options);
-        
+    
     // create shortcuts and aliases
     this.adapter = $tw.taskgraph.adapter;
     this.opt = $tw.taskgraph.opt;
     
     // key (a tiddler) -> callback (called when tiddler changes)
-    this.callbacks = utils.getEmptyMap();
+    this.callbackRegistry = new CallbackRegistry();
+    this.dialogManager = new DialogManager(this, this.callbackRegistry);
         
     // https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/widgets/widget.js#L211
     this.computeAttributes();
@@ -63,74 +65,7 @@ module-type: widget
   // !! EXTENSION !!
   TaskGraphWidget.prototype = new Widget();
   // !! EXTENSION !!
-          
-  /**
-   * The callback mechanism allows to dynamically listen to tiddler
-   * changes without hardcoding a change-check for a tiddler name
-   * in the refresh function.
-   * 
-   * @param [TiddlerReference] tRef - A tiddler whose change triggers
-   *     the callback.
-   * @param {function} callback - A function that is called when the
-   *     tiddler has changed.
-   * @param {boolean} [deleteOnCall=true] - True if to delete the
-   *     callback once it has been called, false otherwise.
-   */
-  TaskGraphWidget.prototype.registerCallback = function(tRef, callback, isDeleteOnCall) {
-    this.logger("debug", "A callback was registered for changes of \"" + tRef + "\"");
-    this.callbacks[tRef] = {
-      execute : callback,
-      isDeleteOnCall : (typeof isDeleteOnCall == "Boolean" ? isDeleteOnCall : true)
-    }
-  };
-  
-  /**
-   * Removes the callback from the list of tiddler callbacks.
-   * 
-   * @see TaskGraphWidget#registerCallback
-   */
-  TaskGraphWidget.prototype.removeCallback = function(tRef) {
-    if(this.callbacks[tRef]) {
-      this.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
-      delete this.callbacks[tRef];
-    }
-  };
-  
-  /**
-   * this method has to be implemented at the top of the refresh method.
-   * It checks for changed tiddlers that have
-   * registered callbacks. If `deleteOnCall` was specified during
-   * registration of the callback, the callback will be deleted
-   * automatically.
-   * 
-   * @see TaskGraphWidget#registerCallback
-   */
-  TaskGraphWidget.prototype.checkForCallbacks = function(changedTiddlers) {
     
-    if(this.callbacks.length == 0) {
-      this.logger("debug", "No registered callbacks exist at the moment");
-      return;
-    }
-    
-    for(var tRef in changedTiddlers) {
-            
-      if(!this.callbacks[tRef]) continue;
-      
-      if(this.wiki.getTiddler(tRef)) {
-        
-        this.logger("debug", "A callback for \"" + tRef + "\" will be executed");
-        this.callbacks[tRef].execute(tRef);
-        
-        // a continue prevents deleting the callback
-        if(!this.callbacks.isDeleteOnCall) continue;
-        
-      }
-      
-      this.removeCallback(tRef);
-      
-    }
-  }
-  
   /**
    * This handler will open a dialog in which the user specifies an
    * edgetype to use to create an edge between to nodes.
@@ -146,8 +81,6 @@ module-type: widget
    *    function(isConfirmed);
    */
   TaskGraphWidget.prototype.handleConnectionEvent = function(edge, callback) {
-       
-    this.logger("info", "Opening a dialog for creating an edge");
 
     var edgeFilterExpr = this.getView().getAllEdgesFilterExpr(true);
 
@@ -157,20 +90,16 @@ module-type: widget
       toLabel: this.adapter.selectNodeById(edge.to).label
     };
     
-    this.openDialog(this.opt.ref.edgeTypeDialog, vars, function(isConfirmed, outputTObj) {
+    this.dialogManager.open(this.opt.ref.edgeTypeDialog, vars, function(isConfirmed, outputTObj) {
     
       if(isConfirmed) {
         
         var text = utils.getText(outputTObj);
-        
         edge.label = (text && text !== this.opt.misc.unknownEdgeLabel
                       ? text
                       : this.opt.misc.unknownEdgeLabel);
-        
-        this.logger("debug", "The edgetype is set to: " + edge.label);
 
-        this.adapter.insertEdge(edge, this.getView());  
-        $tw.taskgraph.notify("edge added");
+        this.adapter.insertEdge(edge, this.getView());
         
       }
       
@@ -180,92 +109,7 @@ module-type: widget
         
     });
     
-  }
-  
-  /**
-  * This function opens a dialog based on a skeleton and some fields and eventually
-  * calls a callback once the dialog is closed. The callback contains an indicator
-  * whether the dialog subject was confirmed or the operation cancelled. In any
-  * case the output tiddler is passed to the callback. Each dialog may write its
-  * changes to this tiddler in order to store the dialog result and make it available
-  * to the callback.
-  * 
-  * How does it work?
-  * 
-  * The output of the dialog process is stored in a temporary tiddler that is only known
-  * to the current instance of the dialog. This way it is ensured that only the dialog process
-  * that created the temporary tiddler will retrieve the result. Now we are able to
-  * provide unambigous and unique correspondance to dialog callbacks.
-      
-  * Any dialog output is stored in a unique output-tiddler. Once there is a result,
-  * a new result tiddler is created with indicators how to interpret the output.
-  * The result tiddler can be understood as exit code that is independent of the output.
-  * It is the result tiddler that triggers the dialog callback that was registered before.
-  * the output is then read immediately from the output-tiddler.
-  * 
-  * @param {$tw.Tiddler} skeleton - A skeleton tObj that is used as the dialog body
-  * @param {Hashmap} [fields] - More fields that can be added.
-  * @param {string} [fields.subtitle] - More fields that can be added. All
-  *     properties of fields will be accessible as variables in the modal
-  * @param {string} [fields.cancelButtonLabel] - The label of the cancel button.
-  * @param {string} [fields.confirmButtonLabel] - The label of the confirm button.
-  * @param {function} [callback] - A function with the signature
-  *     function(isConfirmed, outputTObj). `outputTObj` contains data
-  *     produced by the dialog (can be undefined even if confirmed!).
-  *     Be careful: the tiddler that outputTObj represents is deleted immediately.
-  */
-  TaskGraphWidget.prototype.openDialog = function(skeleton, fields, callback) {
-            
-    skeleton = utils.getTiddler(skeleton);
-    
-    var path = this.opt.path.dialogs + "/" + utils.genUUID();
-    var dialogFields = {
-      title : path,
-      output : path + "/output",
-      result : path + "/result",
-      footer : this.wiki.getTiddler(this.opt.ref.dialogStandardFooter).fields.text
-    };
-    
-    if(!fields || !fields.confirmButtonLabel) {
-      dialogFields.confirmButtonLabel = "Okay";
-    }
-    if(!fields || !fields.cancelButtonLabel) {
-      dialogFields.cancelButtonLabel = "Cancel";
-    }
- 
-    // https://github.com/Jermolene/TiddlyWiki5/blob/master/boot/boot.js#L761
-    var dialogTiddler = new $tw.Tiddler(skeleton, fields, dialogFields);
-    this.logger("debug", "A dialog will be opened based on the following tiddler:", dialogTiddler);
-    
-    // https://github.com/Jermolene/TiddlyWiki5/blob/master/boot/boot.js#L841
-    this.wiki.addTiddler(dialogTiddler);
-
-    this.registerCallback(dialogFields.result, function(t) {
-
-      var triggerTObj = this.wiki.getTiddler(t);
-      var isConfirmed = triggerTObj.fields.text;
-      
-      if(isConfirmed) {
-        var outputTObj = this.wiki.getTiddler(dialogFields.output);
-      } else {
-        var outputTObj = null;
-        $tw.taskgraph.notify("operation cancelled");
-      }
-      
-      if(typeof callback == "function") {
-        callback.call(this, isConfirmed, outputTObj);
-      }
-      
-      // close and remove the tiddlers
-      utils.deleteTiddlers([dialogFields.title, dialogFields.output, dialogFields.result]);
-      
-    }.bind(this), true);
-            
-    this.dispatchEvent({
-      type: "tm-modal", param : dialogTiddler.fields.title, paramObject: dialogTiddler.fields
-    }); 
-    
-  }
+  };
   
   /**
    * Promts a dialog that will confront the user with making a tough choice :)
@@ -282,7 +126,7 @@ module-type: widget
       cancelButtonLabel: "Uuups, hell no!"
     };
     
-    this.openDialog(this.opt.ref.confirmationDialog, vars, callback);
+    this.dialogManager.open(this.opt.ref.confirmationDialog, vars, callback);
   };
     
   TaskGraphWidget.prototype.logger = function(type, message /*, more stuff*/) {
@@ -323,6 +167,9 @@ module-type: widget
     // now initialise graph variables and render the graph
     this.initAndRenderGraph(parent);
     
+    // register this graph at the caretaker's graph registry
+    $tw.taskgraph.registry.push(this);
+    
   };
   
   /**
@@ -348,8 +195,7 @@ module-type: widget
       var tRef = "$:/temp/felixhayashi/taskgraph/quick_connect_search";
       this.wiki.setText(tRef, "text", null, ""); // clear
       var filter = "[search{" + tRef + "}!is[system]limit[10]]" + // search
-                   "[field:title[" + this.getVariable("currentTiddler") + "]]" + // always
-                   "[field:title[" + tRef + "]]"; // react to changes
+                   "[field:title[" + this.getVariable("currentTiddler") + "]]"; // always
       this.view.setNodeFilter(filter);
     }
     
@@ -439,7 +285,7 @@ module-type: widget
   TaskGraphWidget.prototype.refresh = function(changedTiddlers) {
         
     // in any case, check for callbacks triggered by tiddlers
-    this.checkForCallbacks(changedTiddlers);
+    this.callbackRegistry.handleChanges(changedTiddlers);
     
     var isViewSwitched = this.isViewSwitched(changedTiddlers);
     var viewModifications = this.getView().refresh(changedTiddlers);
@@ -458,13 +304,13 @@ module-type: widget
     } else {
       
       // check for changes that effect the graph on an element level
-      this.refreshGraph(changedTiddlers);
+      this.checkOnGraph(changedTiddlers);
             
     }
     
     if(this.editorMode) {
       // in any case give child widgets a chance to refresh
-      this.refreshEditorBar(changedTiddlers, isViewSwitched, viewModifications);
+      this.checkOnEditorBar(changedTiddlers, isViewSwitched, viewModifications);
     }
 
   };
@@ -481,7 +327,6 @@ module-type: widget
     this.hasNetworkStabilized = false;
     
     this.graphData = this.getGraphData(true);
-        
     this.network.setData({ nodes: this.graphData.nodes, edges: this.graphData.edges }, this.preventNextRepaint); // true => disableStart
         
     // reset
@@ -490,6 +335,14 @@ module-type: widget
   
   TaskGraphWidget.prototype.hasStartedDiving = function() {
     return (this.lastNodeDoubleClicked && this.getView().isConfEnabled("node_diving"));
+  }
+  
+  /**
+   * Warning: Do not change this functionname as it is used by the
+   * caretaker's routinely checkups.
+   */
+  TaskGraphWidget.prototype.getContainer = function() {
+    return this.parentDomNode;
   }
   
   /**
@@ -576,7 +429,7 @@ module-type: widget
   /**
    * This method will ckeck if any tw-widget needs a refresh.
    */
-  TaskGraphWidget.prototype.refreshEditorBar = function(changedTiddlers, isViewSwitched, viewModifications) {
+  TaskGraphWidget.prototype.checkOnEditorBar = function(changedTiddlers, isViewSwitched, viewModifications) {
     
     // @TODO viewModifications is actually really heavy. I could narrow this.
     if(isViewSwitched || viewModifications.length) {
@@ -607,7 +460,7 @@ module-type: widget
    * 3. An edge that matches the edge filter has been added or removed.
    * 
    */
-  TaskGraphWidget.prototype.refreshGraph = function(changedTiddlers) {
+  TaskGraphWidget.prototype.checkOnGraph = function(changedTiddlers) {
             
     var nodeFilter = this.getView().getNodeFilter("compiled");
     
@@ -671,14 +524,17 @@ module-type: widget
     
     $tw.utils.addClass(this.graphDomNode, "vis-graph");
     //parent.appendChild(this.graphDomNode);
-    
-    // graph size issues
+
+    // graph width (assigned to the parent)
+    parent.style["width"] = this.getAttribute("width", "100%");
+    // graph height (assigned to the vis graph wrapper)
     if(this.getAttribute("height")) {
       this.graphDomNode.style["height"] = this.getAttribute("height");
     } else {
       // the listener removes itself if parentDomNode becomes an orphan
       window.addEventListener("resize", this.handleResizeEvent.bind(this), false);
-      this.maxEnlarge(this.graphDomNode);
+      // resize now
+      this.maxEnlargeGraphContainer();
     }
     
     window.addEventListener("click", this.handleClickEvent.bind(this), false);
@@ -686,33 +542,29 @@ module-type: widget
     this.graphOptions = this.getGraphOptions();
 
     // init the graph with dummy data as events are not registered yet
-    var dummyData = { nodes: [], edges: [] };
-    this.network = new vis.Network(this.graphDomNode, dummyData, this.graphOptions);
+    this.network = new vis.Network(this.graphDomNode,
+                                   { nodes: [], edges: [] },
+                                   this.graphOptions);
                 
     // repaint when sidebar is hidden
     if(!this.editorMode) {
-      this.registerCallback("$:/state/sidebar", this.repaintGraph.bind(this), false);
+      this.callbackRegistry.add("$:/state/sidebar", this.repaintGraph.bind(this), false);
+    }
+    
+    // listen to refresh-trigger changes if trigger is provided
+    if(utils.tiddlerExists(this.getAttribute("refresh-trigger"))) {
+      this.callbackRegistry.add(this.getAttribute("refresh-trigger"), function() {
+        this.lastNodeDoubleClicked = null; // quits diving mode
+        this.rebuildGraph();
+      }.bind(this), false);
     }
     
     // register events
     
     this.network.on("doubleClick", this.handleDoubleClickEvent.bind(this));
-   
     this.network.on("stabilized", this.handleStabilizedEvent.bind(this));
-    
-    this.network.on('dragStart', function(properties) {
-      if(properties.nodeIds.length) {
-        this.setNodesMoveable([ properties.nodeIds[0] ], true);
-      }
-    }.bind(this));
-    
-    this.network.on("dragEnd", function(properties) {
-      if(properties.nodeIds.length && !this.hasStartedDiving()) {
-        var mode = this.getView().isConfEnabled("physics_mode");
-        this.setNodesMoveable([ properties.nodeIds[0] ], mode);
-        this.handleStorePositions();
-      }
-    }.bind(this));
+    this.network.on('dragStart', this.handleNodeDragStart.bind(this));
+    this.network.on("dragEnd", this.handleNodeDragEnd.bind(this));
     
     this.addGraphButtons({
       "surface": function() {
@@ -729,21 +581,6 @@ module-type: widget
     var center = this.network.getCenterCoordinates();
     this.network.moveTo({position: center, scale: 0.8});
         
-  };
-  
-  
-  
-  TaskGraphWidget.prototype.handleReconnectEdge = function(updatedEdge) {
-
-    var edge = this.graphData.edges.get(updatedEdge.id);
-    $tw.utils.extend(edge, updatedEdge);
-    
-    this.adapter.deleteEdgesFromStore([
-      { id: edge.id, label: edge.label }
-    ], this.getView());
-    
-    this.adapter.insertEdge(edge, this.getView());
-    
   };
   
   TaskGraphWidget.prototype.getGraphOptions = function() {
@@ -788,7 +625,7 @@ module-type: widget
    */
   TaskGraphWidget.prototype.handleCreateView = function() {
     
-    this.openDialog(this.opt.ref.viewNameDialog, null, function(isConfirmed, outputTObj) {
+    this.dialogManager.open(this.opt.ref.viewNameDialog, null, function(isConfirmed, outputTObj) {
     
       if(isConfirmed) {
         var view = this.adapter.createView(utils.getText(outputTObj));
@@ -806,7 +643,7 @@ module-type: widget
       return;
     }
     
-    this.openDialog(this.opt.ref.viewNameDialog, null, function(isConfirmed, outputTObj) {
+    this.dialogManager.open(this.opt.ref.viewNameDialog, null, function(isConfirmed, outputTObj) {
     
       if(isConfirmed) {
         this.view.rename(utils.getText(outputTObj));
@@ -837,7 +674,7 @@ module-type: widget
         filter : filter
       };
 
-      this.openDialog(this.opt.ref.notAllowedToDeleteViewDialog, fields, null);
+      this.dialogManager.open(this.opt.ref.notAllowedToDeleteViewDialog, fields, null);
 
       return;
       
@@ -855,6 +692,19 @@ module-type: widget
       }
 
     }, message);
+    
+  };
+  
+  TaskGraphWidget.prototype.handleReconnectEdge = function(updatedEdge) {
+
+    var edge = this.graphData.edges.get(updatedEdge.id);
+    $tw.utils.extend(edge, updatedEdge);
+    
+    this.adapter.deleteEdgesFromStore([
+      { id: edge.id, label: edge.label }
+    ], this.getView());
+    
+    this.adapter.insertEdge(edge, this.getView());
     
   };
   
@@ -881,7 +731,7 @@ module-type: widget
               "to that node. Really proceed?"
       };
       
-      this.openDialog(null, fields, function(isConfirmed) {
+      this.dialogManager.open(null, fields, function(isConfirmed) {
         
         if(!isConfirmed) return; // callback({}) ?
           
@@ -944,7 +794,7 @@ module-type: widget
       prettyFilter: this.getView().getPrettyNodeFilterExpr()
     };
     
-    this.openDialog(this.opt.ref.editNodeFilter, fields, function(isConfirmed, outputTObj) {
+    this.dialogManager.open(this.opt.ref.editNodeFilter, fields, function(isConfirmed, outputTObj) {
       if(isConfirmed) {
         this.getView().setNodeFilter(utils.getText(outputTObj));
       }
@@ -961,16 +811,12 @@ module-type: widget
    */
   TaskGraphWidget.prototype.handleStabilizedEvent = function(properties) {
     
-    if(this.hasNetworkStabilized) {
-      return;
-    } else {
+    if(!this.hasNetworkStabilized) {
       this.hasNetworkStabilized = true;
+      this.logger("log", "Network stabilized after " + properties.iterations + " iterations");
+      this.setNodesMoveable(this.graphData.nodes.getIds(),
+                            this.getView().isConfEnabled("physics_mode"));
     }
-    
-    this.logger("log", "Network stabilized after " + properties.iterations + " iterations");
-
-    this.setNodesMoveable(this.graphData.nodes.getIds(),
-                          this.getView().isConfEnabled("physics_mode"));
     
   };
   
@@ -1030,7 +876,7 @@ module-type: widget
         return;
       }
       
-      this.openDialog(this.opt.ref.nodeNameDialog, null, function(isConfirmed, outputTObj) {
+      this.dialogManager.open(this.opt.ref.nodeNameDialog, null, function(isConfirmed, outputTObj) {
         if(isConfirmed) {
           var node = properties.pointer.canvas;
           node.label = utils.getText(outputTObj);
@@ -1048,9 +894,14 @@ module-type: widget
         var tRef = node.ref;
         
         if(this.getView().isConfEnabled("node_diving")) {
-          this.rebuildGraph();
-          this.network.focusOnNode(node);
           this.setGraphButtonEnabled("surface", true);
+          var time = 2000;
+          
+          this.preventNextRepaint = true;
+          this.rebuildGraph();
+          this.network.zoomExtent({
+            duration: time
+          });
         }
         
       } else if(properties.edges.length) { // clicked on an edge
@@ -1085,19 +936,19 @@ module-type: widget
    */
   TaskGraphWidget.prototype.handleResizeEvent = function(event) {
 
-    if(!document.body.contains(this.parentDomNode)) {
-      window.removeEventListener("resize", this.handleResizeEvent);
-      return;
+    if(this.network) {
+      this.maxEnlargeGraphContainer(); // resize container
+      this.repaintGraph(); // redraw graph
     }
     
-    if(!this.network) { // has not been initialized yet!
-      return;
-    }
-    
-    this.maxEnlarge(this.graphDomNode);
-
-    this.repaintGraph();
-    
+  };
+  
+  /**
+   * called from outside.
+   */
+  TaskGraphWidget.prototype.destruct = function() {
+    window.removeEventListener("resize", this.handleResizeEvent);
+    this.network.destroy();
   };
   
   /**
@@ -1117,6 +968,34 @@ module-type: widget
       }
     }
 
+  };
+  
+  /**
+   * Called by vis when the dragging of a node(s) has ended.
+   * @param {Object} properties - A vis object containing event-related
+   *     information.
+   * @param {Array<Id>} properties.nodeIds - Array of ids of the nodes
+   *     that were being dragged.
+   */
+  TaskGraphWidget.prototype.handleNodeDragEnd = function(properties) {
+    if(properties.nodeIds.length && !this.hasStartedDiving()) {
+      var mode = this.getView().isConfEnabled("physics_mode");
+      this.setNodesMoveable([ properties.nodeIds[0] ], mode);
+      this.handleStorePositions();
+    }
+  };
+  
+  /**
+   * Called by vis when a node is being dragged.
+   * @param {Object} properties - A vis object containing event-related
+   *     information.
+   * @param {Array<Id>} properties.nodeIds - Array of ids of the nodes
+   *     that are being dragged.
+   */
+  TaskGraphWidget.prototype.handleNodeDragStart = function(properties) {
+    if(properties.nodeIds.length) {
+      this.setNodesMoveable([ properties.nodeIds[0] ], true);
+    }
   };
    
   /**
@@ -1236,24 +1115,44 @@ module-type: widget
     this.network.redraw();
     this.network.zoomExtent();
     
-  }
+  };
   
-  TaskGraphWidget.prototype.maxEnlarge = function(container) {
+  /**
+   * This will make the container dom element stretch to the bottom
+   * of the page.
+   */
+  TaskGraphWidget.prototype.maxEnlargeGraphContainer = function() {
 
     var windowHeight = window.innerHeight;
-    var canvasOffset = utils.getDomNodePos(container).y;
-    var distanceBottom = 10; // in pixel
-    var calculatedHeight = windowHeight - canvasOffset - distanceBottom;
-    container.style["height"] = calculatedHeight + "px";
+    var canvasOffset = utils.getDomNodePos(this.graphDomNode).y;
+    var distanceBottom = this.getAttribute("bottom-spacing", "10px");
+    var calculatedHeight = (windowHeight - canvasOffset) + "px";
+    
+    this.graphDomNode.style["height"] = "calc(" + calculatedHeight + " - " + distanceBottom + ")";
     
   };
   
+  /**
+   * If a button is enabled it means it is displayed on the graph canvas.
+   * 
+   * @param {string} name - The name of the button to enabled. Has to
+   *     correspond with the css button name.
+   * @param {boolean} enable - True if the button should be visible,
+   *     false otherwise.
+   */ 
   TaskGraphWidget.prototype.setGraphButtonEnabled = function(name, enable) {
     var className = "network-navigation taskgraph-button " + name;
     var b = this.parentDomNode.getElementsByClassName(className)[0];
     $tw.utils.toggleClass(b, "enabled", enable);
   }; 
 
+  /**
+   * This function will create the dom elements for all taskgraph-vis
+   * buttons and register the event listeners.
+   * 
+   * @param {Object<string, function>} buttonEvents - The label of the
+   *     button that is used as css class and the click handler.
+   */
   TaskGraphWidget.prototype.addGraphButtons = function(buttonEvents) {
     
     var parent = this.parentDomNode.getElementsByClassName("vis network-frame")[0];

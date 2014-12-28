@@ -80,7 +80,7 @@ type: application/json
   "configurePhysics": false,
   "physics": {
     "barnesHut": {
-      "enabled": true,
+      "enabled": false,
       "theta": 1.6666666666667,
       "gravitationalConstant": -2500,
       "centralGravity": 0.35,
@@ -88,7 +88,7 @@ type: application/json
       "springConstant": 0.04,
       "damping": 0.5
     },
-    "damping": 0.09,
+    "damping": 0.18,
     "centralGravity": 0.3,
     "springLength": 95,
     "springConstant": 0.04

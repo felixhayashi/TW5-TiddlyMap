@@ -11,7 +11,12 @@ Search:
 
 ---
 
-<$taskgraph editor="vis" click-to-use="false" object-id="quick_connect" height="250px" view="quick_connect"></$taskgraph>
+<$taskgraph editor="vis"
+            click-to-use="false"
+            object-id="quick_connect"
+            height="250px"
+            view="quick_connect"
+            refresh-trigger="$:/temp/felixhayashi/taskgraph/quick_connect_search"></$taskgraph>
 
 ---
 

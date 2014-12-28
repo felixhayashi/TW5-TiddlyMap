@@ -2,4 +2,10 @@ title: $:/plugins/felixhayashi/taskgraph/searchVisualizer
 caption: Graph
 tags: $:/tags/SearchResults
 
-<$taskgraph view="search" click-to-use="false" object-id="search_visualizer"></$taskgraph>
+<$taskgraph
+  view="search"
+  click-to-use="false"
+  object-id="search_visualizer"
+  width="calc(100% - 15px)"
+  bottom-spacing="15px"
+  refresh-trigger="$:/temp/search"></$taskgraph>

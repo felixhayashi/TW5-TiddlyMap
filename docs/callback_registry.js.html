@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>TW-Taskgraph Classes</title>
+	<title>TW-Taskgraph Source: callback_registry.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -60,102 +60,132 @@
 	<div class="row-fluid">
 
 		
-		<div class="span8">
-			
+			<div class="span12">
+				
 				<div id="main">
 					
 
 
-	<h1 class="page-title">Classes</h1>
+		<h1 class="page-title">Source: callback_registry.js</h1>
+    
 <section>
+	<article>
+		<pre
+			class="sunlight-highlight-javascript linenums">/*\
 
-<header>
-    <h2>
-    
-    </h2>
-    
-</header>
+title: $:/plugins/felixhayashi/taskgraph/callback_registry.js
+type: application/javascript
+module-type: library
 
-<article>
-    <div class="container-overview">
-    
+@preserve
 
-    
+\*/
+
+(function(){
+
+  /*jslint node: true, browser: true */
+  /*global $tw: false */
+  
+  "use strict";
+  
+  /**************************** IMPORTS ****************************/
+   
+  var utils = require("$:/plugins/felixhayashi/taskgraph/utils.js").utils;
+
+  /***************************** CODE ******************************/
         
+  /**
+   * @constructor
+   */
+  var CallbackRegistry = function() {
+    
+    this.wiki = $tw.wiki;
+    this.logger = $tw.taskgraph.logger;
+    this.callbacks = utils.getEmptyMap();
 
+  };
+          
+  /**
+   * The callback mechanism allows to dynamically listen to tiddler
+   * changes without hardcoding a change-check for a tiddler name
+   * in the refresh function.
+   * 
+   * @param [TiddlerReference] tRef - A tiddler whose change triggers
+   *     the callback.
+   * @param {function} callback - A function that is called when the
+   *     tiddler has changed.
+   * @param {boolean} [deleteOnCall=true] - True if to delete the
+   *     callback once it has been called, false otherwise.
+   */
+  CallbackRegistry.prototype.add = function(tRef, callback, isDeleteOnCall) {
+    
+    this.logger("debug", "A callback was registered for changes of \"" + tRef + "\"");
+    this.callbacks[tRef] = {
+      execute : callback,
+      isDeleteOnCall : (typeof isDeleteOnCall === "boolean" ? isDeleteOnCall : true)
+    };
+    
+  };
+  
+  /**
+   * Removes the callback from the list of tiddler callbacks.
+   * 
+   * @see CallbackRegistry#registerCallback
+   */
+  CallbackRegistry.prototype.remove = function(tRef) {
+    
+    if(this.callbacks[tRef]) {
+      this.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
+      delete this.callbacks[tRef];
+    }
+    
+  };
+  
+  /**
+   * this method has to be implemented at the top of the refresh method.
+   * It checks for changed tiddlers that have
+   * registered callbacks. If `deleteOnCall` was specified during
+   * registration of the callback, the callback will be deleted
+   * automatically.
+   * 
+   * @see CallbackRegistry#registerCallback
+   */
+  CallbackRegistry.prototype.handleChanges = function(changedTiddlers) {
+    
+    if(this.callbacks.length == 0) {
+      this.logger("debug", "No registered callbacks exist at the moment");
+      return;
+    }
+    
+    for(var tRef in changedTiddlers) {
+            
+      if(!this.callbacks[tRef]) continue;
+      
+      if(this.wiki.getTiddler(tRef)) {
         
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-
-	
-
-	
-
-	
-</dl>
-
-
+        this.logger("debug", "A callback for \"" + tRef + "\" will be executed");
+        this.callbacks[tRef].execute(tRef);
         
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="Adapter.html">Adapter</a></dt>
-            <dd></dd>
+        // a continue prevents deleting the callback
+        if(!this.callbacks.isDeleteOnCall) continue;
         
-            <dt><a href="ViewAbstraction.html">ViewAbstraction</a></dt>
-            <dd></dd>
-        </dl>
+      }
+      
+      this.remove(tRef);
+    }
     
+  };
 
-    
-        <h3 class="subsection-title">Namespaces</h3>
+  // !! EXPORT !!
+  exports.CallbackRegistry = CallbackRegistry;
+  // !! EXPORT !!
+  
+})();
 
-        <dl>
-            <dt><a href="namespaces.html#utils"><a href="utils.html">utils</a></a></dt>
-            <dd></dd>
-        </dl>
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
+</pre>
+	</article>
 </section>
+
 
 
 
@@ -179,10 +209,6 @@
 				</footer>
 			</div>
 
-			
-			<div class="span3">
-				<div id="toc"></div>
-			</div>
 			
 			<br clear="both">
 		</div>

@@ -10,4 +10,62 @@ util functions.
 @preserve
 
 \*/
-(function(){"use strict";var r=require("$:/plugins/felixhayashi/taskgraph/utils.js").utils;exports.name="tgmacro";exports.params=function(r){var t=[];for(var e=0;e<r;e++){t.push({name:"arg"+e})}return t}(5);var t=function(){return};exports.run=function(){switch(arguments[0]){case"basename":return r.getBasename(arguments[1]);case"option":var t=$tw.taskgraph.opt;var e=arguments[1].split(".");for(var n=0;n<e.length;n++){if(typeof t=="object"&&t[e[n]]){t=t[e[n]]}else{return"property doesn't exist"}}if(!(typeof t=="string"))return"property is not a string";return t}return"wrong signature"}})();
+(function(){
+  
+  /*jslint node: true, browser: true */
+  /*global $tw: false */
+  "use strict";
+
+  var utils = require("$:/plugins/felixhayashi/taskgraph/utils.js").utils;
+
+  /*
+  Information about this macro
+  */
+
+  exports.name = "tgmacro";
+
+  // unfortunately tw forces us to specify params in advance so I will
+  // reserve some argument slots here.. lets say five.
+  exports.params = (function(maxArgs) {
+    var arr = [];
+    for(var i = 0; i < maxArgs; i++) {
+      arr.push({ name : ("arg" + i) });
+    };
+    return arr;
+  })(5);
+  
+  var getErrorNotification = function() {
+    return 
+  };
+
+  exports.run = function() {
+       
+    switch(arguments[0]) {
+      
+      case "basename":
+      
+        return utils.getBasename(arguments[1]);
+        
+      case "option":
+      
+        var prop = $tw.taskgraph.opt;
+        var propertyPath = arguments[1].split(".");
+
+        for(var i = 0; i < propertyPath.length; i++) {
+          if(typeof prop == "object" && prop[propertyPath[i]]) {
+            prop = prop[propertyPath[i]];
+          } else {
+            return "property doesn't exist";
+          }          
+        }
+        
+        if(!(typeof prop == "string")) return "property is not a string";
+        
+        return prop;
+    } 
+    
+    return "wrong signature";
+    
+  };
+
+})();

@@ -125,13 +125,14 @@ html { // used to increase css importance
         }
       }
     }
-    
-    .network-frame {
-      .taskgraph-button { 
-        &.surface.enabled {
-          bottom: 90px;
-          right: 15px;
-          background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/taskgraph/media/surface.png}} />'));
+    .vis-graph {       
+      .network-frame {
+        .taskgraph-button { 
+          &.surface.enabled {
+            bottom: 90px;
+            right: 15px;
+            background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/taskgraph/media/surface.png}} />'));
+          }
         }
       }
     }

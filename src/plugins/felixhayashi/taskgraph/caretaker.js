@@ -167,10 +167,34 @@ say here is: do not require the caretaker!
 
   };
 
+  /**
+   * This periodic check is needed to trigger a cleanup if a graph is
+   * removed since a graph itself cannot react to its destruction.
+   * This includes removing listeners that were not attached to the
+   * local container or calling the vis destructor.
+   */
+  var routineCheck = function() {
+    
+    for(var i = ($tw.taskgraph.registry.length-1); i >= 0; i--) {
+      var graph = $tw.taskgraph.registry[i];
+      if(!document.body.contains(graph.getContainer())) { // removed
+        $tw.taskgraph.logger("warn", "A graph has been removed.");
+        graph.destruct();
+        $tw.taskgraph.registry.splice(i, 1);
+      }
+    }
+    
+  };
+
   exports.startup = function() {
     
     // create namespaces
     $tw.taskgraph = utils.getEmptyMap();
+    
+    // all graphs need to register here.
+    // @see routineWalk()
+    $tw.taskgraph.registry = [];
+    window.setInterval(routineCheck, 500);
     
     // build and integrate global options
     $tw.taskgraph.opt = utils.getEmptyMap();

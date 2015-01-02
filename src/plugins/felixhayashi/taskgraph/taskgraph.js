@@ -51,9 +51,10 @@ module-type: widget
     if(this.editorMode) {
       // addEventListeners automatically binds "this" object to handler, thus, no need for .bind(this)
       this.addEventListeners([
-        {type: "tm-create-view", handler: function() { this.handleCreateView(null); }},
+        {type: "tm-create-view", handler: this.handleCreateView },
         {type: "tm-rename-view", handler: this.handleRenameView },
         {type: "tm-delete-view", handler: this.handleDeleteView },
+        {type: "tm-edit-view", handler: this.handleEditView },
         {type: "tm-store-position", handler: this.handleStorePositions },
         {type: "tm-edit-node-filter", handler: this.handleEditNodeFilter },
         {type: "tm-import-tiddlers", handler: this.handleImportTiddlers }
@@ -90,7 +91,7 @@ module-type: widget
       toLabel: this.adapter.selectNodeById(edge.to).label
     };
     
-    this.dialogManager.open(this.opt.ref.edgeTypeDialog, vars, function(isConfirmed, outputTObj) {
+    this.dialogManager.open("getEdgeType", vars, function(isConfirmed, outputTObj) {
     
       if(isConfirmed) {
         
@@ -109,6 +110,8 @@ module-type: widget
         
     });
     
+    this.preventNextRepaint = true;
+    
   };
   
   /**
@@ -120,13 +123,15 @@ module-type: widget
   
     // TODO: option paths seriously need some refactoring!
 
-    var vars = {
+    var param = {
       message : message,
-      confirmButtonLabel: "Yes mom, I know what I'm doing!",
-      cancelButtonLabel: "Uuups, hell no!"
+      dialog: {
+        confirmButtonLabel: "Yes, proceed",
+        cancelButtonLabel: "Cancel"
+      }
     };
     
-    this.dialogManager.open(this.opt.ref.confirmationDialog, vars, callback);
+    this.dialogManager.open("getConfirmation", param, callback);
   };
     
   TaskGraphWidget.prototype.logger = function(type, message /*, more stuff*/) {
@@ -294,12 +299,12 @@ module-type: widget
     
       this.logger("warn", "View switched");
       this.view = this.getView(true);
-      this.rebuildGraph();
+      this.rebuildGraph(this.getGraphOptions());
     
     } else if(viewModifications.length) {
       
       this.logger("warn", "View modified", viewModifications);
-      this.rebuildGraph();
+      this.rebuildGraph(this.getGraphOptions());
       
     } else {
       
@@ -319,7 +324,7 @@ module-type: widget
    * param {NodeCollection} [nodes] - An optional set of nodes to use
    * instead of the set created according to the nodes filter.
    */
-  TaskGraphWidget.prototype.rebuildGraph = function() {
+  TaskGraphWidget.prototype.rebuildGraph = function(options) {
     
     this.logger("debug", "Rebuilding graph");
     
@@ -327,7 +332,12 @@ module-type: widget
     this.hasNetworkStabilized = false;
     
     this.graphData = this.getGraphData(true);
-    this.network.setData({ nodes: this.graphData.nodes, edges: this.graphData.edges }, this.preventNextRepaint); // true => disableStart
+     
+    this.network.setData({
+      nodes: this.graphData.nodes,
+      edges: this.graphData.edges,
+      options: options
+    }, this.preventNextRepaint); // true => disableStart
         
     // reset
     this.preventNextRepaint = false;       
@@ -358,24 +368,29 @@ module-type: widget
       return this.graphData;
     }
     
+    // calculate original nodes in form of a hashmap
+    
     if(this.hasStartedDiving()) {
+      
+      var nodes = utils.getEmptyMap();
       this.lastNodeDoubleClicked.group = "special";
-      var nodes = new vis.DataSet([ this.lastNodeDoubleClicked ]);
+      nodes[this.lastNodeDoubleClicked.id] = this.lastNodeDoubleClicked;
+      
     } else {      
+      
       var nodeFilter = this.getView().getNodeFilter("compiled");
       var nodes = this.adapter.selectNodesByFilter(nodeFilter, {
-        view: this.getView()
+        view: this.getView(),
+        outputType: "hashmap"
       });
+      
     }
     
-    var edges = this.adapter.selectEdgesByEndpoints(nodes, {
-      view: this.getView(),
-      endpointsInSet: ">=1" // ">=1" used to calculate neighbours
-    });
+    // add special nodes
     
-    if(this.view.getLabel() === "quick_connect") { // special case; ugly solved!
+    if(this.getView().getLabel() === "quick_connect") { // special case; ugly solved!
       var curNode = this.adapter.selectNodesByReference([ this.getVariable("currentTiddler") ], {
-        outputType: "array",
+        outputType: "hashmap",
         addProperties: {
           group: "special",
           x: 1, // WARNING VIS BUG: never use 0 as coordinate!
@@ -383,13 +398,23 @@ module-type: widget
         }
       });
       
-      nodes.update(curNode);
-    }
+      utils.inject(curNode, nodes);
       
+    }
+        
+    // retrieve edges
+    
+    var edges = this.adapter.selectEdgesByEndpoints(nodes, {
+      view: this.getView(),
+      endpointsInSet: ">=1" // ">=1" used to calculate neighbours
+    });
+    
+    // retrieve and inject neighbours
+        
     if(this.getView().isConfEnabled("display_neighbours") || this.hasStartedDiving()) {
       var neighbours = this.adapter.selectNeighbours(nodes, {
         edges: edges,
-        outputType: "array",
+        outputType: "hashmap",
         view: this.getView(),
         addProperties: {
           group: "neighbours"
@@ -398,17 +423,100 @@ module-type: widget
       utils.inject(neighbours, nodes);
     }
     
+    // calculate levels if layout is set to hierarchical
+    
+    if(this.getView().getConfig("layout.active") === "hierarchical") {
+            
+      var ids = utils.getPropertiesByPrefix(
+                    this.getView().getConfig(),
+                    "config.layout.hierarchical.order-by-",
+                    true);
+                    
+      console.log("ids", ids);
+      
+      var labels = utils.getEmptyMap();
+      for(var id in ids) {
+        var tObj = utils.getTiddlerById(id);
+        if(tObj) {
+          labels[utils.getBasename(tObj.fields.title)] = true;
+        }
+      }
+      
+      console.log("labels", labels);
+            
+      this.setHierarchy(nodes, edges, function(edge) {
+        return labels[edge.label];
+      });
+      
+    }
+            
     // create data and lookup tables
     var graphData = {
       edges: edges,
-      nodes: nodes,
-      nodesByRef: utils.getLookupTable(nodes, "ref")
+      nodes: utils.convert(nodes, "dataset"),
+      nodesByRef: utils.getLookupTable(nodes, "ref"),
+      nodesById: nodes
     };
     
     return graphData;
         
   };
+   
+  TaskGraphWidget.prototype.setHierarchy = function(nodes, edges, orderDefiningEdgesFilter) {
+            
+    // Initialisation Part I
+    // Only calculate the hierarchy based on the edges defined by the user's filter
+    
+    var hierarchy = edges.get({
+      returnType: "Object",
+      filter: orderDefiningEdgesFilter
+    });
 
+    // Initialisation Part II
+    // Get all edges as array to allow faster iteration
+
+    var allEdges = edges.get();
+    
+    // Definition of the recursive function that is responsible for assigning ids.
+    
+    function assignLevel(curNode, level) {
+      
+      if(curNode.level) return; // already visited
+      
+      curNode.level = level;
+      
+      for(var i = 0; i < allEdges.length; i++) {
+        var edge = allEdges[i];
+        if(edge.from === curNode.id) { // outgoing connection
+          var toNode = nodes[edge.to];
+          if(hierarchy[edge.id]) { // edge that defines the hierarchical order
+            assignLevel(toNode, level + 1); // child of curNode
+          } else { // hierarchically equal relationship
+            assignLevel(toNode, level);
+          }
+        } else if(edge.to === curNode.id) { // incoming connection
+          var fromNode = nodes[edge.from];
+          if(hierarchy[edge.id]) { // edge that defines the hierarchical order
+            assignLevel(fromNode, level - 1); // parent of curNode
+          } else { // hierarchically equal relationship
+            assignLevel(fromNode, level);
+          }
+        }
+      }             
+    }
+
+    loop1: for(var nodeId in nodes) {
+      for(var edgeId in allEdges) {
+        if(nodes[nodeId].level || nodes[nodeId].id === allEdges[edgeId].to) {
+          // already assigned a level or not a root node
+          continue loop1;
+        }
+      }
+      assignLevel(nodes[nodeId], 1000);
+    }
+
+  };  
+  
   TaskGraphWidget.prototype.isViewBound = function() {
     
     return utils.startsWith(this.getViewHolderRef(),
@@ -578,8 +686,8 @@ module-type: widget
     this.rebuildGraph();
     
     // fix until zoomExtent() works
-    var center = this.network.getCenterCoordinates();
-    this.network.moveTo({position: center, scale: 0.8});
+    //~ var center = this.network.getCenterCoordinates();
+    //~ this.network.moveTo({position: center, scale: 0.8});
         
   };
   
@@ -613,6 +721,11 @@ module-type: widget
        enabled : true
     };
     
+    if(this.getView().getConfig("layout.active") === "hierarchical") {
+      options.hierarchicalLayout.enabled = true;
+      options.hierarchicalLayout.layout = "direction";
+    }
+        
     options.clickToUse = (this.getAttribute("click-to-use") !== "false");
         
     return options;
@@ -625,7 +738,7 @@ module-type: widget
    */
   TaskGraphWidget.prototype.handleCreateView = function() {
     
-    this.dialogManager.open(this.opt.ref.viewNameDialog, null, function(isConfirmed, outputTObj) {
+    this.dialogManager.open("getViewName", null, function(isConfirmed, outputTObj) {
     
       if(isConfirmed) {
         var view = this.adapter.createView(utils.getText(outputTObj));
@@ -643,11 +756,30 @@ module-type: widget
       return;
     }
     
-    this.dialogManager.open(this.opt.ref.viewNameDialog, null, function(isConfirmed, outputTObj) {
+    this.dialogManager.open("getViewName", null, function(isConfirmed, outputTObj) {
     
       if(isConfirmed) {
         this.view.rename(utils.getText(outputTObj));
         this.setView(this.view.getRoot());
+      }
+
+    });
+    
+  };
+  
+  TaskGraphWidget.prototype.handleEditView = function() {
+    
+    var params = {
+      "var.edgeFilterExpr": this.getView().getEdgeFilter("expression"),
+      dialog: {
+        preselects: this.getView().getConfig()
+      }
+    };
+    
+    this.dialogManager.open("editView", params, function(isConfirmed, outputTObj) {
+      if(isConfirmed && outputTObj) {
+        var updates = utils.getPropertiesByPrefix(outputTObj.fields, "config.");
+        this.getView().setConfig(updates);
       }
 
     });
@@ -674,7 +806,7 @@ module-type: widget
         filter : filter
       };
 
-      this.dialogManager.open(this.opt.ref.notAllowedToDeleteViewDialog, fields, null);
+      this.dialogManager.open("cannotDeleteViewDialog", fields, null);
 
       return;
       
@@ -706,6 +838,8 @@ module-type: widget
     
     this.adapter.insertEdge(edge, this.getView());
     
+    this.preventNextRepaint = true;
+    
   };
   
   /**
@@ -724,14 +858,7 @@ module-type: widget
                         
     if(elements.nodes.length) {
       
-      var fields = {
-        subtitle : "Please confirm your choice",
-        text: "By deleting a node you are also deleting the " +
-              "corresponding tiddler __and__ any edges connected " +
-              "to that node. Really proceed?"
-      };
-      
-      this.dialogManager.open(null, fields, function(isConfirmed) {
+      this.dialogManager.open("deleteNodeDialog", {}, function(isConfirmed) {
         
         if(!isConfirmed) return; // callback({}) ?
           
@@ -794,9 +921,9 @@ module-type: widget
       prettyFilter: this.getView().getPrettyNodeFilterExpr()
     };
     
-    this.dialogManager.open(this.opt.ref.editNodeFilter, fields, function(isConfirmed, outputTObj) {
+    this.dialogManager.open("editNodeFilter", fields, function(isConfirmed, outputTObj) {
       if(isConfirmed) {
-        this.getView().setNodeFilter(utils.getText(outputTObj));
+        this.getView().setNodeFilter(utils.getText(outputTObj, fields.prettyFilter));
       }
     });
       
@@ -876,7 +1003,7 @@ module-type: widget
         return;
       }
       
-      this.dialogManager.open(this.opt.ref.nodeNameDialog, null, function(isConfirmed, outputTObj) {
+      this.dialogManager.open("getNodeName", null, function(isConfirmed, outputTObj) {
         if(isConfirmed) {
           var node = properties.pointer.canvas;
           node.label = utils.getText(outputTObj);
@@ -978,7 +1105,10 @@ module-type: widget
    *     that were being dragged.
    */
   TaskGraphWidget.prototype.handleNodeDragEnd = function(properties) {
-    if(properties.nodeIds.length && !this.hasStartedDiving()) {
+    console.log(this.getView().getConfig("layout.active"));
+    if(properties.nodeIds.length
+       && !this.hasStartedDiving()
+       && this.getView().getConfig("layout.active") !== "hierarchical") {
       var mode = this.getView().isConfEnabled("physics_mode");
       this.setNodesMoveable([ properties.nodeIds[0] ], mode);
       this.handleStorePositions();

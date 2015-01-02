@@ -80,13 +80,27 @@ type: application/json
   "configurePhysics": false,
   "physics": {
     "barnesHut": {
-      "enabled": false,
+      "enabled": true,
       "theta": 1.6666666666667,
       "gravitationalConstant": -2500,
       "centralGravity": 0.35,
       "springLength": 240,
       "springConstant": 0.04,
       "damping": 0.5
+    },
+    "hierarchicalRepulsion": {
+      "centralGravity": 0.5,
+      "springLength": 400,
+      "springConstant": 0.01,
+      "nodeDistance": 200,
+      "damping": 0.09
+    },
+    "repulsion": {
+      "centralGravity": 0.3,
+      "springLength": 95,
+      "springConstant": 0.04,
+      "nodeDistance": 50,
+      "damping": 0.18
     },
     "damping": 0.18,
     "centralGravity": 0.3,
@@ -129,15 +143,15 @@ type: application/json
   },
   "hierarchicalLayout": {
     "enabled": false,
-    "levelSeparation": 150,
-    "nodeSpacing": 100,
+    "levelSeparation": 250,
+    "nodeSpacing": 200,
     "direction": "UD",
-    "layout": "hubsize"
+    "layout": "direction"
   },
   "freezeForStabilization": false,
   "smoothCurves": {
     "enabled": true,
-    "dynamic": true,
+    "dynamic": false,
     "type": "continuous",
     "roundness": 0.5
   },

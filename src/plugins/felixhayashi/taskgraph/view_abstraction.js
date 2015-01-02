@@ -46,10 +46,10 @@ var ViewAbstraction = function(view, isCreate) {
         
   if(isCreate) {
     this._createView();
-  } else if(!this.exists()) {
+  } else if(!this.exists()) { // no valid config path
     return; // skip initialization
   }
-    
+  
   this.path.map = this.path.config + "/map";
   this.path.nodeFilter = this.path.config + "/filter/nodes";
   this.path.edgeFilter = this.path.config + "/filter/edges";
@@ -153,8 +153,9 @@ ViewAbstraction.prototype.rebuildCache = function(components, isForceRebuild) {
 
   if(components.indexOf(this.path.config) != -1) {
     this.logger("debug", "View's config is requested to be rebuild -> trigger full rebuild");
-    // config changes often affect the whole views thinking, that's why
-    // it makes sense to blindly do a full rebuild!
+    // config changes (like changing to private edge mode) often affect
+    // the whole views thinking, that's why it makes sense to blindly
+    // do a full rebuild!
     components = utils.getValues(this.path);
   }
 
@@ -185,8 +186,6 @@ ViewAbstraction.prototype.rebuildCache = function(components, isForceRebuild) {
       case this.path.edgeFilter: 
         this.edgeFilter = this.getEdgeFilter(null, true);
         break;
-      case this.path.edgeFilter:
-        
       default:
         continue; // prevents a record in modified
     }
@@ -290,7 +289,9 @@ ViewAbstraction.prototype.isConfEnabled = function(name) {
  * Returns a configuration value relating to the given name. If no name
  * is given, an object with all configurations is returned.
  * 
- * @param {string} [name] - Use this param to control the output.
+ * @param {string} [name] - Instead of all configurations being returned,
+ *     only the configuration named name is returned. The initial "config."
+ *     may be omitted.
  * @param {boolean} [isRebuild] - True if to rebuild the cache, false otherwise.
  * @result {string|Object} If `type` is not specified an object containing
  *     all configurations is returned, otherwise a single value will be returned.
@@ -305,9 +306,30 @@ ViewAbstraction.prototype.getConfig = function(name, isRebuild) {
     var config = this.config;
   } else {
     var fields = this.wiki.getTiddler(this.path.config).fields;
-    var config = utils.getPropertiesByPrefix(fields, "config-", true);
+    var config = utils.getPropertiesByPrefix(fields, "config.");
   }
-  return (name ? config[name] : config);
+  
+  if(name) {
+    return config[(utils.startsWith(name, "config.") ? name : "config." + name)];
+  } else {
+    return config;
+  }
+  
+};
+
+ViewAbstraction.prototype.setConfig = function(config) {
+  
+  this.logger("log", "Updating config", this.config, "with", config);
+  
+  $tw.utils.extend(this.config, config);
+  
+  this.wiki.addTiddler(new $tw.Tiddler(
+    this.wiki.getTiddler(this.path.config),
+    this.config
+  ));
+  
+  this._ignoreOnNextRebuild[this.path.config] = true;
+  
 };
 
 /**

@@ -66,35 +66,17 @@ utils.getTiddlerIds = function(tiddlers, idFieldName) {
   
 };
 
-/**
- * Function to turn a collection of ids into a prototypeless object
- * where each key maps to a true in order to allow fast existence checks.
- * When `ids` is a dataset or a object (non array), the indeces are used
- * as keys. If `ids` is an array, the values are used as keys.
- * 
- * In java we would use a set for that.
- * 
- * Why bother? Using `Array.prototype.indexOf` is much slower than a
- * property check either via obj[key] === true or in hasOwnProperty(key);
- * 
- * @see http://jsperf.com/object-hasownproperty-vs-array-indexof
- * @param {Array.<Id>|vis.DataSet|object.<Id, *>} obj - A collection of ids.
- * @return {Hashmap} An object where every enumerable property equals true.
- */
-utils.getExistenceMap = function(ids) {
-    
-  if(ids instanceof vis.DataSet) {
-    ids = ids.getIds();
-  } else if(!Array.isArray(ids)) {
-    ids = Object.keys(ids);
-  }
-
-  var result = utils.getEmptyMap();
-  for(var i = 0; i < ids.length; i++) {
-    result[ids[i]] = true;    
-  }
+utils.getTiddlerById = function(id, idField) {
   
-  return result;
+  if(!idField) idField = "id";
+  
+  var allTiddlers = $tw.wiki.allTitles();
+  for(var i = 0; i < allTiddlers.length; i++) {
+    var tObj = utils.getTiddler(allTiddlers[i]);
+    if(tObj.fields[idField] === id) {
+      return tObj;
+    }
+  }
   
 };
 
@@ -617,6 +599,118 @@ utils.getTiddlersWithProperty = function(fieldName, value, options) {
   
 };
 
+/************************* 3rd-party code **************************/
+
+/**
+ * 
+ * Slightly modified by me to allow an optional prefix.
+ * 
+ * For the original code:
+ * 
+ * Copyright (c) 2014, Hugh Kennedy, All rights reserved.
+ * Code published under the BSD 3-Clause License
+ * 
+ * @see oringal repo https://github.com/hughsk/flat
+ * @see snapshot https://github.com/felixhayashi/flat
+ * @see http://opensource.org/licenses/BSD-3-Clause
+ */
+utils.flatten = function(target, opts) {
+  
+  opts = opts || {}
+
+  var delimiter = opts.delimiter || '.'
+  var output = {}
+
+  function step(object, prev) {
+    Object.keys(object).forEach(function(key) {
+      var value = object[key]
+      var isarray = opts.safe && Array.isArray(value)
+      var type = Object.prototype.toString.call(value)
+      var isobject = (
+        type === "[object Object]" ||
+        type === "[object Array]"
+      )
+
+      var newKey = prev
+        ? prev + delimiter + key
+        : opts.prefix + key
+
+      if (!isarray && isobject) {
+        return step(value, newKey)
+      }
+
+      output[newKey] = value
+    })
+  }
+
+  step(target)
+
+  return output;
+  
+};
+
+
+/**
+ * Copyright (c) 2014, Hugh Kennedy, All rights reserved.
+ * Code published under the BSD 3-Clause License
+ * 
+ * @see oringal repo https://github.com/hughsk/flat
+ * @see snapshot https://github.com/felixhayashi/flat
+ * @see http://opensource.org/licenses/BSD-3-Clause
+ */
+utils.unflatten = function(target, opts) {
+  
+  opts = opts || {}
+
+  var delimiter = opts.delimiter || '.'
+  var result = {}
+
+  if (Object.prototype.toString.call(target) !== '[object Object]') {
+    return target
+  }
+
+  // safely ensure that the key is
+  // an integer.
+  function getkey(key) {
+    var parsedKey = Number(key)
+
+    return (
+      isNaN(parsedKey) ||
+      key.indexOf('.') !== -1
+    ) ? key
+      : parsedKey
+  }
+
+  Object.keys(target).forEach(function(key) {
+    var split = key.split(delimiter)
+    var key1 = getkey(split.shift())
+    var key2 = getkey(split[0])
+    var recipient = result
+
+    while (key2 !== undefined) {
+      if (recipient[key1] === undefined) {
+        recipient[key1] = (
+          typeof key2 === 'number' &&
+          !opts.object ? [] : {}
+        )
+      }
+
+      recipient = recipient[key1]
+      if (split.length > 0) {
+        key1 = getkey(split.shift())
+        key2 = getkey(split[0])
+      }
+    }
+
+    // unflatten again for 'messy objects'
+    recipient[key1] = unflatten(target[key], opts)
+  })
+
+  return result;
+
+};
+
+
 /**
  * An adopted version of pmario's version to create
  * uuids of type RFC4122, version 4 ID.
@@ -639,7 +733,7 @@ utils.getTiddlersWithProperty = function(fieldName, value, options) {
 utils.genUUID = (function() {
   
   // Private array of chars to use
-  var CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split(''); 
+  var CHARS = '0123456789abcdefghijklmnopqrstuvwxyz'.split(''); 
 
   return function () {
     var chars = CHARS, uuid = new Array(36);

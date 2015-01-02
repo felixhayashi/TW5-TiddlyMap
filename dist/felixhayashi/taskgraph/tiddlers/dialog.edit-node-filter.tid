@@ -1,5 +1,5 @@
 title: $:/plugins/felixhayashi/taskgraph/dialog/editNodeFilter
-subtitle : Filter Editor
+subtitle: Filter Editor
 
 <div id="node-filter-dialog">
 

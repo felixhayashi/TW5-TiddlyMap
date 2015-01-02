@@ -53,6 +53,20 @@
 					</ul>
 				</li>
 				
+				<li class="dropdown">
+					<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="global.html">Global</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
 			</ul>
 		</div>
 	</div>
@@ -207,7 +221,7 @@ Dual licensed under the MIT and GPL licenses.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-639">line 639</a>
+				 <a href="utils.js.html#sunlight-1-line-733">line 733</a>
 			</li>
 		</ul>
 	</dd>
@@ -394,7 +408,7 @@ properties to Array.prototype :)</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-128">line 128</a>
+				 <a href="utils.js.html#sunlight-1-line-110">line 110</a>
 			</li>
 		</ul>
 	</dd>
@@ -572,6 +586,96 @@ properties to Array.prototype :)</p>
         
             
 <dt>
+    <h4 class="name" id="flatten"><span class="type-signature">&lt;static> </span>flatten<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Slightly modified by me to allow an optional prefix.</p>
+<p>For the original code:</p>
+<p>Copyright (c) 2014, Hugh Kennedy, All rights reserved.
+Code published under the BSD 3-Clause License</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="utils.js.html">utils.js</a>,
+				 <a href="utils.js.html#sunlight-1-line-617">line 617</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+	<dt class="tag-see">See:</dt>
+	<dd class="tag-see">
+		<ul>
+			<li>oringal repo https://github.com/hughsk/flat</li>
+			
+			<li>snapshot https://github.com/felixhayashi/flat</li>
+			
+			<li><a href="http://opensource.org/licenses/BSD-3-Clause">http://opensource.org/licenses/BSD-3-Clause</a></li>
+			</ul>
+	</dd>
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id="getArrayValuesAsHashmapKeys"><span class="type-signature">&lt;static> </span>getArrayValuesAsHashmapKeys<span class="signature">()</span><span class="type-signature"></span></h4>
     
     
@@ -618,7 +722,7 @@ properties to Array.prototype :)</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-573">line 573</a>
+				 <a href="utils.js.html#sunlight-1-line-555">line 555</a>
 			</li>
 		</ul>
 	</dd>
@@ -743,7 +847,7 @@ properties to Array.prototype :)</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-353">line 353</a>
+				 <a href="utils.js.html#sunlight-1-line-335">line 335</a>
 			</li>
 		</ul>
 	</dd>
@@ -891,7 +995,7 @@ properties to Array.prototype :)</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-418">line 418</a>
+				 <a href="utils.js.html#sunlight-1-line-400">line 400</a>
 			</li>
 		</ul>
 	</dd>
@@ -993,7 +1097,7 @@ e.g. visjs.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-241">line 241</a>
+				 <a href="utils.js.html#sunlight-1-line-223">line 223</a>
 			</li>
 		</ul>
 	</dd>
@@ -1016,173 +1120,6 @@ e.g. visjs.</p>
     
     
     
-    
-    
-</dd>
-
-        
-            
-<dt>
-    <h4 class="name" id="getExistenceMap"><span class="type-signature">&lt;static> </span>getExistenceMap<span class="signature">(obj)</span><span class="type-signature"> &rarr; {<a href="global.html#Hashmap">Hashmap</a>}</span></h4>
-    
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Function to turn a collection of ids into a prototypeless object
-where each key maps to a true in order to allow fast existence checks.
-When <code>ids</code> is a dataset or a object (non array), the indeces are used
-as keys. If <code>ids</code> is an array, the values are used as keys.</p>
-<p>In java we would use a set for that.</p>
-<p>Why bother? Using <code>Array.prototype.indexOf</code> is much slower than a
-property check either via obj[key] === true or in hasOwnProperty(key);</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        <h5>Parameters:</h5>
-        
-
-<table class="params table table-striped">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-
-		<th>Type</th>
-
-		
-
-		
-
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-
-	<tbody>
-	
-
-        <tr>
-            
-                <td class="name"><code>obj</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;<a href="global.html#Id">Id</a>></span>
-|
-
-<span class="param-type">vis.DataSet</span>
-|
-
-<span class="param-type">object.&lt;<a href="global.html#Id">Id</a>, *></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>A collection of ids.</p></td>
-        </tr>
-
-	
-	</tbody>
-</table>
-
-    
-    
-    
-<dl class="details">
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-
-
-	
-	<dt class="tag-source">Source:</dt>
-	<dd class="tag-source">
-		<ul class="dummy">
-			<li>
-				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-84">line 84</a>
-			</li>
-		</ul>
-	</dd>
-	
-
-	
-
-	
-	<dt class="tag-see">See:</dt>
-	<dd class="tag-see">
-		<ul>
-			<li><a href="http://jsperf.com/object-hasownproperty-vs-array-indexof">http://jsperf.com/object-hasownproperty-vs-array-indexof</a></li>
-			</ul>
-	</dd>
-	
-
-	
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    <p>An object where every enumerable property equals true.</p>
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type"><a href="global.html#Hashmap">Hashmap</a></span>
-
-
-	</dd>
-</dl>
-
-
-        
     
     
 </dd>
@@ -1286,7 +1223,7 @@ via <code>Object.keys(col)</code> in a loop.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-522">line 522</a>
+				 <a href="utils.js.html#sunlight-1-line-504">line 504</a>
 			</li>
 		</ul>
 	</dd>
@@ -1454,7 +1391,7 @@ via <code>Object.keys(col)</code> in a loop.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-109">line 109</a>
+				 <a href="utils.js.html#sunlight-1-line-91">line 91</a>
 			</li>
 		</ul>
 	</dd>
@@ -1655,7 +1592,7 @@ values are used as keys.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-540">line 540</a>
+				 <a href="utils.js.html#sunlight-1-line-522">line 522</a>
 			</li>
 		</ul>
 	</dd>
@@ -1898,7 +1835,7 @@ the wiki are considered.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-266">line 266</a>
+				 <a href="utils.js.html#sunlight-1-line-248">line 248</a>
 			</li>
 		</ul>
 	</dd>
@@ -2137,7 +2074,7 @@ a certain prefix. The prefix is optionally removed from the result.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-399">line 399</a>
+				 <a href="utils.js.html#sunlight-1-line-381">line 381</a>
 			</li>
 		</ul>
 	</dd>
@@ -2264,7 +2201,7 @@ if we are dealing with an object or a reference.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-341">line 341</a>
+				 <a href="utils.js.html#sunlight-1-line-323">line 323</a>
 			</li>
 		</ul>
 	</dd>
@@ -2593,7 +2530,7 @@ if we are dealing with an object or a reference.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-322">line 322</a>
+				 <a href="utils.js.html#sunlight-1-line-304">line 304</a>
 			</li>
 		</ul>
 	</dd>
@@ -2968,7 +2905,7 @@ if we are dealing with an object or a reference.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-593">line 593</a>
+				 <a href="utils.js.html#sunlight-1-line-575">line 575</a>
 			</li>
 		</ul>
 	</dd>
@@ -3117,7 +3054,7 @@ only properties are considered that are its own and iterable.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-195">line 195</a>
+				 <a href="utils.js.html#sunlight-1-line-177">line 177</a>
 			</li>
 		</ul>
 	</dd>
@@ -3266,7 +3203,7 @@ or, in case of an array, elements.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-452">line 452</a>
+				 <a href="utils.js.html#sunlight-1-line-434">line 434</a>
 			</li>
 		</ul>
 	</dd>
@@ -3444,7 +3381,7 @@ If the latter is the case, <code>hasOwnProperty()</code> doesn't exist.</li>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-231">line 231</a>
+				 <a href="utils.js.html#sunlight-1-line-213">line 213</a>
 			</li>
 		</ul>
 	</dd>
@@ -3605,7 +3542,7 @@ contain distinct values.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-169">line 169</a>
+				 <a href="utils.js.html#sunlight-1-line-151">line 151</a>
 			</li>
 		</ul>
 	</dd>
@@ -3777,7 +3714,7 @@ Returns a boolean value.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-309">line 309</a>
+				 <a href="utils.js.html#sunlight-1-line-291">line 291</a>
 			</li>
 		</ul>
 	</dd>
@@ -4035,7 +3972,7 @@ with a property having certain value. </p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-487">line 487</a>
+				 <a href="utils.js.html#sunlight-1-line-469">line 469</a>
 			</li>
 		</ul>
 	</dd>
@@ -4184,7 +4121,7 @@ temporary message.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-366">line 366</a>
+				 <a href="utils.js.html#sunlight-1-line-348">line 348</a>
 			</li>
 		</ul>
 	</dd>
@@ -4339,7 +4276,7 @@ temporary message.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-438">line 438</a>
+				 <a href="utils.js.html#sunlight-1-line-420">line 420</a>
 			</li>
 		</ul>
 	</dd>
@@ -4464,7 +4401,7 @@ temporary message.</p>
 		<ul class="dummy">
 			<li>
 				<a href="utils.js.html">utils.js</a>,
-				 <a href="utils.js.html#sunlight-1-line-382">line 382</a>
+				 <a href="utils.js.html#sunlight-1-line-364">line 364</a>
 			</li>
 		</ul>
 	</dd>
@@ -4514,6 +4451,94 @@ temporary message.</p>
     
 </dd>
 
+        
+            
+<dt>
+    <h4 class="name" id="unflatten"><span class="type-signature">&lt;static> </span>unflatten<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Copyright (c) 2014, Hugh Kennedy, All rights reserved.
+Code published under the BSD 3-Clause License</p>
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="utils.js.html">utils.js</a>,
+				 <a href="utils.js.html#sunlight-1-line-661">line 661</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+	<dt class="tag-see">See:</dt>
+	<dd class="tag-see">
+		<ul>
+			<li>oringal repo https://github.com/hughsk/flat</li>
+			
+			<li>snapshot https://github.com/felixhayashi/flat</li>
+			
+			<li><a href="http://opensource.org/licenses/BSD-3-Clause">http://opensource.org/licenses/BSD-3-Clause</a></li>
+			</ul>
+	</dd>
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
         </dl>
     
 
@@ -4540,7 +4565,7 @@ temporary message.</p>
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha11</a>
-		on 2014-12-28T01:16:31+01:00 using the <a
+		on 2015-01-02T02:48:16+01:00 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

@@ -680,7 +680,9 @@ Adapter.prototype.insertNode = function(node, options) {
     
   }
   
-  this.wiki.addTiddler(new $tw.Tiddler(fields));
+  this.wiki.addTiddler(new $tw.Tiddler(fields,
+                                       this.wiki.getModificationFields(),
+                                       this.wiki.getCreationFields()));
           
   return node;
   

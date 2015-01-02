@@ -2,7 +2,7 @@
 
 title: $:/plugins/felixhayashi/taskgraph/dialog_manager.js
 type: application/javascript
-module-type: widget
+module-type: library
 
 @preserve
 
@@ -65,50 +65,66 @@ module-type: widget
   * It is the result tiddler that triggers the dialog callback that was registered before.
   * the output is then read immediately from the output-tiddler.
   * 
-  * @param {$tw.Tiddler} skeleton - A skeleton tObj that is used as the dialog body
-  * @param {Hashmap} [fields] - More fields that can be added.
-  * @param {string} [fields.subtitle] - More fields that can be added. All
-  *     properties of fields will be accessible as variables in the modal
-  * @param {string} [fields.cancelButtonLabel] - The label of the cancel button.
-  * @param {string} [fields.confirmButtonLabel] - The label of the confirm button.
+  * @param {string} name - A suffix that denotes a tiddler if combined
+  *     with the dialog prefix.
+  * @param {Hashmap} [param] - All properties (except those with special meanings)
+  *     of param will be accessible as variables in the modal
+  * @param {string} [param.subtitle] - 
+  * @param {string} [param.cancelButtonLabel] - The label of the cancel button.
+  * @param {string} [param.confirmButtonLabel] - The label of the confirm button.
   * @param {function} [callback] - A function with the signature
   *     function(isConfirmed, outputTObj). `outputTObj` contains data
   *     produced by the dialog (can be undefined even if confirmed!).
   *     Be careful: the tiddler that outputTObj represents is deleted immediately.
   */
-  DialogManager.prototype.open = function(skeleton, fields, callback) {
-            
-    skeleton = utils.getTiddler(skeleton);
+  DialogManager.prototype.open = function(name, param, callback) {
     
-    var path = this.opt.path.dialogs + "/" + utils.genUUID();
-    var dialogFields = {
-      title : path,
-      output : path + "/output",
-      result : path + "/result",
-      footer : this.wiki.getTiddler(this.opt.ref.dialogStandardFooter).fields.text
+    if(!param) { param = {}; }
+    
+    // create a temporary tiddler reference for the dialog
+    var dialogTRef = this.opt.path.tempRoot + "/dialog-" + utils.genUUID();
+    
+    // fields used to handle the dialog process
+    var dialog = {
+      title: dialogTRef,
+      footer: utils.getText(this.opt.ref.dialogStandardFooter),
+      output: dialogTRef + "/output",
+      result: dialogTRef + "/result",
+      confirmButtonLabel: "Okay",
+      cancelButtonLabel: "Cancel"
     };
     
-    if(!fields || !fields.confirmButtonLabel) {
-      dialogFields.confirmButtonLabel = "Okay";
+    if(param.dialog) {
+      
+      if(param.dialog.preselects) {
+        
+        // register preselects
+        this.wiki.addTiddler(new $tw.Tiddler(
+          { title : dialog.output },
+          param.dialog.preselects
+        ));
+        
+        // remove preselects from param object
+        delete param.dialog.preselects;
+        
+      }
+      
+      // extend the dialog object with parameters provided by the user
+      $tw.utils.extend(dialog, param.dialog);
+      
+      // remove the user provided dialog object
+      delete param.dialog;
+      
     }
-    if(!fields || !fields.cancelButtonLabel) {
-      dialogFields.cancelButtonLabel = "Cancel";
-    }
- 
-    // https://github.com/Jermolene/TiddlyWiki5/blob/master/boot/boot.js#L761
-    var dialogTiddler = new $tw.Tiddler(skeleton, fields, dialogFields);
-    this.logger("debug", "A dialog will be opened based on the following tiddler:", dialogTiddler);
     
-    // https://github.com/Jermolene/TiddlyWiki5/blob/master/boot/boot.js#L841
-    this.wiki.addTiddler(dialogTiddler);
-
-    this.callbackRegistry.add(dialogFields.result, function(t) {
+    // add trigger 
+    this.callbackRegistry.add(dialog.result, function(t) {
 
       var triggerTObj = this.wiki.getTiddler(t);
       var isConfirmed = triggerTObj.fields.text;
       
       if(isConfirmed) {
-        var outputTObj = this.wiki.getTiddler(dialogFields.output);
+        var outputTObj = this.wiki.getTiddler(dialog.output);
       } else {
         var outputTObj = null;
         $tw.taskgraph.notify("operation cancelled");
@@ -116,22 +132,27 @@ module-type: widget
       
       if(typeof callback == "function") {
         if(this.context) {
-          console.log("callback executed1");
           callback.call(this.context, isConfirmed, outputTObj);
         } else {
-          console.log("callback executed2");
           callback(isConfirmed, outputTObj);
         }
       }
       
       // close and remove the tiddlers
-      utils.deleteTiddlers([dialogFields.title, dialogFields.output, dialogFields.result]);
+      utils.deleteTiddlers([dialog.title, dialog.output, dialog.result]);
       
     }.bind(this), true);
-            
+    
+    // get the dialog template
+    var skeleton = utils.getTiddler(this.opt.path.dialogs + "/" + name);
+    var dialogTiddler = new $tw.Tiddler(skeleton, param, dialog);
+    this.wiki.addTiddler(dialogTiddler);
+    
     $tw.rootWidget.dispatchEvent({
       type: "tm-modal", param : dialogTiddler.fields.title, paramObject: dialogTiddler.fields
     }); 
+    
+    this.logger("debug", "Opened dialog", dialogTiddler);
     
   };
 

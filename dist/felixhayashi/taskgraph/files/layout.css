@@ -4,6 +4,10 @@ html {
     background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/taskgraph/media/surface.png!!type}} text={{$:/plugins/felixhayashi/taskgraph/media/surface.png}}/>'));
   }
   */ }
+  html .small-list {
+    overflow: auto;
+    height: 150px;
+    width: 250px; }
   html .quick-connect.tc-drop-down {
     font-size: 0.5em;
     right: 50px;
@@ -36,6 +40,12 @@ html {
       padding-bottom: 0px; }
       html .tc-modal-wrapper .tc-modal-header h3 {
         line-height: 10px; }
+    html .tc-modal-wrapper .tc-modal-body fieldset legend {
+      font-weight: bold; }
+    html .tc-modal-wrapper .tc-modal-body fieldset ul {
+      padding-left: 30px; }
+      html .tc-modal-wrapper .tc-modal-body fieldset ul li {
+        list-style: none; }
     html .tc-modal-wrapper .tc-modal-footer {
       padding-top: 0px;
       padding-bottom: 0px; }

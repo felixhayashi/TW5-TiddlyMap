@@ -1,5 +1,11 @@
 html { // used to increase css importance
 
+  .small-list {
+    overflow: auto;
+    height: 150px;
+    width: 250px;
+  }
+
   .quick-connect {
 
     &.tc-drop-down {
@@ -52,7 +58,27 @@ html { // used to increase css importance
       h3 {
         line-height: 10px;
       }
+
+    }
+    
+    .tc-modal-body {
       
+      fieldset {
+      
+        legend {
+          font-weight: bold;
+        }
+        
+        ul {
+          
+          padding-left: 30px;
+          
+          li {
+            list-style: none;
+          }
+          
+        }
+      }
     }
 
     .tc-modal-footer {
@@ -221,6 +247,5 @@ html { // used to increase css importance
         box-shadow: none;
       }
     }
-    
   }
 }

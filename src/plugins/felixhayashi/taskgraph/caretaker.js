@@ -68,20 +68,14 @@ say here is: do not require the caretaker!
     // temporary environment
     opt.path.tempRoot =     "$:/temp/felixhayashi/taskgraph";
     opt.path.localHolders = "$:/temp/felixhayashi/taskgraph/holders";
-    opt.path.dialogs =      "$:/temp/felixhayashi/taskgraph/dialog";
+    opt.path.dialogs =      "$:/plugins/felixhayashi/taskgraph/dialog";
     
     // static references to important tiddlers
     if(!opt.ref) opt.ref = utils.getEmptyMap();
     
     opt.ref.dialogStandardFooter =   "$:/plugins/felixhayashi/taskgraph/dialog/standardFooter";
     opt.ref.visOptions =             "$:/plugins/felixhayashi/taskgraph/options/vis";
-    opt.ref.tgOptions =              "$:/plugins/felixhayashi/taskgraph/options/taskgraph";
-    opt.ref.edgeTypeDialog =         "$:/plugins/felixhayashi/taskgraph/dialog/getEdgeType";
-    opt.ref.viewNameDialog =         "$:/plugins/felixhayashi/taskgraph/dialog/getViewName";
-    opt.ref.confirmationDialog =     "$:/plugins/felixhayashi/taskgraph/dialog/getConfirmation";
-    opt.ref.nodeNameDialog =         "$:/plugins/felixhayashi/taskgraph/dialog/getNodeName";
-    opt.ref.editNodeFilter =         "$:/plugins/felixhayashi/taskgraph/dialog/editNodeFilter";
-    opt.ref.cannotDeleteViewDialog = "$:/plugins/felixhayashi/taskgraph/dialog/cannotDeleteViewDialog";
+    opt.ref.tgOptions =              "$:/plugins/felixhayashi/taskgraph/options/taskgraph";    
     opt.ref.defaultGraphViewHolder = "$:/plugins/felixhayashi/taskgraph/misc/defaultViewHolder";
     opt.ref.graphBar =               "$:/plugins/felixhayashi/taskgraph/misc/advancedEditorBar";
     
@@ -103,7 +97,7 @@ say here is: do not require the caretaker!
     if(!opt.misc) opt.misc = utils.getEmptyMap();
     
     // if no edge label is specified, this is used as label
-    opt.misc.unknownEdgeLabel = "(!noname!)";
+    opt.misc.unknownEdgeLabel = "__noname__";
 
     // some popular filters (usually used from within tiddlers via tgmacro)
     if(!opt.filter) opt.filter = utils.getEmptyMap();
@@ -194,7 +188,7 @@ say here is: do not require the caretaker!
     // all graphs need to register here.
     // @see routineWalk()
     $tw.taskgraph.registry = [];
-    window.setInterval(routineCheck, 500);
+    window.setInterval(routineCheck, 1000);
     
     // build and integrate global options
     $tw.taskgraph.opt = utils.getEmptyMap();

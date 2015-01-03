@@ -8,7 +8,7 @@ type: text/x-markdown
 
 ## What it can do for you
 
-TW-TiddlyMap is a [TiddlyWiki](http://tiddlywiki.com/) (TW5) plugin that allows you to link your wiki-topics (tiddlers) in order to create *clickable graphs*. By creating relations between your topics you can easily do the following:
+TiddlyMap is a [TiddlyWiki](http://tiddlywiki.com/) (TW5) plugin that allows you to link your wiki-topics (tiddlers) in order to create *clickable graphs*. By creating relations between your topics you can easily do the following:
 
 * **Create mindmaps** and quickly manifest your ideas in tiddlers (wiki entries).
 * **Create task-dependency graphs** to organize and describe your tasks.
@@ -18,7 +18,7 @@ In general you may **create, visualize and describe any network-structure** you 
 
 ## How it works
 
-TW-TiddlyMap combines the strength of two open-source projects:
+TiddlyMap combines the strength of two open-source projects:
 
 **⤍ The TiddlyWiki Project**
 
@@ -34,7 +34,7 @@ The TiddlyWiki project is a flourishing community project under the lead of its 
 
 **⤍ The Vis.js Project**
 
-For graph visualization and manipulation, tw-tiddlymap draws upon the popular open-source [vis.js](http://visjs.org/) library - *a dynamic, browser based visualization library* actively developed and maintained by a team of enthusiastic developers working at [Almende B.V](|http://almende.com).
+For graph visualization and manipulation, TiddlyMap draws upon the popular open-source [vis.js](http://visjs.org/) library - *a dynamic, browser based visualization library* actively developed and maintained by a team of enthusiastic developers working at [Almende B.V](|http://almende.com).
 
 > The library is designed to be easy to use, handle large amounts of dynamic data, and enable manipulation of the data
 >  - [visjs.org](|http://visjs.org/)

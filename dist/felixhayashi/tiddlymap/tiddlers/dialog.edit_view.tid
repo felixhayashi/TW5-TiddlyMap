@@ -1,0 +1,41 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/editView
+subtitle: View Configuration
+
+\define checkbox(field, title) <$checkbox tiddler=<<output>> field="$field$" checked="true" unchecked="false" default="false"> $title$</$checkbox>
+
+\define orderByEdgeField() config.layout.hierarchical.order-by-$(curEdgeId)$
+
+<fieldset><legend>Layout</legend>
+  <$radio tiddler=<<output>> field="config.layout.active" value="hierarchical"> Hierachical layout</$radio>
+  -- //Display nodes hierarchically ordered.//
+  <ul>
+    <li>
+      Which relations define the hierarchical order?
+      <div class="small-list">
+        <$list filter=<<var.edgeFilterExpr>> >
+          <$set name="curEdgeId" value={{!!id}}>
+          <$checkbox tiddler=<<output>> field=<<orderByEdgeField>> checked="true" unchecked="false" default="false">
+            <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
+          </$checkbox>
+          <br />
+          </$set>
+        </$list>
+      </div>
+    </li>
+  </ul>
+  
+  <$radio tiddler=<<output>> field="config.layout.active" value="user"> User defined layout</$radio>
+  -- //Position nodes on the canvas without any restriction.//
+
+</fieldset>
+
+<fieldset><legend>Other</legend>
+  
+  <<checkbox "config.physics_mode" "Floating nodes">>
+  -- //Set this to true if you want your nodes to freely swirl around.//<br />
+  <<checkbox "config.private_edge_mode" "Private edge mode">>
+  -- //Use local edges that __exclusively__ belong to this particular view.//<br />
+  <<checkbox "config.node_diving" "Node diving mode">>
+  -- //Clicking on a node of your graph exclusively display the clicked node and its neighbours.//
+  
+</fieldset>

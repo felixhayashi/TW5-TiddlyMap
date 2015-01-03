@@ -1,0 +1,22 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/getEdgeType
+subtitle: You are about to connect "<<fromLabel>>" with "<<toLabel>>"
+
+\define getLabel()
+<$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
+\end
+
+''Type'': Please choose an existing relationship type from the list or specify a new one. <sup>[1]</sup>
+
+<!-- "One trap to be aware of is that the edit text widget cannot be used to edit a field of the tiddler that contains it. Each keypress results in the tiddler being re-rendered, which loses the cursor position within the text field." -->
+<$edit-text tiddler=<<output>> field="text" type="text" tag="input" default=""></$edit-text>
+<$select tiddler=<<output>> default="">
+  <option></option>
+    <$list filter=<<edgeFilterExpr>> >
+      <!-- if no value element is specified text is used; see http://dev.w3.org/html5/spec-preview/the-option-element.html -->
+      <option value={{!!title}} >{{!!title}}</option>
+    </$list>
+</$select>
+
+---
+
+<sup>[1]</sup> <small>Please note that the name of the relationship type is case sensitive.</small>

@@ -1,0 +1,3 @@
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/quick_connect
+config.display_neighbours: true
+config.physics_mode: true

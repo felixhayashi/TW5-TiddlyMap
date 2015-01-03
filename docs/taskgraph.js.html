@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>TW-Taskgraph Source: taskgraph.js</title>
+	<title>TiddlyMap Source: taskgraph.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -18,7 +18,7 @@
 <div class="container-fluid">
 	<div class="navbar navbar-fixed-top navbar-inverse">
 		<div class="navbar-inner">
-			<a class="brand" href="index.html">TW-Taskgraph</a>
+			<a class="brand" href="index.html">TiddlyMap</a>
 			<ul class="nav">
 				
 				<li class="dropdown">
@@ -87,7 +87,7 @@
 		<pre
 			class="sunlight-highlight-javascript linenums">/*\
 
-title: $:/plugins/felixhayashi/taskgraph/taskgraph.js
+title: $:/plugins/felixhayashi/tiddlymap/tiddlymap.js
 type: application/javascript
 module-type: widget
 
@@ -105,10 +105,10 @@ module-type: widget
   /**************************** IMPORTS ****************************/
    
   var Widget = require("$:/core/modules/widgets/widget.js").widget;
-  var ViewAbstraction = require("$:/plugins/felixhayashi/taskgraph/view_abstraction.js").ViewAbstraction;
-  var CallbackRegistry = require("$:/plugins/felixhayashi/taskgraph/callback_registry.js").CallbackRegistry;
-  var DialogManager = require("$:/plugins/felixhayashi/taskgraph/dialog_manager.js").DialogManager;
-  var utils = require("$:/plugins/felixhayashi/taskgraph/utils.js").utils;
+  var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/view_abstraction.js").ViewAbstraction;
+  var CallbackRegistry = require("$:/plugins/felixhayashi/tiddlymap/callback_registry.js").CallbackRegistry;
+  var DialogManager = require("$:/plugins/felixhayashi/tiddlymap/dialog_manager.js").DialogManager;
+  var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
   var vis = require("$:/plugins/felixhayashi/vis/vis.js");
 
   /***************************** CODE ******************************/
@@ -116,14 +116,14 @@ module-type: widget
   /**
    * @constructor
    */
-  var TaskGraphWidget = function(parseTreeNode, options) {
+  var TiddlyMapWidget = function(parseTreeNode, options) {
     
     // Main initialisation inherited from widget.js
     this.initialise(parseTreeNode, options);
     
     // create shortcuts and aliases
-    this.adapter = $tw.taskgraph.adapter;
-    this.opt = $tw.taskgraph.opt;
+    this.adapter = $tw.tiddlymap.adapter;
+    this.opt = $tw.tiddlymap.opt;
     
     // key (a tiddler) -> callback (called when tiddler changes)
     this.callbackRegistry = new CallbackRegistry();
@@ -151,7 +151,7 @@ module-type: widget
   };
   
   // !! EXTENSION !!
-  TaskGraphWidget.prototype = new Widget();
+  TiddlyMapWidget.prototype = new Widget();
   // !! EXTENSION !!
     
   /**
@@ -168,7 +168,7 @@ module-type: widget
    * @param {function} [callback] - A function with the signature
    *    function(isConfirmed);
    */
-  TaskGraphWidget.prototype.handleConnectionEvent = function(edge, callback) {
+  TiddlyMapWidget.prototype.handleConnectionEvent = function(edge, callback) {
 
     var edgeFilterExpr = this.getView().getAllEdgesFilterExpr(true);
 
@@ -206,7 +206,7 @@ module-type: widget
    * @param {function} [callback] - A function with the signature function(isConfirmed).
    * @param {string} [message] - An small optional message to display.
    */
-  TaskGraphWidget.prototype.openStandardConfirmDialog = function(callback, message) {
+  TiddlyMapWidget.prototype.openStandardConfirmDialog = function(callback, message) {
   
     // TODO: option paths seriously need some refactoring!
 
@@ -221,12 +221,12 @@ module-type: widget
     this.dialogManager.open("getConfirmation", param, callback);
   };
     
-  TaskGraphWidget.prototype.logger = function(type, message /*, more stuff*/) {
+  TiddlyMapWidget.prototype.logger = function(type, message /*, more stuff*/) {
     
     var args = Array.prototype.slice.call(arguments, 1);
     args.unshift("@" + this.objectId.toUpperCase());
     args.unshift(type);
-    $tw.taskgraph.logger.apply(this, args);
+    $tw.tiddlymap.logger.apply(this, args);
     
   };
   
@@ -236,7 +236,7 @@ module-type: widget
    * 
    * @override
    */
-  TaskGraphWidget.prototype.render = function(parent, nextSibling) {
+  TiddlyMapWidget.prototype.render = function(parent, nextSibling) {
     
     // remember our place in the dom
     this.registerParentDomNode(parent);
@@ -260,7 +260,7 @@ module-type: widget
     this.initAndRenderGraph(parent);
     
     // register this graph at the caretaker's graph registry
-    $tw.taskgraph.registry.push(this);
+    $tw.tiddlymap.registry.push(this);
     
   };
   
@@ -268,10 +268,10 @@ module-type: widget
    * Add some classes to give the user a chance to apply some css
    * to different graph modes.
    */
-  TaskGraphWidget.prototype.registerParentDomNode = function(parent) {
+  TiddlyMapWidget.prototype.registerParentDomNode = function(parent) {
     this.parentDomNode = parent;
-    if(!$tw.utils.hasClass(parent, "taskgraph")) {
-      $tw.utils.addClass(parent, "taskgraph");
+    if(!$tw.utils.hasClass(parent, "tiddlymap")) {
+      $tw.utils.addClass(parent, "tiddlymap");
       if(this.getAttribute("click-to-use") !== "false") {
         $tw.utils.addClass(parent, "click-to-use");
       }
@@ -281,10 +281,10 @@ module-type: widget
     }
   }
   
-  TaskGraphWidget.prototype.handleSpecialViews = function() {
+  TiddlyMapWidget.prototype.handleSpecialViews = function() {
     
     if(this.view.getLabel() === "quick_connect") {
-      var tRef = "$:/temp/felixhayashi/taskgraph/quick_connect_search";
+      var tRef = "$:/temp/felixhayashi/tiddlymap/quick_connect_search";
       this.wiki.setText(tRef, "text", null, ""); // clear
       var filter = "[search{" + tRef + "}!is[system]limit[10]]" + // search
                    "[field:title[" + this.getVariable("currentTiddler") + "]]"; // always
@@ -300,7 +300,7 @@ module-type: widget
    * @param {Element} parent The dom node in which the editor bar will
    *     be injected in.
    */
-  TaskGraphWidget.prototype.initAndRenderEditorBar = function(parent) {
+  TiddlyMapWidget.prototype.initAndRenderEditorBar = function(parent) {
     
     if(this.editorMode === "advanced") {
     
@@ -320,7 +320,7 @@ module-type: widget
    * 
    * @see https://groups.google.com/forum/#!topic/tiddlywikidev/sJrblP4A0o4
    */
-  TaskGraphWidget.prototype.rebuildEditorBar = function() {
+  TiddlyMapWidget.prototype.rebuildEditorBar = function() {
     
     if(this.editorMode === "advanced") {
     
@@ -374,7 +374,7 @@ module-type: widget
    * @override Widget.refresh();
    * @see https://groups.google.com/d/msg/tiddlywikidev/hwtX59tKsIk/EWSG9glqCnsJ
    */
-  TaskGraphWidget.prototype.refresh = function(changedTiddlers) {
+  TiddlyMapWidget.prototype.refresh = function(changedTiddlers) {
         
     // in any case, check for callbacks triggered by tiddlers
     this.callbackRegistry.handleChanges(changedTiddlers);
@@ -411,7 +411,7 @@ module-type: widget
    * param {NodeCollection} [nodes] - An optional set of nodes to use
    * instead of the set created according to the nodes filter.
    */
-  TaskGraphWidget.prototype.rebuildGraph = function(options) {
+  TiddlyMapWidget.prototype.rebuildGraph = function(options) {
     
     this.logger("debug", "Rebuilding graph");
     
@@ -430,7 +430,7 @@ module-type: widget
     this.preventNextRepaint = false;       
   };
   
-  TaskGraphWidget.prototype.hasStartedDiving = function() {
+  TiddlyMapWidget.prototype.hasStartedDiving = function() {
     return (this.lastNodeDoubleClicked &amp;&amp; this.getView().isConfEnabled("node_diving"));
   }
   
@@ -438,7 +438,7 @@ module-type: widget
    * Warning: Do not change this functionname as it is used by the
    * caretaker's routinely checkups.
    */
-  TaskGraphWidget.prototype.getContainer = function() {
+  TiddlyMapWidget.prototype.getContainer = function() {
     return this.parentDomNode;
   }
   
@@ -449,7 +449,7 @@ module-type: widget
    *     a nodes collection will always recreate the cache despite the value
    *     of `isRebuild`.
    */
-  TaskGraphWidget.prototype.getGraphData = function(isRebuild) {
+  TiddlyMapWidget.prototype.getGraphData = function(isRebuild) {
       
     if(!isRebuild &amp;&amp; this.graphData) {
       return this.graphData;
@@ -549,7 +549,7 @@ module-type: widget
         
   };
    
-  TaskGraphWidget.prototype.setHierarchy = function(nodes, edges, orderDefiningEdgesFilter) {
+  TiddlyMapWidget.prototype.setHierarchy = function(nodes, edges, orderDefiningEdgesFilter) {
             
     // Initialisation Part I
     // Only calculate the hierarchy based on the edges defined by the user's filter
@@ -604,14 +604,14 @@ module-type: widget
 
   };  
   
-  TaskGraphWidget.prototype.isViewBound = function() {
+  TiddlyMapWidget.prototype.isViewBound = function() {
     
     return utils.startsWith(this.getViewHolderRef(),
                             this.opt.path.localHolders);  
     
   };  
   
-  TaskGraphWidget.prototype.isViewSwitched = function(changedTiddlers) {
+  TiddlyMapWidget.prototype.isViewSwitched = function(changedTiddlers) {
   
     if(this.isViewBound()) {
       return false; // bound views can never be switched!
@@ -624,7 +624,7 @@ module-type: widget
   /**
    * This method will ckeck if any tw-widget needs a refresh.
    */
-  TaskGraphWidget.prototype.checkOnEditorBar = function(changedTiddlers, isViewSwitched, viewModifications) {
+  TiddlyMapWidget.prototype.checkOnEditorBar = function(changedTiddlers, isViewSwitched, viewModifications) {
     
     // @TODO viewModifications is actually really heavy. I could narrow this.
     if(isViewSwitched || viewModifications.length) {
@@ -655,7 +655,7 @@ module-type: widget
    * 3. An edge that matches the edge filter has been added or removed.
    * 
    */
-  TaskGraphWidget.prototype.checkOnGraph = function(changedTiddlers) {
+  TiddlyMapWidget.prototype.checkOnGraph = function(changedTiddlers) {
             
     var nodeFilter = this.getView().getNodeFilter("compiled");
     
@@ -701,7 +701,7 @@ module-type: widget
    *   - http://visjs.org/docs/network.html
    *   - http://visjs.org/docs/dataset.html
    */
-  TaskGraphWidget.prototype.initAndRenderGraph = function(parent) {
+  TiddlyMapWidget.prototype.initAndRenderGraph = function(parent) {
     
     this.logger("info", "Initializing and rendering the graph");
     
@@ -778,9 +778,9 @@ module-type: widget
         
   };
   
-  TaskGraphWidget.prototype.getGraphOptions = function() {
+  TiddlyMapWidget.prototype.getGraphOptions = function() {
     
-    // current vis options can be found at $tw.taskgraph.logger("log", this.network.constants);
+    // current vis options can be found at $tw.tiddlymap.logger("log", this.network.constants);
     
     // get a copy of the options
     var options = this.wiki.getTiddlerData(this.opt.ref.visOptions);
@@ -823,7 +823,7 @@ module-type: widget
    * Create an empty view. A dialog is opened that asks the user how to
    * name the view. The view is then registered as current view.
    */
-  TaskGraphWidget.prototype.handleCreateView = function() {
+  TiddlyMapWidget.prototype.handleCreateView = function() {
     
     this.dialogManager.open("getViewName", null, function(isConfirmed, outputTObj) {
     
@@ -836,10 +836,10 @@ module-type: widget
     
   };
 
-  TaskGraphWidget.prototype.handleRenameView = function() {
+  TiddlyMapWidget.prototype.handleRenameView = function() {
     
     if(this.getView().getLabel() === "default") {
-      $tw.taskgraph.notify("Thou shalt not rename the default view!");
+      $tw.tiddlymap.notify("Thou shalt not rename the default view!");
       return;
     }
     
@@ -854,7 +854,7 @@ module-type: widget
     
   };
   
-  TaskGraphWidget.prototype.handleEditView = function() {
+  TiddlyMapWidget.prototype.handleEditView = function() {
     
     var params = {
       "var.edgeFilterExpr": this.getView().getEdgeFilter("expression"),
@@ -873,17 +873,17 @@ module-type: widget
     
   };
 
-  TaskGraphWidget.prototype.handleDeleteView = function() {
+  TiddlyMapWidget.prototype.handleDeleteView = function() {
     
     var viewname = this.getView().getLabel();
     
     if(viewname === "default") {
-      $tw.taskgraph.notify("Thou shalt not kill the default view!");
+      $tw.tiddlymap.notify("Thou shalt not kill the default view!");
       return;
     }
     
     // regex is non-greedy
-    var filter = "[regexp:text[&lt;\\$taskgraph.*?view=." + viewname + "..*?>]]";
+    var filter = "[regexp:text[&lt;\\$tiddlymap.*?view=." + viewname + "..*?>]]";
     var matches = utils.getMatches(filter);
     
     if(matches.length) {
@@ -907,14 +907,14 @@ module-type: widget
       if(isConfirmed) {
         this.getView().destroy();
         this.setView(this.opt.path.views + "/default");
-        $tw.taskgraph.notify("view \"" + viewname + "\" deleted ");
+        $tw.tiddlymap.notify("view \"" + viewname + "\" deleted ");
       }
 
     }, message);
     
   };
   
-  TaskGraphWidget.prototype.handleReconnectEdge = function(updatedEdge) {
+  TiddlyMapWidget.prototype.handleReconnectEdge = function(updatedEdge) {
 
     var edge = this.graphData.edges.get(updatedEdge.id);
     $tw.utils.extend(edge, updatedEdge);
@@ -936,11 +936,11 @@ module-type: widget
    * @param {Array&lt;Id>} elements.nodes - Removed edges.
    * @param {Array&lt;Id>} elements.edges - Removed nodes.
    */
-  TaskGraphWidget.prototype.handleRemoveElement = function(elements) {
+  TiddlyMapWidget.prototype.handleRemoveElement = function(elements) {
     
     if(elements.edges.length &amp;&amp; !elements.nodes.length) { // only deleting edges
       this.adapter.deleteEdgesFromStore(this.graphData.edges.get(elements.edges), this.getView());
-      $tw.taskgraph.notify("edge" + (elements.edges.length > 1 ? "s" : "") + " removed");
+      $tw.tiddlymap.notify("edge" + (elements.edges.length > 1 ? "s" : "") + " removed");
     }
                         
     if(elements.nodes.length) {
@@ -956,15 +956,15 @@ module-type: widget
           this.adapter.deleteNodesFromStore(nodes);
           this.adapter.deleteEdgesFromStore(edges, this.getView());
           
-          $tw.taskgraph.notify("node" + (elements.nodes.length > 1 ? "s" : "") + " removed");
+          $tw.tiddlymap.notify("node" + (elements.nodes.length > 1 ? "s" : "") + " removed");
         
       });
     }     
   }
   
-  TaskGraphWidget.prototype.handleImportTiddlers = function(event) {
+  TiddlyMapWidget.prototype.handleImportTiddlers = function(event) {
     
-    //var pos = this.network.DOMtoCanvas($tw.taskgraph.mouseDropPos);
+    //var pos = this.network.DOMtoCanvas($tw.tiddlymap.mouseDropPos);
     var pos = this.network.getCenterCoordinates();
     var tiddlers = JSON.parse(event.param);
         
@@ -997,12 +997,12 @@ module-type: widget
     
   };
   
-  TaskGraphWidget.prototype.handleStorePositions = function() {
+  TiddlyMapWidget.prototype.handleStorePositions = function() {
     this.adapter.storePositions(this.network.getPositions(), this.getView());
-    $tw.taskgraph.notify("positions stored");
+    $tw.tiddlymap.notify("positions stored");
   };
   
-  TaskGraphWidget.prototype.handleEditNodeFilter = function() {
+  TiddlyMapWidget.prototype.handleEditNodeFilter = function() {
 
     var fields = {
       prettyFilter: this.getView().getPrettyNodeFilterExpr()
@@ -1023,7 +1023,7 @@ module-type: widget
    * as this will affect other graphs positions and will cause recursion!
    * Storing positions inside vis' nodes is fine though
    */
-  TaskGraphWidget.prototype.handleStabilizedEvent = function(properties) {
+  TiddlyMapWidget.prototype.handleStabilizedEvent = function(properties) {
     
     if(!this.hasNetworkStabilized) {
       this.hasNetworkStabilized = true;
@@ -1042,7 +1042,7 @@ module-type: widget
    * @param {boolean} isEnabled - True, if the nodes are allowed to
    *     move or be moved.
    */    
-  TaskGraphWidget.prototype.setNodesMoveable = function(ids, isMoveable) {
+  TiddlyMapWidget.prototype.setNodesMoveable = function(ids, isMoveable) {
 
     //this.logger("log", "Nodes", ids, "can move:", isMoveable);
     
@@ -1063,7 +1063,7 @@ module-type: widget
 
   };
 
-  TaskGraphWidget.prototype.insertNode = function(node) {
+  TiddlyMapWidget.prototype.insertNode = function(node) {
     this.preventNextRepaint = true;
     this.adapter.insertNode(node, {
       view: this.getView(),
@@ -1082,7 +1082,7 @@ module-type: widget
    * @properties a list of nodes and/or edges that correspond to the
    * click event.
    */
-  TaskGraphWidget.prototype.handleDoubleClickEvent = function(properties) {
+  TiddlyMapWidget.prototype.handleDoubleClickEvent = function(properties) {
     
     if(!properties.nodes.length &amp;&amp; !properties.edges.length) { // clicked on an empty spot
       
@@ -1148,7 +1148,7 @@ module-type: widget
    *     https://groups.google.com/d/topic/tiddlywikidev/yuQB1KwlKx8/discussion
    *   - https://developer.mozilla.org/en-US/docs/Web/API/Node.contains
    */
-  TaskGraphWidget.prototype.handleResizeEvent = function(event) {
+  TiddlyMapWidget.prototype.handleResizeEvent = function(event) {
 
     if(this.network) {
       this.maxEnlargeGraphContainer(); // resize container
@@ -1160,7 +1160,7 @@ module-type: widget
   /**
    * called from outside.
    */
-  TaskGraphWidget.prototype.destruct = function() {
+  TiddlyMapWidget.prototype.destruct = function() {
     window.removeEventListener("resize", this.handleResizeEvent);
     this.network.destroy();
   };
@@ -1168,7 +1168,7 @@ module-type: widget
   /**
    * used to prevent nasty deletion as edges are not unselected when leaving vis
    */
-  TaskGraphWidget.prototype.handleClickEvent = function(event) {
+  TiddlyMapWidget.prototype.handleClickEvent = function(event) {
 
     if(!document.body.contains(this.parentDomNode)) {
       window.removeEventListener("click", this.handleClickEvent);
@@ -1191,7 +1191,7 @@ module-type: widget
    * @param {Array&lt;Id>} properties.nodeIds - Array of ids of the nodes
    *     that were being dragged.
    */
-  TaskGraphWidget.prototype.handleNodeDragEnd = function(properties) {
+  TiddlyMapWidget.prototype.handleNodeDragEnd = function(properties) {
     console.log(this.getView().getConfig("layout.active"));
     if(properties.nodeIds.length
        &amp;&amp; !this.hasStartedDiving()
@@ -1209,7 +1209,7 @@ module-type: widget
    * @param {Array&lt;Id>} properties.nodeIds - Array of ids of the nodes
    *     that are being dragged.
    */
-  TaskGraphWidget.prototype.handleNodeDragStart = function(properties) {
+  TiddlyMapWidget.prototype.handleNodeDragStart = function(properties) {
     if(properties.nodeIds.length) {
       this.setNodesMoveable([ properties.nodeIds[0] ], true);
     }
@@ -1221,13 +1221,13 @@ module-type: widget
    * attribute, the default view holder is used. Otherwise, a temporary
    * holder is created whose value is set to the view specified by the user.
    * This way, the graph is independent from view changes made in a
-   * taskgraph editor.
+   * tiddlymap editor.
    * 
    * This function will only calculate a new reference to the holder
    * on first call (that is when no view holder is registered to "this".
    * 
    */
-  TaskGraphWidget.prototype.getViewHolderRef = function() {
+  TiddlyMapWidget.prototype.getViewHolderRef = function() {
     
     // the viewholder is never recalculated once it exists
     if(this.viewHolderRef) {
@@ -1281,7 +1281,7 @@ module-type: widget
    * @viewRef (optional) a reference (tiddler title) to a view
    * @viewHolderRef (optional) a reference to the view holder that should be updated
    */
-  TaskGraphWidget.prototype.setView = function(viewRef, viewHolderRef) {
+  TiddlyMapWidget.prototype.setView = function(viewRef, viewHolderRef) {
     
     if(viewRef) {
       if(!viewHolderRef) {
@@ -1306,7 +1306,7 @@ module-type: widget
    *     from the holder and recreate the view abstraction object.
    * @return {ViewAbstraction} the view
    */
-  TaskGraphWidget.prototype.getView = function(isRebuild) {
+  TiddlyMapWidget.prototype.getView = function(isRebuild) {
     
     if(!isRebuild &amp;&amp; this.view) {
       return this.view;
@@ -1325,7 +1325,7 @@ module-type: widget
     
   };
     
-  TaskGraphWidget.prototype.repaintGraph = function() {
+  TiddlyMapWidget.prototype.repaintGraph = function() {
     
     this.logger("info", "Repainting the whole graph");
     
@@ -1338,7 +1338,7 @@ module-type: widget
    * This will make the container dom element stretch to the bottom
    * of the page.
    */
-  TaskGraphWidget.prototype.maxEnlargeGraphContainer = function() {
+  TiddlyMapWidget.prototype.maxEnlargeGraphContainer = function() {
 
     var windowHeight = window.innerHeight;
     var canvasOffset = utils.getDomNodePos(this.graphDomNode).y;
@@ -1357,26 +1357,26 @@ module-type: widget
    * @param {boolean} enable - True if the button should be visible,
    *     false otherwise.
    */ 
-  TaskGraphWidget.prototype.setGraphButtonEnabled = function(name, enable) {
-    var className = "network-navigation taskgraph-button " + name;
+  TiddlyMapWidget.prototype.setGraphButtonEnabled = function(name, enable) {
+    var className = "network-navigation tiddlymap-button " + name;
     var b = this.parentDomNode.getElementsByClassName(className)[0];
     $tw.utils.toggleClass(b, "enabled", enable);
   }; 
 
   /**
-   * This function will create the dom elements for all taskgraph-vis
+   * This function will create the dom elements for all tiddlymap-vis
    * buttons and register the event listeners.
    * 
    * @param {Object&lt;string, function>} buttonEvents - The label of the
    *     button that is used as css class and the click handler.
    */
-  TaskGraphWidget.prototype.addGraphButtons = function(buttonEvents) {
+  TiddlyMapWidget.prototype.addGraphButtons = function(buttonEvents) {
     
     var parent = this.parentDomNode.getElementsByClassName("vis network-frame")[0];
     
     for(var name in buttonEvents) {
       var div = document.createElement("div");
-      div.className = "network-navigation taskgraph-button " + name;
+      div.className = "network-navigation tiddlymap-button " + name;
       div.addEventListener("click", buttonEvents[name].bind(this), false);
       parent.appendChild(div);
     }
@@ -1384,7 +1384,7 @@ module-type: widget
   };
   
   // !! EXPORT !!
-  exports.taskgraph = TaskGraphWidget;
+  exports.tiddlymap = TiddlyMapWidget;
   // !! EXPORT !!
   
 })();
@@ -1410,7 +1410,7 @@ module-type: widget
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha11</a>
-		on 2015-01-02T02:48:16+01:00 using the <a
+		on 2015-01-03T20:20:51+01:00 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

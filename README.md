@@ -1,16 +1,14 @@
 created: 20141221140636352
 icon: $:/core/images/star-filled
 id: 6159DA1A-73F2-451D-B55F-8744480BA7AC
-modified: 20141225160103417
+modified: 20150103191651753
 tags: 
-title: Taskgraph - The Big Picture
+title: TiddlyMap - The Big Picture
 type: text/x-markdown
 
-# TW-Taskgraph
+## What it can do for you
 
-**Warning:** Taskgraph is cool but unstable. Just play with it, don't use it! In case you really want to use it now, make sure to always check back to the [official demo site](http://bit.ly/taskgraph) to see whether your version is up-to-date as updates and bugfixes come quick! For any bug you discover, please create an issue at [github.com](|https://github.com/felixhayashi/tw-taskgraph/issues).
-
-TW-Taskgraph is a [TiddlyWiki](http://tiddlywiki.com/) (TW5) plugin that allows you to link your wiki-topics (tiddlers) in order to create *clickable graphs*. By creating relations between your topics you can easily do the following:
+TW-TiddlyMap is a [TiddlyWiki](http://tiddlywiki.com/) (TW5) plugin that allows you to link your wiki-topics (tiddlers) in order to create *clickable graphs*. By creating relations between your topics you can easily do the following:
 
 * **Create mindmaps** and quickly manifest your ideas in tiddlers (wiki entries).
 * **Create task-dependency graphs** to organize and describe your tasks.
@@ -18,9 +16,9 @@ TW-Taskgraph is a [TiddlyWiki](http://tiddlywiki.com/) (TW5) plugin that allows 
 
 In general you may **create, visualize and describe any network-structure** you have in mind.
 
-# How it works
+## How it works
 
-TW-Taskgraph combines the strength of two open-source projects:
+TW-TiddlyMap combines the strength of two open-source projects:
 
 **⤍ The TiddlyWiki Project**
 
@@ -36,7 +34,7 @@ The TiddlyWiki project is a flourishing community project under the lead of its 
 
 **⤍ The Vis.js Project**
 
-For graph visualization and manipulation, tw-taskgraph draws upon the popular open-source [vis.js](http://visjs.org/) library - *a dynamic, browser based visualization library* actively developed and maintained by a team of enthusiastic developers working at [Almende B.V](|http://almende.com).
+For graph visualization and manipulation, tw-tiddlymap draws upon the popular open-source [vis.js](http://visjs.org/) library - *a dynamic, browser based visualization library* actively developed and maintained by a team of enthusiastic developers working at [Almende B.V](|http://almende.com).
 
 > The library is designed to be easy to use, handle large amounts of dynamic data, and enable manipulation of the data
 >  - [visjs.org](|http://visjs.org/)

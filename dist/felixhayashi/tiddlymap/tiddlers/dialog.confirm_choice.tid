@@ -1,0 +1,8 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/getConfirmation
+subtitle: You must confirm in order to proceed!
+
+<<message>>
+
+''Are you really sure you want to do this?''
+
+

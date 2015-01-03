@@ -1,4 +1,4 @@
-TW-Taskgraph - Code documentation
+TiddlyMap - Code documentation
 ---------------------------------------------------------------------
 
 This documentation is automatically generated from code comments via
@@ -16,19 +16,19 @@ as well as manipulating views:
 
 ```javascript
 // create a new view
-var myView = $tw.taskgraph.adapter.createView("My new View");
+var myView = $tw.tiddlymap.adapter.createView("My new View");
 
 // insert a node in this view
 var node = { label: "I am a node" };
 var options = { view: myView };
-$tw.taskgraph.adapter.insertNode(node, options);
+$tw.tiddlymap.adapter.insertNode(node, options);
 ```
 
 To retrieve view-information or manipulate views, use the ViewAbstraction class:
 
 ```javascript
 // open an existing view
-var myView = $tw.taskgraph.adapter.getView("My existing View");
+var myView = $tw.tiddlymap.adapter.getView("My existing View");
 
 // some examples...
 myView.getNodeFilter("expression");

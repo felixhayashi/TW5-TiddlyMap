@@ -1,0 +1,83 @@
+title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
+
+\define showEdgeField() show-$(curEdgeId)$
+
+<!-- ===== View Switcher ======================================== -->
+
+<div>
+  View:
+  <$reveal type="match" text="false" default=<<var.isViewBound>> >
+    <$select tiddler=<<var.ref.viewHolder>> field="text" default=<<var.ref.view>> >
+       <$list filter=<<tgmacro "option" "filter.allViews">> >
+         <option value={{!!title}}>
+           <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
+          </option>
+       </$list>
+    </$select>
+  </$reveal>
+  <$reveal type="match" text="true" default=<<var.isViewBound>> >
+    <b><<var.viewLabel>></b>
+  </$reveal>
+
+  <$button popup=<<qualify "$:/temp/tiddlymap/editor/showactions">> >{{$:/core/images/menu-button}}</$button>
+
+  <$reveal type="popup" position="below" state=<<qualify "$:/temp/tiddlymap/editor/showactions">> >
+    <div class="tc-drop-down">
+      <$button class="tc-btn-invisible" message="tm-modal" param="$:/plugins/felixhayashi/tiddlymap/docs/help/viewActionQuickHelp">{{$:/core/images/info-button}} quick help</$button>
+      <hr />
+      <$button class="tc-btn-invisible" message="tm-create-view">{{$:/core/images/new-button}} Create empty view</$button>
+      <$button class="tc-btn-invisible" message="tm-rename-view">{{$:/core/images/tag-button}} Rename view</$button>
+      <$button class="tc-btn-invisible" message="tm-delete-view">{{$:/core/images/delete-button}} Delete view</$button>
+      <$button class="tc-btn-invisible" message="tm-edit-view">{{$:/core/images/theme-button}} Configure View</$button>
+      <$button class="tc-btn-invisible" message="tm-store-position">{{$:/core/images/globe}} Save positions</$button>
+    </div>
+  </$reveal>
+
+</div>
+
+<!-- ===== Edge Filter ========================================== -->
+
+<span class="separator" />
+
+<div>
+  Edge Filter:
+  <$button popup=<<qualify "$:/temp/tiddlymap/editor/filteredges">> >{{$:/core/images/menu-button}}</$button>
+  <$reveal type="popup" position="below" state=<<qualify "$:/temp/tiddlymap/editor/filteredges">> >
+    <div class="tc-drop-down">
+      <$button class="tc-btn-invisible">{{$:/core/images/info-button}} quick help
+        <$action-sendmessage $message="tm-modal" $param="$:/plugins/felixhayashi/tiddlymap/docs/help/viewActionQuickHelp" />
+      </$button>
+      <hr />
+      <$list filter=<<var.edgeFilterExpr>> >
+        <$set name="curEdgeId" value={{!!id}}>
+        <$checkbox tiddler=<<var.ref.edgeFilter>> field=<<showEdgeField>> checked="true" unchecked="false" default="true">
+          <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
+        </$checkbox>
+        <br />
+        </$set>
+      </$list>
+    </div>
+  </$reveal>
+
+</div>
+
+<!-- ===== Node Filter ========================================== -->
+
+<span class="separator" />
+
+<div>
+  Node Filter:
+  <$button popup=<<qualify "$:/temp/tiddlymap/editor/state/nodeFilterActions">> >{{$:/core/images/menu-button}}</$button>
+  <$reveal type="popup" position="below" state=<<qualify "$:/temp/tiddlymap/editor/state/nodeFilterActions">> >
+    <div class="tc-drop-down">
+      <$button class="tc-btn-invisible" message="tm-modal" param="$:/plugins/felixhayashi/tiddlymap/docs/help/NodeFilterQuickHelp">{{$:/core/images/info-button}} quick help</$button>
+      <hr />
+      <$button class="tc-btn-invisible" message="tm-edit-node-filter">{{$:/core/images/edit-button}} Edit filter</$button>
+      <hr />
+      <$checkbox field="config.display_neighbours" checked="true" unchecked="false" default="false">
+        Show neighbours
+      </$checkbox>
+    </div>
+  </$reveal>
+
+</div>

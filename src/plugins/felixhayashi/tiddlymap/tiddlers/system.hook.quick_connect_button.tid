@@ -1,0 +1,26 @@
+tags: $:/tags/ViewToolbar
+title: $:/plugins/felixhayashi/tiddlymap/misc/quickConnectButton
+
+<$button class="tc-btn-invisible" popup=<<qualify "$:/temp/tiddlymap/">>>
+  {{$:/plugins/felixhayashi/tiddlymap/icon}}
+</$button>
+
+<$reveal animate="yes" type="popup" position="belowleft" state=<<qualify "$:/temp/tiddlymap/">> >
+<div class="tc-drop-down quick-connect">
+
+  {{$:/core/images/import-button}} ''Add this node''
+
+  Simply drag'n'drop <$link to=<<currentTiddler>>>this link</$link> on a graph editor to add
+  it to an existing view.
+
+  ---
+
+  {{$:/plugins/felixhayashi/tiddlymap/icon}} ''Link this node''
+
+  You may link this node with any other node, just open this
+  <$button class="tc-btn-invisible">connection wizard
+    <$action-sendmessage $message="tm-modal" $param="$:/plugins/felixhayashi/tiddlymap/misc/connection_wizard" currentTiddler={{!!title}} />
+  </$button>.
+
+</div>
+</$reveal>

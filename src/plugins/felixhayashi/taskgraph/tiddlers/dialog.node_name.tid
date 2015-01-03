@@ -1,9 +1,0 @@
-title: $:/plugins/felixhayashi/taskgraph/dialog/getNodeName
-subtitle : Please name your new node
-
-Name: <$edit-text tiddler=<<output>> field="text" type="text" tag="input" default=""></$edit-text> <sup>[1]</sup> 
-
----
-
-<sup>[1]</sup>
-<small>If you leave the name field blank, a name will be automatically generated for you.</small>

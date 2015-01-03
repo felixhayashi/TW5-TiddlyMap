@@ -1,2 +1,0 @@
-title: $:/plugins/felixhayashi/taskgraph/graph/views/search/filter/nodes
-filter: [!is[system]search{$:/temp/search}limit[20]]

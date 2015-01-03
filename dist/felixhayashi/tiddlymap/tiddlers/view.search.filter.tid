@@ -1,0 +1,2 @@
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/search/filter/nodes
+filter: [!is[system]search{$:/temp/search}limit[20]]

@@ -1,0 +1,251 @@
+html { // used to increase css importance
+
+  .small-list {
+    overflow: auto;
+    height: 150px;
+    width: 250px;
+  }
+
+  .quick-connect {
+
+    &.tc-drop-down {
+      font-size: 0.5em;
+      right: 50px;
+      padding: 5px;
+      width: 200px;
+      white-space: normal;
+      line-height: 1em;
+    }
+    
+    hr {
+      border: 0;
+      height: 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .tc-btn-invisible {
+      @extend a;
+      width: auto;
+    }
+    
+    a {
+      display: inline;
+      padding: 0;
+      color: #5778d8;
+      background: transparent;
+      
+      &:hover {
+        background: transparent;
+        color: #5778d8;
+        text-decoration: underline;
+      }
+    }
+    
+    >button {
+      padding-left: 10px;
+    }
+
+  }
+
+  .tc-modal-wrapper {
+    z-index: 1010; // fix this in core?
+
+    .tc-modal-header {
+      padding-top: 0px;
+      padding-bottom: 0px;
+      
+      h3 {
+        line-height: 10px;
+      }
+
+    }
+    
+    .tc-modal-body {
+      
+      fieldset {
+      
+        legend {
+          font-weight: bold;
+        }
+        
+        ul {
+          
+          padding-left: 30px;
+          
+          li {
+            list-style: none;
+          }
+          
+        }
+      }
+    }
+
+    .tc-modal-footer {
+      padding-top: 0px;
+      padding-bottom: 0px;
+    }
+  }
+
+
+  $padding : 5px;
+  $color: #666666;
+
+  /*
+  body {
+    background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/tiddlymap/media/surface.png!!type}} text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}}/>'));
+  }
+  */
+
+  #node-filter-dialog {
+
+    #filter-tips {
+      font-size: 0.8em;
+    }
+
+    textarea {
+      height: 100px;
+      max-height: 300px;
+      overflow: auto;
+      width: 100%;
+      font-size: 11px;
+      font-family: "Courier New", Courier, monospace;
+    }
+          
+  }
+
+  .tiddlymap {
+    border: 3px dotted lightgray;
+    padding: 2px;
+    width: 100%;
+    color: $color;
+    
+    &.click-to-use {
+
+      .network-frame {
+        
+        &:not(.vis-active) {
+          cursor: pointer;
+          
+          .network-navigation {
+            display: none;
+          }
+          
+          &:hover:before {
+            box-shadow: 10px 10px 5px lightgray;
+            color: gray;
+            background: white;
+            content: "Click to use";
+            font-size: 18px;
+            font-weight: bold;
+            left: 50%;
+            margin-left: -100px;
+            position: absolute;
+            text-align: center;
+            top: 50px;
+            width: 200px;
+            z-index: 2000;
+            padding: 5px;
+            pointer-events: none;
+          }
+        }
+      }
+    }
+    .vis-graph {       
+      .network-frame {
+        .tiddlymap-button { 
+          &.surface.enabled {
+            bottom: 90px;
+            right: 15px;
+            background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}} />'));
+          }
+        }
+      }
+    }
+
+    .network-manipulationUI.edit.editmode {
+      height: 26px;
+    }
+    
+    .network-manipulationDiv {
+      background: transparent;
+      padding: 3px 0;
+      height: 35px;
+    }
+    
+    .filterbar {
+      
+      background: #d6d9d8;
+      border-bottom: 1px solid lightgray;
+      padding: 3px $padding;
+      
+      .tc-drop-down {
+          background-color: #F3F3F3;
+          border: none;
+          min-width: 170px;
+          padding: $padding;
+          margin: 5px 0;
+          
+          button {
+            padding : 0px;
+          }
+      }
+      
+      [hidden] {
+        display: none;
+      }
+      
+      .tc-block-dropdown {
+        width: 370px;
+        min-width: 370px;
+        padding: $padding;
+        margin: 15px 0 0 -370px;
+                
+          a {
+            display: inline;
+            padding : 0px;
+          }
+        
+      }
+      
+      button {
+        line-height: inherit;
+        color: $color;
+      }
+    
+       > * {
+        display: inline-block; // TODO: this is too rigorous
+      }
+      
+      .separator:after {
+        color: "#BDBFBF";
+        margin: 3px;
+        content: " | ";
+      }
+      
+      .quickhelp {
+        background: transparent;
+        border: none;
+        border-left: 1px solid #cccccc;
+        color: slategrey;
+        float: right;
+        font-weight: bold;
+        margin: $padding+1;
+      }
+      
+      .tc-edit-add-tag .tc-add-tag-name input {
+        width: 70%;
+      }
+      
+      .tc-sidebar-header {
+        text-shadow: none;
+      }
+      
+      .tc-edit-tags {
+        border: none;
+        padding: inherit;
+        box-shadow: none;
+      }
+    }
+  }
+}

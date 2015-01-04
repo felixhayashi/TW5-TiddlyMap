@@ -302,22 +302,34 @@ Adapter.prototype.selectNodesByReference = function(tiddlers, options) {
 
 Adapter.prototype.createNode = function(tiddler, protoNode) {
 
-  var tiddler = utils.getTiddler(tiddler);
+  // ALWAYS reload from store to avoid setting wrong ids on tiddler
+  // being in the role of from and to at the same time.  
+  // Therefore, do not use utils.getTiddler(tiddler)!
+  var tObj = this.wiki.getTiddler(utils.getTiddlerReference(tiddler));
 
-  if(!tiddler || tiddler.isDraft() || this.wiki.isSystemTiddler(tiddler.fields.title)) {
+  if(!tObj || tObj.isDraft() || this.wiki.isSystemTiddler(tObj.fields.title)) {
     return; // silently ignore
   }
   
-  var tObj = this.setupTiddler(tiddler);
-  
-  if(!tObj) { // cannot ignore this
-    throw "TiddlyMap: Cannot create node from tiddler \"" + tiddler + "\"";
+  // make sure underlying tiddler has an id
+  if(!tObj.fields[this.opt.field.nodeId]) {
+    var fields = utils.getEmptyMap();
+    fields[this.opt.field.nodeId] = utils.genUUID();
+    tObj = new $tw.Tiddler(tObj, fields);
+    $tw.wiki.addTiddler(tObj);
   }
   
   var node = utils.getEmptyMap();
   
   // assign label
-  node.label = utils.getLabel(tObj, this.opt.field.nodeLabel);
+  node.label = (tObj && tObj.fields[this.opt.field.nodeLabel]
+          ? tObj.fields[this.opt.field.nodeLabel]
+          : tObj.fields.title);
+  
+  // use the tiddler's color field as node color
+  if(tObj.fields.color) {
+    node.color = tObj.fields.color;
+  }
   
   // allow override
   if(typeof protoNode === "object") {

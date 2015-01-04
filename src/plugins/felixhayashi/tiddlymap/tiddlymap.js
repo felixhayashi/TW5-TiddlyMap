@@ -18,6 +18,7 @@ module-type: widget
   /**************************** IMPORTS ****************************/
    
   var Widget = require("$:/core/modules/widgets/widget.js").widget;
+  var DropZoneWidget = require("$:/core/modules/widgets/dropzone.js").dropzone;
   var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/view_abstraction.js").ViewAbstraction;
   var CallbackRegistry = require("$:/plugins/felixhayashi/tiddlymap/callback_registry.js").CallbackRegistry;
   var DialogManager = require("$:/plugins/felixhayashi/tiddlymap/dialog_manager.js").DialogManager;
@@ -60,7 +61,6 @@ module-type: widget
         {type: "tm-import-tiddlers", handler: this.handleImportTiddlers }
       ]);
     }
-
   };
   
   // !! EXTENSION !!
@@ -618,11 +618,18 @@ module-type: widget
     
     this.logger("info", "Initializing and rendering the graph");
     
-    
     if(this.editorMode) {
       // we do **not** register this child via this.children.push(dropZoneWidget);
       // as this would cause the graph to be destroyed on the next refreshWidgets
       var dropZoneWidget = this.makeChildWidget({ type: "dropzone" });
+      var self = this;
+      dropZoneWidget.handleDropEvent = function(event) {
+        self.lastImportDropCoordinates = {
+          x: event.clientX,
+          y: event.clientY
+        }
+        DropZoneWidget.prototype.handleDropEvent.call(this, event);
+      };
       dropZoneWidget.render(parent); 
       this.graphDomNode = dropZoneWidget.findFirstDomNode();
     } else {
@@ -877,32 +884,37 @@ module-type: widget
   
   TiddlyMapWidget.prototype.handleImportTiddlers = function(event) {
     
-    //var pos = this.network.DOMtoCanvas($tw.tiddlymap.mouseDropPos);
-    var pos = this.network.getCenterCoordinates();
     var tiddlers = JSON.parse(event.param);
-        
+    
+    // translate coordinates
+    var canvas = utils.getDomNodePos(this.graphDomNode);
+    var pos = this.network.DOMtoCanvas({
+      x: (this.lastImportDropCoordinates.x - canvas.x),
+      y: (this.lastImportDropCoordinates.y - canvas.y)
+    });
+    
     for(var i = 0; i < tiddlers.length; i++) {
       var tObj = this.wiki.getTiddler(tiddlers[i].title);
       
       if(!tObj) {
-        this.notify("Cannot integrate foreign tiddler");
+        $tw.tiddlymap.notify("Cannot integrate foreign tiddler");
         return;
       }
       
       if(utils.isMatch(tObj, this.getView().getNodeFilter("compiled"))) { // no dublicates
-        this.notify("Node already exists");
+        $tw.tiddlymap.notify("Node already exists");
         continue;
       }
       
       var node = this.adapter.createNode(tObj, {
-        //~ x: ((i * 20) + pos.x), // if more than one, create some space
-        //~ y: pos.y,
+        x: ((i * 20) + pos.x), // if more than one, create some space
+        y: pos.y,
       });
       
       if(node) { // only tiddlers that already exist in the wiki
         
-        //this.preventNextRepaint = true;
         this.getView().addNodeToView(node);
+        this.preventNextRepaint = true;
         this.rebuildGraph();
         
       }

@@ -119,6 +119,11 @@ html { // used to increase css importance
     padding: 2px;
     width: 100%;
     color: $color;
+
+    &:-moz-full-screen { background: white; }    
+    &:-webkit-full-screen { background: white; }    
+    &:-ms-fullscreen { background: white; }
+    &:fullscreen { background: white; }
     
     &.click-to-use {
 

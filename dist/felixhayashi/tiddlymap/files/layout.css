@@ -63,6 +63,14 @@ html {
     padding: 2px;
     width: 100%;
     color: #666666; }
+    html .tiddlymap:-moz-full-screen {
+      background: white; }
+    html .tiddlymap:-webkit-full-screen {
+      background: white; }
+    html .tiddlymap:-ms-fullscreen {
+      background: white; }
+    html .tiddlymap:fullscreen {
+      background: white; }
     html .tiddlymap.click-to-use .network-frame:not(.vis-active) {
       cursor: pointer; }
       html .tiddlymap.click-to-use .network-frame:not(.vis-active) .network-navigation {

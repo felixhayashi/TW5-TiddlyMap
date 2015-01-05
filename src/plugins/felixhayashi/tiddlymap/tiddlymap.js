@@ -58,7 +58,8 @@ module-type: widget
         {type: "tm-edit-view", handler: this.handleEditView },
         {type: "tm-store-position", handler: this.handleStorePositions },
         {type: "tm-edit-node-filter", handler: this.handleEditNodeFilter },
-        {type: "tm-import-tiddlers", handler: this.handleImportTiddlers }
+        {type: "tm-import-tiddlers", handler: this.handleImportTiddlers },
+        {type: "tm-go-full-screen", handler: this.handleGoFullScreen }
       ]);
     }
   };
@@ -881,6 +882,11 @@ module-type: widget
       });
     }     
   }
+  
+  TiddlyMapWidget.prototype.handleGoFullScreen = function(event) { 
+    this.parentDomNode.mozRequestFullScreen();
+  };
+    
   
   TiddlyMapWidget.prototype.handleImportTiddlers = function(event) {
     

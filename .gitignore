@@ -1,0 +1,8 @@
+# ignore all files with a leading dot
+.*
+!.gitignore
+!.git
+
+# ignore file in these paths
+src/note_modules/
+src/jsdoc/templates/docstrap/

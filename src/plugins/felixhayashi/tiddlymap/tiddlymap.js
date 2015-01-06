@@ -876,16 +876,37 @@ module-type: widget
     }     
   }
   
-  TiddlyMapWidget.prototype.handleGoFullScreen = function(event) { 
-
-    var fullscreen = $tw.utils.getFullScreenApis();
-    if(fullscreen) {
-      if(document[fullscreen._fullscreenElement]) {
-        document[fullscreen._exitFullscreen]();
-      } else {
-        this.parentDomNode[fullscreen._requestFullscreen]();
+  TiddlyMapWidget.prototype.handleGoFullScreen = function(event) {
+    
+    // first we need to mark the element that we want fullscreen.
+    // we cannot set the element itself fullscreen as this would
+    // cause modals to be hidden.
+    
+    var marker = this.opt.misc.cssPrefix + "fullscreen";
+    var el = document.getElementsByClassName("tiddlymap" + " " + marker)[0];
+    if(el !== this.parentDomNode) { // remove previous marker
+      if(el) {
+        $tw.utils.removeClass(el, marker);
       }
+      $tw.utils.addClass(this.parentDomNode, marker);
     }
+    
+    // it's not nice but we need to set a marker to be able to shift
+    // the stacking context as the z-index cannot do it on its own
+    
+    var stackingContextMarker = this.opt.misc.cssPrefix + "has-fullscreen-child";
+    var sidebar = document.getElementsByClassName("tc-sidebar-scrollable")[0];
+    var storyRiver = document.getElementsByClassName("tc-story-river")[0];
+    if(storyRiver && storyRiver.contains(this.parentDomNode)) {
+      $tw.utils.addClass(storyRiver, stackingContextMarker);
+      $tw.utils.removeClass(sidebar, stackingContextMarker);
+    } else if(sidebar && sidebar.contains(this.parentDomNode)) {
+      $tw.utils.addClass(sidebar, stackingContextMarker);
+      $tw.utils.removeClass(storyRiver, stackingContextMarker);
+    }
+    
+    this.dispatchEvent({ type: "tm-full-screen" });
+    
   };
   
   TiddlyMapWidget.prototype.handleQuitDiving = function() {

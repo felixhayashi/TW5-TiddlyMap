@@ -121,19 +121,8 @@ html { // used to increase css importance
     padding: 2px;
     width: 100%;
     color: $color;
-
-    @mixin fullscreen() {
-      background: white;
-      height: 100% !important;
-      width: 100% !important;
-    }
-
-    &:fullscreen { @include fullscreen(); }
-    &:-moz-full-screen { @include fullscreen(); }
-    &:-webkit-full-screen { @include fullscreen(); }
-    &:-ms-fullscreen { @include fullscreen(); }
     
-    &.click-to-use .network-frame:not(.vis-active) {
+    &.click-to-use .network-frame:not(.vis-active):not(.tmap-fullscreen) {
       cursor: pointer;
       
       .network-navigation {
@@ -178,8 +167,11 @@ html { // used to increase css importance
       }
     }
     
-    &.advanced-editor .vis-graph {
-      height: calc(100% - 35px);
+    &.advanced-editor {
+      background: #F2F2F2;
+      .vis-graph {
+        height: calc(100% - 35px);
+      }
     }
 
     .network-manipulationUI.edit.editmode {
@@ -200,7 +192,6 @@ html { // used to increase css importance
       
       .tc-drop-down {
           background-color: #F3F3F3;
-          border: none;
           min-width: 170px;
           padding: $padding;
           margin: 5px 0;
@@ -268,3 +259,31 @@ html { // used to increase css importance
     }
   }
 }
+
+@mixin fullscreen() {
+
+  .tmap-has-fullscreen-child {
+    z-index: 998;
+
+    .tiddlymap.tmap-fullscreen {
+      background: white;
+      height: 100% !important;
+      width: 100% !important;
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 999;
+      border: none;
+      margin: 0;
+    }
+    
+  }
+    
+}
+
+html:fullscreen { @include fullscreen(); }
+html:-moz-full-screen { @include fullscreen(); }
+html:-webkit-full-screen { @include fullscreen(); }
+html:-ms-fullscreen { @include fullscreen(); }

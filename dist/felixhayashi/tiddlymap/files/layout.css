@@ -63,27 +63,11 @@ html {
     padding: 2px;
     width: 100%;
     color: #666666; }
-    html .tiddlymap:fullscreen {
-      background: white;
-      height: 100% !important;
-      width: 100% !important; }
-    html .tiddlymap:-moz-full-screen {
-      background: white;
-      height: 100% !important;
-      width: 100% !important; }
-    html .tiddlymap:-webkit-full-screen {
-      background: white;
-      height: 100% !important;
-      width: 100% !important; }
-    html .tiddlymap:-ms-fullscreen {
-      background: white;
-      height: 100% !important;
-      width: 100% !important; }
-    html .tiddlymap.click-to-use .network-frame:not(.vis-active) {
+    html .tiddlymap.click-to-use .network-frame:not(.vis-active):not(.tmap-fullscreen) {
       cursor: pointer; }
-      html .tiddlymap.click-to-use .network-frame:not(.vis-active) .network-navigation {
+      html .tiddlymap.click-to-use .network-frame:not(.vis-active):not(.tmap-fullscreen) .network-navigation {
         display: none; }
-      html .tiddlymap.click-to-use .network-frame:not(.vis-active):hover:before {
+      html .tiddlymap.click-to-use .network-frame:not(.vis-active):not(.tmap-fullscreen):hover:before {
         box-shadow: 10px 10px 5px lightgray;
         color: gray;
         background: white;
@@ -109,8 +93,10 @@ html {
         bottom: 90px;
         right: 15px;
         background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />); }
-    html .tiddlymap.advanced-editor .vis-graph {
-      height: calc(100% - 35px); }
+    html .tiddlymap.advanced-editor {
+      background: #F2F2F2; }
+      html .tiddlymap.advanced-editor .vis-graph {
+        height: calc(100% - 35px); }
     html .tiddlymap .network-manipulationUI.edit.editmode {
       height: 26px; }
     html .tiddlymap .network-manipulationDiv {
@@ -124,7 +110,6 @@ html {
       height: 35px; }
       html .tiddlymap .filterbar .tc-drop-down {
         background-color: #F3F3F3;
-        border: none;
         min-width: 170px;
         padding: 5px;
         margin: 5px 0; }
@@ -165,3 +150,63 @@ html {
         border: none;
         padding: inherit;
         box-shadow: none; }
+
+html:fullscreen .tmap-has-fullscreen-child {
+  z-index: 998; }
+  html:fullscreen .tmap-has-fullscreen-child .tiddlymap.tmap-fullscreen {
+    background: white;
+    height: 100% !important;
+    width: 100% !important;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 999;
+    border: none;
+    margin: 0; }
+
+html:-moz-full-screen .tmap-has-fullscreen-child {
+  z-index: 998; }
+  html:-moz-full-screen .tmap-has-fullscreen-child .tiddlymap.tmap-fullscreen {
+    background: white;
+    height: 100% !important;
+    width: 100% !important;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 999;
+    border: none;
+    margin: 0; }
+
+html:-webkit-full-screen .tmap-has-fullscreen-child {
+  z-index: 998; }
+  html:-webkit-full-screen .tmap-has-fullscreen-child .tiddlymap.tmap-fullscreen {
+    background: white;
+    height: 100% !important;
+    width: 100% !important;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 999;
+    border: none;
+    margin: 0; }
+
+html:-ms-fullscreen .tmap-has-fullscreen-child {
+  z-index: 998; }
+  html:-ms-fullscreen .tmap-has-fullscreen-child .tiddlymap.tmap-fullscreen {
+    background: white;
+    height: 100% !important;
+    width: 100% !important;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 999;
+    border: none;
+    margin: 0; }

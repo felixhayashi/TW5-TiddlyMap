@@ -63,14 +63,22 @@ html {
     padding: 2px;
     width: 100%;
     color: #666666; }
-    html .tiddlymap:-moz-full-screen {
-      background: white; }
-    html .tiddlymap:-webkit-full-screen {
-      background: white; }
-    html .tiddlymap:-ms-fullscreen {
-      background: white; }
     html .tiddlymap:fullscreen {
-      background: white; }
+      background: white;
+      height: 100% !important;
+      width: 100% !important; }
+    html .tiddlymap:-moz-full-screen {
+      background: white;
+      height: 100% !important;
+      width: 100% !important; }
+    html .tiddlymap:-webkit-full-screen {
+      background: white;
+      height: 100% !important;
+      width: 100% !important; }
+    html .tiddlymap:-ms-fullscreen {
+      background: white;
+      height: 100% !important;
+      width: 100% !important; }
     html .tiddlymap.click-to-use .network-frame:not(.vis-active) {
       cursor: pointer; }
       html .tiddlymap.click-to-use .network-frame:not(.vis-active) .network-navigation {
@@ -91,10 +99,18 @@ html {
         z-index: 2000;
         padding: 5px;
         pointer-events: none; }
-    html .tiddlymap .vis-graph .network-frame .tiddlymap-button.surface.enabled {
-      bottom: 90px;
-      right: 15px;
-      background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}} />); }
+    html .tiddlymap .vis-graph {
+      height: 100%; }
+      html .tiddlymap .vis-graph .network-frame .tiddlymap-button.surface.enabled {
+        bottom: 130px;
+        right: 15px;
+        background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}} />); }
+      html .tiddlymap .vis-graph .network-frame .tiddlymap-button.fullscreen.enabled {
+        bottom: 90px;
+        right: 15px;
+        background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />); }
+    html .tiddlymap.advanced-editor .vis-graph {
+      height: calc(100% - 35px); }
     html .tiddlymap .network-manipulationUI.edit.editmode {
       height: 26px; }
     html .tiddlymap .network-manipulationDiv {
@@ -104,7 +120,8 @@ html {
     html .tiddlymap .filterbar {
       background: #d6d9d8;
       border-bottom: 1px solid lightgray;
-      padding: 3px 5px; }
+      padding: 3px 5px;
+      height: 35px; }
       html .tiddlymap .filterbar .tc-drop-down {
         background-color: #F3F3F3;
         border: none;

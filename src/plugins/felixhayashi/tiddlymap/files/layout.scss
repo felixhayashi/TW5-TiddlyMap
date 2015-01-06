@@ -1,3 +1,5 @@
+$filterbar-height: 35px;
+
 html { // used to increase css importance
 
   .small-list {
@@ -120,52 +122,64 @@ html { // used to increase css importance
     width: 100%;
     color: $color;
 
-    &:-moz-full-screen { background: white; }    
-    &:-webkit-full-screen { background: white; }    
-    &:-ms-fullscreen { background: white; }
-    &:fullscreen { background: white; }
-    
-    &.click-to-use {
+    @mixin fullscreen() {
+      background: white;
+      height: 100% !important;
+      width: 100% !important;
+    }
 
+    &:fullscreen { @include fullscreen(); }
+    &:-moz-full-screen { @include fullscreen(); }
+    &:-webkit-full-screen { @include fullscreen(); }
+    &:-ms-fullscreen { @include fullscreen(); }
+    
+    &.click-to-use .network-frame:not(.vis-active) {
+      cursor: pointer;
+      
+      .network-navigation {
+        display: none;
+      }
+      
+      &:hover:before {
+        box-shadow: 10px 10px 5px lightgray;
+        color: gray;
+        background: white;
+        content: "Click to use";
+        font-size: 18px;
+        font-weight: bold;
+        left: 50%;
+        margin-left: -100px;
+        position: absolute;
+        text-align: center;
+        top: 50px;
+        width: 200px;
+        z-index: 2000;
+        padding: 5px;
+        pointer-events: none;
+      }
+    }
+
+    .vis-graph {
+      height: 100%;
+      
       .network-frame {
-        
-        &:not(.vis-active) {
-          cursor: pointer;
-          
-          .network-navigation {
-            display: none;
+        .tiddlymap-button { 
+          &.surface.enabled {
+            bottom: 130px;
+            right: 15px;
+            background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}} />'));
           }
-          
-          &:hover:before {
-            box-shadow: 10px 10px 5px lightgray;
-            color: gray;
-            background: white;
-            content: "Click to use";
-            font-size: 18px;
-            font-weight: bold;
-            left: 50%;
-            margin-left: -100px;
-            position: absolute;
-            text-align: center;
-            top: 50px;
-            width: 200px;
-            z-index: 2000;
-            padding: 5px;
-            pointer-events: none;
+          &.fullscreen.enabled {
+            bottom: 90px;
+            right: 15px;
+            background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />'));
           }
         }
       }
     }
-    .vis-graph {       
-      .network-frame {
-        .tiddlymap-button { 
-          &.surface.enabled {
-            bottom: 90px;
-            right: 15px;
-            background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}} />'));
-          }
-        }
-      }
+    
+    &.advanced-editor .vis-graph {
+      height: calc(100% - 35px);
     }
 
     .network-manipulationUI.edit.editmode {
@@ -179,10 +193,10 @@ html { // used to increase css importance
     }
     
     .filterbar {
-      
       background: #d6d9d8;
       border-bottom: 1px solid lightgray;
       padding: 3px $padding;
+      height: $filterbar-height;
       
       .tc-drop-down {
           background-color: #F3F3F3;

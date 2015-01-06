@@ -196,16 +196,7 @@ say here is: do not require the caretaker!
     
     // build and integrate functions that depend on the options
     attachFunctions($tw.tiddlymap, $tw.tiddlymap.opt);
-    
-    // I know it's ugly to track the mouse like this but I need the coordinates
-    // as the tw-event does not pass me these
-    $tw.tiddlymap.curMouse = {};
-    document.addEventListener('drop', function(event){ 
-        $tw.tiddlymap.mouseDropPos.x = event.clientX,
-        $tw.tiddlymap.mouseDropPos.y = event.clientY
-    }, false);
-    
-    
+        
     // attach the adapter
     $tw.tiddlymap.adapter = new Adapter();
     

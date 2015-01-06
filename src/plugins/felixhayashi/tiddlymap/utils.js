@@ -392,26 +392,6 @@ utils.getPropertiesByPrefix = function(obj, prefix, removePrefix) {
 };
 
 /**
- * Calculates the top, left coordinates of a dom element in the window.
- * 
- * @param {domNode} el - The dom element.
- * @return {Position} The calculated position.
- */
-utils.getDomNodePos = function(el) {
-  
-  var pos = { x: 0, y: 0 };
-  while(true){
-    pos.x += el.offsetLeft;
-    pos.y += el.offsetTop;
-    if(el.offsetParent === null) break;
-    el = el.offsetParent;
-  }
-  
-  return pos;
-  
-};
-
-/**
  * Helper to increase the code semantics.
  * @param {string} str - The string to work with.
  * @param {string} prefix - The sequence to test.

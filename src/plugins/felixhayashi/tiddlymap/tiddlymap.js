@@ -58,8 +58,7 @@ module-type: widget
         {type: "tm-edit-view", handler: this.handleEditView },
         {type: "tm-store-position", handler: this.handleStorePositions },
         {type: "tm-edit-node-filter", handler: this.handleEditNodeFilter },
-        {type: "tm-import-tiddlers", handler: this.handleImportTiddlers },
-        {type: "tm-go-full-screen", handler: this.handleGoFullScreen }
+        {type: "tm-import-tiddlers", handler: this.handleImportTiddlers }
       ]);
     }
   };
@@ -189,6 +188,9 @@ module-type: widget
       if(this.getAttribute("click-to-use") !== "false") {
         $tw.utils.addClass(parent, "click-to-use");
       }
+      if(this.getAttribute("editor") === "advanced") {
+        $tw.utils.addClass(parent, "advanced-editor");
+      }
       if(this.getAttribute("class")) {
         $tw.utils.addClass(parent, this.getAttribute("class"));
       }
@@ -296,15 +298,16 @@ module-type: widget
     var isViewSwitched = this.isViewSwitched(changedTiddlers);
     var viewModifications = this.getView().refresh(changedTiddlers);
             
-    if(isViewSwitched) {
+    if(isViewSwitched || viewModifications.length) {
     
-      this.logger("warn", "View switched");
-      this.view = this.getView(true);
-      this.rebuildGraph(this.getGraphOptions());
-    
-    } else if(viewModifications.length) {
+      if(isViewSwitched) {
+        this.logger("warn", "View switched");
+        this.view = this.getView(true);
+      } else {
+        this.logger("warn", "View modified", viewModifications);
+      }
       
-      this.logger("warn", "View modified", viewModifications);
+      this.graphOptions = this.getGraphOptions();
       this.rebuildGraph(this.getGraphOptions());
       
     } else {
@@ -432,8 +435,6 @@ module-type: widget
                     this.getView().getConfig(),
                     "config.layout.hierarchical.order-by-",
                     true);
-                    
-      console.log("ids", ids);
       
       var labels = utils.getEmptyMap();
       for(var id in ids) {
@@ -442,8 +443,6 @@ module-type: widget
           labels[utils.getBasename(tObj.fields.title)] = true;
         }
       }
-      
-      console.log("labels", labels);
             
       this.setHierarchy(nodes, edges, function(edge) {
         return labels[edge.label];
@@ -641,19 +640,14 @@ module-type: widget
     $tw.utils.addClass(this.graphDomNode, "vis-graph");
     //parent.appendChild(this.graphDomNode);
 
-    // graph width (assigned to the parent)
+    // in contrast to the graph height, which is assigned to the vis
+    // graph wrapper, the graph width is assigned to the parent
     parent.style["width"] = this.getAttribute("width", "100%");
-    // graph height (assigned to the vis graph wrapper)
-    if(this.getAttribute("height")) {
-      this.graphDomNode.style["height"] = this.getAttribute("height");
-    } else {
-      // the listener removes itself if parentDomNode becomes an orphan
-      window.addEventListener("resize", this.handleResizeEvent.bind(this), false);
-      // resize now
-      this.maxEnlargeGraphContainer();
-    }
-    
+
+    window.addEventListener("resize", this.handleResizeEvent.bind(this), false);
     window.addEventListener("click", this.handleClickEvent.bind(this), false);
+    
+    this.handleResizeEvent();
 
     this.graphOptions = this.getGraphOptions();
 
@@ -663,9 +657,7 @@ module-type: widget
                                    this.graphOptions);
                 
     // repaint when sidebar is hidden
-    if(!this.editorMode) {
-      this.callbackRegistry.add("$:/state/sidebar", this.repaintGraph.bind(this), false);
-    }
+    this.callbackRegistry.add("$:/state/sidebar", this.repaintGraph.bind(this), false);
     
     // listen to refresh-trigger changes if trigger is provided
     if(utils.tiddlerExists(this.getAttribute("refresh-trigger"))) {
@@ -683,12 +675,10 @@ module-type: widget
     this.network.on("dragEnd", this.handleNodeDragEnd.bind(this));
     
     this.addGraphButtons({
-      "surface": function() {
-        this.lastNodeDoubleClicked = null;
-        this.setGraphButtonEnabled("surface", false);
-        this.rebuildGraph();
-      }
+      "surface": this.handleQuitDiving,
+      "fullscreen": this.handleGoFullScreen      
     });
+    this.setGraphButtonEnabled("fullscreen", true);
         
     // finally create and register the data and rebuild the graph
     this.rebuildGraph();
@@ -703,39 +693,42 @@ module-type: widget
     
     // current vis options can be found at $tw.tiddlymap.logger("log", this.network.constants);
     
-    // get a copy of the options
-    var options = this.wiki.getTiddlerData(this.opt.ref.visOptions);
-        
-    options.onDelete = function(data, callback) {
-      this.handleRemoveElement(data);
-    }.bind(this);
-    options.onConnect = function(data, callback) {
-      this.handleConnectionEvent(data);
-    }.bind(this);
-    options.onAdd = function(data, callback) {
-      this.insertNode(data);
-    }.bind(this);
-    options.onEditEdge = function(data, callback) {
-      this.handleReconnectEdge(data);
-    }.bind(this);
+    if(!this.graphOptions) {
+      // get a copy of the options
+      var options = this.wiki.getTiddlerData(this.opt.ref.visOptions);
+          
+      options.onDelete = function(data, callback) {
+        this.handleRemoveElement(data);
+      }.bind(this);
+      options.onConnect = function(data, callback) {
+        this.handleConnectionEvent(data);
+      }.bind(this);
+      options.onAdd = function(data, callback) {
+        this.insertNode(data);
+      }.bind(this);
+      options.onEditEdge = function(data, callback) {
+        this.handleReconnectEdge(data);
+      }.bind(this);
 
-    options.dataManipulation = {
-        enabled : (this.editorMode ? true : false),
-        initiallyVisible : (this.view.getLabel() !== "quick_connect"
-                            && this.view.getLabel() !== "search_visualizer")
-    };
+      options.dataManipulation = {
+          enabled : (this.editorMode ? true : false),
+          initiallyVisible : (this.view.getLabel() !== "quick_connect"
+                              && this.view.getLabel() !== "search_visualizer")
+      };
         
-    options.navigation = {
-       enabled : true
-    };
+      options.navigation = true;
+      options.clickToUse = (this.getAttribute("click-to-use") !== "false");
+    } else {
+      var options = this.graphOptions;
+      //~ // BUG https://github.com/almende/vis/issues/540
+      //~ delete this.graphOptions.clickToUse;
+    }
     
     if(this.getView().getConfig("layout.active") === "hierarchical") {
       options.hierarchicalLayout.enabled = true;
       options.hierarchicalLayout.layout = "direction";
     }
-        
-    options.clickToUse = (this.getAttribute("click-to-use") !== "false");
-        
+
     return options;
     
   };
@@ -884,21 +877,34 @@ module-type: widget
   }
   
   TiddlyMapWidget.prototype.handleGoFullScreen = function(event) { 
-    this.parentDomNode.mozRequestFullScreen();
+
+    var fullscreen = $tw.utils.getFullScreenApis();
+    if(fullscreen) {
+      if(document[fullscreen._fullscreenElement]) {
+        document[fullscreen._exitFullscreen]();
+      } else {
+        this.parentDomNode[fullscreen._requestFullscreen]();
+      }
+    }
   };
-    
   
+  TiddlyMapWidget.prototype.handleQuitDiving = function() {
+    this.lastNodeDoubleClicked = null;
+    this.setGraphButtonEnabled("surface", false);
+    this.rebuildGraph();
+  };
+      
   TiddlyMapWidget.prototype.handleImportTiddlers = function(event) {
     
     var tiddlers = JSON.parse(event.param);
     
     // translate coordinates
-    var canvas = utils.getDomNodePos(this.graphDomNode);
+    var canvas = this.graphDomNode.getBoundingClientRect();
     var pos = this.network.DOMtoCanvas({
-      x: (this.lastImportDropCoordinates.x - canvas.x),
-      y: (this.lastImportDropCoordinates.y - canvas.y)
+      x: (this.lastImportDropCoordinates.x - canvas.left),
+      y: (this.lastImportDropCoordinates.y - canvas.top)
     });
-    
+        
     for(var i = 0; i < tiddlers.length; i++) {
       var tObj = this.wiki.getTiddler(tiddlers[i].title);
       
@@ -1080,9 +1086,24 @@ module-type: widget
    *   - https://developer.mozilla.org/en-US/docs/Web/API/Node.contains
    */
   TiddlyMapWidget.prototype.handleResizeEvent = function(event) {
+    
+    if(this.objectId === "search_visualizer" || this.objectId ===  "main_editor") {
+      
+      var windowHeight = window.innerHeight;
+      var canvasOffset = this.parentDomNode.getBoundingClientRect().top;
+      var distanceBottom = this.getAttribute("bottom-spacing", "10px");
+      var calculatedHeight = (windowHeight - canvasOffset) + "px";
+      
+      this.parentDomNode.style["height"] = "calc(" + calculatedHeight + " - " + distanceBottom + ")";
+      
+    } else {
+      
+      var height = this.getAttribute("height");
+      this.parentDomNode.style["height"] = (height ? height : "300px");
+      
+    }
 
     if(this.network) {
-      this.maxEnlargeGraphContainer(); // resize container
       this.repaintGraph(); // redraw graph
     }
     
@@ -1123,7 +1144,6 @@ module-type: widget
    *     that were being dragged.
    */
   TiddlyMapWidget.prototype.handleNodeDragEnd = function(properties) {
-    console.log(this.getView().getConfig("layout.active"));
     if(properties.nodeIds.length
        && !this.hasStartedDiving()
        && this.getView().getConfig("layout.active") !== "hierarchical") {
@@ -1264,22 +1284,7 @@ module-type: widget
     this.network.zoomExtent();
     
   };
-  
-  /**
-   * This will make the container dom element stretch to the bottom
-   * of the page.
-   */
-  TiddlyMapWidget.prototype.maxEnlargeGraphContainer = function() {
-
-    var windowHeight = window.innerHeight;
-    var canvasOffset = utils.getDomNodePos(this.graphDomNode).y;
-    var distanceBottom = this.getAttribute("bottom-spacing", "10px");
-    var calculatedHeight = (windowHeight - canvasOffset) + "px";
     
-    this.graphDomNode.style["height"] = "calc(" + calculatedHeight + " - " + distanceBottom + ")";
-    
-  };
-  
   /**
    * If a button is enabled it means it is displayed on the graph canvas.
    * 

@@ -10,11 +10,11 @@ In general you may create, visualize and describe any network-structure you have
 
 A demo with several examples and explanations can be found [here](bit.ly/tiddlymap).
 
-# How it works
+## How it works
 
 TiddlyMap combines the strength of two open-source projects.
 
-### The TiddlyWiki Project
+#### The TiddlyWiki Project
 
 > [TiddlyWiki](http://tiddlywiki.com/) has bought unprecedented freedom to people to keep their precious information under their own control.
 > – [tiddlywiki.com]([http://tiddlywiki.com]/#TiddlyWiki)
@@ -31,7 +31,7 @@ The building blocks of TiddlyWiki are small pieces of information called "tiddle
 > –  Adapted from [Philosophy of Tiddlers](http://tiddlywiki.com/#Philosophy%20of%20Tiddlers) and [Tiddlers](http://tiddlywiki.com/#
 Tiddlers)
 
-### The Vis.js Project
+#### The Vis.js Project
 
 For graph visualization and manipulation, TiddlyMap draws upon the popular open-source [vis.js](http://visjs.org/) library - *a dynamic, browser based visualization library* actively developed and maintained by a team of enthusiastic developers working at [Almende B.V](|http://almende.com).
 

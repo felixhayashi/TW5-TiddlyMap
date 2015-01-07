@@ -122,7 +122,8 @@ html { // used to increase css importance
     width: 100%;
     color: $color;
     
-    &.click-to-use .network-frame:not(.vis-active):not(.tmap-fullscreen) {
+    
+    &.click-to-use .network-frame:not(.vis-active) {
       cursor: pointer;
       
       .network-navigation {

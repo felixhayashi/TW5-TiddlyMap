@@ -1,12 +1,4 @@
-created: 20141221140636352
-icon: $:/core/images/star-filled
-id: 6159DA1A-73F2-451D-B55F-8744480BA7AC
-modified: 20150103191651753
-tags: 
-title: TiddlyMap - The Big Picture
-type: text/x-markdown
-
-## What it can do for you
+# TiddlyMap
 
 TiddlyMap is a [TiddlyWiki](http://tiddlywiki.com/) (TW5) plugin that allows you to link your wiki-topics (tiddlers) in order to create *clickable graphs*. By creating relations between your topics you can easily do the following:
 
@@ -16,14 +8,16 @@ TiddlyMap is a [TiddlyWiki](http://tiddlywiki.com/) (TW5) plugin that allows you
 
 In general you may **create, visualize and describe any network-structure** you have in mind.
 
-## How it works
+A demo with several examples and explanations can be found [here](bit.ly/tiddlymap).
 
-TiddlyMap combines the strength of two open-source projects:
+# How it works
 
-**⤍ The TiddlyWiki Project**
+TiddlyMap combines the strength of two open-source projects.
 
-> TiddlyWiki has bought unprecedented freedom to people to keep their precious information under their own control
-> - [tiddlywiki.com]([http://tiddlywiki.com]/#TiddlyWiki)
+### The TiddlyWiki Project
+
+> TiddlyWiki has bought unprecedented freedom to people to keep their precious information under their own control.
+> – [tiddlywiki.com]([http://tiddlywiki.com]/#TiddlyWiki)
 
 The TiddlyWiki project is a flourishing community project under the lead of its original inventor Jeremy Ruston (@Jermolene). Put in simple words, TiddlyWiki is a highly interactive wiki stored in a single file that can be used for:
 
@@ -31,11 +25,16 @@ The TiddlyWiki project is a flourishing community project under the lead of its 
 * Project documentation and management
 * To create whole encyclopedias
 
+The building blocks of TiddlyWiki are small pieces of information called "tiddlers":
 
-**⤍ The Vis.js Project**
+> "Tiddlers" are fundamental units of information. Tiddlers work best when they are as small as possible so that they can be reused by weaving them together in different ways. The TiddlyWiki project aspires to provide a concise way of expressing and exploring the relationships between these small pieces of information.
+> –  Adapted from [Philosophy of Tiddlers](http://tiddlywiki.com/#Philosophy%20of%20Tiddlers) and [Tiddlers](http://tiddlywiki.com/#
+Tiddlers)
+
+### The Vis.js Project
 
 For graph visualization and manipulation, TiddlyMap draws upon the popular open-source [vis.js](http://visjs.org/) library - *a dynamic, browser based visualization library* actively developed and maintained by a team of enthusiastic developers working at [Almende B.V](|http://almende.com).
 
 > The library is designed to be easy to use, handle large amounts of dynamic data, and enable manipulation of the data
->  - [visjs.org](|http://visjs.org/)
+> – [visjs.org](|http://visjs.org/)
 

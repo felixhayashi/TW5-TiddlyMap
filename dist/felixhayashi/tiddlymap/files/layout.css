@@ -63,11 +63,11 @@ html {
     padding: 2px;
     width: 100%;
     color: #666666; }
-    html .tiddlymap.click-to-use .network-frame:not(.vis-active):not(.tmap-fullscreen) {
+    html .tiddlymap.click-to-use .network-frame:not(.vis-active) {
       cursor: pointer; }
-      html .tiddlymap.click-to-use .network-frame:not(.vis-active):not(.tmap-fullscreen) .network-navigation {
+      html .tiddlymap.click-to-use .network-frame:not(.vis-active) .network-navigation {
         display: none; }
-      html .tiddlymap.click-to-use .network-frame:not(.vis-active):not(.tmap-fullscreen):hover:before {
+      html .tiddlymap.click-to-use .network-frame:not(.vis-active):hover:before {
         box-shadow: 10px 10px 5px lightgray;
         color: gray;
         background: white;

@@ -643,9 +643,10 @@ module-type: widget
     // in contrast to the graph height, which is assigned to the vis
     // graph wrapper, the graph width is assigned to the parent
     parent.style["width"] = this.getAttribute("width", "100%");
-
+    
     window.addEventListener("resize", this.handleResizeEvent.bind(this), false);
     window.addEventListener("click", this.handleClickEvent.bind(this), false);
+    window.addEventListener($tw.utils.getFullScreenApis()["_fullscreenChange"], this.handleFullScreenChange.bind(this), false);
     
     this.handleResizeEvent();
 
@@ -676,7 +677,7 @@ module-type: widget
     
     this.addGraphButtons({
       "surface": this.handleQuitDiving,
-      "fullscreen": this.handleGoFullScreen      
+      "fullscreen": this.handleFullScreenButtonClick
     });
     this.setGraphButtonEnabled("fullscreen", true);
         
@@ -876,39 +877,66 @@ module-type: widget
     }     
   }
   
-  TiddlyMapWidget.prototype.handleGoFullScreen = function(event) {
+  TiddlyMapWidget.prototype.handleFullScreenButtonClick = function() {
+
+    this.logger("log", "Toggle fullscreen");
+
+    if(!this.isFullscreenMode) {
+      
+      this.logger("log", "Adding fullscreen markers");
+      
+      var fsMarker = this.opt.misc.cssPrefix + "fullscreen";
+      var contextMarker = this.opt.misc.cssPrefix + "has-fullscreen-child";
+      
+      // first we need to mark the element that we want fullscreen.
+      // we cannot set the element itself fullscreen as this would
+      // cause modals to be hidden.
+      
+      var el = document.getElementsByClassName(fsMarker)[0];
+      $tw.utils.addClass(this.parentDomNode, fsMarker);
     
-    // first we need to mark the element that we want fullscreen.
-    // we cannot set the element itself fullscreen as this would
-    // cause modals to be hidden.
+      // it's not nice but we need to set a marker to be able to shift
+      // the stacking context as the z-index cannot do it on its own
     
-    var marker = this.opt.misc.cssPrefix + "fullscreen";
-    var el = document.getElementsByClassName("tiddlymap" + " " + marker)[0];
-    if(el !== this.parentDomNode) { // remove previous marker
-      if(el) {
-        $tw.utils.removeClass(el, marker);
+      var storyRiver = document.getElementsByClassName("tc-story-river")[0];
+      if(storyRiver && storyRiver.contains(this.parentDomNode)) {
+        $tw.utils.addClass(storyRiver, contextMarker);
+      } else {
+        var sidebar = document.getElementsByClassName("tc-sidebar-scrollable")[0];
+        if(sidebar && sidebar.contains(this.parentDomNode)) {
+          $tw.utils.addClass(sidebar, contextMarker);
+        }
       }
-      $tw.utils.addClass(this.parentDomNode, marker);
+      
+      this.isFullscreenMode = true;
+      
     }
     
-    // it's not nice but we need to set a marker to be able to shift
-    // the stacking context as the z-index cannot do it on its own
-    
-    var stackingContextMarker = this.opt.misc.cssPrefix + "has-fullscreen-child";
-    var sidebar = document.getElementsByClassName("tc-sidebar-scrollable")[0];
-    var storyRiver = document.getElementsByClassName("tc-story-river")[0];
-    if(storyRiver && storyRiver.contains(this.parentDomNode)) {
-      $tw.utils.addClass(storyRiver, stackingContextMarker);
-      $tw.utils.removeClass(sidebar, stackingContextMarker);
-    } else if(sidebar && sidebar.contains(this.parentDomNode)) {
-      $tw.utils.addClass(sidebar, stackingContextMarker);
-      $tw.utils.removeClass(storyRiver, stackingContextMarker);
-    }
-    
+    // toggles(!) fullscreen
     this.dispatchEvent({ type: "tm-full-screen" });
     
   };
-  
+    
+    
+  TiddlyMapWidget.prototype.handleFullScreenChange = function() {
+    
+    if(this.isFullscreenMode
+       && !document[$tw.utils.getFullScreenApis()["_fullscreenElement"]]) {
+         
+      this.logger("log", "Removing fullscreen markers");
+
+      var fsMarker = this.opt.misc.cssPrefix + "fullscreen";
+      var contextMarker = this.opt.misc.cssPrefix + "has-fullscreen-child";
+    
+      // remove all markers everywhere
+      utils.findAndRemoveClassNames([ fsMarker, contextMarker ]);
+      
+      this.isFullscreenMode = false;
+      
+    }
+    
+  };
+    
   TiddlyMapWidget.prototype.handleQuitDiving = function() {
     this.lastNodeDoubleClicked = null;
     this.setGraphButtonEnabled("surface", false);
@@ -1067,12 +1095,11 @@ module-type: widget
         
         if(this.getView().isConfEnabled("node_diving")) {
           this.setGraphButtonEnabled("surface", true);
-          var time = 2000;
           
           this.preventNextRepaint = true;
           this.rebuildGraph();
           this.network.zoomExtent({
-            duration: time
+            duration: 2000
           });
         }
         
@@ -1299,10 +1326,15 @@ module-type: widget
     
   TiddlyMapWidget.prototype.repaintGraph = function() {
     
-    this.logger("info", "Repainting the whole graph");
+    if(!document[$tw.utils.getFullScreenApis()["_fullscreenElement"]]
+       || this.isFullscreenMode) {
     
-    this.network.redraw();
-    this.network.zoomExtent();
+      this.logger("info", "Repainting the whole graph");
+    
+      this.network.redraw();
+      this.network.zoomExtent();
+      
+    }
     
   };
     

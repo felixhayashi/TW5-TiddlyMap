@@ -417,6 +417,23 @@ utils.hasElements = function(obj) {
   
 };
 
+/**
+ * Searches the dom for elements that possess a certain class
+ * and removes this class from each element.
+ * 
+ * @param {Array<string>} classNames - The class names to remove.
+ */
+utils.findAndRemoveClassNames = function(classNames) {
+  
+  for(var i = 0; i < classNames.length; i++) {
+    var elements = document.getElementsByClassName(classNames[i]);
+    for(var i = 0; i < elements.length; i++) {
+      $tw.utils.removeClass(elements[i], classNames[i]);
+    }
+  }
+
+};
+
 utils.isDraft = function(tiddler) {
 
   return (utils.getTiddler(tiddler) && utils.getTiddler(tiddler).isDraft());

@@ -646,7 +646,7 @@ module-type: widget
     
     window.addEventListener("resize", this.handleResizeEvent.bind(this), false);
     window.addEventListener("click", this.handleClickEvent.bind(this), false);
-    window.addEventListener($tw.utils.getFullScreenApis()["_fullscreenChange"], this.handleFullScreenChange.bind(this), false);
+    window.addEventListener(utils.getFullScreenApis()["_fullscreenChange"], this.handleFullScreenChange.bind(this), false);
     
     this.handleResizeEvent();
 
@@ -921,7 +921,7 @@ module-type: widget
   TiddlyMapWidget.prototype.handleFullScreenChange = function() {
     
     if(this.isFullscreenMode
-       && !document[$tw.utils.getFullScreenApis()["_fullscreenElement"]]) {
+       && !document[utils.getFullScreenApis()["_fullscreenElement"]]) {
          
       this.logger("log", "Removing fullscreen markers");
 
@@ -1326,7 +1326,7 @@ module-type: widget
     
   TiddlyMapWidget.prototype.repaintGraph = function() {
     
-    if(!document[$tw.utils.getFullScreenApis()["_fullscreenElement"]]
+    if(!document[utils.getFullScreenApis()["_fullscreenElement"]]
        || this.isFullscreenMode) {
     
       this.logger("info", "Repainting the whole graph");

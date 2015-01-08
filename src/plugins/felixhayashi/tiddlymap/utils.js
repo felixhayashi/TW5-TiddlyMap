@@ -427,8 +427,8 @@ utils.findAndRemoveClassNames = function(classNames) {
   
   for(var i = 0; i < classNames.length; i++) {
     var elements = document.getElementsByClassName(classNames[i]);
-    for(var i = 0; i < elements.length; i++) {
-      $tw.utils.removeClass(elements[i], classNames[i]);
+    for(var j = 0; j < elements.length; j++) {
+      $tw.utils.removeClass(elements[j], classNames[i]);
     }
   }
 
@@ -597,6 +597,38 @@ utils.getTiddlersWithProperty = function(fieldName, value, options) {
 };
 
 /************************* 3rd-party code **************************/
+
+/**
+ * TW-Code
+ * @deprecated delete this in one year and use $tw.utils.getFullScreenApis instead
+ */
+utils.getFullScreenApis = function() {
+  var d = document,
+    db = d.body,
+    result = {
+    "_requestFullscreen": db.webkitRequestFullscreen !== undefined ? "webkitRequestFullscreen" :
+              db.mozRequestFullScreen !== undefined ? "mozRequestFullScreen" :
+              db.msRequestFullscreen !== undefined ? "msRequestFullscreen" :
+              db.requestFullscreen !== undefined ? "requestFullscreen" : "",
+    "_exitFullscreen": d.webkitExitFullscreen !== undefined ? "webkitExitFullscreen" :
+              d.mozCancelFullScreen !== undefined ? "mozCancelFullScreen" :
+              d.msExitFullscreen !== undefined ? "msExitFullscreen" :
+              d.exitFullscreen !== undefined ? "exitFullscreen" : "",
+    "_fullscreenElement": d.webkitFullscreenElement !== undefined ? "webkitFullscreenElement" :
+              d.mozFullScreenElement !== undefined ? "mozFullScreenElement" :
+              d.msFullscreenElement !== undefined ? "msFullscreenElement" :
+              d.fullscreenElement !== undefined ? "fullscreenElement" : "",
+    "_fullscreenChange": d.webkitFullscreenElement !== undefined ? "webkitfullscreenchange" :
+              d.mozFullScreenElement !== undefined ? "mozfullscreenchange" :
+              d.msFullscreenElement !== undefined ? "MSFullscreenChange" :
+              d.fullscreenElement !== undefined ? "fullscreenchange" : ""
+  };
+  if(!result._requestFullscreen || !result._exitFullscreen || !result._fullscreenElement) {
+    return null;
+  } else {
+    return result;
+  }
+};
 
 /**
  * 

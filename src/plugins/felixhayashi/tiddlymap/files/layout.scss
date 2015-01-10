@@ -263,8 +263,12 @@ html { // used to increase css importance
 
 @mixin fullscreen() {
 
+  .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
+    z-index: 0;
+  }
+
   .tmap-has-fullscreen-child {
-    z-index: 998;
+    z-index: 1;
 
     .tiddlymap.tmap-fullscreen {
       background: white;

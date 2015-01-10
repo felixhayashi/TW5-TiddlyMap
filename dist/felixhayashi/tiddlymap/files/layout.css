@@ -151,8 +151,10 @@ html {
         padding: inherit;
         box-shadow: none; }
 
+html:fullscreen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
+  z-index: 0; }
 html:fullscreen .tmap-has-fullscreen-child {
-  z-index: 998; }
+  z-index: 1; }
   html:fullscreen .tmap-has-fullscreen-child .tiddlymap.tmap-fullscreen {
     background: white;
     height: 100% !important;
@@ -166,8 +168,10 @@ html:fullscreen .tmap-has-fullscreen-child {
     border: none;
     margin: 0; }
 
+html:-moz-full-screen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
+  z-index: 0; }
 html:-moz-full-screen .tmap-has-fullscreen-child {
-  z-index: 998; }
+  z-index: 1; }
   html:-moz-full-screen .tmap-has-fullscreen-child .tiddlymap.tmap-fullscreen {
     background: white;
     height: 100% !important;
@@ -181,8 +185,10 @@ html:-moz-full-screen .tmap-has-fullscreen-child {
     border: none;
     margin: 0; }
 
+html:-webkit-full-screen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
+  z-index: 0; }
 html:-webkit-full-screen .tmap-has-fullscreen-child {
-  z-index: 998; }
+  z-index: 1; }
   html:-webkit-full-screen .tmap-has-fullscreen-child .tiddlymap.tmap-fullscreen {
     background: white;
     height: 100% !important;
@@ -196,8 +202,10 @@ html:-webkit-full-screen .tmap-has-fullscreen-child {
     border: none;
     margin: 0; }
 
+html:-ms-fullscreen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
+  z-index: 0; }
 html:-ms-fullscreen .tmap-has-fullscreen-child {
-  z-index: 998; }
+  z-index: 1; }
   html:-ms-fullscreen .tmap-has-fullscreen-child .tiddlymap.tmap-fullscreen {
     background: white;
     height: 100% !important;

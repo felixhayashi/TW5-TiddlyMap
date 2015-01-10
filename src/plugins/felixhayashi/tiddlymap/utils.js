@@ -428,6 +428,7 @@ utils.findAndRemoveClassNames = function(classNames) {
   for(var i = 0; i < classNames.length; i++) {
     var elements = document.getElementsByClassName(classNames[i]);
     for(var j = 0; j < elements.length; j++) {
+      console.log(elements[j], classNames[i]);
       $tw.utils.removeClass(elements[j], classNames[i]);
     }
   }

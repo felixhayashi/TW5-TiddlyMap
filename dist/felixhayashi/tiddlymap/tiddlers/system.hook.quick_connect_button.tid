@@ -1,7 +1,8 @@
 tags: $:/tags/ViewToolbar
 title: $:/plugins/felixhayashi/tiddlymap/misc/quickConnectButton
+description: Show available ~TiddlyMap actions
 
-<$button class="tc-btn-invisible" popup=<<qualify "$:/temp/tiddlymap/">>>
+<$button popup=<<qualify "$:/temp/tiddlymap/">> class=<<tv-config-toolbar-class>> >
   {{$:/plugins/felixhayashi/tiddlymap/icon}}
 </$button>
 

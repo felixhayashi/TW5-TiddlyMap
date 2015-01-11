@@ -154,6 +154,10 @@ module-type: widget
     // remember our place in the dom
     this.registerParentDomNode(parent);
     
+    // register storyriver dom node
+    this.storyRiver = document.getElementsByClassName("tc-story-river")[0];
+    this.sidebar = document.getElementsByClassName("tc-sidebar-scrollable")[0];
+    
     // who am I?
     this.objectId = (this.getAttribute("object-id")
                      ? this.getAttribute("object-id")
@@ -617,7 +621,7 @@ module-type: widget
   TiddlyMapWidget.prototype.initAndRenderGraph = function(parent) {
     
     this.logger("info", "Initializing and rendering the graph");
-    
+        
     if(this.editorMode) {
       // we do **not** register this child via this.children.push(dropZoneWidget);
       // as this would cause the graph to be destroyed on the next refreshWidgets
@@ -636,9 +640,16 @@ module-type: widget
       this.graphDomNode = document.createElement("div");
       parent.appendChild(this.graphDomNode);
     }
-    
+        
     $tw.utils.addClass(this.graphDomNode, "vis-graph");
-    //parent.appendChild(this.graphDomNode);
+    
+    if(this.getView().getLabel() === "live"
+       && !this.wiki.getTiddler("$:/plugins/felixhayashi/topstoryview")) {
+      
+      throw "To use this feature, please install the TW5-TopStoryView Plugin";
+      
+    }
+    
 
     // in contrast to the graph height, which is assigned to the vis
     // graph wrapper, the graph width is assigned to the parent
@@ -663,6 +674,7 @@ module-type: widget
     // listen to refresh-trigger changes if trigger is provided
     if(utils.tiddlerExists(this.getAttribute("refresh-trigger"))) {
       this.callbackRegistry.add(this.getAttribute("refresh-trigger"), function() {
+        this.logger("log", this.getAttribute("refresh-trigger"), "triggered a refresh");
         this.lastNodeDoubleClicked = null; // quits diving mode
         this.rebuildGraph();
       }.bind(this), false);
@@ -899,12 +911,11 @@ module-type: widget
       // the stacking context as the z-index cannot do it on its own
     
       var storyRiver = document.getElementsByClassName("tc-story-river")[0];
-      if(storyRiver && storyRiver.contains(this.parentDomNode)) {
-        $tw.utils.addClass(storyRiver, contextMarker);
+      if(this.storyRiver && this.storyRiver.contains(this.parentDomNode)) {
+        $tw.utils.addClass(this.storyRiver, contextMarker);
       } else {
-        var sidebar = document.getElementsByClassName("tc-sidebar-scrollable")[0];
-        if(sidebar && sidebar.contains(this.parentDomNode)) {
-          $tw.utils.addClass(sidebar, contextMarker);
+        if(this.sidebar && this.sidebar.contains(this.parentDomNode)) {
+          $tw.utils.addClass(this.sidebar, contextMarker);
         }
       }
       
@@ -1135,7 +1146,7 @@ module-type: widget
    */
   TiddlyMapWidget.prototype.handleResizeEvent = function(event) {
     
-    if(this.objectId === "search_visualizer" || this.objectId ===  "main_editor") {
+    if(this.sidebar.contains(this.parentDomNode)) {
       
       var windowHeight = window.innerHeight;
       var canvasOffset = this.parentDomNode.getBoundingClientRect().top;

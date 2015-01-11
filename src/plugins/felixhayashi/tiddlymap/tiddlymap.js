@@ -740,6 +740,8 @@ module-type: widget
     if(this.getView().getConfig("layout.active") === "hierarchical") {
       options.hierarchicalLayout.enabled = true;
       options.hierarchicalLayout.layout = "direction";
+    } else {
+      options.hierarchicalLayout.enabled = false;
     }
 
     return options;

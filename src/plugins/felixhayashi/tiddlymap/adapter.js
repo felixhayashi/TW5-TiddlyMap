@@ -342,7 +342,6 @@ Adapter.prototype.createNode = function(tiddler, protoNode) {
         body = body.replace(/\r?\n|\r/g, " ");
         if(body.indexOf("xmlns") === -1) { // it's a bad habit of tiddlywiki...
           body = body.replace(/<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-          console.log(body);
         }
       }
 

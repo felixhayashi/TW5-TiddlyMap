@@ -91,6 +91,7 @@ say here is: do not require the caretaker!
     // as view but won't show up 
     opt.field.viewMarker = "isview";
     opt.field.nodeId = (opt.user.field_nodeId ? opt.user.field_nodeId : "id");
+    opt.field.nodeIcon = (opt.user.field_nodeIcon ? opt.user.field_nodeIcon : "icon");
     opt.field.nodeLabel = (opt.user.field_nodeLabel ? opt.user.field_nodeLabel : "title");
 
     // some other options

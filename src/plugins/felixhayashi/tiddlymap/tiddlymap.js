@@ -409,7 +409,7 @@ module-type: widget
       utils.inject(curNode, nodes);
       
     }
-        
+    
     // retrieve edges
     
     var edges = this.adapter.selectEdgesByEndpoints(nodes, {

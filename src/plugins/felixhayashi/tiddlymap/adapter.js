@@ -312,6 +312,7 @@ Adapter.prototype.createNode = function(tiddler, protoNode) {
   }
   
   // make sure underlying tiddler has an id
+  
   if(!tObj.fields[this.opt.field.nodeId]) {
     var fields = utils.getEmptyMap();
     fields[this.opt.field.nodeId] = utils.genUUID();
@@ -322,9 +323,34 @@ Adapter.prototype.createNode = function(tiddler, protoNode) {
   var node = utils.getEmptyMap();
   
   // assign label
-  node.label = (tObj && tObj.fields[this.opt.field.nodeLabel]
-          ? tObj.fields[this.opt.field.nodeLabel]
-          : tObj.fields.title);
+  
+  node.label = (tObj.fields[this.opt.field.nodeLabel]
+                ? tObj.fields[this.opt.field.nodeLabel]
+                : tObj.fields.title);
+  
+  // determine shape
+  
+  var iconRef = tObj.fields[this.opt.field.nodeIcon];
+  if(iconRef) {
+    var imgTObj = utils.getTiddler(iconRef);
+    if(imgTObj && imgTObj.fields.text) {
+      var type = (imgTObj.fields.type ? imgTObj.fields.type : "image/svg+xml");
+      var body = imgTObj.fields.text;
+      node.shape = "image";
+      if(type === "image/svg+xml") {
+        // see http://stackoverflow.com/questions/10768451/inline-svg-in-css
+        body = body.replace(/\r?\n|\r/g, " ");
+        if(body.indexOf("xmlns") === -1) { // it's a bad habit of tiddlywiki...
+          body = body.replace(/<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+          console.log(body);
+        }
+      }
+
+      node.image = "data:" + type + ";base64," + window.btoa(body);
+      
+    }
+  }
+     
   
   // use the tiddler's color field as node color
   if(tObj.fields.color) {

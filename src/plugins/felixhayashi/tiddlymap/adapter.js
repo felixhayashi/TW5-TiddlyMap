@@ -344,8 +344,13 @@ Adapter.prototype.createNode = function(tiddler, protoNode) {
           body = body.replace(/<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
         }
       }
+      
 
-      node.image = "data:" + type + ";base64," + window.btoa(body);
+      var encodedBody = ($tw.config.contentTypeInfo[type].encoding === "base64"
+                         ? body
+                         : window.btoa(body));
+
+      node.image = "data:" + type + ";base64," + encodedBody;
       
     }
   }

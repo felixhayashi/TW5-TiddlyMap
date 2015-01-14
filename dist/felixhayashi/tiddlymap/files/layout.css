@@ -58,12 +58,13 @@ html {
     width: 100%;
     font-size: 11px;
     font-family: "Courier New", Courier, monospace; }
+  html .tc-sidebar-scrollable .tiddlymap {
+    min-height: 350px; }
   html .tiddlymap {
     border: 3px dotted lightgray;
     padding: 2px;
     width: 100%;
-    color: #666666;
-    min-height: 350px; }
+    color: #666666; }
     html .tiddlymap.click-to-use .network-frame:not(.vis-active) {
       cursor: pointer; }
       html .tiddlymap.click-to-use .network-frame:not(.vis-active) .network-navigation {
@@ -101,7 +102,8 @@ html {
     html .tiddlymap .network-manipulationUI.edit.editmode {
       height: 26px; }
     html .tiddlymap .network-manipulationDiv {
-      background: transparent;
+      border-top: #d6d9d8;
+      background: #E6E6E6;
       padding: 3px 0;
       height: 35px; }
     html .tiddlymap .filterbar {
@@ -132,17 +134,9 @@ html {
       html .tiddlymap .filterbar > * {
         display: inline-block; }
       html .tiddlymap .filterbar .separator:after {
-        color: "#BDBFBF";
+        color: #bdbdbd;
         margin: 3px;
         content: " | "; }
-      html .tiddlymap .filterbar .quickhelp {
-        background: transparent;
-        border: none;
-        border-left: 1px solid #cccccc;
-        color: slategrey;
-        float: right;
-        font-weight: bold;
-        margin: 6px; }
       html .tiddlymap .filterbar .tc-edit-add-tag .tc-add-tag-name input {
         width: 70%; }
       html .tiddlymap .filterbar .tc-sidebar-header {

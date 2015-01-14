@@ -115,13 +115,18 @@ html { // used to increase css importance
     }
           
   }
+  
+  .tc-sidebar-scrollable {
+    .tiddlymap {
+      min-height: 350px;
+    }
+  }
 
   .tiddlymap {
     border: 3px dotted lightgray;
     padding: 2px;
     width: 100%;
     color: $color;
-    min-height: 350px;
     
     &.click-to-use .network-frame:not(.vis-active) {
       cursor: pointer;
@@ -180,7 +185,8 @@ html { // used to increase css importance
     }
     
     .network-manipulationDiv {
-      background: transparent;
+      border-top: #d6d9d8;
+      background: #E6E6E6;
       padding: 3px 0;
       height: 35px;
     }
@@ -229,19 +235,9 @@ html { // used to increase css importance
       }
       
       .separator:after {
-        color: "#BDBFBF";
+        color: #bdbdbd;
         margin: 3px;
         content: " | ";
-      }
-      
-      .quickhelp {
-        background: transparent;
-        border: none;
-        border-left: 1px solid #cccccc;
-        color: slategrey;
-        float: right;
-        font-weight: bold;
-        margin: $padding+1;
       }
       
       .tc-edit-add-tag .tc-add-tag-name input {

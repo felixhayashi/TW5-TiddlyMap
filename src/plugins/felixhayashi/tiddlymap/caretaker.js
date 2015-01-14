@@ -69,20 +69,25 @@ say here is: do not require the caretaker!
     opt.path.tempRoot =     "$:/temp/felixhayashi/tiddlymap";
     opt.path.localHolders = "$:/temp/felixhayashi/tiddlymap/holders";
     opt.path.dialogs =      "$:/plugins/felixhayashi/tiddlymap/dialog";
+    opt.path.visOptions =   "$:/plugins/felixhayashi/tiddlymap/options/vis";
     
     // static references to important tiddlers
     if(!opt.ref) opt.ref = utils.getEmptyMap();
     
     opt.ref.dialogStandardFooter =   "$:/plugins/felixhayashi/tiddlymap/dialog/standardFooter";
-    opt.ref.visOptions =             "$:/plugins/felixhayashi/tiddlymap/options/vis";
     opt.ref.tgOptions =              "$:/plugins/felixhayashi/tiddlymap/options/tiddlymap";    
     opt.ref.defaultGraphViewHolder = "$:/plugins/felixhayashi/tiddlymap/misc/defaultViewHolder";
     opt.ref.graphBar =               "$:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar";
     
     // original user options from the option tiddlers
     opt.user = $tw.wiki.getTiddlerData(opt.ref.tgOptions, utils.getEmptyMap());
-    opt.user.vis = $tw.wiki.getTiddlerData(opt.ref.visOptions, utils.getEmptyMap());
-    
+    opt.user.vis = utils.getEmptyMap();
+    var modules = [ "locales", "styles", "system" ];
+    for(var i = 0; i < modules.length; i++) {
+      var data = $tw.wiki.getTiddlerData(opt.path.visOptions + "/" + modules[i]);
+      $tw.utils.extend(opt.user.vis, data);
+    }
+        
     // fields with special meanings
     if(!opt.field) opt.field = utils.getEmptyMap();
     
@@ -93,6 +98,7 @@ say here is: do not require the caretaker!
     opt.field.nodeId = (opt.user.field_nodeId ? opt.user.field_nodeId : "id");
     opt.field.nodeIcon = (opt.user.field_nodeIcon ? opt.user.field_nodeIcon : "icon");
     opt.field.nodeLabel = (opt.user.field_nodeLabel ? opt.user.field_nodeLabel : "title");
+    opt.field.nodeInfo = (opt.user.field_nodeInfo ? opt.user.field_nodeInfo : "description");
 
     // some other options
     if(!opt.misc) opt.misc = utils.getEmptyMap();

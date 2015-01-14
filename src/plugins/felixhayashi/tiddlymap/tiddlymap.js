@@ -110,7 +110,8 @@ module-type: widget
         
     });
     
-    this.preventNextRepaint = true;
+    // TODO: disabled because a graphics bug
+    // this.preventNextRepaint = true;
     
   };
   
@@ -121,8 +122,6 @@ module-type: widget
    */
   TiddlyMapWidget.prototype.openStandardConfirmDialog = function(callback, message) {
   
-    // TODO: option paths seriously need some refactoring!
-
     var param = {
       message : message,
       dialog: {
@@ -310,9 +309,10 @@ module-type: widget
       } else {
         this.logger("warn", "View modified", viewModifications);
       }
-      
+            
+      // rebuild
       this.graphOptions = this.getGraphOptions();
-      this.rebuildGraph(this.getGraphOptions());
+      this.rebuildGraph(this.graphOptions);
       
     } else {
       
@@ -661,12 +661,11 @@ module-type: widget
     
     this.handleResizeEvent();
 
-    this.graphOptions = this.getGraphOptions();
+    // register options
+    this.graphOptions = this.getGraphOptions();  
 
     // init the graph with dummy data as events are not registered yet
-    this.network = new vis.Network(this.graphDomNode,
-                                   { nodes: [], edges: [] },
-                                   this.graphOptions);
+    this.network = new vis.Network(this.graphDomNode, { nodes: [], edges: [] }, this.graphOptions);
                 
     // repaint when sidebar is hidden
     this.callbackRegistry.add("$:/state/sidebar", this.repaintGraph.bind(this), false);
@@ -708,7 +707,7 @@ module-type: widget
     
     if(!this.graphOptions) {
       // get a copy of the options
-      var options = this.wiki.getTiddlerData(this.opt.ref.visOptions);
+      var options = $tw.utils.extendDeepCopy(this.opt.user.vis);
           
       options.onDelete = function(data, callback) {
         this.handleRemoveElement(data);
@@ -717,24 +716,23 @@ module-type: widget
         this.handleConnectionEvent(data);
       }.bind(this);
       options.onAdd = function(data, callback) {
-        this.insertNode(data);
+        this.handleInsertNode(data);
       }.bind(this);
       options.onEditEdge = function(data, callback) {
-        this.handleReconnectEdge(data);
+        var changedData = this.handleReconnectEdge(data);
       }.bind(this);
 
       options.dataManipulation = {
-          enabled : (this.editorMode ? true : false),
-          initiallyVisible : (this.view.getLabel() !== "quick_connect"
-                              && this.view.getLabel() !== "search_visualizer")
+        enabled : (this.editorMode ? true : false),
+        initiallyVisible : (this.view.getLabel() !== "quick_connect"
+                            && this.view.getLabel() !== "search_visualizer")
       };
         
       options.navigation = true;
       options.clickToUse = (this.getAttribute("click-to-use") !== "false");
+      
     } else {
       var options = this.graphOptions;
-      //~ // BUG https://github.com/almende/vis/issues/540
-      //~ delete this.graphOptions.clickToUse;
     }
     
     if(this.getView().getConfig("layout.active") === "hierarchical") {
@@ -852,9 +850,8 @@ module-type: widget
       { id: edge.id, label: edge.label }
     ], this.getView());
     
-    this.adapter.insertEdge(edge, this.getView());
-    
-    this.preventNextRepaint = true;
+    //this.preventNextRepaint = true;
+    return this.adapter.insertEdge(edge, this.getView());
     
   };
   
@@ -988,7 +985,7 @@ module-type: widget
       if(node) { // only tiddlers that already exist in the wiki
         
         this.getView().addNodeToView(node);
-        this.preventNextRepaint = true;
+        //this.preventNextRepaint = true;
         this.rebuildGraph();
         
       }
@@ -1062,11 +1059,16 @@ module-type: widget
 
   };
 
-  TiddlyMapWidget.prototype.insertNode = function(node) {
-    this.preventNextRepaint = true;
-    this.adapter.insertNode(node, {
-      view: this.getView(),
-      editNodeOnCreate: false
+  TiddlyMapWidget.prototype.handleInsertNode = function(node) {
+    this.dialogManager.open("getNodeName", null, function(isConfirmed, outputTObj) {
+      if(isConfirmed) {
+        node.label = utils.getText(outputTObj);
+        this.preventNextRepaint = true;
+        this.adapter.insertNode(node, {
+          view: this.getView(),
+          editNodeOnCreate: false
+        });
+      }
     });
   };
     
@@ -1085,17 +1087,9 @@ module-type: widget
     
     if(!properties.nodes.length && !properties.edges.length) { // clicked on an empty spot
       
-      if(!this.editorMode) {
-        return;
+      if(this.editorMode) {
+        this.handleInsertNode(properties.pointer.canvas);
       }
-      
-      this.dialogManager.open("getNodeName", null, function(isConfirmed, outputTObj) {
-        if(isConfirmed) {
-          var node = properties.pointer.canvas;
-          node.label = utils.getText(outputTObj);
-          this.insertNode(node);
-        }
-      });
       
     } else {
       
@@ -1208,9 +1202,11 @@ module-type: widget
     if(properties.nodeIds.length
        && !this.hasStartedDiving()
        && this.getView().getConfig("layout.active") !== "hierarchical") {
-      var mode = this.getView().isConfEnabled("physics_mode");
-      this.setNodesMoveable([ properties.nodeIds[0] ], mode);
-      this.handleStorePositions();
+      var isFloatingMode = this.getView().isConfEnabled("physics_mode");
+      this.setNodesMoveable([ properties.nodeIds[0] ], isFloatingMode);
+      if(!isFloatingMode) { // only store positions if in floating mode
+        this.handleStorePositions();
+      }
     }
   };
   
@@ -1383,6 +1379,18 @@ module-type: widget
       parent.appendChild(div);
     }
     
+  };
+  
+  TiddlyMapWidget.prototype.exitVisEditMode = function() {
+    
+    //~ this.logger("debug", "Leaving the vis edit-mode");
+    //~ var backButton = this.parentDomNode.getElementsByClassName("network-manipulationUI back")[0];
+    //~ if(backButton) {
+      //~ //backButton.onclick.call(backButton);
+    //~ } else {
+      //~ throw new utils.Exception.EnvironmentError();
+    //~ }
+
   };
   
   // !! EXPORT !!

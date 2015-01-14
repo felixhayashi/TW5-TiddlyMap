@@ -8,7 +8,7 @@ TiddlyMap is a TiddlyWiki plugin that allows you to link your wiki-topics (tiddl
 
 In general you may create, visualize and describe any network-structure you have in mind.
 
-A demo with several examples and explanations can be found [here](bit.ly/tiddlymap).
+A demo with several examples and explanations can be found [here](http://bit.ly/tiddlymap).
 
 ## How it works
 

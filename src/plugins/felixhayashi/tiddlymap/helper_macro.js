@@ -10,6 +10,7 @@ util functions.
 @preserve
 
 \*/
+
 (function(){
   
   /*jslint node: true, browser: true */

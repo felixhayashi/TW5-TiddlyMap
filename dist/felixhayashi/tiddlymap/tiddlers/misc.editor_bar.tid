@@ -42,20 +42,33 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
 <div>
   Edge Filter:
   <$button popup=<<qualify "$:/temp/tiddlymap/editor/filteredges">> >{{$:/core/images/menu-button}}</$button>
+  
   <$reveal type="popup" position="below" state=<<qualify "$:/temp/tiddlymap/editor/filteredges">> >
     <div class="tc-drop-down">
+    
+    <$tiddler tiddler=<<var.ref.edgeFilter>>>
       <$button class="tc-btn-invisible">{{$:/core/images/info-button}} quick help
         <$action-sendmessage $message="tm-modal" $param="$:/plugins/felixhayashi/tiddlymap/docs/help/viewActionQuickHelp" />
       </$button>
       <hr />
-      <$list filter=<<var.edgeFilterExpr>> >
-        <$set name="curEdgeId" value={{!!id}}>
-        <$checkbox tiddler=<<var.ref.edgeFilter>> field=<<showEdgeField>> checked="true" unchecked="false" default="true">
-          <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
-        </$checkbox>
-        <br />
-        </$set>
-      </$list>
+      <$checkbox field="default-is-show" checked="true" unchecked="false" default="true">
+        Toggle default (show or hide)
+      </$checkbox>
+      <hr />
+      <$set name="default" filter="[all[current]!field:default-is-show[false]]" value="true" emptyValue="false">
+      <div class="small-list">
+        <$list filter=<<var.edgeFilterExpr>> >
+          <$set name="curEdgeId" value={{!!id}}>
+            <$checkbox tiddler=<<var.ref.edgeFilter>> field=<<showEdgeField>> checked="true" unchecked="false" default=<<default>> >
+              <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
+            </$checkbox>
+            <br />
+          </$set>
+        </$list>
+      </div>
+      </$set>
+    </$tiddler>
+    
     </div>
   </$reveal>
 

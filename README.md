@@ -19,7 +19,7 @@ TiddlyMap combines the strength of two open-source projects.
 > [TiddlyWiki](http://tiddlywiki.com/) has bought unprecedented freedom to people to keep their precious information under their own control.
 > – [tiddlywiki.com]([http://tiddlywiki.com]/#TiddlyWiki)
 
-The TiddlyWiki project is a flourishing community project under the lead of its original inventor Jeremy Ruston (@Jermolene). Put in simple words, TiddlyWiki is a highly interactive wiki stored in a single file that can be used for:
+The TiddlyWiki project is a flourishing community project under the lead of its original inventor Jeremy Ruston. Put in simple words, TiddlyWiki is a highly interactive wiki stored in a single file that can be used for:
 
 * Personal note taking
 * Project documentation and management

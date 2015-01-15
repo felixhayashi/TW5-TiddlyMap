@@ -38,3 +38,24 @@ For graph visualization and manipulation, TiddlyMap draws upon the popular open-
 > The library is designed to be easy to use, handle large amounts of dynamic data, and enable manipulation of the data
 > – [visjs.org](|http://visjs.org/)
 
+## Impressions
+
+#### :paperclip: Use colors and icons in your graphs
+
+![tiddlymap demo site create clickable graphs and mindmaps by simply linking your tiddlers - chromium_439](https://cloud.githubusercontent.com/assets/4307137/5756039/85fc17ba-9cab-11e4-914e-e2176af1af15.png)
+
+#### :paperclip: Work fullscreen
+
+![tiddlymap demo site create clickable graphs and mindmaps by simply linking your tiddlers - chromium_443](https://cloud.githubusercontent.com/assets/4307137/5755990/09d15308-9cab-11e4-8bf0-d9bd6c5a0c4f.png)
+
+#### :paperclip: Use filters to decide what nodes to display in the graph
+
+![tiddlymap demo site create clickable graphs and mindmaps by simply linking your tiddlers - chromium_444](https://cloud.githubusercontent.com/assets/4307137/5756086/317535c2-9cac-11e4-99e6-6f048f512e6b.png)
+
+#### :paperclip: Get search results as graph (including direct neighbours)
+
+![tiddlymap demo site create clickable graphs and mindmaps by simply linking your tiddlers - chromium_441](https://cloud.githubusercontent.com/assets/4307137/5756022/60369244-9cab-11e4-880a-41ca63663c89.png)
+
+#### :paperclip: Create hierarchical layouts based on certain edge types
+
+![tiddlymap demo site create clickable graphs and mindmaps by simply linking your tiddlers - chromium_445](https://cloud.githubusercontent.com/assets/4307137/5756112/7966e902-9cac-11e4-838c-788393843814.png)

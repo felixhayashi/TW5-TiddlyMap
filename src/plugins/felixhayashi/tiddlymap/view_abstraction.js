@@ -309,13 +309,44 @@ module-type: library
     } else {
       var fields = this.wiki.getTiddler(this.path.config).fields;
       var config = utils.getPropertiesByPrefix(fields, "config.");
+      defaults = {
+        "config.layout.active": "user"
+      };
+      $tw.utils.extend(defaults, config);
     }
     
-    if(name) {
-      return config[(utils.startsWith(name, "config.") ? name : "config." + name)];
-    } else {
-      return config;
+    return (name
+            ? config[(utils.startsWith(name, "config.") ? name : "config." + name)]
+            : config);
+    
+  };
+  
+  /**
+   * If the active layout is set to *hierarchical*, this function will
+   * return all edges that define the hierarchical order of this view.
+   * If the layout is not set to *hierarchical*, an empty array is
+   * returned.
+   * 
+   * @return {Array<string>} A list of edge labels of edges that define
+   *     the hierarchy.
+   */
+  ViewAbstraction.prototype.getHierarchyEdgeTypes = function() {
+    
+    if(this.getConfig("layout.active") !== "hierarchical") return [];
+    
+    var orderByEdges = utils.getPropertiesByPrefix(this.getConfig(), "config.layout.hierarchical.order-by-", true);
+    
+    var labels = utils.getEmptyMap();
+    for(var id in orderByEdges) {
+      if(orderByEdges[id] === "true") {
+        var tObj = utils.getTiddlerById(id);
+        if(tObj) {
+          labels[utils.getBasename(tObj.fields.title)] = true;
+        }
+      }
     }
+          
+    return labels;
     
   };
 
@@ -332,6 +363,26 @@ module-type: library
     
     this._ignoreOnNextRebuild[this.path.config] = true;
     
+  };
+  
+  ViewAbstraction.prototype.removeNodeFromFilter = function(node) {
+    
+    var curExpr = this.getNodeFilter("expression");
+    var newFilter = curExpr
+                     .replace("[[" + node.label + "]]", "")
+                     .replace(this._getAddNodeFilterPart(node), "");
+                     
+    if(newFilter !== curExpr) {
+      this.setNodeFilter(newFilter);
+      return true;
+    } 
+    
+    return false;
+    
+  };
+  
+  ViewAbstraction.prototype._getAddNodeFilterPart = function(node) {
+    return "[field:" + this.opt.field.nodeId + "[" + node.id + "]]";
   };
 
   /**
@@ -412,8 +463,7 @@ module-type: library
 
   ViewAbstraction.prototype.addNodeToView = function(node) {
     
-    var filter = "[field:" + this.opt.field.nodeId + "[" + node.id + "]]";
-    this.appendToNodeFilter(filter);
+    this.appendToNodeFilter(this._getAddNodeFilterPart(node));
     this.setNodePosition(node);
     
   };

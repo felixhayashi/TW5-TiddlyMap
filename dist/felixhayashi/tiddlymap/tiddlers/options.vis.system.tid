@@ -68,7 +68,7 @@ type: application/json
   "maxVelocity": 30,
   "minVelocity": 0.1,
   "stabilize": true,
-  "stabilizationIterations": 2000,
+  "stabilizationIterations": 1000,
   "dragNetwork": true,
   "dragNodes": true,
   "zoomable": true,

@@ -289,7 +289,7 @@ module-type: library
     var result = utils.getEmptyMap();
     for(var i = 0; i < tiddlers.length; i++) {
       
-      var node = this.createNode(tiddlers[i], protoNode);
+      var node = this.createNode(tiddlers[i], protoNode, options.view);
       if(node) {
         result[node.id] = node;
       }
@@ -304,7 +304,7 @@ module-type: library
     
   };
 
-  Adapter.prototype.createNode = function(tiddler, protoNode) {
+  Adapter.prototype.createNode = function(tiddler, protoNode, view) {
 
     // ALWAYS reload from store to avoid setting wrong ids on tiddler
     // being in the role of from and to at the same time.  
@@ -377,6 +377,15 @@ module-type: library
     // force these fields
     node.id = tObj.fields[this.opt.field.nodeId];
     node.ref = tObj.fields.title;
+
+
+    if(view) {
+      var view = new ViewAbstraction(view);
+      if(view.isConfEnabled("physics_mode")) {
+        node.allowedToMoveX = true; 
+        node.allowedToMoveY = true;
+      }
+    }
     
     return node;
     
@@ -470,7 +479,7 @@ module-type: library
     for(var id in nodeIds) {
       for(var i = 0; i < allTiddlers.length; i++) {
         
-        var node = this.createNode(allTiddlers[i], protoNode);
+        var node = this.createNode(allTiddlers[i], protoNode, options.view);
         
         if(node && nodeIds[node.id]) { // valid and contained in set
           result[node.id] = node;
@@ -516,7 +525,7 @@ module-type: library
    * 
    * @param {NodeCollection} nodes - A collection of nodes.
    */
-  Adapter.prototype.deleteNodesFromStore = function(nodes) {
+  Adapter.prototype.deleteNodesFromStore = function(nodes, view) {
 
     if(!nodes) return;
     
@@ -552,6 +561,15 @@ module-type: library
     
     // delete tiddlers
     utils.deleteTiddlers(deleteCandidates);
+    
+    // remove connected edges
+    
+    var edges = this.selectEdgesByEndpoints(nodes, {
+      view: view,
+      outputType: "array"
+    });
+    
+    this.deleteEdgesFromStore(edges);
     
   };
 

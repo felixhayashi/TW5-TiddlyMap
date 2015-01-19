@@ -1,4 +1,3 @@
 title: $:/plugins/felixhayashi/tiddlymap/graph/views/search
 config.display_neighbours: true
 config.physics_mode: true
-config.node_diving: true

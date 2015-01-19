@@ -1,0 +1,18 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/deleteNodeDialog
+subtitle: Deleting the node named "<<var.nodeLabel>>"
+
+''Please choose an option or abort:''
+
+<$radio tiddler=<<output>> field="opt.delete" value="from system">
+  Delete from system <sup>[1]</sup>
+</$radio><br />
+<$radio tiddler=<<output>> field="opt.delete" value="from filter">
+  Delete from graph's filter <sup>[2]</sup>
+</$radio>
+
+---
+
+<sup>[1]</sup>
+<small>This will delete the node named "<<var.nodeLabel>>" ''and'' the corresponding tiddler named "<<var.nodeRef>>" ''and'' all connected edges.</small><br/>
+<sup>[2]</sup>
+<small>''Important:'' Removing a node from the graph's filter only works, if the node has been added in the map editor per double click or via "Add Node". Then we can delete the node "<<var.nodeLabel>>" from the existing filter used by the graph without removing the underlying tiddler.  If the node hasn't been added as mentioned above, you need to change the underlying tiddler in a way that it doesn't match your filter anymore, if you want it to be removed from the graph.</small>

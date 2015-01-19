@@ -38,6 +38,7 @@ module-type: widget
     // create shortcuts and aliases
     this.adapter = $tw.tiddlymap.adapter;
     this.opt = $tw.tiddlymap.opt;
+    this.notify = $tw.tiddlymap.notify;
     
     // key (a tiddler) -> callback (called when tiddler changes)
     this.callbackRegistry = new CallbackRegistry();
@@ -110,9 +111,6 @@ module-type: widget
         
     });
     
-    // TODO: disabled because a graphics bug
-    // this.preventNextRepaint = true;
-    
   };
   
   /**
@@ -165,9 +163,6 @@ module-type: widget
     // get view and view holder
     this.viewHolderRef = this.getViewHolderRef();
     this.view = this.getView();
-    
-    // some views are system views with special meaning 
-    this.handleSpecialViews();
         
     // first append the bar if we are in editor mode
     this.initAndRenderEditorBar(parent);
@@ -198,18 +193,6 @@ module-type: widget
         $tw.utils.addClass(parent, this.getAttribute("class"));
       }
     }
-  }
-  
-  TiddlyMapWidget.prototype.handleSpecialViews = function() {
-    
-    if(this.view.getLabel() === "quick_connect") {
-      var tRef = "$:/temp/felixhayashi/tiddlymap/quick_connect_search";
-      this.wiki.setText(tRef, "text", null, ""); // clear
-      var filter = "[search{" + tRef + "}!is[system]limit[10]]" + // search
-                   "[field:title[" + this.getVariable("currentTiddler") + "]]"; // always
-      this.view.setNodeFilter(filter);
-    }
-    
   };
   
   /**
@@ -311,8 +294,7 @@ module-type: widget
       }
             
       // rebuild
-      this.graphOptions = this.getGraphOptions();
-      this.rebuildGraph(this.graphOptions);
+      this.rebuildGraph(true);      
       
     } else {
       
@@ -332,28 +314,28 @@ module-type: widget
    * param {NodeCollection} [nodes] - An optional set of nodes to use
    * instead of the set created according to the nodes filter.
    */
-  TiddlyMapWidget.prototype.rebuildGraph = function(options) {
+  TiddlyMapWidget.prototype.rebuildGraph = function(resetContext) {
     
     this.logger("debug", "Rebuilding graph");
     
     // always reset to allow handling of stabilized-event!
     this.hasNetworkStabilized = false;
+        
+    if(resetContext) { // those resets executed BEFORE the data refresh
+      this.graphOptions = this.getGraphOptions();
+      this.network.setOptions(this.graphOptions);
+    }
     
     this.graphData = this.getGraphData(true);
-     
-    this.network.setData({
-      nodes: this.graphData.nodes,
-      edges: this.graphData.edges,
-      options: options
-    }, this.preventNextRepaint); // true => disableStart
-        
-    // reset
-    this.preventNextRepaint = false;       
+
+    if(resetContext) { // those resets executed AFTER the data refresh
+      if(!this.preventNextContextReset) {
+        this.network.zoomExtent();
+        this.preventNextContextReset = false;
+      }
+    }
+
   };
-  
-  TiddlyMapWidget.prototype.hasStartedDiving = function() {
-    return (this.lastNodeDoubleClicked && this.getView().isConfEnabled("node_diving"));
-  }
   
   /**
    * Warning: Do not change this functionname as it is used by the
@@ -377,26 +359,21 @@ module-type: widget
     }
     
     // calculate original nodes in form of a hashmap
-    
-    if(this.hasStartedDiving()) {
-      
-      var nodes = utils.getEmptyMap();
-      this.lastNodeDoubleClicked.group = "special";
-      nodes[this.lastNodeDoubleClicked.id] = this.lastNodeDoubleClicked;
-      
-    } else {      
-      
-      var nodeFilter = this.getView().getNodeFilter("compiled");
-      var nodes = this.adapter.selectNodesByFilter(nodeFilter, {
-        view: this.getView(),
-        outputType: "hashmap"
-      });
-      
-    }
+          
+    var nodeFilter = this.getView().getNodeFilter("compiled");
+    var nodes = this.adapter.selectNodesByFilter(nodeFilter, {
+      view: this.getView(),
+      outputType: "hashmap",
+      addProperties: {
+        group: "matches"
+      }
+    });
+
     
     // add special nodes
     
     if(this.getView().getLabel() === "quick_connect") { // special case; ugly solved!
+      
       var curNode = this.adapter.selectNodesByReference([ this.getVariable("currentTiddler") ], {
         outputType: "hashmap",
         addProperties: {
@@ -414,12 +391,13 @@ module-type: widget
     
     var edges = this.adapter.selectEdgesByEndpoints(nodes, {
       view: this.getView(),
+      outputType: "hashmap",
       endpointsInSet: ">=1" // ">=1" used to calculate neighbours
     });
     
     // retrieve and inject neighbours
         
-    if(this.getView().isConfEnabled("display_neighbours") || this.hasStartedDiving()) {
+    if(this.getView().isConfEnabled("display_neighbours")) {
       var neighbours = this.adapter.selectNeighbours(nodes, {
         edges: edges,
         outputType: "hashmap",
@@ -434,53 +412,33 @@ module-type: widget
     // calculate levels if layout is set to hierarchical
     
     if(this.getView().getConfig("layout.active") === "hierarchical") {
-            
-      var ids = utils.getPropertiesByPrefix(
-                    this.getView().getConfig(),
-                    "config.layout.hierarchical.order-by-",
-                    true);
-      
-      var labels = utils.getEmptyMap();
-      for(var id in ids) {
-        var tObj = utils.getTiddlerById(id);
-        if(tObj) {
-          labels[utils.getBasename(tObj.fields.title)] = true;
-        }
-      }
-            
-      this.setHierarchy(nodes, edges, function(edge) {
-        return labels[edge.label];
-      });
-      
+      this.setHierarchy(nodes, edges, this.getView().getHierarchyEdgeTypes());
     }
-            
-    // create data and lookup tables
-    var graphData = {
-      edges: edges,
-      nodes: utils.convert(nodes, "dataset"),
-      nodesByRef: utils.getLookupTable(nodes, "ref"),
-      nodesById: nodes
-    };
+      
+    // refresh datasets
     
-    return graphData;
+    if(!this.graphData) this.graphData = utils.getEmptyMap();
+    
+    this.graphData.nodes = utils.refresh(nodes, // new nodes
+                                         this.graphData.nodesById, // old nodes
+                                         this.graphData.nodes); // dataset
+                                                                                  
+    this.graphData.edges = utils.refresh(edges, // new edges
+                                         this.graphData.edgesById, // old edges
+                                         this.graphData.edges); // dataset
+                                       
+    // create lookup tables
+    
+    this.graphData.nodesByRef = utils.getLookupTable(nodes, "ref");
+    this.graphData.nodesById = nodes;
+    this.graphData.edgesById = edges;
+
+    return this.graphData;
         
   };
-   
-  TiddlyMapWidget.prototype.setHierarchy = function(nodes, edges, orderDefiningEdgesFilter) {
-            
-    // Initialisation Part I
-    // Only calculate the hierarchy based on the edges defined by the user's filter
-    
-    var hierarchy = edges.get({
-      returnType: "Object",
-      filter: orderDefiningEdgesFilter
-    });
 
-    // Initialisation Part II
-    // Get all edges as array to allow faster iteration
+  TiddlyMapWidget.prototype.setHierarchy = function(nodes, edges, hierarchyEdgeTypes) {
 
-    var allEdges = edges.get();
-    
     // Definition of the recursive function that is responsible for assigning ids.
     
     function assignLevel(curNode, level) {
@@ -489,18 +447,18 @@ module-type: widget
       
       curNode.level = level;
       
-      for(var i = 0; i < allEdges.length; i++) {
-        var edge = allEdges[i];
+      for(var id in edges) {
+        var edge = edges[id];
         if(edge.from === curNode.id) { // outgoing connection
           var toNode = nodes[edge.to];
-          if(hierarchy[edge.id]) { // edge that defines the hierarchical order
+          if(hierarchyEdgeTypes[edge.label]) { // edge that defines the hierarchical order
             assignLevel(toNode, level + 1); // child of curNode
           } else { // hierarchically equal relationship
             assignLevel(toNode, level);
           }
         } else if(edge.to === curNode.id) { // incoming connection
           var fromNode = nodes[edge.from];
-          if(hierarchy[edge.id]) { // edge that defines the hierarchical order
+          if(hierarchyEdgeTypes[edge.label]) { // edge that defines the hierarchical order
             assignLevel(fromNode, level - 1); // parent of curNode
           } else { // hierarchically equal relationship
             assignLevel(fromNode, level);
@@ -510,8 +468,8 @@ module-type: widget
     }
 
     loop1: for(var nodeId in nodes) {
-      for(var edgeId in allEdges) {
-        if(nodes[nodeId].level || nodes[nodeId].id === allEdges[edgeId].to) {
+      for(var id in edges) {
+        if(nodes[nodeId].level || nodes[nodeId].id === edges[id].to) {
           // already assigned a level or not a root node
           continue loop1;
         }
@@ -581,16 +539,15 @@ module-type: widget
     // check for updated or modified nodes that match the filter
     if(matchingChangedNodes.length) {
       
-      this.logger("info", "modified nodes", matchingChangedNodes);
+      this.logger("info", "Modified nodes", matchingChangedNodes);
       this.rebuildGraph();
       return;
       
     } else { // no node matches
-      
       // check for nodes that do not match the filter anymore
       for(var tRef in changedTiddlers) {
         if(this.graphData.nodesByRef[tRef]) {
-          this.logger("info", "obsolete node", matchingChangedNodes);
+          this.logger("info", "Obsolete node", matchingChangedNodes);
           this.rebuildGraph();
           return;
           
@@ -603,7 +560,7 @@ module-type: widget
     
     if(changedEdgestores.length) {
       
-      this.logger("info", "changed edge stores", changedEdgestores);
+      this.logger("info", "Changed edge stores", changedEdgestores);
       this.rebuildGraph();
       return;
     
@@ -661,20 +618,21 @@ module-type: widget
     
     this.handleResizeEvent();
 
-    // register options
-    this.graphOptions = this.getGraphOptions();  
+    // register options and data
+    this.graphOptions = this.getGraphOptions(); 
+    this.graphData = this.getGraphData(); 
 
     // init the graph with dummy data as events are not registered yet
-    this.network = new vis.Network(this.graphDomNode, { nodes: [], edges: [] }, this.graphOptions);
+    this.network = new vis.Network(this.graphDomNode, this.graphData, this.graphOptions);
                 
     // repaint when sidebar is hidden
     this.callbackRegistry.add("$:/state/sidebar", this.repaintGraph.bind(this), false);
     
     // listen to refresh-trigger changes if trigger is provided
-    if(utils.tiddlerExists(this.getAttribute("refresh-trigger"))) {
-      this.callbackRegistry.add(this.getAttribute("refresh-trigger"), function() {
-        this.logger("log", this.getAttribute("refresh-trigger"), "triggered a refresh");
-        this.lastNodeDoubleClicked = null; // quits diving mode
+    var refreshTrigger = this.getAttribute("refresh-trigger");
+    if(utils.tiddlerExists(refreshTrigger)) {
+      this.callbackRegistry.add(refreshTrigger, function() {
+        this.logger("log", refreshTrigger, "triggered a refresh");
         this.rebuildGraph();
       }.bind(this), false);
     }
@@ -687,17 +645,10 @@ module-type: widget
     this.network.on("dragEnd", this.handleNodeDragEnd.bind(this));
     
     this.addGraphButtons({
-      "surface": this.handleQuitDiving,
       "fullscreen": this.handleFullScreenButtonClick
     });
-    this.setGraphButtonEnabled("fullscreen", true);
-        
-    // finally create and register the data and rebuild the graph
-    this.rebuildGraph();
     
-    // fix until zoomExtent() works
-    //~ var center = this.network.getCenterCoordinates();
-    //~ this.network.moveTo({position: center, scale: 0.8});
+    this.setGraphButtonEnabled("fullscreen", true);
         
   };
   
@@ -724,8 +675,7 @@ module-type: widget
 
       options.dataManipulation = {
         enabled : (this.editorMode ? true : false),
-        initiallyVisible : (this.view.getLabel() !== "quick_connect"
-                            && this.view.getLabel() !== "search_visualizer")
+        initiallyVisible : true
       };
         
       options.navigation = true;
@@ -766,7 +716,7 @@ module-type: widget
   TiddlyMapWidget.prototype.handleRenameView = function() {
     
     if(this.getView().getLabel() === "default") {
-      $tw.tiddlymap.notify("Thou shalt not rename the default view!");
+      this.notify("Thou shalt not rename the default view!");
       return;
     }
     
@@ -805,7 +755,7 @@ module-type: widget
     var viewname = this.getView().getLabel();
     
     if(viewname === "default") {
-      $tw.tiddlymap.notify("Thou shalt not kill the default view!");
+      this.notify("Thou shalt not kill the default view!");
       return;
     }
     
@@ -834,7 +784,7 @@ module-type: widget
       if(isConfirmed) {
         this.getView().destroy();
         this.setView(this.opt.path.views + "/default");
-        $tw.tiddlymap.notify("view \"" + viewname + "\" deleted ");
+        this.notify("view \"" + viewname + "\" deleted ");
       }
 
     }, message);
@@ -850,7 +800,6 @@ module-type: widget
       { id: edge.id, label: edge.label }
     ], this.getView());
     
-    //this.preventNextRepaint = true;
     return this.adapter.insertEdge(edge, this.getView());
     
   };
@@ -866,25 +815,11 @@ module-type: widget
     
     if(elements.edges.length && !elements.nodes.length) { // only deleting edges
       this.adapter.deleteEdgesFromStore(this.graphData.edges.get(elements.edges), this.getView());
-      $tw.tiddlymap.notify("edge" + (elements.edges.length > 1 ? "s" : "") + " removed");
+      this.notify("edge" + (elements.edges.length > 1 ? "s" : "") + " removed");
     }
                         
     if(elements.nodes.length) {
-      
-      this.dialogManager.open("deleteNodeDialog", {}, function(isConfirmed) {
-        
-        if(!isConfirmed) return; // callback({}) ?
-          
-          // get objects with labels and ids
-          var nodes = this.graphData.nodes.get(elements.nodes);
-          var edges = this.graphData.edges.get(elements.edges);
-          
-          this.adapter.deleteNodesFromStore(nodes);
-          this.adapter.deleteEdgesFromStore(edges, this.getView());
-          
-          $tw.tiddlymap.notify("node" + (elements.nodes.length > 1 ? "s" : "") + " removed");
-        
-      });
+      this.handleRemoveNode(this.graphData.nodesById[elements.nodes[0]]);
     }     
   }
   
@@ -928,6 +863,46 @@ module-type: widget
   };
     
     
+  TiddlyMapWidget.prototype.handleRemoveNode = function(node) {
+
+    var params = {
+      "var.nodeLabel": node.label,
+      "var.nodeRef": node.ref,
+      dialog: {
+        preselects: {
+          "opt.delete": "from system"
+        }
+      }
+    };
+
+    this.dialogManager.open("deleteNodeDialog", params, function(isConfirmed, outputTObj) {
+      
+      if(isConfirmed) {
+        
+        if(outputTObj.fields["opt.delete"] === "from system") {
+
+          // will also delete edges
+          this.adapter.deleteNodesFromStore([ node ]);
+
+        } else {
+        
+          var success = this.getView().removeNodeFromFilter(node);
+          
+          if(!success) {
+            this.notify("Couldn't remove node from filter");
+            return;
+          }
+          
+        }
+        
+        this.notify("Node removed " + outputTObj.fields["opt.delete"]);
+        
+      }
+      
+    });
+      
+  };
+  
   TiddlyMapWidget.prototype.handleFullScreenChange = function() {
     
     if(this.isFullscreenMode
@@ -946,13 +921,7 @@ module-type: widget
     }
     
   };
-    
-  TiddlyMapWidget.prototype.handleQuitDiving = function() {
-    this.lastNodeDoubleClicked = null;
-    this.setGraphButtonEnabled("surface", false);
-    this.rebuildGraph();
-  };
-      
+     
   TiddlyMapWidget.prototype.handleImportTiddlers = function(event) {
     
     var tiddlers = JSON.parse(event.param);
@@ -968,34 +937,36 @@ module-type: widget
       var tObj = this.wiki.getTiddler(tiddlers[i].title);
       
       if(!tObj) {
-        $tw.tiddlymap.notify("Cannot integrate foreign tiddler");
+        this.notify("Cannot integrate foreign tiddler");
         return;
       }
       
       if(utils.isMatch(tObj, this.getView().getNodeFilter("compiled"))) { // no dublicates
-        $tw.tiddlymap.notify("Node already exists");
+        this.notify("Node already exists");
         continue;
       }
       
       var node = this.adapter.createNode(tObj, {
         x: ((i * 20) + pos.x), // if more than one, create some space
         y: pos.y,
-      });
+      }, this.getView());
       
       if(node) { // only tiddlers that already exist in the wiki
         
         this.getView().addNodeToView(node);
-        //this.preventNextRepaint = true;
         this.rebuildGraph();
         
       }
     }
     
   };
+    
   
-  TiddlyMapWidget.prototype.handleStorePositions = function() {
+  TiddlyMapWidget.prototype.handleStorePositions = function(withNotify) {
     this.adapter.storePositions(this.network.getPositions(), this.getView());
-    $tw.tiddlymap.notify("positions stored");
+    if(withNotify) {
+      this.notify("positions stored");
+    }
   };
   
   TiddlyMapWidget.prototype.handleEditNodeFilter = function() {
@@ -1024,7 +995,7 @@ module-type: widget
     if(!this.hasNetworkStabilized) {
       this.hasNetworkStabilized = true;
       this.logger("log", "Network stabilized after " + properties.iterations + " iterations");
-      this.setNodesMoveable(this.graphData.nodes.getIds(),
+      this.setNodesMoveable(this.graphData.nodesById,
                             this.getView().isConfEnabled("physics_mode"));
     }
     
@@ -1038,20 +1009,21 @@ module-type: widget
    * @param {boolean} isEnabled - True, if the nodes are allowed to
    *     move or be moved.
    */    
-  TiddlyMapWidget.prototype.setNodesMoveable = function(ids, isMoveable) {
-
-    //this.logger("log", "Nodes", ids, "can move:", isMoveable);
+  TiddlyMapWidget.prototype.setNodesMoveable = function(nodes, isMoveable) {
     
     this.network.storePositions(); // does it matter if we put this before setter? yes, I guess.
 
     var updates = [];
-    for(var i = 0; i < ids.length; i++) {
+    var keys = Object.keys(nodes);
+    for(var i = 0; i < keys.length; i++) {
       
-      updates.push({
-        id: ids[i],
+      var update = {
+        id: nodes[keys[i]].id,
         allowedToMoveX: isMoveable,
         allowedToMoveY: isMoveable
-      });
+      };
+      
+      updates.push(update);
       
     }
     
@@ -1063,11 +1035,11 @@ module-type: widget
     this.dialogManager.open("getNodeName", null, function(isConfirmed, outputTObj) {
       if(isConfirmed) {
         node.label = utils.getText(outputTObj);
-        this.preventNextRepaint = true;
         this.adapter.insertNode(node, {
           view: this.getView(),
           editNodeOnCreate: false
         });
+        this.preventNextContextReset = true;
       }
     });
   };
@@ -1099,17 +1071,7 @@ module-type: widget
         this.logger("debug", "Doubleclicked on node", node);        
         this.lastNodeDoubleClicked = node;
         var tRef = node.ref;
-        
-        if(this.getView().isConfEnabled("node_diving")) {
-          this.setGraphButtonEnabled("surface", true);
-          
-          this.preventNextRepaint = true;
-          this.rebuildGraph();
-          this.network.zoomExtent({
-            duration: 2000
-          });
-        }
-        
+                
       } else if(properties.edges.length) { // clicked on an edge
         
         this.logger("debug", "Doubleclicked on an Edge");
@@ -1200,10 +1162,11 @@ module-type: widget
    */
   TiddlyMapWidget.prototype.handleNodeDragEnd = function(properties) {
     if(properties.nodeIds.length
-       && !this.hasStartedDiving()
        && this.getView().getConfig("layout.active") !== "hierarchical") {
       var isFloatingMode = this.getView().isConfEnabled("physics_mode");
-      this.setNodesMoveable([ properties.nodeIds[0] ], isFloatingMode);
+      
+      var node = this.graphData.nodesById[properties.nodeIds[0]];
+      this.setNodesMoveable([ node ], isFloatingMode);
       if(!isFloatingMode) { // only store positions if in floating mode
         this.handleStorePositions();
       }
@@ -1219,7 +1182,8 @@ module-type: widget
    */
   TiddlyMapWidget.prototype.handleNodeDragStart = function(properties) {
     if(properties.nodeIds.length) {
-      this.setNodesMoveable([ properties.nodeIds[0] ], true);
+      var node = this.graphData.nodesById[properties.nodeIds[0]];
+      this.setNodesMoveable([ node ], true);
     }
   };
    
@@ -1379,18 +1343,6 @@ module-type: widget
       parent.appendChild(div);
     }
     
-  };
-  
-  TiddlyMapWidget.prototype.exitVisEditMode = function() {
-    
-    //~ this.logger("debug", "Leaving the vis edit-mode");
-    //~ var backButton = this.parentDomNode.getElementsByClassName("network-manipulationUI back")[0];
-    //~ if(backButton) {
-      //~ //backButton.onclick.call(backButton);
-    //~ } else {
-      //~ throw new utils.Exception.EnvironmentError();
-    //~ }
-
   };
   
   // !! EXPORT !!

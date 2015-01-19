@@ -58,21 +58,10 @@ type: application/json
       }
     },
     "neighbours": {
-      "shape": "box",
-      "radius": 5,
-      "widthMin": 16,
-      "widthMax": 64,
-      "fontColor": "black",
-      "fontSize": 14,
-      "fontFace": "verdana",
-      "color": {
-        "border" : "#ADADAD",
-        "background" : "#DCDCDC",
-        "highlight": {
-          "border": "#ADADAD",
-          "background": "#E8E8E8"
-        }
-      }
+      "color": "#DCDCDC"
+    },
+    "matches": {
+      "color": "#97C2FC"
     }
   },
   "tooltip": {

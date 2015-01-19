@@ -50,11 +50,3 @@ caption: The View Action Menu
   mind that you can display private and shared edges at the same time so private edges will
   always stay private and the public edges always public.
   """
-; Node diving mode
-: """
-  Ever dreamed of exploring your tiddlywiki by clicking through a network of nodes?
-  With this option enabled, clicking on a node of your graph will force the graph
-  to exclusively display the clicked node and its neighbours. At the same time the click
-  opens the corresponding tiddler in your storyview. To stop //diving//, click on this
-  graph button {{$:/plugins/felixhayashi/tiddlymap/media/surface.png}}.
-  """

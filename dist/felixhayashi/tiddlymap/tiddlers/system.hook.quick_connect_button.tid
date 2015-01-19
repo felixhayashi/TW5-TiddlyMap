@@ -20,6 +20,7 @@ description: Show available ~TiddlyMap actions
 
   You may link this node with any other node, just open this
   <$button class="tc-btn-invisible">connection wizard
+    <$action-setfield $tiddler="$:/temp/felixhayashi/tiddlymap/quick_connect_search" text="" />
     <$action-sendmessage $message="tm-modal" $param="$:/plugins/felixhayashi/tiddlymap/misc/connection_wizard" currentTiddler={{!!title}} />
   </$button>.
 

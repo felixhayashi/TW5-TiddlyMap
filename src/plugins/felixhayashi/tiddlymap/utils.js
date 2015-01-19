@@ -170,6 +170,38 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     return setB;
     
   };
+  
+  /**
+   * using an existing dataset to reflect the changes between
+   * two node sets.
+   * 
+   * @param {Hashmap<id, Node>} lt1 - Lookup table that contains the
+   *     *new* set of nodes.
+   * @param {Hashmap<id, Node>} lt1 - lookup table that holds the
+   *     *old* set of nodes.
+   * @param {vis.DataSet} [ds] - The dataset to be updated
+   */
+  utils.refresh = function(lt1, lt2, ds) {
+    
+    if(!ds) {
+      return new vis.DataSet(utils.convert(lt1, "array"));
+    }
+        
+    var changes = {
+      updated: utils.convert(lt1, "array"),
+      removed: []
+    };
+    
+    for(var id in lt2) {
+      if(!lt1[id]) changes.removed.push(id);
+    }
+    
+    ds.remove(changes.removed); // remove before update!
+    ds.update(changes.updated);
+    
+    return ds;
+    
+  };
 
   /**
    * Extract all the values from a collection. If `col` is an object,

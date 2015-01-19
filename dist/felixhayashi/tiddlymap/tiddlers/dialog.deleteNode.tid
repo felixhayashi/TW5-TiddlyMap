@@ -1,7 +1,0 @@
-title: $:/plugins/felixhayashi/tiddlymap/dialog/deleteNodeDialog
-subtitle: Please confirm your choice
-
-By deleting a node you are also deleting the corresponding tiddler
-__and__ any edges connected to that node.
-
-''Really proceed?''

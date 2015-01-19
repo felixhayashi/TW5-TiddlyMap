@@ -1,0 +1,2 @@
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/quick_connect/filter/nodes
+filter: [field:title<currentTiddler>] [!is[system]search{$:/temp/felixhayashi/tiddlymap/quick_connect_search}limit[10]]

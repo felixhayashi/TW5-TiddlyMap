@@ -23,7 +23,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
 
   <$reveal type="popup" position="below" state=<<qualify "$:/temp/tiddlymap/editor/showactions">> >
     <div class="tc-drop-down">
-      <$button class="tc-btn-invisible" message="tm-modal" param="$:/plugins/felixhayashi/tiddlymap/docs/help/viewActionQuickHelp">{{$:/core/images/info-button}} quick help</$button>
+      <a href="http://bit.ly/tiddlymap#Configuring the current view" target="_blank">{{$:/core/images/info-button}} Open online help</a>
       <hr />
       <$button class="tc-btn-invisible" message="tm-create-view">{{$:/core/images/new-button}} Create empty view</$button>
       <$button class="tc-btn-invisible" message="tm-rename-view">{{$:/core/images/tag-button}} Rename view</$button>
@@ -47,9 +47,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
     <div class="tc-drop-down">
     
     <$tiddler tiddler=<<var.ref.edgeFilter>>>
-      <$button class="tc-btn-invisible">{{$:/core/images/info-button}} quick help
-        <$action-sendmessage $message="tm-modal" $param="$:/plugins/felixhayashi/tiddlymap/docs/help/viewActionQuickHelp" />
-      </$button>
+      <a href="http://bit.ly/tiddlymap#Using the edge filter" target="_blank">{{$:/core/images/info-button}} Open online help</a>
       <hr />
       <$checkbox field="default-is-show" checked="true" unchecked="false" default="true">
         Toggle default (show or hide)
@@ -83,7 +81,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
   <$button popup=<<qualify "$:/temp/tiddlymap/editor/state/nodeFilterActions">> >{{$:/core/images/menu-button}}</$button>
   <$reveal type="popup" position="below" state=<<qualify "$:/temp/tiddlymap/editor/state/nodeFilterActions">> >
     <div class="tc-drop-down">
-      <$button class="tc-btn-invisible" message="tm-modal" param="$:/plugins/felixhayashi/tiddlymap/docs/help/NodeFilterQuickHelp">{{$:/core/images/info-button}} quick help</$button>
+      <a href="http://bit.ly/tiddlymap#Using the node filter" target="_blank">{{$:/core/images/info-button}} Open online help</a>
       <hr />
       <$button class="tc-btn-invisible" message="tm-edit-node-filter">{{$:/core/images/edit-button}} Edit filter</$button>
       <hr />

@@ -1,9 +1,0 @@
-title: $:/plugins/felixhayashi/tiddlymap/docs/help
-subtitle: Help
-
-\define topicRef() $:/plugins/felixhayashi/tiddlymap/docs/help/$(topic)$
-
-<!-- last slash in prefix exludes this wrapper -->
-<$set name="topic" value="globalConfig">
-<$macrocall $name="tabs" tabsList="[all[shadows]prefix[$:/plugins/felixhayashi/tiddlymap/docs/help/]]" class="tc-vertical" default=<<topicRef>> />
-</set>

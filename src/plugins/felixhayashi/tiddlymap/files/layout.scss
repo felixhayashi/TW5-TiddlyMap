@@ -203,8 +203,13 @@ html { // used to increase css importance
           padding: $padding;
           margin: 5px 0;
           
-          button {
+          button, a {
             padding : 0px;
+            text-decoration: none;
+            
+            svg {
+              vertical-align: middle;
+            }
           }
       }
       

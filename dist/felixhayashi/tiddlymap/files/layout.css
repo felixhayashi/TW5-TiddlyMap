@@ -116,8 +116,11 @@ html {
         min-width: 170px;
         padding: 5px;
         margin: 5px 0; }
-        html .tiddlymap .filterbar .tc-drop-down button {
-          padding: 0px; }
+        html .tiddlymap .filterbar .tc-drop-down button, html .tiddlymap .filterbar .tc-drop-down a, html .tiddlymap .filterbar .tc-drop-down .quick-connect .tc-btn-invisible, html .quick-connect .tiddlymap .filterbar .tc-drop-down .tc-btn-invisible {
+          padding: 0px;
+          text-decoration: none; }
+          html .tiddlymap .filterbar .tc-drop-down button svg, html .tiddlymap .filterbar .tc-drop-down a svg, html .tiddlymap .filterbar .tc-drop-down .quick-connect .tc-btn-invisible svg, html .quick-connect .tiddlymap .filterbar .tc-drop-down .tc-btn-invisible svg {
+            vertical-align: middle; }
       html .tiddlymap .filterbar [hidden] {
         display: none; }
       html .tiddlymap .filterbar .tc-block-dropdown {

@@ -314,7 +314,7 @@ module-type: widget
    * param {NodeCollection} [nodes] - An optional set of nodes to use
    * instead of the set created according to the nodes filter.
    */
-  TiddlyMapWidget.prototype.rebuildGraph = function(isResetContext) {
+  TiddlyMapWidget.prototype.rebuildGraph = function(isResetContext, fitGraphDelay) {
     
     this.logger("debug", "Rebuilding graph");
     
@@ -330,7 +330,7 @@ module-type: widget
 
     if(isResetContext) { // those resets executed AFTER the data-refresh
       if(!this.preventNextContextReset) {
-        this.fitGraph(2000);
+        this.fitGraph(fitGraphDelay);
         this.preventNextContextReset = false;
         
       }
@@ -705,7 +705,7 @@ module-type: widget
 
   TiddlyMapWidget.prototype.handleTriggeredRefresh = function(trigger) {
     this.logger("log", "Tiddler", trigger, "triggered a refresh");
-    this.rebuildGraph(true);
+    this.rebuildGraph(true, 2000);
   };
   
   TiddlyMapWidget.prototype.handleRenameView = function() {
@@ -1000,13 +1000,18 @@ module-type: widget
     
     window.clearTimeout(this.activeZoomExtentTimeout);
     
-    this.activeZoomExtentTimeout = window.setTimeout(function() {
+    var f = function() {
       this.network.zoomExtent({
         duration: 2000
       });
       this.activeZoomExtentTimeout = 0;
-    }.bind(this), delay);
-        
+    }.bind(this);
+    
+    if(delay) {
+      this.activeZoomExtentTimeout = window.setTimeout(f, delay);
+    } else {
+      f();
+    }
   }
   
   TiddlyMapWidget.prototype.handleStartStabilizionEvent = function(properties) {

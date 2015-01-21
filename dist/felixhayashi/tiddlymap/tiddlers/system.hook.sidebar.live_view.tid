@@ -2,6 +2,10 @@ caption: Live
 tags: $:/tags/SideBar
 title: $:/plugins/felixhayashi/tiddlymap/hook/liveView
 
+<$reveal type="nomatch" state="$:/view" text="top" default="">
+  <span style="color: red">''Warning:''</span> You see this warning because either you did not install the ''TW5-TopStoryView'' plugin or haven't set the scroll view to ''top'' (configuration ➡ Appearance ➡ Story view ➡ Current view). Please do so, otherwise the live view won't work.
+</$reveal>
+
 <$tiddlymap
   object-id="live_view"
   view="live"
@@ -9,3 +13,6 @@ title: $:/plugins/felixhayashi/tiddlymap/hook/liveView
   click-to-use="false"
   width="calc(100% - 15px)"
   bottom-spacing="15px"></$tiddlymap>
+
+  
+

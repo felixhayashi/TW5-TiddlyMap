@@ -163,7 +163,7 @@ module-type: widget
     // get view and view holder
     this.viewHolderRef = this.getViewHolderRef();
     this.view = this.getView();
-        
+            
     // first append the bar if we are in editor mode
     this.initAndRenderEditorBar(parent);
         
@@ -314,24 +314,25 @@ module-type: widget
    * param {NodeCollection} [nodes] - An optional set of nodes to use
    * instead of the set created according to the nodes filter.
    */
-  TiddlyMapWidget.prototype.rebuildGraph = function(resetContext) {
+  TiddlyMapWidget.prototype.rebuildGraph = function(isResetContext) {
     
     this.logger("debug", "Rebuilding graph");
     
     // always reset to allow handling of stabilized-event!
     this.hasNetworkStabilized = false;
         
-    if(resetContext) { // those resets executed BEFORE the data refresh
+    if(isResetContext) { // those resets executed BEFORE the data-refresh
       this.graphOptions = this.getGraphOptions();
       this.network.setOptions(this.graphOptions);
     }
     
     this.graphData = this.getGraphData(true);
 
-    if(resetContext) { // those resets executed AFTER the data refresh
+    if(isResetContext) { // those resets executed AFTER the data-refresh
       if(!this.preventNextContextReset) {
-        this.network.zoomExtent();
+        this.fitGraph(2000);
         this.preventNextContextReset = false;
+        
       }
     }
 
@@ -599,14 +600,6 @@ module-type: widget
     }
         
     $tw.utils.addClass(this.graphDomNode, "vis-graph");
-    
-    if(this.getView().getLabel() === "live"
-       && !this.wiki.getTiddler("$:/plugins/felixhayashi/topstoryview")) {
-      
-      throw "To use this feature, please install the TW5-TopStoryView Plugin";
-      
-    }
-    
 
     // in contrast to the graph height, which is assigned to the vis
     // graph wrapper, the graph width is assigned to the parent
@@ -631,10 +624,7 @@ module-type: widget
     // listen to refresh-trigger changes if trigger is provided
     var refreshTrigger = this.getAttribute("refresh-trigger");
     if(utils.tiddlerExists(refreshTrigger)) {
-      this.callbackRegistry.add(refreshTrigger, function() {
-        this.logger("log", refreshTrigger, "triggered a refresh");
-        this.rebuildGraph();
-      }.bind(this), false);
+      this.callbackRegistry.add(refreshTrigger, this.handleTriggeredRefresh.bind(this), false);
     }
     
     // register events
@@ -645,7 +635,7 @@ module-type: widget
     this.network.on("dragEnd", this.handleNodeDragEnd.bind(this));
     
     this.addGraphButtons({
-      "fullscreen": this.handleFullScreenButtonClick
+      "fullscreen": this.handleToggleFullscreen
     });
     
     this.setGraphButtonEnabled("fullscreen", true);
@@ -713,6 +703,11 @@ module-type: widget
     
   };
 
+  TiddlyMapWidget.prototype.handleTriggeredRefresh = function(trigger) {
+    this.logger("log", "Tiddler", trigger, "triggered a refresh");
+    this.rebuildGraph(true);
+  };
+  
   TiddlyMapWidget.prototype.handleRenameView = function() {
     
     if(this.getView().getLabel() === "default") {
@@ -823,7 +818,7 @@ module-type: widget
     }     
   }
   
-  TiddlyMapWidget.prototype.handleFullScreenButtonClick = function() {
+  TiddlyMapWidget.prototype.handleToggleFullscreen = function() {
 
     this.logger("log", "Toggle fullscreen");
 
@@ -1001,6 +996,28 @@ module-type: widget
     
   };
   
+  TiddlyMapWidget.prototype.fitGraph = function(delay) {
+    
+    window.clearTimeout(this.activeZoomExtentTimeout);
+    
+    this.activeZoomExtentTimeout = window.setTimeout(function() {
+      this.network.zoomExtent({
+        duration: 2000
+      });
+      this.activeZoomExtentTimeout = 0;
+    }.bind(this), delay);
+        
+  }
+  
+  TiddlyMapWidget.prototype.handleStartStabilizionEvent = function(properties) {
+    
+      //~ this.activeZoomExtentTimeout = this.network.zoomExtent({
+        //~ duration: 2000
+      //~ });
+
+    
+  };
+  
   /**
    * Allow the given nodes to be moveable.
    * 
@@ -1065,7 +1082,11 @@ module-type: widget
       
     } else {
       
-       if(properties.nodes.length) { // clicked on a node
+      if(this.isFullscreenMode) {
+        this.handleToggleFullscreen(); // exit fullsreen
+      }
+      
+      if(properties.nodes.length) { // clicked on a node
          
         var node = this.graphData.nodes.get(properties.nodes[0]);
         this.logger("debug", "Doubleclicked on node", node);        

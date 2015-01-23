@@ -64,7 +64,8 @@ html {
     border: 3px dotted lightgray;
     padding: 2px;
     width: 100%;
-    color: #666666; }
+    color: #666666;
+    display: block; }
     html .tiddlymap.click-to-use .network-frame:not(.vis-active) {
       cursor: pointer; }
       html .tiddlymap.click-to-use .network-frame:not(.vis-active) .network-navigation {

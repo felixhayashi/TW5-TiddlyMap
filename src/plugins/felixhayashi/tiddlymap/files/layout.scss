@@ -127,6 +127,7 @@ html { // used to increase css importance
     padding: 2px;
     width: 100%;
     color: $color;
+    display: block; // sometimes tw puts us into a span
     
     &.click-to-use .network-frame:not(.vis-active) {
       cursor: pointer;

@@ -432,7 +432,7 @@ module-type: widget
     if(this.getView().getConfig("layout.active") === "hierarchical") {
       this.setHierarchy(nodes, edges, this.getView().getHierarchyEdgeTypes());
     }
-      
+    
     // refresh datasets
     
     if(!this.graphData) this.graphData = utils.getEmptyMap();
@@ -450,7 +450,7 @@ module-type: widget
     this.graphData.nodesByRef = utils.getLookupTable(nodes, "ref");
     this.graphData.nodesById = nodes;
     this.graphData.edgesById = edges;
-
+    
     return this.graphData;
         
   };
@@ -637,7 +637,8 @@ module-type: widget
     
     // listen to refresh-trigger changes if trigger is provided
     var refreshTrigger = this.getAttribute("refresh-trigger");
-    if(utils.tiddlerExists(refreshTrigger)) {
+    if(refreshTrigger) {
+      this.logger("debug", "Registering refresh trigger:", refreshTrigger);
       this.callbackRegistry.add(refreshTrigger, this.handleTriggeredRefresh.bind(this), false);
     }
     

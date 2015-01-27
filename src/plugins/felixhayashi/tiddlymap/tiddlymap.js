@@ -383,7 +383,6 @@ module-type: widget
     // calculate original nodes in form of a hashmap
           
     var nodeFilter = this.getView().getNodeFilter("compiled");
-    console.log("nodeFilter", this.getView().getNodeFilter("expression"));
     var nodes = this.adapter.selectNodesByFilter(nodeFilter, {
       view: this.getView(),
       outputType: "hashmap",
@@ -399,11 +398,7 @@ module-type: widget
       
       var curNode = this.adapter.selectNodesByReference([ this.getVariable("currentTiddler") ], {
         outputType: "hashmap",
-        addProperties: {
-          group: "special",
-          x: 1, // WARNING VIS BUG: never use 0 as coordinate!
-          y: 1
-        }
+        addProperties: { group: "special", x: 0, y: 0 }
       });
       
       utils.inject(curNode, nodes);
@@ -606,7 +601,6 @@ module-type: widget
       // we do **not** register this child via this.children.push(dropZoneWidget);
       // as this would cause the graph to be destroyed on the next refreshWidgets
       var dropZoneWidget = this.makeChildWidget({ type: "dropzone" });
-      console.log(dropZoneWidget);
       var self = this;
       dropZoneWidget.handleDropEvent = function(event) {
         self.lastImportDropCoordinates = {
@@ -640,9 +634,6 @@ module-type: widget
 
     // init the graph with dummy data as events are not registered yet
     this.network = new vis.Network(this.graphDomNode, this.graphData, this.graphOptions);
-                
-    // repaint when sidebar is hidden
-    this.callbackRegistry.add("$:/state/sidebar", this.repaintGraph.bind(this), false);
     
     // listen to refresh-trigger changes if trigger is provided
     var refreshTrigger = this.getAttribute("refresh-trigger");

@@ -226,7 +226,7 @@ module-type: library
 
       switch(filter) {
         case "=2":
-          isMatch = nodes[edge.from];
+          isMatch = (nodes[edge.from] && nodes[edge.to]);
           break;
         case ">=1":
           isMatch = (nodes[edge.from] || nodes[edge.to]);
@@ -331,6 +331,10 @@ module-type: library
     node.label = (tObj.fields[this.opt.field.nodeLabel]
                   ? tObj.fields[this.opt.field.nodeLabel]
                   : tObj.fields.title);
+                  
+    // assign default level
+    
+    //~ node.level = 0;
     
     // determine shape
     

@@ -2,27 +2,71 @@ tags: $:/tags/ViewToolbar
 title: $:/plugins/felixhayashi/tiddlymap/misc/quickConnectButton
 description: Show available ~TiddlyMap actions
 
-<$button popup=<<qualify "$:/temp/tiddlymap/">> class=<<tv-config-toolbar-class>> >
-  {{$:/plugins/felixhayashi/tiddlymap/icon}}
-</$button>
-
-<$reveal animate="yes" type="popup" position="belowleft" state=<<qualify "$:/temp/tiddlymap/">> >
-<div class="tc-drop-down quick-connect">
-
-  {{$:/core/images/import-button}} ''Add this node''
-
-  Simply drag'n'drop <$link to=<<currentTiddler>>>this link</$link> on a graph editor to add
-  it to an existing view.
-
-  ---
-
-  {{$:/plugins/felixhayashi/tiddlymap/icon}} ''Link this node''
-
-  You may link this node with any other node, just open this
-  <$button class="tc-btn-invisible">connection wizard
-    <$action-setfield $tiddler="$:/temp/felixhayashi/tiddlymap/quick_connect_search" text="" />
-    <$action-sendmessage $message="tm-modal" $param="$:/plugins/felixhayashi/tiddlymap/misc/connection_wizard" currentTiddler={{!!title}} />
-  </$button>.
-
-</div>
+<$reveal type="nomatch" state=<<qualify "$:/temp/tiddlymap/">> text="show">
+  <$button set=<<qualify "$:/temp/tiddlymap/">> setTo="show" class=<<tv-config-toolbar-class>> >
+   {{$:/plugins/felixhayashi/tiddlymap/icon}}
+  </$button>
 </$reveal>
+
+<$reveal type="match" state=<<qualify "$:/temp/tiddlymap/">> text="show">
+  <$button set=<<qualify "$:/temp/tiddlymap/">> setTo="hide" class=<<tv-config-toolbar-class>> >
+    {{$:/plugins/felixhayashi/tiddlymap/icon}}
+  </$button>
+
+<div class="quick-connect tc-reveal tc-popup">
+  <div class="tc-drop-down">
+    <p>{{$:/core/images/import-button}} ''Add this node''</p>
+    <p>Simply drag'n'drop <$link to=<<currentTiddler>>>this link</$link> on a graph editor to add it to an existing view.</p>
+    <hr />
+    <p>{{$:/core/images/close-others-button}} ''Link this node''</p>
+    <p>1) Select or specify the edge-type (optional)</p>
+    <p>
+    <$edit-text tiddler="$:/temp/quickConnectSearch/type" field="text" type="text" tag="input" default="" />
+    <$select tiddler="$:/temp/quickConnectSearch/type" default="">
+    <option></option>
+      <$list filter=<<tgmacro "option" "filter.allSharedEdgesByLabel">>  >
+        <option>{{!!title}}</option>
+      </$list>
+    </$select>
+    </p>
+    <p>2) Search a tiddler you want to connect</p>
+    <p><$edit-text class="wiki-search" tiddler="$:/temp/quickConnectSearch" type="search" tag="input" default=""></$edit-text>
+       <small><$count filter="[!is[system]search{$:/temp/quickConnectSearch}sort[title]limit[50]]" /> results</small>
+    </p>
+    <p>
+      <table>
+        <$list filter="[!is[system]search{$:/temp/quickConnectSearch}sort[title]count[]]" variable="item">
+        <tr>
+          <td>
+            <$button>From
+              <$action-sendmessage $message="tm-create-edge"
+                                   from=<<item>>
+                                   to=<<currentTiddler>>
+                                   label={{$:/temp/quickConnectSearch/type}} />
+            </$button>
+          </td>
+          <td>
+            <$button>To
+              <$action-sendmessage $message="tm-create-edge"
+                                   from=<<currentTiddler>>
+                                   to=<<item>>
+                                   label={{$:/temp/quickConnectSearch/type}} />
+            </$button>
+          </td>
+          <td><<item>></td>
+        </tr>
+        </$list>
+      </table>
+    </p>
+
+  </div>
+</div>
+
+
+
+
+</$reveal>
+
+
+
+

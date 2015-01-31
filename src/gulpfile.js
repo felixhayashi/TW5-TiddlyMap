@@ -39,7 +39,7 @@ gulp.task("compile", ["clean"], function () {
     
   // uglify js
   gulp.src("plugins/**/*.js")
-    .pipe(uglify({ compress: false, preserveComments: "some" }))
+    //~ .pipe(uglify({ compress: false, preserveComments: "some" }))
     .pipe(gulp.dest("../dist/"));
     
 });

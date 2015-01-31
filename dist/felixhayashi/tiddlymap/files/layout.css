@@ -8,31 +8,46 @@ html {
     overflow: auto;
     height: 150px;
     width: 250px; }
-  html .quick-connect.tc-drop-down {
-    font-size: 0.5em;
-    right: 50px;
-    padding: 5px;
-    width: 200px;
-    white-space: normal;
-    line-height: 1em; }
-  html .quick-connect hr {
-    border: 0;
-    height: 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
-  html .quick-connect .tc-btn-invisible {
-    width: auto; }
-  html .quick-connect a, html .quick-connect .tc-btn-invisible {
-    display: inline;
-    padding: 0;
-    color: #5778d8;
-    background: transparent; }
-    html .quick-connect a:hover, html .quick-connect .tc-btn-invisible:hover {
-      background: transparent;
-      color: #5778d8;
-      text-decoration: underline; }
-  html .quick-connect > button {
-    padding-left: 10px; }
+  html .quick-connect {
+    font-size: 0.7em; }
+    html .quick-connect .tc-drop-down {
+      padding: 5px;
+      width: 200px;
+      white-space: normal;
+      line-height: 1em;
+      position: absolute;
+      z-index: 1000;
+      right: 50px; }
+      html .quick-connect .tc-drop-down table {
+        border: none;
+        max-height: 120px;
+        overflow: auto;
+        display: block; }
+        html .quick-connect .tc-drop-down table td {
+          padding: 3px;
+          border: none;
+          vertical-align: top; }
+      html .quick-connect .tc-drop-down hr {
+        border: 0;
+        height: 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+      html .quick-connect .tc-drop-down a {
+        display: inline;
+        padding: 0;
+        color: #5778d8;
+        background: transparent; }
+        html .quick-connect .tc-drop-down a:hover {
+          background: transparent;
+          color: #5778d8;
+          text-decoration: underline; }
+      html .quick-connect .tc-drop-down button {
+        display: inline-block;
+        padding: 0px 5px;
+        width: auto;
+        text-align: left;
+        color: #333333;
+        line-height: 1; }
   html .tc-modal-wrapper {
     z-index: 1010; }
     html .tc-modal-wrapper .tc-modal-header {
@@ -117,10 +132,10 @@ html {
         min-width: 170px;
         padding: 5px;
         margin: 5px 0; }
-        html .tiddlymap .filterbar .tc-drop-down button, html .tiddlymap .filterbar .tc-drop-down a, html .tiddlymap .filterbar .tc-drop-down .quick-connect .tc-btn-invisible, html .quick-connect .tiddlymap .filterbar .tc-drop-down .tc-btn-invisible {
+        html .tiddlymap .filterbar .tc-drop-down button, html .tiddlymap .filterbar .tc-drop-down a {
           padding: 0px;
           text-decoration: none; }
-          html .tiddlymap .filterbar .tc-drop-down button svg, html .tiddlymap .filterbar .tc-drop-down a svg, html .tiddlymap .filterbar .tc-drop-down .quick-connect .tc-btn-invisible svg, html .quick-connect .tiddlymap .filterbar .tc-drop-down .tc-btn-invisible svg {
+          html .tiddlymap .filterbar .tc-drop-down button svg, html .tiddlymap .filterbar .tc-drop-down a svg {
             vertical-align: middle; }
       html .tiddlymap .filterbar [hidden] {
         display: none; }
@@ -129,7 +144,7 @@ html {
         min-width: 370px;
         padding: 5px;
         margin: 15px 0 0 -370px; }
-        html .tiddlymap .filterbar .tc-block-dropdown a, html .tiddlymap .filterbar .tc-block-dropdown .quick-connect .tc-btn-invisible, html .quick-connect .tiddlymap .filterbar .tc-block-dropdown .tc-btn-invisible {
+        html .tiddlymap .filterbar .tc-block-dropdown a {
           display: inline;
           padding: 0px; }
       html .tiddlymap .filterbar button {

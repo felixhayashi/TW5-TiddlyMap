@@ -410,7 +410,9 @@ module-type: widget
     var edges = this.adapter.selectEdgesByEndpoints(nodes, {
       view: this.getView(),
       outputType: "hashmap",
-      endpointsInSet: ">=1" // ">=1" used to calculate neighbours
+      endpointsInSet: (this.getView().isConfEnabled("display_neighbours")
+                       ? ">=1" // needed when calculating neighbours
+                       : "=2") // closed set
     });
     
     // retrieve and inject neighbours
@@ -1123,25 +1125,27 @@ module-type: widget
         this.logger("debug", "Doubleclicked on node", node);        
         this.lastNodeDoubleClicked = node;
         var tRef = node.ref;
+        
+        // window.location.hash = node.ref; is not the right way to do it
+        this.dispatchEvent({
+          type: "tm-navigate", navigateTo: tRef
+        }); 
                 
       } else if(properties.edges.length) { // clicked on an edge
         
         this.logger("debug", "Doubleclicked on an Edge");
         
-        // TODO: open option menu
-        var edge = this.graphData.edges.get(properties.edges[0]);
-        var label = (edge.label
-                     ? edge.label
-                     : this.opt.misc.unknownEdgeLabel);
-        var tRef = this.getView().getEdgeStoreLocation() + "/" + label;
+        //~ if(this.editorMode) {
+          //~ // TODO: open option menu
+          //~ var edge = this.graphData.edges.get(properties.edges[0]);
+          //~ var label = (edge.label
+                       //~ ? edge.label
+                       //~ : this.opt.misc.unknownEdgeLabel);
+          //~ var tRef = this.getView().getEdgeStoreLocation() + "/" + label;
+        //~ }
       
       }
-      
-      // window.location.hash = node.ref; is not the right way to do it
-      this.dispatchEvent({
-        type: "tm-navigate", navigateTo: tRef
-      }); 
-            
+                  
     }
     
   };

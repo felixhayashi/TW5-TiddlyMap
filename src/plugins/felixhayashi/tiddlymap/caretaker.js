@@ -233,6 +233,20 @@ say here is: do not require the caretaker!
     
     var filter = getChangeFilter();
     
+    // hook to allow adding an edge via quick connect
+    $tw.rootWidget.addEventListener("tm-create-edge", function(event) {
+      
+      var edge = {
+        from: $tw.tiddlymap.adapter.createNode(event.paramObject.from).id,
+        to: $tw.tiddlymap.adapter.createNode(event.paramObject.to).id,
+        label: event.paramObject.label
+      }
+      
+      $tw.tiddlymap.adapter.insertEdge(edge);
+      $tw.tiddlymap.notify("Edge inserted");
+      
+    });
+    
     $tw.wiki.addEventListener("change", function(changedTiddlers) {
       
       $tw.tiddlymap.logger("warn", "These tiddlers changed:", changedTiddlers);

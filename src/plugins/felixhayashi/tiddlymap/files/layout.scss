@@ -9,45 +9,60 @@ html { // used to increase css importance
   }
 
   .quick-connect {
-
-    &.tc-drop-down {
-      font-size: 0.5em;
-      right: 50px;
+    font-size: 0.7em;
+  
+    .tc-drop-down {
       padding: 5px;
       width: 200px;
       white-space: normal;
       line-height: 1em;
-    }
-    
-    hr {
-      border: 0;
-      height: 0;
-      border-top: 1px solid rgba(0, 0, 0, 0.1);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-    }
-    
-    .tc-btn-invisible {
-      @extend a;
-      width: auto;
-    }
-    
-    a {
-      display: inline;
-      padding: 0;
-      color: #5778d8;
-      background: transparent;
+      position: absolute;
+      z-index: 1000;
+      right: 50px;
       
-      &:hover {
-        background: transparent;
+      table {
+        border: none;
+        max-height: 120px;
+        overflow: auto;
+        display: block;
+        
+        td {
+          padding: 3px;
+          border: none;
+          vertical-align: top;
+        }
+        
+      }
+      
+      hr {
+        border: 0;
+        height: 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      
+      a {
+        display: inline;
+        padding: 0;
         color: #5778d8;
-        text-decoration: underline;
+        background: transparent;
+        
+        &:hover {
+          background: transparent;
+          color: #5778d8;
+          text-decoration: underline;
+        }
+      }
+      
+      button {
+        display: inline-block;
+        padding: 0px 5px;
+        width: auto;
+        text-align: left;
+        color: #333333;
+        line-height: 1.0;
       }
     }
-    
-    >button {
-      padding-left: 10px;
-    }
-
   }
 
   .tc-modal-wrapper {

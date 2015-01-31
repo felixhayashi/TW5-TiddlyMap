@@ -7,30 +7,4 @@ module-type: library
 @preserve
 
 \*/
-
-(function(){
-  
-  Exception = {};
-  
-  Exception.EnvironmentError = function(aspect) {
-    this.name = "EnvironmentError";
-    this.message = "Critical parts (" + aspect + ") of the underlying system changed.";
-  };
-  
-  Exception.DependencyError = function(module) {
-    this.name = "DependencyError";
-    this.message = "TiddlyMap cannot run without: " + module;
-  };
-    
-  for(var ex in Exception) {
-    Exception[ex].prototype = Object.create(Error.prototype);
-    Exception[ex].constructor = Exception[ex];
-  }
-
-  // !! EXPORT !!
-  exports.Exception = Exception;
-  // !! EXPORT !!
-  
-})();
-
-
+(function(){Exception={};Exception.EnvironmentError=function(n){this.name="EnvironmentError";this.message="Critical parts ("+n+") of the underlying system changed."};Exception.DependencyError=function(n){this.name="DependencyError";this.message="TiddlyMap cannot run without: "+n};for(var n in Exception){Exception[n].prototype=Object.create(Error.prototype);Exception[n].constructor=Exception[n]}exports.Exception=Exception})();

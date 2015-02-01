@@ -15,50 +15,80 @@ description: Show available ~TiddlyMap actions
 
 <div class="quick-connect tc-reveal tc-popup">
   <div class="tc-drop-down">
-    <p>{{$:/core/images/import-button}} ''Add this node''</p>
-    <p>Simply drag'n'drop <$link to=<<currentTiddler>>>this link</$link> on a graph editor to add it to an existing view.</p>
+    <p>{{$:/core/images/import-button}} ''Add this node'': Drop  <$link to=<<currentTiddler>>>this link</$link> on a graph editor</p>
     <hr />
     <p>{{$:/core/images/close-others-button}} ''Link this node''</p>
-    <p>1) Select or specify the edge-type (optional)</p>
-    <p>
-    <$edit-text tiddler="$:/temp/quickConnectSearch/type" field="text" type="text" tag="input" default="" />
-    <$select tiddler="$:/temp/quickConnectSearch/type" default="">
-    <option></option>
-      <$list filter=<<tgmacro "option" "filter.allSharedEdgesByLabel">>  >
-        <option>{{!!title}}</option>
-      </$list>
-    </$select>
-    </p>
-    <p>2) Search a tiddler you want to connect</p>
-    <p><$edit-text class="wiki-search" tiddler="$:/temp/quickConnectSearch" type="search" tag="input" default=""></$edit-text>
-       <small><$count filter="[!is[system]search{$:/temp/quickConnectSearch}sort[title]limit[50]]" /> results</small>
-    </p>
-    <p>
-      <table>
-        <$list filter="[!is[system]search{$:/temp/quickConnectSearch}sort[title]count[]]" variable="item">
-        <tr>
-          <td>
-            <$button>From
-              <$action-sendmessage $message="tm-create-edge"
-                                   from=<<item>>
-                                   to=<<currentTiddler>>
-                                   label={{$:/temp/quickConnectSearch/type}} />
-            </$button>
-          </td>
-          <td>
-            <$button>To
-              <$action-sendmessage $message="tm-create-edge"
-                                   from=<<currentTiddler>>
-                                   to=<<item>>
-                                   label={{$:/temp/quickConnectSearch/type}} />
-            </$button>
-          </td>
-          <td><<item>></td>
-        </tr>
-        </$list>
-      </table>
-    </p>
-
+    <table>
+      <tr>
+        <td>Edge:</td>
+        <td>
+          <$edit-text tiddler="$:/temp/quickConnectSearch/type" field="text" type="text" tag="input" default="" />
+          <$select tiddler="$:/temp/quickConnectSearch/type" default="">
+            <option></option>
+            <$list filter=<<tgmacro "option" "filter.allSharedEdgesByLabel">>  >
+              <option>{{!!title}}</option>
+            </$list>
+          </$select> <sup>[1]</sup>
+        </td>
+      </tr>
+<!--
+      <tr>
+        <td>View:</td>
+        <td>
+          <$select tiddler="$:/temp/quickConnectSearch/view" default="">
+            <option></option>
+           <$list filter=<<tgmacro "option" "filter.allPrivateViews">> >
+             <option>{{!!title}}</option>
+           </$list>
+          </$select> <sup>[1]</sup><sup>[2]</sup>
+        </td>
+      </tr>
+-->
+      <tr>
+        <td>Search:</td>
+        <td>
+          <$edit-text class="wiki-search" tiddler="$:/temp/quickConnectSearch" type="search" tag="input" default=""></$edit-text>
+          <small><$count filter="[!is[system]search{$:/temp/quickConnectSearch}sort[title]limit[50]]" /> results</small>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <table class="scroll-table">
+            <$list filter="[!is[system]search{$:/temp/quickConnectSearch}sort[title]count[]]" variable="item" emptyMessage="//No results//">
+            <tr>
+              <td>
+                <$button>From
+                  <$action-sendmessage $message="tm-create-edge"
+                                       from=<<item>>
+                                       to=<<currentTiddler>>
+                                       label={{$:/temp/quickConnectSearch/type}}
+                                       view={{$:/temp/quickConnectSearch/view}} />
+                </$button>
+              </td>
+              <td>
+                <$button>To
+                  <$action-sendmessage $message="tm-create-edge"
+                                       from=<<currentTiddler>>
+                                       to=<<item>>
+                                       label={{$:/temp/quickConnectSearch/type}}
+                                       view={{$:/temp/quickConnectSearch/view}} />
+                </$button>
+              </td>
+              <td><<item>></td>
+            </tr>
+            </$list>
+          </table>
+        </td>
+      </tr>
+    </table>
+    
+    <hr />
+    
+    <sup>[1]</sup> <small>Optional</small><br />
+<!--
+    <sup>[2]</sup> <small>Only views operating in private edge mode are listed.</small>
+-->
+    
   </div>
 </div>
 

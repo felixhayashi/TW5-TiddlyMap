@@ -114,6 +114,8 @@ say here is: do not require the caretaker!
     opt.filter.allSharedEdgesByLabel = "[prefix[" + opt.path.edges + "]removeprefix[" + opt.path.edges + "/]]";
     opt.filter.allViews = "[all[tiddlers+shadows]has[" + opt.field.viewMarker + "]]";
     opt.filter.allViewsByLabel = "[all[tiddlers+shadows]has[" + opt.field.viewMarker + "]removeprefix[" + opt.path.views + "/]]";
+    opt.filter.allPrivateViews = "[all[tiddlers+shadows]field:config.private_edge_mode[true]has[" + opt.field.viewMarker + "]removeprefix[" + opt.path.views + "/]]";
+    
     
   };
   

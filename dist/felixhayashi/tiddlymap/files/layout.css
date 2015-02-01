@@ -12,21 +12,24 @@ html {
     font-size: 0.7em; }
     html .quick-connect .tc-drop-down {
       padding: 5px;
-      width: 200px;
+      width: 250px;
       white-space: normal;
       line-height: 1em;
       position: absolute;
       z-index: 1000;
       right: 50px; }
+      html .quick-connect .tc-drop-down select {
+        width: 80px; }
       html .quick-connect .tc-drop-down table {
-        border: none;
-        max-height: 120px;
-        overflow: auto;
-        display: block; }
+        border: none; }
         html .quick-connect .tc-drop-down table td {
           padding: 3px;
           border: none;
           vertical-align: top; }
+      html .quick-connect .tc-drop-down .scroll-table {
+        height: 120px;
+        overflow: auto;
+        display: block; }
       html .quick-connect .tc-drop-down hr {
         border: 0;
         height: 0;
@@ -43,7 +46,7 @@ html {
           text-decoration: underline; }
       html .quick-connect .tc-drop-down button {
         display: inline-block;
-        padding: 0px 5px;
+        padding: 0px 3px;
         width: auto;
         text-align: left;
         color: #333333;

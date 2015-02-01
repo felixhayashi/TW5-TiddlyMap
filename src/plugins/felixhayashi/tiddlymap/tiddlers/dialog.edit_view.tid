@@ -11,7 +11,7 @@ subtitle: View Configuration
   <ul>
     <li>
       Which relations define the hierarchical order?
-      <div class="small-list">
+      <div class="tmap-small-list">
         <$list filter=<<var.edgeFilterExpr>> >
           <$set name="curEdgeId" value={{!!id}}>
           <$checkbox tiddler=<<output>> field=<<orderByEdgeField>> checked="true" unchecked="false" default="false">

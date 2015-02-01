@@ -1,11 +1,11 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/editNodeFilter
 subtitle: Filter Editor
 
-<div id="node-filter-dialog">
+<div id="tmap-node-filter-dialog">
 
   <$edit-text tag="textarea" tiddler=<<output>> field="text" default=<<prettyFilter>> autoHeight="no" />
 
-  <div id="filter-tips">
+  <div id="tmap-filter-tips">
 
   Tips for creating a node filter:
 

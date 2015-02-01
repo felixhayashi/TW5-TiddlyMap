@@ -37,7 +37,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
 
 <!-- ===== Edge Filter ========================================== -->
 
-<span class="separator" />
+<span class="tmap-separator" />
 
 <div>
   Edge Filter:
@@ -54,7 +54,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
       </$checkbox>
       <hr />
       <$set name="default" filter="[all[current]!field:default-is-show[false]]" value="true" emptyValue="false">
-      <div class="small-list">
+      <div class="tmap-small-list">
         <$list filter=<<var.edgeFilterExpr>> >
           <$set name="curEdgeId" value={{!!id}}>
             <$checkbox tiddler=<<var.ref.edgeFilter>> field=<<showEdgeField>> checked="true" unchecked="false" default=<<default>> >
@@ -74,7 +74,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
 
 <!-- ===== Node Filter ========================================== -->
 
-<span class="separator" />
+<span class="tmap-separator" />
 
 <div>
   Node Filter:

@@ -181,13 +181,13 @@ module-type: widget
    */
   TiddlyMapWidget.prototype.registerParentDomNode = function(parent) {
     this.parentDomNode = parent;
-    if(!$tw.utils.hasClass(parent, "tiddlymap")) {
-      $tw.utils.addClass(parent, "tiddlymap");
+    if(!$tw.utils.hasClass(parent, "tmap-widget")) {
+      $tw.utils.addClass(parent, "tmap-widget");
       if(this.getAttribute("click-to-use") !== "false") {
-        $tw.utils.addClass(parent, "click-to-use");
+        $tw.utils.addClass(parent, "tmap-click-to-use");
       }
       if(this.getAttribute("editor") === "advanced") {
-        $tw.utils.addClass(parent, "advanced-editor");
+        $tw.utils.addClass(parent, "tmap-advanced-editor");
       }
       if(this.getAttribute("class")) {
         $tw.utils.addClass(parent, this.getAttribute("class"));
@@ -207,7 +207,7 @@ module-type: widget
     if(this.editorMode === "advanced") {
     
       this.graphBarDomNode = document.createElement("div");
-      $tw.utils.addClass(this.graphBarDomNode, "filterbar");
+      $tw.utils.addClass(this.graphBarDomNode, "tmap-filterbar");
       parent.appendChild(this.graphBarDomNode);
       
       this.rebuildEditorBar();
@@ -618,7 +618,7 @@ module-type: widget
       parent.appendChild(this.graphDomNode);
     }
         
-    $tw.utils.addClass(this.graphDomNode, "vis-graph");
+    $tw.utils.addClass(this.graphDomNode, "tmap-vis-graph");
 
     // in contrast to the graph height, which is assigned to the vis
     // graph wrapper, the graph width is assigned to the parent
@@ -850,8 +850,8 @@ module-type: widget
       
       this.logger("log", "Adding fullscreen markers");
       
-      var fsMarker = this.opt.misc.cssPrefix + "fullscreen";
-      var contextMarker = this.opt.misc.cssPrefix + "has-fullscreen-child";
+      var fsMarker = "tmap-fullscreen";
+      var contextMarker = "tmap-has-fullscreen-child";
       
       // first we need to mark the element that we want fullscreen.
       // we cannot set the element itself fullscreen as this would
@@ -929,8 +929,8 @@ module-type: widget
          
       this.logger("log", "Removing fullscreen markers");
 
-      var fsMarker = this.opt.misc.cssPrefix + "fullscreen";
-      var contextMarker = this.opt.misc.cssPrefix + "has-fullscreen-child";
+      var fsMarker = "tmap-fullscreen";
+      var contextMarker = "tmap-has-fullscreen-child";
     
       // remove all markers everywhere
       utils.findAndRemoveClassNames([ fsMarker, contextMarker ]);
@@ -1376,9 +1376,9 @@ module-type: widget
    *     false otherwise.
    */ 
   TiddlyMapWidget.prototype.setGraphButtonEnabled = function(name, enable) {
-    var className = "network-navigation tiddlymap-button " + name;
+    var className = "network-navigation tmap-vis-button" + " " + "tmap-" + name;
     var b = this.parentDomNode.getElementsByClassName(className)[0];
-    $tw.utils.toggleClass(b, "enabled", enable);
+    $tw.utils.toggleClass(b, "tmap-button-enabled", enable);
   }; 
 
   /**
@@ -1394,7 +1394,7 @@ module-type: widget
     
     for(var name in buttonEvents) {
       var div = document.createElement("div");
-      div.className = "network-navigation tiddlymap-button " + name;
+      div.className = "network-navigation tmap-vis-button " + " " + "tmap-" + name;
       div.addEventListener("click", buttonEvents[name].bind(this), false);
       parent.appendChild(div);
     }

@@ -4,13 +4,13 @@ html {
     background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/tiddlymap/media/surface.png!!type}} text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}}/>'));
   }
   */ }
-  html .small-list {
+  html .tmap-small-list {
     overflow: auto;
     height: 150px;
     width: 250px; }
-  html .quick-connect {
+  html .tmap-quick-connect {
     font-size: 0.7em; }
-    html .quick-connect .tc-drop-down {
+    html .tmap-quick-connect .tc-drop-down {
       padding: 5px;
       width: 250px;
       white-space: normal;
@@ -18,34 +18,34 @@ html {
       position: absolute;
       z-index: 1000;
       right: 50px; }
-      html .quick-connect .tc-drop-down select {
+      html .tmap-quick-connect .tc-drop-down select {
         width: 80px;
         word-wrap: initial; }
-      html .quick-connect .tc-drop-down table {
+      html .tmap-quick-connect .tc-drop-down table {
         border: none; }
-        html .quick-connect .tc-drop-down table td {
+        html .tmap-quick-connect .tc-drop-down table td {
           padding: 3px;
           border: none;
           vertical-align: top; }
-      html .quick-connect .tc-drop-down .scroll-table {
+      html .tmap-quick-connect .tc-drop-down .tmap-scroll-table {
         height: 120px;
         overflow: auto;
         display: block; }
-      html .quick-connect .tc-drop-down hr {
+      html .tmap-quick-connect .tc-drop-down hr {
         border: 0;
         height: 0;
         border-top: 1px solid rgba(0, 0, 0, 0.1);
         border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
-      html .quick-connect .tc-drop-down a {
+      html .tmap-quick-connect .tc-drop-down a {
         display: inline;
         padding: 0;
         color: #5778d8;
         background: transparent; }
-        html .quick-connect .tc-drop-down a:hover {
+        html .tmap-quick-connect .tc-drop-down a:hover {
           background: transparent;
           color: #5778d8;
           text-decoration: underline; }
-      html .quick-connect .tc-drop-down button {
+      html .tmap-quick-connect .tc-drop-down button {
         display: inline-block;
         padding: 0px 3px;
         width: auto;
@@ -68,9 +68,9 @@ html {
     html .tc-modal-wrapper .tc-modal-footer {
       padding-top: 0px;
       padding-bottom: 0px; }
-  html #node-filter-dialog #filter-tips {
+  html #tmap-node-filter-dialog #tmap-filter-tips {
     font-size: 0.8em; }
-  html #node-filter-dialog textarea {
+  html #tmap-node-filter-dialog textarea {
     height: 100px;
     max-height: 300px;
     overflow: auto;
@@ -79,17 +79,17 @@ html {
     font-family: "Courier New", Courier, monospace; }
   html .tc-sidebar-scrollable .tiddlymap {
     min-height: 350px; }
-  html .tiddlymap {
+  html .tmap-widget {
     border: 3px dotted lightgray;
     padding: 2px;
     width: 100%;
     color: #666666;
     display: block; }
-    html .tiddlymap.click-to-use .network-frame:not(.vis-active) {
+    html .tmap-widget.tmap-click-to-use .network-frame:not(.vis-active) {
       cursor: pointer; }
-      html .tiddlymap.click-to-use .network-frame:not(.vis-active) .network-navigation {
+      html .tmap-widget.tmap-click-to-use .network-frame:not(.vis-active) .network-navigation {
         display: none; }
-      html .tiddlymap.click-to-use .network-frame:not(.vis-active):hover:before {
+      html .tmap-widget.tmap-click-to-use .network-frame:not(.vis-active):hover:before {
         box-shadow: 10px 10px 5px lightgray;
         color: gray;
         background: white;
@@ -105,66 +105,62 @@ html {
         z-index: 2000;
         padding: 5px;
         pointer-events: none; }
-    html .tiddlymap .vis-graph {
+    html .tmap-widget .tmap-vis-graph {
       height: 100%; }
-      html .tiddlymap .vis-graph .network-frame .tiddlymap-button.surface.enabled {
-        bottom: 130px;
-        right: 15px;
-        background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}} />); }
-      html .tiddlymap .vis-graph .network-frame .tiddlymap-button.fullscreen.enabled {
+      html .tmap-widget .tmap-vis-graph .network-frame .tmap-vis-button.tmap-fullscreen.tmap-button-enabled {
         bottom: 90px;
         right: 15px;
         background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />); }
-    html .tiddlymap.advanced-editor {
+    html .tmap-widget.tmap-advanced-editor {
       background: #F2F2F2; }
-      html .tiddlymap.advanced-editor .vis-graph {
+      html .tmap-widget.tmap-advanced-editor .tmap-vis-graph {
         height: calc(100% - 35px); }
-    html .tiddlymap .network-manipulationUI.edit.editmode {
+    html .tmap-widget .network-manipulationUI.edit.editmode {
       height: 26px; }
-    html .tiddlymap .network-manipulationDiv {
+    html .tmap-widget .network-manipulationDiv {
       border-top: #d6d9d8;
       background: #E6E6E6;
       padding: 3px 0;
       height: 35px; }
-    html .tiddlymap .filterbar {
+    html .tmap-widget .tmap-filterbar {
       background: #d6d9d8;
       border-bottom: 1px solid lightgray;
       padding: 3px 5px;
       height: 35px; }
-      html .tiddlymap .filterbar .tc-drop-down {
+      html .tmap-widget .tmap-filterbar .tc-drop-down {
         background-color: #F3F3F3;
         min-width: 170px;
         padding: 5px;
         margin: 5px 0; }
-        html .tiddlymap .filterbar .tc-drop-down button, html .tiddlymap .filterbar .tc-drop-down a {
+        html .tmap-widget .tmap-filterbar .tc-drop-down button, html .tmap-widget .tmap-filterbar .tc-drop-down a {
           padding: 0px;
           text-decoration: none; }
-          html .tiddlymap .filterbar .tc-drop-down button svg, html .tiddlymap .filterbar .tc-drop-down a svg {
+          html .tmap-widget .tmap-filterbar .tc-drop-down button svg, html .tmap-widget .tmap-filterbar .tc-drop-down a svg {
             vertical-align: middle; }
-      html .tiddlymap .filterbar [hidden] {
+      html .tmap-widget .tmap-filterbar [hidden] {
         display: none; }
-      html .tiddlymap .filterbar .tc-block-dropdown {
+      html .tmap-widget .tmap-filterbar .tc-block-dropdown {
         width: 370px;
         min-width: 370px;
         padding: 5px;
         margin: 15px 0 0 -370px; }
-        html .tiddlymap .filterbar .tc-block-dropdown a {
+        html .tmap-widget .tmap-filterbar .tc-block-dropdown a {
           display: inline;
           padding: 0px; }
-      html .tiddlymap .filterbar button {
+      html .tmap-widget .tmap-filterbar button {
         line-height: inherit;
         color: #666666; }
-      html .tiddlymap .filterbar > * {
+      html .tmap-widget .tmap-filterbar > * {
         display: inline-block; }
-      html .tiddlymap .filterbar .separator:after {
+      html .tmap-widget .tmap-filterbar .tmap-separator:after {
         color: #bdbdbd;
         margin: 3px;
         content: " | "; }
-      html .tiddlymap .filterbar .tc-edit-add-tag .tc-add-tag-name input {
+      html .tmap-widget .tmap-filterbar .tc-edit-add-tag .tc-add-tag-name input {
         width: 70%; }
-      html .tiddlymap .filterbar .tc-sidebar-header {
+      html .tmap-widget .tmap-filterbar .tc-sidebar-header {
         text-shadow: none; }
-      html .tiddlymap .filterbar .tc-edit-tags {
+      html .tmap-widget .tmap-filterbar .tc-edit-tags {
         border: none;
         padding: inherit;
         box-shadow: none; }
@@ -173,7 +169,7 @@ html:fullscreen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:fullscreen .tmap-has-fullscreen-child {
   z-index: 1; }
-  html:fullscreen .tmap-has-fullscreen-child .tiddlymap.tmap-fullscreen {
+  html:fullscreen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
     background: white;
     height: 100% !important;
     width: 100% !important;
@@ -190,7 +186,7 @@ html:-moz-full-screen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:-moz-full-screen .tmap-has-fullscreen-child {
   z-index: 1; }
-  html:-moz-full-screen .tmap-has-fullscreen-child .tiddlymap.tmap-fullscreen {
+  html:-moz-full-screen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
     background: white;
     height: 100% !important;
     width: 100% !important;
@@ -207,7 +203,7 @@ html:-webkit-full-screen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:-webkit-full-screen .tmap-has-fullscreen-child {
   z-index: 1; }
-  html:-webkit-full-screen .tmap-has-fullscreen-child .tiddlymap.tmap-fullscreen {
+  html:-webkit-full-screen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
     background: white;
     height: 100% !important;
     width: 100% !important;
@@ -224,7 +220,7 @@ html:-ms-fullscreen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:-ms-fullscreen .tmap-has-fullscreen-child {
   z-index: 1; }
-  html:-ms-fullscreen .tmap-has-fullscreen-child .tiddlymap.tmap-fullscreen {
+  html:-ms-fullscreen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
     background: white;
     height: 100% !important;
     width: 100% !important;

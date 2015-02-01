@@ -13,11 +13,11 @@ description: Show available ~TiddlyMap actions
     {{$:/plugins/felixhayashi/tiddlymap/icon}}
   </$button>
 
-<div class="quick-connect tc-reveal tc-popup">
+<div class="tmap-quick-connect tc-reveal tc-popup">
   <div class="tc-drop-down">
     <div>{{$:/core/images/import-button}} ''Add this node'': Drop  <$link to=<<currentTiddler>>>this link</$link> on a graph editor</div>
     <hr />
-    <div>{{$:/core/images/close-others-button}} ''Link this node''</div>
+    <div>{{$:/core/images/close-others-button}} ''Link this node'' <sup>[1]</sup></div>
     <table>
       <tr>
         <td>Edge:</td>
@@ -28,7 +28,7 @@ description: Show available ~TiddlyMap actions
             <$list filter=<<tgmacro "option" "filter.allSharedEdgesByLabel">>  >
               <option>{{!!title}}</option>
             </$list>
-          </$select> <sup>[1]</sup>
+          </$select>
         </td>
       </tr>
 <!--
@@ -47,13 +47,13 @@ description: Show available ~TiddlyMap actions
       <tr>
         <td>Search:</td>
         <td>
-          <$edit-text class="wiki-search" tiddler="$:/temp/quickConnectSearch" type="search" tag="input" default=""></$edit-text>
+          <$edit-text tiddler="$:/temp/quickConnectSearch" type="search" tag="input" default=""></$edit-text>
           <small><$count filter="[!is[system]search{$:/temp/quickConnectSearch}sort[title]limit[50]]" /> results</small>
         </td>
       </tr>
       <tr>
         <td colspan="2">
-          <table class="scroll-table">
+          <table class="tmap-scroll-table">
             <$list filter="[!is[system]search{$:/temp/quickConnectSearch}sort[title]count[]]" variable="item" emptyMessage="//No results//">
             <tr>
               <td>
@@ -84,7 +84,7 @@ description: Show available ~TiddlyMap actions
     
     <hr />
     
-    <sup>[1]</sup> <small>Optional</small><br />
+    <small>[1] Note, that nodes will be linked globally. Have a look at the [[docs|http://bit.ly/tiddlymap#Public%20and%20Private%20Edges]] for more information on private and public relations.</small><br />
 <!--
     <sup>[2]</sup> <small>Only views operating in private edge mode are listed.</small>
 -->

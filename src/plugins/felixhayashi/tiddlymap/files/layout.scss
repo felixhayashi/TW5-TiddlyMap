@@ -2,13 +2,13 @@ $filterbar-height: 35px;
 
 html { // used to increase css importance
 
-  .small-list {
+  .tmap-small-list {
     overflow: auto;
     height: 150px;
     width: 250px;
   }
 
-  .quick-connect {
+  .tmap-quick-connect {
     font-size: 0.7em;
   
     .tc-drop-down {
@@ -35,7 +35,7 @@ html { // used to increase css importance
         }
       }
       
-      .scroll-table {
+      .tmap-scroll-table {
         height: 120px;
         overflow: auto;
         display: block;
@@ -121,9 +121,9 @@ html { // used to increase css importance
   }
   */
 
-  #node-filter-dialog {
+  #tmap-node-filter-dialog {
 
-    #filter-tips {
+    #tmap-filter-tips {
       font-size: 0.8em;
     }
 
@@ -144,14 +144,14 @@ html { // used to increase css importance
     }
   }
 
-  .tiddlymap {
+  .tmap-widget {
     border: 3px dotted lightgray;
     padding: 2px;
     width: 100%;
     color: $color;
     display: block; // sometimes tw puts us into a span
     
-    &.click-to-use .network-frame:not(.vis-active) {
+    &.tmap-click-to-use .network-frame:not(.vis-active) {
       cursor: pointer;
       
       .network-navigation {
@@ -177,17 +177,12 @@ html { // used to increase css importance
       }
     }
 
-    .vis-graph {
+    .tmap-vis-graph {
       height: 100%;
       
       .network-frame {
-        .tiddlymap-button { 
-          &.surface.enabled {
-            bottom: 130px;
-            right: 15px;
-            background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}} />'));
-          }
-          &.fullscreen.enabled {
+        .tmap-vis-button { 
+          &.tmap-fullscreen.tmap-button-enabled {
             bottom: 90px;
             right: 15px;
             background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />'));
@@ -196,9 +191,9 @@ html { // used to increase css importance
       }
     }
     
-    &.advanced-editor {
+    &.tmap-advanced-editor {
       background: #F2F2F2;
-      .vis-graph {
+      .tmap-vis-graph {
         height: calc(100% - 35px);
       }
     }
@@ -214,7 +209,7 @@ html { // used to increase css importance
       height: 35px;
     }
     
-    .filterbar {
+    .tmap-filterbar {
       background: #d6d9d8;
       border-bottom: 1px solid lightgray;
       padding: 3px $padding;
@@ -262,7 +257,7 @@ html { // used to increase css importance
         display: inline-block; // TODO: this is too rigorous
       }
       
-      .separator:after {
+      .tmap-separator:after {
         color: #bdbdbd;
         margin: 3px;
         content: " | ";
@@ -294,7 +289,7 @@ html { // used to increase css importance
   .tmap-has-fullscreen-child {
     z-index: 1;
 
-    .tiddlymap.tmap-fullscreen {
+    .tmap-widget.tmap-fullscreen {
       background: white;
       height: 100% !important;
       width: 100% !important;

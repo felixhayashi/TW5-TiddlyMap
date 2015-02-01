@@ -19,7 +19,8 @@ html {
       z-index: 1000;
       right: 50px; }
       html .quick-connect .tc-drop-down select {
-        width: 80px; }
+        width: 80px;
+        word-wrap: initial; }
       html .quick-connect .tc-drop-down table {
         border: none; }
         html .quick-connect .tc-drop-down table td {

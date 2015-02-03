@@ -248,3 +248,8 @@ html:-ms-fullscreen .tmap-has-fullscreen-child {
     z-index: 999;
     border: none;
     margin: 0; }
+
+fieldset.tmap-options dt, fieldset.tmap-options dd {
+  margin-bottom: 15px; }
+fieldset.tmap-options input {
+  font-weight: normal; }

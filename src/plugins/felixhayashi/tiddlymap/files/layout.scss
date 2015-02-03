@@ -340,3 +340,12 @@ html:fullscreen { @include fullscreen(); }
 html:-moz-full-screen { @include fullscreen(); }
 html:-webkit-full-screen { @include fullscreen(); }
 html:-ms-fullscreen { @include fullscreen(); }
+
+fieldset.tmap-options {
+  dt, dd {
+    margin-bottom: 15px;
+  }
+  input {
+    font-weight: normal;
+  }
+}

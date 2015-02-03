@@ -28,8 +28,10 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
       <$button class="tc-btn-invisible" message="tm-create-view">{{$:/core/images/new-button}} Create empty view</$button>
       <$button class="tc-btn-invisible" message="tm-rename-view">{{$:/core/images/tag-button}} Rename view</$button>
       <$button class="tc-btn-invisible" message="tm-delete-view">{{$:/core/images/delete-button}} Delete view</$button>
-      <$button class="tc-btn-invisible" message="tm-edit-view">{{$:/core/images/theme-button}} Configure View</$button>
+      <$button class="tc-btn-invisible" message="tm-edit-view">{{$:/core/images/theme-button}} Configure view</$button>
       <$button class="tc-btn-invisible" message="tm-store-position">{{$:/core/images/globe}} Save positions</$button>
+      <hr />
+      <$button class="tc-btn-invisible" message="tm-configure-system">{{$:/core/images/options-button}} Global configurations</$button>
     </div>
   </$reveal>
 

@@ -1,0 +1,38 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/configureTiddlyMap
+subtitle: Configuration of TiddlyMap
+
+\define checkbox(title, field) <$checkbox tiddler=<<output>> field=$field$ checked="true" unchecked="false" default=<<tgmacro "option" "$field$">>> $title$</$checkbox>
+
+\define textfield(title, field) $title$: <$edit-text tiddler=<<output>> field=$field$ type="text" tag="input" />
+
+Please visit the [[online docs|http://bit.ly/tiddlymap#Changing%20TiddlyMap's%20default%20configuration]] for more information about the following options.
+
+<fieldset class="tmap-options">
+  <legend>Field settings</legend>  
+
+    <<textfield "Node-id field" "config.sys.field.nodeId">>
+    <br />//Field to identify tiddlers and trace their changes. ''Warning'': If you plan on using ~TiddlyWiki's cloning feature, set this value to //title//.//<br /><br />
+
+    <<textfield "Node-icon field" "config.sys.field.nodeIcon">>
+    <br />//Image to use as node image instead of displaying a node as rectangle in the graph//<br /><br />
+
+    <<textfield "Node-label field" "config.sys.field.nodeLabel">>
+    <br />//Alternative node label, the tiddler title is used as fallback.//<br /><br />
+
+    <<textfield "Node-info field" "config.sys.field.nodeInfo">>
+    <br />//The value of this field will be displayed as tooltip when hovering a node in the graph.//<br /><br />
+
+    <<textfield "View-marker field" "config.sys.field.viewMarker">>
+    <br />//Field to identify a view in order to list it as an existing view.
+    It is __not__ recommended to change this default unless it conflicts with an existing system tiddler property.//
+
+</fieldset>
+
+<fieldset><legend>Other settings</legend>
+  
+  <<checkbox "Enable debug output" "config.sys.debug" >>
+  -- //Set this to true if you want debug information to be displayed in the browser console.//<br />
+  <<checkbox "Enable notifications" "config.sys.notifications" >>
+  -- //Set this to true if you want to receive notifications on important events.//<br />
+  
+</fieldset>

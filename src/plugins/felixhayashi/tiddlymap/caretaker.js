@@ -76,15 +76,17 @@ say here is: do not require the caretaker!
     opt.ref.dialogStandardFooter =   "$:/plugins/felixhayashi/tiddlymap/dialog/standardFooter";
     opt.ref.defaultGraphViewHolder = "$:/plugins/felixhayashi/tiddlymap/misc/defaultViewHolder";
     opt.ref.graphBar =               "$:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar";
-    opt.ref.sysConf =                "$:/plugins/felixhayashi/tiddlymap/config";
+    opt.ref.sysConf =                "$:/plugins/felixhayashi/tiddlymap/config/sys";
     opt.ref.visConf =                "$:/plugins/felixhayashi/tiddlymap/config/vis";
     
     // default configurations mixed with user config
     if(!opt.config) opt.config = utils.getEmptyMap();
   
-    opt.config = $tw.wiki.getTiddlerData(opt.ref.sysConf, {});
+    opt.config.sys = $tw.wiki.getTiddlerData(opt.ref.sysConf, {});
     var data = utils.unflatten($tw.wiki.getTiddlerData(opt.ref.sysConf + "/user", {}));
-    opt.config = $tw.utils.extendDeepCopy(opt.config, data);
+    console.log("new data", data);
+    opt.config.sys = $tw.utils.extendDeepCopy(opt.config.sys, data);
+    console.log("new merged data", opt.config.sys);
     
     opt.config.vis = $tw.wiki.getTiddlerData(opt.ref.visConf, {});
     var data = utils.unflatten($tw.wiki.getTiddlerData(opt.ref.visConf + "/user", {}));
@@ -92,7 +94,7 @@ say here is: do not require the caretaker!
 
     // a shortcut for fields property
     if(!opt.field) opt.field = utils.getEmptyMap();
-    $tw.utils.extend(opt.field, opt.config.field);
+    $tw.utils.extend(opt.field, opt.config.sys.field);
         
     // some other options
     if(!opt.misc) opt.misc = utils.getEmptyMap();
@@ -120,7 +122,7 @@ say here is: do not require the caretaker!
     
     var nirvana = function() { /* /dev/null */ }; 
 
-    if($tw.tiddlymap.opt.config.debug === true && console) {
+    if($tw.tiddlymap.opt.config.sys.debug === "true" && console) {
     
       // http://stackoverflow.com/questions/5538972/console-log-apply-not-working-in-ie9
       // http://stackoverflow.com/questions/9521921/why-does-console-log-apply-throw-an-illegal-invocation-error
@@ -142,7 +144,7 @@ say here is: do not require the caretaker!
       
     } else { fn.logger = nirvana }
 
-    fn.notify = ($tw.tiddlymap.opt.config.notifications ? utils.notify : nirvana);
+    fn.notify = ($tw.tiddlymap.opt.config.sys.notifications === "true" ? utils.notify : nirvana);
     
     return fn;
     
@@ -251,7 +253,7 @@ say here is: do not require the caretaker!
       $tw.tiddlymap.logger("warn", "Global options will be rebuild");
       
       // rebuild
-      attachOptions($tw.tiddlymap);
+      attachOptions($tw.tiddlymap.opt);      
       attachFunctions($tw.tiddlymap);
       
     });

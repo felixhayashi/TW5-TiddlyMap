@@ -57,6 +57,7 @@ module-type: widget
         {type: "tm-rename-view", handler: this.handleRenameView },
         {type: "tm-delete-view", handler: this.handleDeleteView },
         {type: "tm-edit-view", handler: this.handleEditView },
+        {type: "tm-configure-system", handler: this.handleConfigureSystem },
         {type: "tm-store-position", handler: this.handleStorePositions },
         {type: "tm-edit-node-filter", handler: this.handleEditNodeFilter },
         {type: "tm-import-tiddlers", handler: this.handleImportTiddlers },
@@ -757,6 +758,23 @@ module-type: widget
         this.setView(this.view.getRoot());
       }
 
+    });
+    
+  };
+  
+  TiddlyMapWidget.prototype.handleConfigureSystem = function() {
+        
+    var params = {
+      dialog: {
+        preselects: utils.flatten({ config: { sys: this.opt.config.sys }})
+      }
+    };
+    
+    this.dialogManager.open("configureTiddlyMap", params, function(isConfirmed, outputTObj) {
+      if(isConfirmed && outputTObj) {
+        var config = utils.getPropertiesByPrefix(outputTObj.fields, "config.sys.", true);
+        this.wiki.setTiddlerData(this.opt.ref.sysConf + "/user", config);
+      }
     });
     
   };

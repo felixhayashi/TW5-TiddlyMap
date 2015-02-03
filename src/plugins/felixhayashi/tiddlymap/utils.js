@@ -684,6 +684,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     opts = opts || {}
 
     var delimiter = opts.delimiter || '.'
+    var prefix = opts.prefix || ''
     var output = {}
 
     function step(object, prev) {
@@ -698,7 +699,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
 
         var newKey = prev
           ? prev + delimiter + key
-          : opts.prefix + key
+          : prefix + key
 
         if (!isarray && isobject) {
           return step(value, newKey)

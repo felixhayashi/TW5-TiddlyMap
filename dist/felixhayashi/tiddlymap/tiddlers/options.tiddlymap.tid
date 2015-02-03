@@ -1,4 +1,4 @@
-title: $:/plugins/felixhayashi/tiddlymap/config
+title: $:/plugins/felixhayashi/tiddlymap/config/sys
 type: application/json
 
 { 
@@ -9,7 +9,7 @@ type: application/json
     "nodeInfo": "description",
     "viewMarker": "isview"
   },
-  "debug": false,
-  "notifications": true,
-  "editNodeOnCreate": false
+  "debug": "false",
+  "notifications": "true",
+  "editNodeOnCreate": "false"
 }

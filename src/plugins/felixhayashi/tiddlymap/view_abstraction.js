@@ -490,7 +490,7 @@ module-type: library
    * Based on the `private_edge_mode` configuration. This filter shows
    * all available edges in the current mode - whether displayed or not
    */
-  ViewAbstraction.prototype.getAllEdgesFilterExpr = function(isOnlyLabels) {
+  ViewAbstraction.prototype.getAllEdgesFilter = function(isOnlyLabels) {
     
     var appendix = (isOnlyLabels
                     ? "removeprefix[" + this.getEdgeStoreLocation() + "/]"

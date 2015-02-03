@@ -12,7 +12,7 @@ subtitle: View Configuration
     <li>
       Which relations define the hierarchical order?
       <div class="tmap-small-list">
-        <$list filter=<<var.edgeFilterExpr>> >
+        <$list filter=<<var.edgeFilter>> >
           <$set name="curEdgeId" value={{!!id}}>
           <$checkbox tiddler=<<output>> field=<<orderByEdgeField>> checked="true" unchecked="false" default="false">
             <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />

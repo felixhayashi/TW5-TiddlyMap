@@ -59,7 +59,8 @@ module-type: widget
         {type: "tm-edit-view", handler: this.handleEditView },
         {type: "tm-store-position", handler: this.handleStorePositions },
         {type: "tm-edit-node-filter", handler: this.handleEditNodeFilter },
-        {type: "tm-import-tiddlers", handler: this.handleImportTiddlers }
+        {type: "tm-import-tiddlers", handler: this.handleImportTiddlers },
+        {type: "tm-focus-node", handler: this.handleFocusNode }
       ]);
     }
   };
@@ -84,7 +85,7 @@ module-type: widget
    */
   TiddlyMapWidget.prototype.handleConnectionEvent = function(edge, callback) {
 
-    var edgeFilterExpr = this.getView().getAllEdgesFilterExpr(true);
+    var edgeFilterExpr = this.getView().getAllEdgesFilter(true);
 
     var vars = {
       edgeFilterExpr: edgeFilterExpr,
@@ -227,12 +228,22 @@ module-type: widget
     if(this.editorMode === "advanced") {
     
       // register variables
-      this.setVariable("var.viewLabel", this.getView().getLabel());
-      this.setVariable("var.isViewBound", String(this.isViewBound()));
-      this.setVariable("var.ref.view", this.getView().getRoot());
-      this.setVariable("var.ref.viewHolder", this.getViewHolderRef());
-      this.setVariable("var.ref.edgeFilter", this.getView().getPaths().edgeFilter);
-      this.setVariable("var.edgeFilterExpr", this.view.getAllEdgesFilterExpr());
+      
+      var params = {
+        "viewLabel": this.getView().getLabel(),
+        "isViewBound": String(this.isViewBound()),
+        "ref.view": this.getView().getRoot(),
+        "ref.viewHolder": this.getViewHolderRef(),
+        "ref.edgeFilter": this.getView().getPaths().edgeFilter,
+        "allEdgesFilter": this.view.getAllEdgesFilter(),
+        "search-output":  "$:/temp/tmap/editor/search",
+        "nodeFilter": this.view.getNodeFilter("expression")
+                      + "+[search{$:/temp/tmap/editor/search}]"
+      };
+      
+      for(var name in params) {
+        this.setVariable("param." + name, params[name]);
+      }
       
       // Construct the child widget tree
       var body = {
@@ -753,7 +764,7 @@ module-type: widget
   TiddlyMapWidget.prototype.handleEditView = function() {
     
     var params = {
-      "var.edgeFilterExpr": this.getView().getEdgeFilter("expression"),
+      "var.edgeFilter": this.getView().getEdgeFilter("expression"),
       dialog: {
         preselects: this.getView().getConfig()
       }
@@ -764,7 +775,6 @@ module-type: widget
         var updates = utils.getPropertiesByPrefix(outputTObj.fields, "config.");
         this.getView().setConfig(updates);
       }
-
     });
     
   };
@@ -1022,6 +1032,12 @@ module-type: widget
       }
     }
     
+  };
+  
+  TiddlyMapWidget.prototype.handleFocusNode = function(event) {
+    this.network.focusOnNode(this.graphData.nodesByRef[event.param].id, {
+      scale: 1, animation: true
+    });
   };
   
   TiddlyMapWidget.prototype.fitGraph = function(delay, duration) {

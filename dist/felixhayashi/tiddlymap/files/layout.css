@@ -4,10 +4,12 @@ html {
     background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/tiddlymap/media/surface.png!!type}} text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}}/>'));
   }
   */ }
-  html .tmap-small-list {
+  html .tmap-small-list, html .tmap-very-small-list {
     overflow: auto;
     height: 150px;
-    width: 250px; }
+    max-width: 270px; }
+  html .tmap-very-small-list {
+    height: 100px; }
   html .tmap-quick-connect {
     font-size: 0.7em; }
     html .tmap-quick-connect .tc-drop-down {
@@ -127,6 +129,14 @@ html {
       border-bottom: 1px solid lightgray;
       padding: 3px 5px;
       height: 35px; }
+      html .tmap-widget .tmap-filterbar .editor-search-button {
+        float: right; }
+      html .tmap-widget .tmap-filterbar .tmap-popup {
+        position: relative; }
+        html .tmap-widget .tmap-filterbar .tmap-popup .tc-drop-down {
+          position: absolute;
+          z-index: 999;
+          right: 0px; }
       html .tmap-widget .tmap-filterbar .tc-drop-down {
         background-color: #F3F3F3;
         min-width: 170px;
@@ -135,6 +145,8 @@ html {
         html .tmap-widget .tmap-filterbar .tc-drop-down button, html .tmap-widget .tmap-filterbar .tc-drop-down a {
           padding: 0px;
           text-decoration: none; }
+          html .tmap-widget .tmap-filterbar .tc-drop-down button:hover, html .tmap-widget .tmap-filterbar .tc-drop-down a:hover {
+            color: #ffffff; }
           html .tmap-widget .tmap-filterbar .tc-drop-down button svg, html .tmap-widget .tmap-filterbar .tc-drop-down a svg {
             vertical-align: middle; }
       html .tmap-widget .tmap-filterbar [hidden] {
@@ -147,6 +159,10 @@ html {
         html .tmap-widget .tmap-filterbar .tc-block-dropdown a {
           display: inline;
           padding: 0px; }
+      html .tmap-widget .tmap-filterbar select {
+        width: 100px;
+        word-wrap: initial;
+        padding: 2px; }
       html .tmap-widget .tmap-filterbar button {
         line-height: inherit;
         color: #666666; }

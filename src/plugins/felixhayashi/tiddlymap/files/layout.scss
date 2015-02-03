@@ -5,7 +5,12 @@ html { // used to increase css importance
   .tmap-small-list {
     overflow: auto;
     height: 150px;
-    width: 250px;
+    max-width: 270px;
+  }
+  
+  .tmap-very-small-list {
+    @extend .tmap-small-list;
+    height: 100px;
   }
 
   .tmap-quick-connect {
@@ -215,16 +220,34 @@ html { // used to increase css importance
       padding: 3px $padding;
       height: $filterbar-height;
       
+      .editor-search-button {
+        float: right;
+      }
+      
+      .tmap-popup {
+        position: relative;
+      
+        .tc-drop-down {
+          position: absolute;
+          z-index: 999;
+          right: 0px;
+        }
+      }
+      
       .tc-drop-down {
           background-color: #F3F3F3;
           min-width: 170px;
           padding: $padding;
           margin: 5px 0;
-          
+                   
           button, a {
             padding : 0px;
             text-decoration: none;
             
+            &:hover {
+              color: #ffffff;
+            }
+      
             svg {
               vertical-align: middle;
             }
@@ -246,6 +269,12 @@ html { // used to increase css importance
             padding : 0px;
           }
         
+      }
+      
+      select {
+        width: 100px;
+        word-wrap: initial;
+        padding: 2px;
       }
       
       button {

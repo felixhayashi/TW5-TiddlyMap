@@ -64,42 +64,36 @@ say here is: do not require the caretaker!
     opt.path.pluginRoot =   "$:/plugins/felixhayashi/tiddlymap";
     opt.path.edges =        "$:/plugins/felixhayashi/tiddlymap/graph/edges";
     opt.path.views =        "$:/plugins/felixhayashi/tiddlymap/graph/views";
-    opt.path.options =      "$:/plugins/felixhayashi/tiddlymap/options";
+    opt.path.options =      "$:/plugins/felixhayashi/tiddlymap/config";
     // temporary environment
     opt.path.tempRoot =     "$:/temp/felixhayashi/tiddlymap";
     opt.path.localHolders = "$:/temp/felixhayashi/tiddlymap/holders";
     opt.path.dialogs =      "$:/plugins/felixhayashi/tiddlymap/dialog";
-    opt.path.visOptions =   "$:/plugins/felixhayashi/tiddlymap/options/vis";
     
     // static references to important tiddlers
     if(!opt.ref) opt.ref = utils.getEmptyMap();
     
     opt.ref.dialogStandardFooter =   "$:/plugins/felixhayashi/tiddlymap/dialog/standardFooter";
-    opt.ref.tgOptions =              "$:/plugins/felixhayashi/tiddlymap/options/tiddlymap";    
     opt.ref.defaultGraphViewHolder = "$:/plugins/felixhayashi/tiddlymap/misc/defaultViewHolder";
     opt.ref.graphBar =               "$:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar";
+    opt.ref.sysConf =                "$:/plugins/felixhayashi/tiddlymap/config";
+    opt.ref.visConf =                "$:/plugins/felixhayashi/tiddlymap/config/vis";
     
-    // original user options from the option tiddlers
-    opt.user = $tw.wiki.getTiddlerData(opt.ref.tgOptions, utils.getEmptyMap());
-    opt.user.vis = utils.getEmptyMap();
-    var modules = [ "locales", "styles", "system" ];
-    for(var i = 0; i < modules.length; i++) {
-      var data = $tw.wiki.getTiddlerData(opt.path.visOptions + "/" + modules[i]);
-      $tw.utils.extend(opt.user.vis, data);
-    }
-        
-    // fields with special meanings
-    if(!opt.field) opt.field = utils.getEmptyMap();
+    // default configurations mixed with user config
+    if(!opt.config) opt.config = utils.getEmptyMap();
+  
+    opt.config = $tw.wiki.getTiddlerData(opt.ref.sysConf, {});
+    var data = utils.unflatten($tw.wiki.getTiddlerData(opt.ref.sysConf + "/user", {}));
+    opt.config = $tw.utils.extendDeepCopy(opt.config, data);
     
-    // used to identify a tiddler being a view that visbile to the user.
-    // if a view tiddler is not tagged with this marker, it can still be used
-    // as view but won't show up 
-    opt.field.viewMarker = "isview";
-    opt.field.nodeId = (opt.user.field_nodeId ? opt.user.field_nodeId : "id");
-    opt.field.nodeIcon = (opt.user.field_nodeIcon ? opt.user.field_nodeIcon : "icon");
-    opt.field.nodeLabel = (opt.user.field_nodeLabel ? opt.user.field_nodeLabel : "title");
-    opt.field.nodeInfo = (opt.user.field_nodeInfo ? opt.user.field_nodeInfo : "description");
+    opt.config.vis = $tw.wiki.getTiddlerData(opt.ref.visConf, {});
+    var data = utils.unflatten($tw.wiki.getTiddlerData(opt.ref.visConf + "/user", {}));
+    opt.config.vis = $tw.utils.extendDeepCopy(opt.config.vis, data);
 
+    // a shortcut for fields property
+    if(!opt.field) opt.field = utils.getEmptyMap();
+    $tw.utils.extend(opt.field, opt.config.field);
+        
     // some other options
     if(!opt.misc) opt.misc = utils.getEmptyMap();
     
@@ -113,9 +107,7 @@ say here is: do not require the caretaker!
     opt.filter.allSharedEdges = "[prefix[" + opt.path.edges + "]]";
     opt.filter.allSharedEdgesByLabel = "[prefix[" + opt.path.edges + "]removeprefix[" + opt.path.edges + "/]]";
     opt.filter.allViews = "[all[tiddlers+shadows]has[" + opt.field.viewMarker + "]]";
-    opt.filter.allViewsByLabel = "[all[tiddlers+shadows]has[" + opt.field.viewMarker + "]removeprefix[" + opt.path.views + "/]]";
-    opt.filter.allPrivateViews = "[all[tiddlers+shadows]field:config.private_edge_mode[true]has[" + opt.field.viewMarker + "]removeprefix[" + opt.path.views + "/]]";
-    
+    opt.filter.allViewsByLabel = "[all[tiddlers+shadows]has[" + opt.field.viewMarker + "]removeprefix[" + opt.path.views + "/]]";    
     
   };
   
@@ -128,7 +120,7 @@ say here is: do not require the caretaker!
     
     var nirvana = function() { /* /dev/null */ }; 
 
-    if($tw.tiddlymap.opt.user.debug === true && console) {
+    if($tw.tiddlymap.opt.config.debug === true && console) {
     
       // http://stackoverflow.com/questions/5538972/console-log-apply-not-working-in-ie9
       // http://stackoverflow.com/questions/9521921/why-does-console-log-apply-throw-an-illegal-invocation-error
@@ -150,7 +142,7 @@ say here is: do not require the caretaker!
       
     } else { fn.logger = nirvana }
 
-    fn.notify = ($tw.tiddlymap.opt.user.notifications ? utils.notify : nirvana);
+    fn.notify = ($tw.tiddlymap.opt.config.notifications ? utils.notify : nirvana);
     
     return fn;
     

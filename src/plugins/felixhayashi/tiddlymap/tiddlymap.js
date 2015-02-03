@@ -665,7 +665,7 @@ module-type: widget
     
     if(!this.graphOptions) {
       // get a copy of the options
-      var options = $tw.utils.extendDeepCopy(this.opt.user.vis);
+      var options = $tw.utils.extendDeepCopy(this.opt.config.vis);
           
       options.onDelete = function(data, callback) {
         this.handleRemoveElement(data);

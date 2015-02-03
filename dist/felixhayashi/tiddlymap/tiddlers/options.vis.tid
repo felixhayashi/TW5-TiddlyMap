@@ -1,0 +1,171 @@
+title: $:/plugins/felixhayashi/tiddlymap/config/vis
+type: application/json
+
+{
+  "nodes": {
+    "radiusMin": 10,
+    "radiusMax": 30,
+    "radius": 10,
+    "shape": "box",
+    "widthMin": 16,
+    "widthMax": 64,
+    "fontColor": "black",
+    "fontSize": 14,
+    "fontFace": "verdana",
+    "level": -1,
+    "color": {
+      "border" : "#2B7CE9",
+      "background" : "#97C2FC",
+      "highlight": {
+        "border": "#2B7CE9",
+        "background": "#D2E5FF"
+      },
+      "hover": {
+        "border": "white",
+        "background": "white"
+      }
+    }
+  },
+  "edges": {
+    "widthMin": 1,
+    "widthMax": 15,
+    "width": 1,
+    "widthSelectionMultiplier": 4,
+    "hoverWidth": 1.5,
+    "style": "arrow",
+    "color": {
+      "color": "#848484",
+      "highlight": "#B90000",
+      "hover": "B90000"
+    },
+    "fontColor": "gray",
+    "fontSize": 14,
+    "fontFace": "arial",
+    "fontFill": "transparent",
+    "arrowScaleFactor": 1,
+    "dash": {
+      "length": 10,
+      "gap": 5
+    },
+    "inheritColor": false
+  },
+  "groups": {
+    "special": {
+      "borderWidth": 1,
+      "color": {
+        "background": "#E6B293",
+        "border": "#FF6700"
+      }
+    },
+    "neighbours": {
+      "color": "#DCDCDC"
+    },
+    "matches": {
+      "color": "#97C2FC"
+    }
+  },
+  "tooltip": {
+    "delay": 300,
+    "fontColor": "black",
+    "fontSize": 14,
+    "fontFace": "verdana",
+    "color": {
+      "border": "#666",
+      "background": "#FFFFC6"
+    }
+  },
+  "clickToUse": true,
+  "configurePhysics": false,
+  "physics": {
+    "barnesHut": {
+      "enabled": false
+    },
+    "repulsion": {
+      "enabled": false,
+      "centralGravity": 0,
+      "springLength": 200,
+      "springConstant": 0.05,
+      "nodeDistance": 100,
+      "damping": 0.18
+    }
+  },
+  "clustering": {
+    "enabled": false,
+    "initialMaxNodes": 100,
+    "clusterThreshold": 500,
+    "reduceToNodes": 300,
+    "chainThreshold": 0.4,
+    "clusterEdgeThreshold": 20,
+    "sectorThreshold": 100,
+    "screenSizeThreshold": 0.2,
+    "fontSizeMultiplier": 4,
+    "maxFontSize": 1000,
+    "forceAmplification": 0.1,
+    "distanceAmplification": 0.1,
+    "edgeGrowth": 20,
+    "nodeScaling": {
+      "width": 1,
+      "height": 1,
+      "radius": 1
+    },
+    "maxNodeSizeIncrements": 600,
+    "activeAreaBoxSize": 80,
+    "clusterLevelDifference": 2
+  },
+  "navigation": {
+    "enabled": true
+  },
+  "keyboard": {
+    "enabled": false,
+    "speed": {
+      "x": 10,
+      "y": 10,
+      "zoom": 0.02
+    }
+  },
+  "hierarchicalLayout": {
+    "enabled": false,
+    "levelSeparation": 250,
+    "nodeSpacing": 200,
+    "direction": "UD",
+    "layout": "direction"
+  },
+  "freezeForStabilization": false,
+  "smoothCurves": {
+    "enabled": true,
+    "dynamic": true,
+    "type": "continuous",
+    "roundness": 0.5
+  },
+  "maxVelocity": 30,
+  "minVelocity": 0.1,
+  "stabilize": true,
+  "zoomExtentOnStabilize": true,
+  "stabilizationIterations": 1500,
+  "dragNetwork": true,
+  "dragNodes": true,
+  "zoomable": true,
+  "hover": false,
+  "hideEdgesOnDrag": false,
+  "hideNodesOnDrag": false,
+  "width": "100%",
+  "height": "100%",
+  "selectable": true,
+  "locale": "en_EN",
+  "locales": {
+    "en_EN": {
+      "edit": "Edit",
+      "del": "Delete selected",
+      "back": "Back",
+      "addNode": "Add Node",
+      "addEdge": "Add Edge",
+      "editNode": "Edit Node",
+      "editEdge": "Edit Edge",
+      "addDescription": "Click in an empty space to place a new node.",
+      "edgeDescription": "Click on a node and drag the edge to another node to connect them.",
+      "editEdgeDescription": "Click on the control points and drag them to a node to connect to it.",
+      "createEdgeError": "Cannot link edges to a cluster.",
+      "deleteClusterError": "Clusters cannot be deleted."
+    }
+  }
+}

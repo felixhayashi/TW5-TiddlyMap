@@ -1,11 +1,15 @@
-title: $:/plugins/felixhayashi/tiddlymap/options/tiddlymap
+title: $:/plugins/felixhayashi/tiddlymap/config
 type: application/json
 
 { 
-  "field_nodeId": "id",
-  "field_nodeLabel": "caption",
-  "tag_ticket": "ticket",
-  "debug": true,
+  "field": {
+    "nodeId": "id",
+    "nodeLabel": "caption",
+    "nodeIcon": "icon",
+    "nodeInfo": "description",
+    "viewMarker": "isview"
+  },
+  "debug": false,
   "notifications": true,
   "editNodeOnCreate": false
 }

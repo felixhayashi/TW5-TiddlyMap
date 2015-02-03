@@ -768,7 +768,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
       }
 
       // unflatten again for 'messy objects'
-      recipient[key1] = unflatten(target[key], opts)
+      recipient[key1] = utils.unflatten(target[key], opts)
     })
 
     return result;

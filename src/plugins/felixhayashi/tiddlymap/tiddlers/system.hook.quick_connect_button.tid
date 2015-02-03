@@ -31,19 +31,6 @@ description: Show available ~TiddlyMap actions
           </$select>
         </td>
       </tr>
-<!--
-      <tr>
-        <td>View:</td>
-        <td>
-          <$select tiddler="$:/temp/quickConnectSearch/view" default="">
-            <option></option>
-           <$list filter=<<tgmacro "option" "filter.allPrivateViews">> >
-             <option>{{!!title}}</option>
-           </$list>
-          </$select> <sup>[1]</sup><sup>[2]</sup>
-        </td>
-      </tr>
--->
       <tr>
         <td>Search:</td>
         <td>
@@ -85,9 +72,6 @@ description: Show available ~TiddlyMap actions
     <hr />
     
     <small>[1] Note, that nodes will be linked globally. Have a look at the [[docs|http://bit.ly/tiddlymap#Public%20and%20Private%20Edges]] for more information on private and public relations.</small><br />
-<!--
-    <sup>[2]</sup> <small>Only views operating in private edge mode are listed.</small>
--->
     
   </div>
 </div>

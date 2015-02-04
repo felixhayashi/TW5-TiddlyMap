@@ -732,24 +732,25 @@ module-type: library
       node = utils.getEmptyMap();
     }
     
-    if(!node.id) {
-      node.id = utils.genUUID();
-    }
-    
     var fields = utils.getEmptyMap();
-    var label = (node.label ? node.label : "New node");
-    fields.title = this.wiki.generateNewTitle(label);
-    fields[this.opt.field.nodeId] = node.id;
-    
+    fields.title = this.wiki.generateNewTitle((node.label ? node.label : "New node"));
     // title might has changed after generateNewTitle()
     node.label = fields.title;
     node.ref = fields.title;
     
-    if(options.view) {
+    
+    if(!node.id) {
+      if(this.opt.field.nodeId === "title") {
+        node.id = fields.title;
+      } else {
+        node.id = utils.genUUID();
+        fields[this.opt.field.nodeId] = node.id;
+      }
+    }
 
+    if(options.view) {
       var view = new ViewAbstraction(options.view);
       view.addNodeToView(node);
-      
     }
     
     this.wiki.addTiddler(new $tw.Tiddler(fields,

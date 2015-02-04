@@ -20,7 +20,7 @@ module-type: widget
   var Widget = require("$:/core/modules/widgets/widget.js").widget;
   var DropZoneWidget = require("$:/core/modules/widgets/dropzone.js").dropzone;
   var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/view_abstraction.js").ViewAbstraction;
-  var CallbackRegistry = require("$:/plugins/felixhayashi/tiddlymap/callback_registry.js").CallbackRegistry;
+  var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/callback_manager.js").CallbackManager;
   var DialogManager = require("$:/plugins/felixhayashi/tiddlymap/dialog_manager.js").DialogManager;
   var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
   var vis = require("$:/plugins/felixhayashi/vis/vis.js");
@@ -41,7 +41,7 @@ module-type: widget
     this.notify = $tw.tiddlymap.notify;
     
     // key (a tiddler) -> callback (called when tiddler changes)
-    this.callbackRegistry = new CallbackRegistry();
+    this.callbackRegistry = new CallbackManager();
     this.dialogManager = new DialogManager(this, this.callbackRegistry);
         
     // https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/widgets/widget.js#L211

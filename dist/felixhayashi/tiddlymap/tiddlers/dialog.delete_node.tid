@@ -1,5 +1,5 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/deleteNodeDialog
-subtitle: Deleting the node named "<<var.nodeLabel>>"
+subtitle: {{$:/core/images/delete-button}} Deleting the node named "<<var.nodeLabel>>"
 
 ''Please choose an option or abort:''
 

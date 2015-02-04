@@ -1,5 +1,5 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/getNodeName
-subtitle : Please name your new node
+subtitle: {{$:/core/images/tag-button}} Please name your new node
 
 Name: <$edit-text tiddler=<<output>> field="text" type="text" tag="input" default=""></$edit-text> <sup>[1]</sup> 
 

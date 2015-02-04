@@ -1,5 +1,5 @@
 title: $:/plugins/felixhayashi/tiddlymap/misc/connection_wizard
-subtitle: Connection Wizard
+subtitle: {{$:/plugins/felixhayashi/tiddlymap/icon}} Connection Wizard
 
 """
 Please go on connecting <<currentTiddler>> with any tiddler of your choice.

@@ -1,6 +1,6 @@
 /*\
 
-title: $:/plugins/felixhayashi/tiddlymap/callback_registry.js
+title: $:/plugins/felixhayashi/tiddlymap/callback_manager.js
 type: application/javascript
 module-type: library
 
@@ -24,7 +24,7 @@ module-type: library
   /**
    * @constructor
    */
-  var CallbackRegistry = function() {
+  var CallbackManager = function() {
     
     this.wiki = $tw.wiki;
     this.logger = $tw.tiddlymap.logger;
@@ -44,7 +44,7 @@ module-type: library
    * @param {boolean} [deleteOnCall=true] - True if to delete the
    *     callback once it has been called, false otherwise.
    */
-  CallbackRegistry.prototype.add = function(tRef, callback, isDeleteOnCall) {
+  CallbackManager.prototype.add = function(tRef, callback, isDeleteOnCall) {
     
     this.logger("debug", "A callback was registered for changes of \"" + tRef + "\"");
     this.callbacks[tRef] = {
@@ -57,9 +57,9 @@ module-type: library
   /**
    * Removes the callback from the list of tiddler callbacks.
    * 
-   * @see CallbackRegistry#registerCallback
+   * @see CallbackManager#registerCallback
    */
-  CallbackRegistry.prototype.remove = function(tRef) {
+  CallbackManager.prototype.remove = function(tRef) {
     
     if(this.callbacks[tRef]) {
       this.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
@@ -75,9 +75,9 @@ module-type: library
    * registration of the callback, the callback will be deleted
    * automatically.
    * 
-   * @see CallbackRegistry#registerCallback
+   * @see CallbackManager#registerCallback
    */
-  CallbackRegistry.prototype.handleChanges = function(changedTiddlers) {
+  CallbackManager.prototype.handleChanges = function(changedTiddlers) {
     
     if(this.callbacks.length == 0) {
       this.logger("debug", "No registered callbacks exist at the moment");
@@ -104,7 +104,7 @@ module-type: library
   };
 
   // !! EXPORT !!
-  exports.CallbackRegistry = CallbackRegistry;
+  exports.CallbackManager = CallbackManager;
   // !! EXPORT !!
   
 })();

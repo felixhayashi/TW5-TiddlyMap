@@ -1,5 +1,5 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/editView
-subtitle: View Configuration
+subtitle: {{$:/core/images/theme-button}} View Configuration
 
 \define checkbox(field, title) <$checkbox tiddler=<<output>> field="$field$" checked="true" unchecked="false" default="false"> $title$</$checkbox>
 

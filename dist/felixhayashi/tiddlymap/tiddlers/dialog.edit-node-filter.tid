@@ -1,5 +1,5 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/editNodeFilter
-subtitle: Filter Editor
+subtitle: {{$:/core/images/edit-button}} Filter Editor
 
 <div id="tmap-node-filter-dialog">
 

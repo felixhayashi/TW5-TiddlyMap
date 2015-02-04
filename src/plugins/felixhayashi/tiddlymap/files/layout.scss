@@ -84,18 +84,53 @@ html { // used to increase css importance
       padding-top: 0px;
       padding-bottom: 0px;
       
+      svg {
+        vertical-align: sub;
+      }
+      
       h3 {
         line-height: 10px;
       }
-
+      
     }
     
     .tc-modal-body {
+      
+      .tc-image-button {
+        font-size: 14px;
+      }
       
       fieldset {
       
         legend {
           font-weight: bold;
+        }
+        
+        .tmap-fieldrow {
+          margin: 6px 0;
+          clear: both;
+          
+          > :first-child {
+            width: 140px;
+            float: left;
+            display: inline-block; }
+          
+          .tmap-row-body {
+            display: inline-block;
+            float: left;
+            width: calc(100% - 145px);
+            
+            .tmap-note {
+              margin: 10px 10px 10px 0; }
+            input {
+              width: 140px; }
+            .tmap-description {
+              font-style: italic;
+              
+              &:before {
+                content: " – "; }}
+            }
+                
         }
         
         ul {
@@ -272,7 +307,7 @@ html { // used to increase css importance
       }
       
       select {
-        width: 100px;
+        width: 150px;
         word-wrap: initial;
         padding: 2px;
       }

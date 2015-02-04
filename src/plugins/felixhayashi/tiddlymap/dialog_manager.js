@@ -19,7 +19,7 @@ module-type: library
    
 
   var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
-  var CallbackRegistry = require("$:/plugins/felixhayashi/tiddlymap/callback_registry.js").CallbackRegistry;
+  var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/callback_manager.js").CallbackManager;
 
   /***************************** CODE ******************************/
         

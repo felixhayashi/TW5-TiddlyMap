@@ -1,6 +1,6 @@
 /*\
 
-title: $:/plugins/felixhayashi/tiddlymap/dialog_manager.js
+title: $:/plugins/felixhayashi/tiddlymap/dialog_registry.js
 type: application/javascript
 module-type: library
 
@@ -24,33 +24,25 @@ module-type: library
   /***************************** CODE ******************************/
         
   /**
-   * The DialogManager is responsible for preparing, displaying and
-   * finalizing all the dialogs.
-   * 
-   * @param {CallbackManager} callbackManager - A callback manager that
-   *     is informed about changed tiddlers and keeps track of the
-   *     various tiddlers produced during the dialog process.
-   * @param {Object} [context] - An optional *this*-reference to bind the
-   *     callback of each called dialog to. Otherwise, the callback of
-   *     each dialog has to be bound manually to the callback if required.
    * @constructor
    */
-  var DialogManager = function(callbackManager, context) {
+  var DialogRegistry = function(manager) {
     
     // create shortcuts and aliases
-    this.wiki = $tw.wiki;
+    this.manager = $tw.wiki;
     this.logger = $tw.tiddlymap.logger;
     this.adapter = $tw.tiddlymap.adapter;
     this.opt = $tw.tiddlymap.opt;
     
     // create callback registry
-    this.callbackManager = callbackManager;
+    this.callbackRegistry = callbackRegistry;
     
     if(context) {
       this.context = context;
     }
 
   };
+  
   
   /**
   * This function opens a dialog based on a skeleton and some fields and eventually
@@ -88,10 +80,6 @@ module-type: library
   DialogManager.prototype.open = function(name, param, callback) {
     
     if(!param) { param = {}; }
-  
-    if(typeof callback === "function" && this.context) {
-      callback = callback.bind(this.context);
-    }
     
     // create a temporary tiddler reference for the dialog
     var dialogTRef = this.opt.path.tempRoot + "/dialog-" + utils.genUUID();
@@ -130,7 +118,7 @@ module-type: library
     }
     
     // add trigger 
-    this.callbackManager.add(dialog.result, function(t) {
+    this.callbackRegistry.add(dialog.result, function(t) {
 
       var triggerTObj = this.wiki.getTiddler(t);
       var isConfirmed = triggerTObj.fields.text;
@@ -142,8 +130,12 @@ module-type: library
         $tw.tiddlymap.notify("operation cancelled");
       }
       
-      if(typeof callback === "function") {
-        callback(isConfirmed, outputTObj);
+      if(typeof callback == "function") {
+        if(this.context) {
+          callback.call(this.context, isConfirmed, outputTObj);
+        } else {
+          callback(isConfirmed, outputTObj);
+        }
       }
       
       // close and remove the tiddlers

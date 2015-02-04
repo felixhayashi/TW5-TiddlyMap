@@ -78,15 +78,14 @@ say here is: do not require the caretaker!
     opt.ref.graphBar =               "$:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar";
     opt.ref.sysConf =                "$:/plugins/felixhayashi/tiddlymap/config/sys";
     opt.ref.visConf =                "$:/plugins/felixhayashi/tiddlymap/config/vis";
+    opt.ref.welcomeFlag =            "$:/plugins/felixhayashi/tiddlymap/flag/welcome";
     
     // default configurations mixed with user config
     if(!opt.config) opt.config = utils.getEmptyMap();
   
     opt.config.sys = $tw.wiki.getTiddlerData(opt.ref.sysConf, {});
     var data = utils.unflatten($tw.wiki.getTiddlerData(opt.ref.sysConf + "/user", {}));
-    console.log("new data", data);
     opt.config.sys = $tw.utils.extendDeepCopy(opt.config.sys, data);
-    console.log("new merged data", opt.config.sys);
     
     opt.config.vis = $tw.wiki.getTiddlerData(opt.ref.visConf, {});
     var data = utils.unflatten($tw.wiki.getTiddlerData(opt.ref.visConf + "/user", {}));

@@ -40,9 +40,9 @@ module-type: widget
     this.opt = $tw.tiddlymap.opt;
     this.notify = $tw.tiddlymap.notify;
     
-    // key (a tiddler) -> callback (called when tiddler changes)
-    this.callbackRegistry = new CallbackManager();
-    this.dialogManager = new DialogManager(this, this.callbackRegistry);
+    // instanciate managers
+    this.callbackManager = new CallbackManager();
+    this.dialogManager = new DialogManager(this.callbackManager, this);
         
     // https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/widgets/widget.js#L211
     this.computeAttributes();
@@ -64,6 +64,9 @@ module-type: widget
         {type: "tm-focus-node", handler: this.handleFocusNode }
       ]);
     }
+    
+    this.checkForFreshInstall();
+    
   };
   
   // !! EXTENSION !!
@@ -113,6 +116,13 @@ module-type: widget
         
     });
     
+  };
+  
+  TiddlyMapWidget.prototype.checkForFreshInstall = function(callback, message) {
+    if(!utils.tiddlerExists(this.opt.ref.welcomeFlag)) {
+      this.handleConfigureSystem(true);
+      this.wiki.addTiddler(new $tw.Tiddler({ title: this.opt.ref.welcomeFlag }));
+    }
   };
   
   /**
@@ -291,7 +301,7 @@ module-type: widget
   TiddlyMapWidget.prototype.refresh = function(changedTiddlers) {
         
     // in any case, check for callbacks triggered by tiddlers
-    this.callbackRegistry.handleChanges(changedTiddlers);
+    this.callbackManager.handleChanges(changedTiddlers);
     
     var isViewSwitched = this.isViewSwitched(changedTiddlers);
     var viewModifications = this.getView().refresh(changedTiddlers);
@@ -469,48 +479,6 @@ module-type: widget
         
   };
 
-  TiddlyMapWidget.prototype.setHierarchy = function(nodes, edges, hierarchyEdgeTypes) {
-
-    // Definition of the recursive function that is responsible for assigning ids.
-    
-    function assignLevel(curNode, level) {
-      
-      if(curNode.level) return; // already visited
-      
-      curNode.level = level;
-      
-      for(var id in edges) {
-        var edge = edges[id];
-        if(edge.from === curNode.id) { // outgoing connection
-          var toNode = nodes[edge.to];
-          if(hierarchyEdgeTypes[edge.label]) { // edge that defines the hierarchical order
-            assignLevel(toNode, level + 1); // child of curNode
-          } else { // hierarchically equal relationship
-            assignLevel(toNode, level);
-          }
-        } else if(edge.to === curNode.id) { // incoming connection
-          var fromNode = nodes[edge.from];
-          if(hierarchyEdgeTypes[edge.label]) { // edge that defines the hierarchical order
-            assignLevel(fromNode, level - 1); // parent of curNode
-          } else { // hierarchically equal relationship
-            assignLevel(fromNode, level);
-          }
-        }
-      }             
-    }
-
-    loop1: for(var nodeId in nodes) {
-      for(var id in edges) {
-        if(nodes[nodeId].level || nodes[nodeId].id === edges[id].to) {
-          // already assigned a level or not a root node
-          continue loop1;
-        }
-      }
-      assignLevel(nodes[nodeId], 1000);
-    }
-
-  };  
-  
   TiddlyMapWidget.prototype.isViewBound = function() {
     
     return utils.startsWith(this.getViewHolderRef(),
@@ -653,7 +621,7 @@ module-type: widget
     var refreshTrigger = this.getAttribute("refresh-trigger");
     if(refreshTrigger) {
       this.logger("debug", "Registering refresh trigger:", refreshTrigger);
-      this.callbackRegistry.add(refreshTrigger, this.handleTriggeredRefresh.bind(this), false);
+      this.callbackManager.add(refreshTrigger, this.handleTriggeredRefresh.bind(this), false);
     }
     
     // register events
@@ -762,7 +730,7 @@ module-type: widget
     
   };
   
-  TiddlyMapWidget.prototype.handleConfigureSystem = function() {
+  TiddlyMapWidget.prototype.handleConfigureSystem = function(isWelcomeDialog) {
         
     var params = {
       dialog: {
@@ -770,7 +738,9 @@ module-type: widget
       }
     };
     
-    this.dialogManager.open("configureTiddlyMap", params, function(isConfirmed, outputTObj) {
+    var dialogName = (isWelcomeDialog ? "welcome" : "configureTiddlyMap");
+        
+    this.dialogManager.open(dialogName, params, function(isConfirmed, outputTObj) {
       if(isConfirmed && outputTObj) {
         var config = utils.getPropertiesByPrefix(outputTObj.fields, "config.sys.", true);
         this.wiki.setTiddlerData(this.opt.ref.sysConf + "/user", config);
@@ -1084,36 +1054,6 @@ module-type: widget
 
     
   };
-  
-  /**
-   * Allow the given nodes to be moveable.
-   * 
-   * @param {vis.DataSet} nodes - The nodes for which to allow any
-   *     movement (either by physics or by dragging).
-   * @param {boolean} isEnabled - True, if the nodes are allowed to
-   *     move or be moved.
-   */    
-  TiddlyMapWidget.prototype.setNodesMoveable = function(nodes, isMoveable) {
-    
-    this.network.storePositions(); // does it matter if we put this before setter? yes, I guess.
-
-    var updates = [];
-    var keys = Object.keys(nodes);
-    for(var i = 0; i < keys.length; i++) {
-      
-      var update = {
-        id: nodes[keys[i]].id,
-        allowedToMoveX: isMoveable,
-        allowedToMoveY: isMoveable
-      };
-      
-      updates.push(update);
-      
-    }
-    
-    this.graphData.nodes.update(updates);
-
-  };
 
   TiddlyMapWidget.prototype.handleInsertNode = function(node) {
     this.dialogManager.open("getNodeName", null, function(isConfirmed, outputTObj) {
@@ -1215,15 +1155,7 @@ module-type: widget
     }
     
   };
-  
-  /**
-   * called from outside.
-   */
-  TiddlyMapWidget.prototype.destruct = function() {
-    window.removeEventListener("resize", this.handleResizeEvent);
-    this.network.destroy();
-  };
-  
+    
   /**
    * used to prevent nasty deletion as edges are not unselected when leaving vis
    */
@@ -1275,6 +1207,14 @@ module-type: widget
       var node = this.graphData.nodesById[properties.nodeIds[0]];
       this.setNodesMoveable([ node ], true);
     }
+  };
+   
+  /**
+   * called from outside.
+   */
+  TiddlyMapWidget.prototype.destruct = function() {
+    window.removeEventListener("resize", this.handleResizeEvent);
+    this.network.destroy();
   };
    
   /**
@@ -1414,6 +1354,79 @@ module-type: widget
     var b = this.parentDomNode.getElementsByClassName(className)[0];
     $tw.utils.toggleClass(b, "tmap-button-enabled", enable);
   }; 
+  
+  
+  /**
+   * Allow the given nodes to be moveable.
+   * 
+   * @param {vis.DataSet} nodes - The nodes for which to allow any
+   *     movement (either by physics or by dragging).
+   * @param {boolean} isEnabled - True, if the nodes are allowed to
+   *     move or be moved.
+   */    
+  TiddlyMapWidget.prototype.setNodesMoveable = function(nodes, isMoveable) {
+    
+    this.network.storePositions(); // does it matter if we put this before setter? yes, I guess.
+
+    var updates = [];
+    var keys = Object.keys(nodes);
+    for(var i = 0; i < keys.length; i++) {
+      
+      var update = {
+        id: nodes[keys[i]].id,
+        allowedToMoveX: isMoveable,
+        allowedToMoveY: isMoveable
+      };
+      
+      updates.push(update);
+      
+    }
+    
+    this.graphData.nodes.update(updates);
+
+  };
+
+  TiddlyMapWidget.prototype.setHierarchy = function(nodes, edges, hierarchyEdgeTypes) {
+
+    // Definition of the recursive function that is responsible for assigning ids.
+    
+    function assignLevel(curNode, level) {
+      
+      if(curNode.level) return; // already visited
+      
+      curNode.level = level;
+      
+      for(var id in edges) {
+        var edge = edges[id];
+        if(edge.from === curNode.id) { // outgoing connection
+          var toNode = nodes[edge.to];
+          if(hierarchyEdgeTypes[edge.label]) { // edge that defines the hierarchical order
+            assignLevel(toNode, level + 1); // child of curNode
+          } else { // hierarchically equal relationship
+            assignLevel(toNode, level);
+          }
+        } else if(edge.to === curNode.id) { // incoming connection
+          var fromNode = nodes[edge.from];
+          if(hierarchyEdgeTypes[edge.label]) { // edge that defines the hierarchical order
+            assignLevel(fromNode, level - 1); // parent of curNode
+          } else { // hierarchically equal relationship
+            assignLevel(fromNode, level);
+          }
+        }
+      }             
+    }
+
+    loop1: for(var nodeId in nodes) {
+      for(var id in edges) {
+        if(nodes[nodeId].level || nodes[nodeId].id === edges[id].to) {
+          // already assigned a level or not a root node
+          continue loop1;
+        }
+      }
+      assignLevel(nodes[nodeId], 1000);
+    }
+
+  };
 
   /**
    * This function will create the dom elements for all tiddlymap-vis

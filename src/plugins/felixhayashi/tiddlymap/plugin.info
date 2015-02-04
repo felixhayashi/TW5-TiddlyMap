@@ -2,12 +2,14 @@
   "title": "$:/plugins/felixhayashi/tiddlymap",
   "description": "Create clickable graphs and mindmaps by simply linking your tiddlers!",
   "author": "Felix Küppers",
-  "version": "0.6.4+1630",
-  "released": "Wed, 04 Feb 2015 13:30:24 +0100",
+  "version": "0.6.4+1652",
+  "released": "Wed, 04 Feb 2015 17:20:17 +0100",
   "core-version": ">=5.1.5",
   "source": "https://github.com/felixhayashi/TW5-TiddlyMap",
   "type": "application/json",
   "plugin-type": "plugin",
   "list": "readme license",
-  "dependents": "$:/plugins/felixhayashi/vis"
+  "dependents": "$:/plugins/felixhayashi/vis",
+  "depends": "$:/plugins/felixhayashi/vis",
+  "suggested": "$:/plugins/felixhayashi/topstoryview"
 }

@@ -2,7 +2,7 @@ title: $:/plugins/felixhayashi/tiddlymap/dialog/getEdgeType
 subtitle: You are about to connect "<<fromLabel>>" with "<<toLabel>>"
 
 \define getLabel()
-<$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
+<$macrocall $name="tmap-macro" arg0="basename" arg1={{!!title}} />
 \end
 
 ''Type'': Please choose an existing relationship type from the list or specify a new one. <sup>[1]</sup>

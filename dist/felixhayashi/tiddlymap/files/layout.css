@@ -6,10 +6,11 @@ html {
   */ }
   html .tmap-small-list, html .tmap-very-small-list {
     overflow: auto;
-    height: 150px;
-    max-width: 270px; }
+    min-height: 20px;
+    max-height: 150px;
+    display: block; }
   html .tmap-very-small-list {
-    height: 100px; }
+    max-height: 100px; }
   html .tmap-quick-connect {
     font-size: 0.7em; }
     html .tmap-quick-connect .tc-drop-down {

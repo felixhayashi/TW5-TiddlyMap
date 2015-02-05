@@ -25,7 +25,7 @@ description: Show available ~TiddlyMap actions
           <$edit-text tiddler="$:/temp/quickConnectSearch/type" field="text" type="text" tag="input" default="" />
           <$select tiddler="$:/temp/quickConnectSearch/type" default="">
             <option></option>
-            <$list filter=<<tgmacro "option" "filter.allSharedEdgesByLabel">>  >
+            <$list filter=<<tmap-macro "option" "filter.allSharedEdgesByLabel">>  >
               <option>{{!!title}}</option>
             </$list>
           </$select>
@@ -40,7 +40,7 @@ description: Show available ~TiddlyMap actions
       </tr>
       <tr>
         <td colspan="2">
-          <table class="tmap-scroll-table">
+          <table class="tmap-small-list">
             <$list filter="[!is[system]search{$:/temp/quickConnectSearch}sort[title]count[]]" variable="item" emptyMessage="//No results//">
             <tr>
               <td>
@@ -69,9 +69,22 @@ description: Show available ~TiddlyMap actions
       </tr>
     </table>
     
+    <div>{{$:/core/images/delete-button}} ''Delete Connections'' <sup>[1]</sup></div>
+    <p>  
+
+      <$tmap-links>
+        <div>
+          <$button class="tc-btn-invisible">
+            <$action-sendmessage $message="tm-remove-edge" id=<<edge.id>> label=<<edge.label>> />
+            {{$:/core/images/close-button}}
+          </$button> <<role>> <$link><<neighbour>></$link>
+        </div>
+      </$tmap-links>
+    </p>
+    
     <hr />
     
-    <small>[1] Note, that nodes will be linked globally. Have a look at the [[docs|http://bit.ly/tiddlymap#Public%20and%20Private%20Edges]] for more information on private and public relations.</small><br />
+    <small>[1] Note, that nodes will be globally linked or removed. Have a look at the [[docs|http://bit.ly/tiddlymap#Public%20and%20Private%20Edges]] for more information on private and public relations.</small><br />
     
   </div>
 </div>

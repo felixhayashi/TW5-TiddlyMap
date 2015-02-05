@@ -1,6 +1,6 @@
 /*\
 
-title: $:/plugins/felixhayashi/tiddlymap/tiddlymap.js
+title: $:/plugins/felixhayashi/tiddlymap/graph_widget.js
 type: application/javascript
 module-type: widget
 
@@ -31,6 +31,9 @@ module-type: widget
    * @constructor
    */
   var TiddlyMapWidget = function(parseTreeNode, options) {
+    
+    // call the constructor
+    Widget.call(this);
     
     // Main initialisation inherited from widget.js
     this.initialise(parseTreeNode, options);
@@ -70,7 +73,7 @@ module-type: widget
   };
   
   // !! EXTENSION !!
-  TiddlyMapWidget.prototype = new Widget();
+  TiddlyMapWidget.prototype = Object.create(Widget.prototype);
   // !! EXTENSION !!
     
   /**
@@ -413,20 +416,6 @@ module-type: widget
       }
     });
 
-    
-    // add special nodes
-    
-    if(this.getView().getLabel() === "quick_connect") { // special case; ugly solved!
-      
-      var curNode = this.adapter.selectNodesByReference([ this.getVariable("currentTiddler") ], {
-        outputType: "hashmap",
-        addProperties: { group: "special", x: 0, y: 0 }
-      });
-      
-      utils.inject(curNode, nodes);
-      
-    }
-    
     // retrieve edges
     
     var edges = this.adapter.selectEdgesByEndpoints(nodes, {

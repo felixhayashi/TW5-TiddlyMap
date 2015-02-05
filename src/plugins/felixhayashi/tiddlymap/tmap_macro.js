@@ -1,5 +1,5 @@
 /*\
-title: $:/plugins/felixhayashi/tiddlymap/tgmacro.js
+title: $:/plugins/felixhayashi/tiddlymap/tmap-macro.js
 type: application/javascript
 module-type: macro
 
@@ -23,7 +23,7 @@ util functions.
   Information about this macro
   */
 
-  exports.name = "tgmacro";
+  exports.name = "tmap-macro";
 
   // unfortunately tw forces us to specify params in advance so I will
   // reserve some argument slots here.. lets say five.
@@ -63,6 +63,7 @@ util functions.
         if(!(typeof prop == "string")) return "property is not a string";
         
         return prop;
+        
     } 
     
     return "wrong signature";

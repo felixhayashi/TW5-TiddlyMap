@@ -8,9 +8,9 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
   View:
   <$reveal type="match" text="false" default=<<param.isViewBound>> >
     <$select tiddler=<<param.ref.viewHolder>> field="text" default=<<param.ref.view>> >
-       <$list filter=<<tgmacro "option" "filter.allViews">> >
+       <$list filter=<<tmap-macro "option" "filter.allViews">> >
          <option value={{!!title}}>
-           <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
+           <$macrocall $name="tmap-macro" arg0="basename" arg1={{!!title}} />
           </option>
        </$list>
     </$select>
@@ -60,7 +60,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
         <$list filter=<<param.allEdgesFilter>> >
           <$set name="curEdgeId" value={{!!id}}>
             <$checkbox tiddler=<<param.ref.edgeFilter>> field=<<showEdgeField>> checked="true" unchecked="false" default=<<default>> >
-              <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
+              <$macrocall $name="tmap-macro" arg0="basename" arg1={{!!title}} />
             </$checkbox>
             <br />
           </$set>

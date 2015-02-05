@@ -102,7 +102,7 @@ say here is: do not require the caretaker!
     opt.misc.unknownEdgeLabel = "__noname__";
     opt.misc.cssPrefix = "tmap-";
 
-    // some popular filters (usually used from within tiddlers via tgmacro)
+    // some popular filters (usually used from within tiddlers via tmap-macro)
     if(!opt.filter) opt.filter = utils.getEmptyMap();
     
     opt.filter.allSharedEdges = "[prefix[" + opt.path.edges + "]]";

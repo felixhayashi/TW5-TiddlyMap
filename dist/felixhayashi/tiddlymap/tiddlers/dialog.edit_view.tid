@@ -15,7 +15,7 @@ subtitle: {{$:/core/images/theme-button}} View Configuration
         <$list filter=<<var.edgeFilter>> >
           <$set name="curEdgeId" value={{!!id}}>
           <$checkbox tiddler=<<output>> field=<<orderByEdgeField>> checked="true" unchecked="false" default="false">
-            <$macrocall $name="tgmacro" arg0="basename" arg1={{!!title}} />
+            <$macrocall $name="tmap-macro" arg0="basename" arg1={{!!title}} />
           </$checkbox>
           <br />
           </$set>

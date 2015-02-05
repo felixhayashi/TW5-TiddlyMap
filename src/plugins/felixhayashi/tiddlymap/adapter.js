@@ -79,7 +79,7 @@ module-type: library
       var key = records.length;
     }
     
-    this.logger("info", "Inserting edge into store  \"" + storeRef + "\"", edge);
+    this.logger("info", "Inserting edge", edge, "into store", storeRef);
     
     records[key] = edge;
     
@@ -290,6 +290,7 @@ module-type: library
     for(var i = 0; i < tiddlers.length; i++) {
       
       var node = this.createNode(tiddlers[i], protoNode, options.view);
+      
       if(node) {
         result[node.id] = node;
       }
@@ -303,6 +304,15 @@ module-type: library
     return utils.convert(result, options.outputType);
     
   };
+  
+  //~ Adapter.prototype.selectNodeByReference = function(tiddler, options) {
+    //~ 
+    //~ if(typeof options !== "object") options = utils.getEmptyMap();
+    //~ options.outputType = "array";
+    //~ 
+    //~ return this.selectNodesByReference([ tiddler ], options)[0];
+    //~ 
+  //~ };
 
   Adapter.prototype.createNode = function(tiddler, protoNode, view) {
 
@@ -586,7 +596,7 @@ module-type: library
     var storeRef = view.getEdgeStoreLocation() + "/" + label;
     var storeData = this.wiki.getTiddlerData(storeRef, []);
     
-    this.logger("info", "Edge with label \"" + label + "\" will be deleted: " + edge);
+    this.logger("info", "Edge with label", label, "will be deleted: ", edge);
     
     var key = utils.keyOfItemWithProperty(storeData, "id", edge.id);
     if(key != null) { // neither undefined nor null

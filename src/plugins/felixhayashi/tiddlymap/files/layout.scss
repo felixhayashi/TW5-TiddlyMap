@@ -4,13 +4,14 @@ html { // used to increase css importance
 
   .tmap-small-list {
     overflow: auto;
-    height: 150px;
-    max-width: 270px;
+    min-height: 20px;
+    max-height: 150px;
+    display: block;
   }
   
   .tmap-very-small-list {
     @extend .tmap-small-list;
-    height: 100px;
+    max-height: 100px;
   }
 
   .tmap-quick-connect {

@@ -1,0 +1,10 @@
+/*\
+
+title: $:/plugins/felixhayashi/tiddlymap/connections.js
+type: application/javascript
+module-type: widget
+
+@preserve
+
+\*/
+(function(){"use strict";var e=require("$:/core/modules/widgets/widget.js").widget;var t=require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;var r=function(t,r){e.call(this,t,r);this.addEventListener("tm-remove-edge",function(e){$tw.tiddlymap.adapter.deleteEdgeFromStore(e.paramObject)})};r.prototype=Object.create(e.prototype);r.prototype.render=function(e,t){this.parentDomNode=e;this.computeAttributes();this.execute();this.renderChildren(e,t)};r.prototype.execute=function(){var e="[field:title["+this.getVariable("currentTiddler")+"]!has[draft.of]]";var t=this.getAttribute("filter",e);this.nodes=$tw.tiddlymap.adapter.selectNodesByFilter(t,{outputType:"hashmap"});this.edges=$tw.tiddlymap.adapter.selectEdgesByEndpoints(this.nodes,{outputType:"hashmap",endpointsInSet:">=1"});this.neighbours=$tw.tiddlymap.adapter.selectNeighbours(this.nodes,{edges:this.edges,outputType:"hashmap"});var r=[];for(var i in this.edges){var s=this.makeItemTemplate(this.edges[i]);if(s){r.push(s)}}this.makeChildWidgets(r)};r.prototype.makeItemTemplate=function(e){var t="";var r=this.nodes[e.to]?"From":"To";var i=this.neighbours[e[r.toLowerCase()]];if(!i)return;return{type:"edgelistitem",edge:e,link:i,linkRole:r,children:this.parseTreeNode.children}};r.prototype.refresh=function(e){for(var r in e){var i=t.startsWith(r,$tw.tiddlymap.opt.path.edges);var s=r===this.getVariable("currentTiddler");if(i||s){this.refreshSelf();return true}}return this.refreshChildren(e)};exports["connections"]=r;var i=function(t,r){e.call(this,t,r)};i.prototype=Object.create(e.prototype);i.prototype.execute=function(){var e=this.parseTreeNode;this.setVariable("currentTiddler",e.link.ref);this.setVariable("edge.id",e.edge.id);this.setVariable("edge.label",e.edge.label);this.setVariable("neighbour",e.link.ref);this.setVariable("role",e.linkRole);this.makeChildWidgets()};i.prototype.refresh=function(e){return this.refreshChildren(e)};exports.edgelistitem=i})();

@@ -1,4 +1,5 @@
 $filterbar-height: 35px;
+$default-input-width: 140px;
 
 html { // used to increase css importance
 
@@ -11,7 +12,7 @@ html { // used to increase css importance
   
   .tmap-very-small-list {
     @extend .tmap-small-list;
-    max-height: 100px;
+    max-height: 60px;
   }
 
   .tmap-quick-connect {
@@ -124,7 +125,7 @@ html { // used to increase css importance
             .tmap-note {
               margin: 10px 10px 10px 0; }
             input {
-              width: 140px; }
+              width: $default-input-width; }
             .tmap-description {
               font-style: italic;
               
@@ -219,8 +220,8 @@ html { // used to increase css importance
     }
 
     .tmap-vis-graph {
-      height: 100%;
-      
+      height: calc(100% - 35px);
+
       .network-frame {
         .tmap-vis-button { 
           &.tmap-fullscreen.tmap-button-enabled {
@@ -234,8 +235,9 @@ html { // used to increase css importance
     
     &.tmap-advanced-editor {
       background: #F2F2F2;
-      .tmap-vis-graph {
-        height: calc(100% - 35px);
+      
+      .tmap-topbar {
+        background: #d6d9d8;
       }
     }
 
@@ -250,14 +252,27 @@ html { // used to increase css importance
       height: 35px;
     }
     
-    .tmap-filterbar {
-      background: #d6d9d8;
+    .tmap-topbar {
+      background: #F5F5F5;
       border-bottom: 1px solid lightgray;
       padding: 3px $padding;
       height: $filterbar-height;
+      position: relative;
       
-      .editor-search-button {
-        float: right;
+      .tmap-view-label {
+        width: 100%;
+        text-align: center;
+        font-weight: bold;
+        padding-top: 3px;
+      }
+      
+      .focus-button {
+        position: absolute;
+        right: 10px;
+        
+        input {
+          width: $default-input-width;
+        }
       }
       
       .tmap-popup {

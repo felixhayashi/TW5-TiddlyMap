@@ -1,10 +1,10 @@
 /*\
-title: $:/plugins/felixhayashi/tiddlymap/tmap-macro.js
+title: $:/plugins/felixhayashi/tiddlymap/map-macro.js
 type: application/javascript
 module-type: macro
 
-In connection with tiddlymap, this macro allows us to access some
-needed information from within tiddlers as well as to execute some
+In connection with tiddlymap, this macro allows us to access
+system information from within tiddlers as well as to execute some
 util functions.
 
 @preserve
@@ -23,7 +23,7 @@ util functions.
   Information about this macro
   */
 
-  exports.name = "tmap-macro";
+  exports.name = "map-macro";
 
   // unfortunately tw forces us to specify params in advance so I will
   // reserve some argument slots here.. lets say five.

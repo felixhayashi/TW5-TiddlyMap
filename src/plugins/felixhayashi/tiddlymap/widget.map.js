@@ -30,7 +30,7 @@ module-type: widget
   /**
    * @constructor
    */
-  var TiddlyMapWidget = function(parseTreeNode, options) {
+  var MapWidget = function(parseTreeNode, options) {
     
     // call the constructor
     Widget.call(this);
@@ -54,7 +54,6 @@ module-type: widget
     this.editorMode = this.getAttribute("editor");
     
     if(this.editorMode) {
-      // addEventListeners automatically binds "this" object to handler, thus, no need for .bind(this)
       this.addEventListeners([
         {type: "tm-create-view", handler: this.handleCreateView },
         {type: "tm-rename-view", handler: this.handleRenameView },
@@ -63,17 +62,21 @@ module-type: widget
         {type: "tm-configure-system", handler: this.handleConfigureSystem },
         {type: "tm-store-position", handler: this.handleStorePositions },
         {type: "tm-edit-node-filter", handler: this.handleEditNodeFilter },
-        {type: "tm-import-tiddlers", handler: this.handleImportTiddlers },
-        {type: "tm-focus-node", handler: this.handleFocusNode }
+        {type: "tm-import-tiddlers", handler: this.handleImportTiddlers }
       ]);
     }
+    
+    this.addEventListeners([
+      {type: "tm-focus-node", handler: this.handleFocusNode },
+      {type: "tm-reset-focus", handler: this.repaintGraph }
+    ]);
     
     this.checkForFreshInstall();
     
   };
   
   // !! EXTENSION !!
-  TiddlyMapWidget.prototype = Object.create(Widget.prototype);
+  MapWidget.prototype = Object.create(Widget.prototype);
   // !! EXTENSION !!
     
   /**
@@ -90,7 +93,7 @@ module-type: widget
    * @param {function} [callback] - A function with the signature
    *    function(isConfirmed);
    */
-  TiddlyMapWidget.prototype.handleConnectionEvent = function(edge, callback) {
+  MapWidget.prototype.handleConnectionEvent = function(edge, callback) {
 
     var edgeFilterExpr = this.getView().getAllEdgesFilter(true);
 
@@ -121,7 +124,7 @@ module-type: widget
     
   };
   
-  TiddlyMapWidget.prototype.checkForFreshInstall = function(callback, message) {
+  MapWidget.prototype.checkForFreshInstall = function(callback, message) {
     if(!utils.tiddlerExists(this.opt.ref.welcomeFlag)) {
       this.handleConfigureSystem(true);
       this.wiki.addTiddler(new $tw.Tiddler({ title: this.opt.ref.welcomeFlag }));
@@ -133,7 +136,7 @@ module-type: widget
    * @param {function} [callback] - A function with the signature function(isConfirmed).
    * @param {string} [message] - An small optional message to display.
    */
-  TiddlyMapWidget.prototype.openStandardConfirmDialog = function(callback, message) {
+  MapWidget.prototype.openStandardConfirmDialog = function(callback, message) {
   
     var param = {
       message : message,
@@ -146,7 +149,7 @@ module-type: widget
     this.dialogManager.open("getConfirmation", param, callback);
   };
     
-  TiddlyMapWidget.prototype.logger = function(type, message /*, more stuff*/) {
+  MapWidget.prototype.logger = function(type, message /*, more stuff*/) {
     
     var args = Array.prototype.slice.call(arguments, 1);
     args.unshift("@" + this.objectId.toUpperCase());
@@ -161,7 +164,7 @@ module-type: widget
    * 
    * @override
    */
-  TiddlyMapWidget.prototype.render = function(parent, nextSibling) {
+  MapWidget.prototype.render = function(parent, nextSibling) {
     
     // remember our place in the dom
     this.registerParentDomNode(parent);
@@ -194,7 +197,7 @@ module-type: widget
    * Add some classes to give the user a chance to apply some css
    * to different graph modes.
    */
-  TiddlyMapWidget.prototype.registerParentDomNode = function(parent) {
+  MapWidget.prototype.registerParentDomNode = function(parent) {
     this.parentDomNode = parent;
     if(!$tw.utils.hasClass(parent, "tmap-widget")) {
       $tw.utils.addClass(parent, "tmap-widget");
@@ -217,18 +220,14 @@ module-type: widget
    * @param {Element} parent The dom node in which the editor bar will
    *     be injected in.
    */
-  TiddlyMapWidget.prototype.initAndRenderEditorBar = function(parent) {
-    
-    if(this.editorMode === "advanced") {
-    
+  MapWidget.prototype.initAndRenderEditorBar = function(parent) {
+        
       this.graphBarDomNode = document.createElement("div");
-      $tw.utils.addClass(this.graphBarDomNode, "tmap-filterbar");
+      $tw.utils.addClass(this.graphBarDomNode, "tmap-topbar");
       parent.appendChild(this.graphBarDomNode);
       
       this.rebuildEditorBar();
       this.renderChildren(this.graphBarDomNode);
-      
-    }
     
   };
 
@@ -236,46 +235,67 @@ module-type: widget
    * Creates this widget's child-widgets.
    * 
    * @see https://groups.google.com/forum/#!topic/tiddlywikidev/sJrblP4A0o4
+   * @see blob/master/editions/test/tiddlers/tests/test-wikitext-parser.js
    */
-  TiddlyMapWidget.prototype.rebuildEditorBar = function() {
+  MapWidget.prototype.rebuildEditorBar = function() {
+        
+    // register variables
+    
+    var params = {
+      "viewLabel": this.getView().getLabel(),
+      "isViewBound": String(this.isViewBound()),
+      "ref.view": this.getView().getRoot(),
+      "ref.viewHolder": this.getViewHolderRef(),
+      "ref.edgeFilter": this.getView().getPaths().edgeFilter,
+      "allEdgesFilter": this.view.getAllEdgesFilter(),
+      "search-output": "$:/temp/tmap/editor/search",
+      "nodeFilter": this.view.getNodeFilter("expression")
+                    + "+[search{$:/temp/tmap/editor/search}]"
+    };
+    
+    for(var name in params) {
+      this.setVariable("param." + name, params[name]);
+    }
+    
+    // Construct the child widget tree
+    var body = {
+      type: "tiddler",
+      attributes: {
+        tiddler: { type: "string", value: this.getView().getRoot() }
+      },
+      children: []
+    };
     
     if(this.editorMode === "advanced") {
-    
-      // register variables
       
-      var params = {
-        "viewLabel": this.getView().getLabel(),
-        "isViewBound": String(this.isViewBound()),
-        "ref.view": this.getView().getRoot(),
-        "ref.viewHolder": this.getViewHolderRef(),
-        "ref.edgeFilter": this.getView().getPaths().edgeFilter,
-        "allEdgesFilter": this.view.getAllEdgesFilter(),
-        "search-output":  "$:/temp/tmap/editor/search",
-        "nodeFilter": this.view.getNodeFilter("expression")
-                      + "+[search{$:/temp/tmap/editor/search}]"
-      };
-      
-      for(var name in params) {
-        this.setVariable("param." + name, params[name]);
-      }
-      
-      // Construct the child widget tree
-      var body = {
-        type: "tiddler",
+      body.children.push({
+        type: "transclude",
         attributes: {
-          tiddler: { type: "string", value: this.getView().getRoot() }
-        },
-        children: [{
-          type: "transclude",
-          attributes: {
-            tiddler: { type: "string", value: this.opt.ref.graphBar }
-          }
-        }]
-      };
-          
-      this.makeChildWidgets([body]);
+          tiddler: { type: "string", value: this.opt.ref.graphBar }
+        }
+      });
+      
+    } else {
+      
+      body.children.push({
+        type: "element",
+        tag: "span",
+        attributes: { class: { type: "string", value: "tmap-view-label" }},
+        children: [ {type: "text", text: params.viewLabel } ]
+      });
       
     }
+    
+    body.children.push({
+      type: "transclude",
+      attributes: {
+        tiddler: { type: "string", value: this.opt.ref.focusButton }
+      }
+    });
+
+        
+    this.makeChildWidgets([body]);
+
   };
       
   /**
@@ -301,7 +321,7 @@ module-type: widget
    * @override Widget.refresh();
    * @see https://groups.google.com/d/msg/tiddlywikidev/hwtX59tKsIk/EWSG9glqCnsJ
    */
-  TiddlyMapWidget.prototype.refresh = function(changedTiddlers) {
+  MapWidget.prototype.refresh = function(changedTiddlers) {
         
     // in any case, check for callbacks triggered by tiddlers
     this.callbackManager.handleChanges(changedTiddlers);
@@ -334,10 +354,9 @@ module-type: widget
             
     }
     
-    if(this.editorMode) {
-      // in any case give child widgets a chance to refresh
-      this.checkOnEditorBar(changedTiddlers, isViewSwitched, viewModifications);
-    }
+
+    // in any case give child widgets a chance to refresh
+    this.checkOnEditorBar(changedTiddlers, isViewSwitched, viewModifications);
 
   };
   
@@ -345,7 +364,7 @@ module-type: widget
    * param {NodeCollection} [nodes] - An optional set of nodes to use
    * instead of the set created according to the nodes filter.
    */
-  TiddlyMapWidget.prototype.rebuildGraph = function(options) {
+  MapWidget.prototype.rebuildGraph = function(options) {
     
     this.logger("debug", "Rebuilding graph");
     
@@ -388,7 +407,7 @@ module-type: widget
    * Warning: Do not change this functionname as it is used by the
    * caretaker's routinely checkups.
    */
-  TiddlyMapWidget.prototype.getContainer = function() {
+  MapWidget.prototype.getContainer = function() {
     return this.parentDomNode;
   }
   
@@ -399,7 +418,7 @@ module-type: widget
    *     a nodes collection will always recreate the cache despite the value
    *     of `isRebuild`.
    */
-  TiddlyMapWidget.prototype.getGraphData = function(isRebuild) {
+  MapWidget.prototype.getGraphData = function(isRebuild) {
       
     if(!isRebuild && this.graphData) {
       return this.graphData;
@@ -468,14 +487,14 @@ module-type: widget
         
   };
 
-  TiddlyMapWidget.prototype.isViewBound = function() {
+  MapWidget.prototype.isViewBound = function() {
     
     return utils.startsWith(this.getViewHolderRef(),
                             this.opt.path.localHolders);  
     
   };  
   
-  TiddlyMapWidget.prototype.isViewSwitched = function(changedTiddlers) {
+  MapWidget.prototype.isViewSwitched = function(changedTiddlers) {
   
     if(this.isViewBound()) {
       return false; // bound views can never be switched!
@@ -488,7 +507,7 @@ module-type: widget
   /**
    * This method will ckeck if any tw-widget needs a refresh.
    */
-  TiddlyMapWidget.prototype.checkOnEditorBar = function(changedTiddlers, isViewSwitched, viewModifications) {
+  MapWidget.prototype.checkOnEditorBar = function(changedTiddlers, isViewSwitched, viewModifications) {
     
     // @TODO viewModifications is actually really heavy. I could narrow this.
     if(isViewSwitched || viewModifications.length) {
@@ -519,7 +538,7 @@ module-type: widget
    * 3. An edge that matches the edge filter has been added or removed.
    * 
    */
-  TiddlyMapWidget.prototype.checkOnGraph = function(changedTiddlers) {
+  MapWidget.prototype.checkOnGraph = function(changedTiddlers) {
             
     var nodeFilter = this.getView().getNodeFilter("compiled");
     
@@ -564,7 +583,7 @@ module-type: widget
    *   - http://visjs.org/docs/network.html
    *   - http://visjs.org/docs/dataset.html
    */
-  TiddlyMapWidget.prototype.initAndRenderGraph = function(parent) {
+  MapWidget.prototype.initAndRenderGraph = function(parent) {
     
     this.logger("info", "Initializing and rendering the graph");
         
@@ -628,7 +647,7 @@ module-type: widget
         
   };
   
-  TiddlyMapWidget.prototype.getGraphOptions = function() {
+  MapWidget.prototype.getGraphOptions = function() {
     
     // current vis options can be found at $tw.tiddlymap.logger("log", this.network.constants);
     
@@ -676,7 +695,7 @@ module-type: widget
    * Create an empty view. A dialog is opened that asks the user how to
    * name the view. The view is then registered as current view.
    */
-  TiddlyMapWidget.prototype.handleCreateView = function() {
+  MapWidget.prototype.handleCreateView = function() {
     
     this.dialogManager.open("getViewName", null, function(isConfirmed, outputTObj) {
     
@@ -689,7 +708,7 @@ module-type: widget
     
   };
 
-  TiddlyMapWidget.prototype.handleTriggeredRefresh = function(trigger) {
+  MapWidget.prototype.handleTriggeredRefresh = function(trigger) {
     this.logger("log", "Tiddler", trigger, "triggered a refresh");
     this.rebuildGraph({
       resetData: false,
@@ -701,7 +720,7 @@ module-type: widget
     });
   };
   
-  TiddlyMapWidget.prototype.handleRenameView = function() {
+  MapWidget.prototype.handleRenameView = function() {
     
     if(this.getView().getLabel() === "default") {
       this.notify("Thou shalt not rename the default view!");
@@ -719,7 +738,7 @@ module-type: widget
     
   };
   
-  TiddlyMapWidget.prototype.handleConfigureSystem = function(isWelcomeDialog) {
+  MapWidget.prototype.handleConfigureSystem = function(isWelcomeDialog) {
         
     var params = {
       dialog: {
@@ -738,7 +757,7 @@ module-type: widget
     
   };
   
-  TiddlyMapWidget.prototype.handleEditView = function() {
+  MapWidget.prototype.handleEditView = function() {
     
     var params = {
       "var.edgeFilter": this.getView().getEdgeFilter("expression"),
@@ -756,7 +775,7 @@ module-type: widget
     
   };
 
-  TiddlyMapWidget.prototype.handleDeleteView = function() {
+  MapWidget.prototype.handleDeleteView = function() {
     
     var viewname = this.getView().getLabel();
     
@@ -797,7 +816,7 @@ module-type: widget
     
   };
   
-  TiddlyMapWidget.prototype.handleReconnectEdge = function(updatedEdge) {
+  MapWidget.prototype.handleReconnectEdge = function(updatedEdge) {
 
     var edge = this.graphData.edges.get(updatedEdge.id);
     $tw.utils.extend(edge, updatedEdge);
@@ -817,7 +836,7 @@ module-type: widget
    * @param {Array<Id>} elements.nodes - Removed edges.
    * @param {Array<Id>} elements.edges - Removed nodes.
    */
-  TiddlyMapWidget.prototype.handleRemoveElement = function(elements) {
+  MapWidget.prototype.handleRemoveElement = function(elements) {
     
     if(elements.edges.length && !elements.nodes.length) { // only deleting edges
       this.adapter.deleteEdgesFromStore(this.graphData.edges.get(elements.edges), this.getView());
@@ -829,7 +848,7 @@ module-type: widget
     }     
   }
   
-  TiddlyMapWidget.prototype.handleToggleFullscreen = function() {
+  MapWidget.prototype.handleToggleFullscreen = function() {
 
     this.logger("log", "Toggle fullscreen");
 
@@ -869,7 +888,7 @@ module-type: widget
   };
     
     
-  TiddlyMapWidget.prototype.handleRemoveNode = function(node) {
+  MapWidget.prototype.handleRemoveNode = function(node) {
 
     var params = {
       "var.nodeLabel": node.label,
@@ -909,7 +928,7 @@ module-type: widget
       
   };
   
-  TiddlyMapWidget.prototype.handleFullScreenChange = function() {
+  MapWidget.prototype.handleFullScreenChange = function() {
     
     if(this.isFullscreenMode
        && !document[utils.getFullScreenApis()["_fullscreenElement"]]) {
@@ -928,7 +947,7 @@ module-type: widget
     
   };
      
-  TiddlyMapWidget.prototype.handleImportTiddlers = function(event) {
+  MapWidget.prototype.handleImportTiddlers = function(event) {
     
     var tiddlers = JSON.parse(event.param);
     
@@ -968,14 +987,14 @@ module-type: widget
   };
     
   
-  TiddlyMapWidget.prototype.handleStorePositions = function(withNotify) {
+  MapWidget.prototype.handleStorePositions = function(withNotify) {
     this.adapter.storePositions(this.network.getPositions(), this.getView());
     if(withNotify) {
       this.notify("positions stored");
     }
   };
   
-  TiddlyMapWidget.prototype.handleEditNodeFilter = function() {
+  MapWidget.prototype.handleEditNodeFilter = function() {
 
     var fields = {
       prettyFilter: this.getView().getPrettyNodeFilterExpr()
@@ -996,7 +1015,7 @@ module-type: widget
    * as this will affect other graphs positions and will cause recursion!
    * Storing positions inside vis' nodes is fine though
    */
-  TiddlyMapWidget.prototype.handleStabilizedEvent = function(properties) {
+  MapWidget.prototype.handleStabilizedEvent = function(properties) {
     
     if(!this.hasNetworkStabilized) {
       this.hasNetworkStabilized = true;
@@ -1011,13 +1030,13 @@ module-type: widget
     
   };
   
-  TiddlyMapWidget.prototype.handleFocusNode = function(event) {
+  MapWidget.prototype.handleFocusNode = function(event) {
     this.network.focusOnNode(this.graphData.nodesByRef[event.param].id, {
       scale: 1, animation: true
     });
   };
   
-  TiddlyMapWidget.prototype.fitGraph = function(delay, duration) {
+  MapWidget.prototype.fitGraph = function(delay, duration) {
     
     window.clearTimeout(this.activeZoomExtentTimeout);
     
@@ -1035,7 +1054,7 @@ module-type: widget
     }
   }
   
-  TiddlyMapWidget.prototype.handleStartStabilizionEvent = function(properties) {
+  MapWidget.prototype.handleStartStabilizionEvent = function(properties) {
     
       //~ this.activeZoomExtentTimeout = this.network.zoomExtent({
         //~ duration: 2000
@@ -1044,7 +1063,7 @@ module-type: widget
     
   };
 
-  TiddlyMapWidget.prototype.handleInsertNode = function(node) {
+  MapWidget.prototype.handleInsertNode = function(node) {
     this.dialogManager.open("getNodeName", null, function(isConfirmed, outputTObj) {
       if(isConfirmed) {
         node.label = utils.getText(outputTObj);
@@ -1068,7 +1087,7 @@ module-type: widget
    * @properties a list of nodes and/or edges that correspond to the
    * click event.
    */
-  TiddlyMapWidget.prototype.handleDoubleClickEvent = function(properties) {
+  MapWidget.prototype.handleDoubleClickEvent = function(properties) {
     
     if(!properties.nodes.length && !properties.edges.length) { // clicked on an empty spot
       
@@ -1121,7 +1140,7 @@ module-type: widget
    *     https://groups.google.com/d/topic/tiddlywikidev/yuQB1KwlKx8/discussion
    *   - https://developer.mozilla.org/en-US/docs/Web/API/Node.contains
    */
-  TiddlyMapWidget.prototype.handleResizeEvent = function(event) {
+  MapWidget.prototype.handleResizeEvent = function(event) {
     
     if(this.sidebar.contains(this.parentDomNode)) {
       
@@ -1148,7 +1167,7 @@ module-type: widget
   /**
    * used to prevent nasty deletion as edges are not unselected when leaving vis
    */
-  TiddlyMapWidget.prototype.handleClickEvent = function(event) {
+  MapWidget.prototype.handleClickEvent = function(event) {
 
     if(!document.body.contains(this.parentDomNode)) {
       window.removeEventListener("click", this.handleClickEvent);
@@ -1171,7 +1190,7 @@ module-type: widget
    * @param {Array<Id>} properties.nodeIds - Array of ids of the nodes
    *     that were being dragged.
    */
-  TiddlyMapWidget.prototype.handleNodeDragEnd = function(properties) {
+  MapWidget.prototype.handleNodeDragEnd = function(properties) {
     if(properties.nodeIds.length
        && this.getView().getConfig("layout.active") !== "hierarchical") {
       var isFloatingMode = this.getView().isConfEnabled("physics_mode");
@@ -1191,7 +1210,7 @@ module-type: widget
    * @param {Array<Id>} properties.nodeIds - Array of ids of the nodes
    *     that are being dragged.
    */
-  TiddlyMapWidget.prototype.handleNodeDragStart = function(properties) {
+  MapWidget.prototype.handleNodeDragStart = function(properties) {
     if(properties.nodeIds.length) {
       var node = this.graphData.nodesById[properties.nodeIds[0]];
       this.setNodesMoveable([ node ], true);
@@ -1201,7 +1220,7 @@ module-type: widget
   /**
    * called from outside.
    */
-  TiddlyMapWidget.prototype.destruct = function() {
+  MapWidget.prototype.destruct = function() {
     window.removeEventListener("resize", this.handleResizeEvent);
     this.network.destroy();
   };
@@ -1218,7 +1237,7 @@ module-type: widget
    * on first call (that is when no view holder is registered to "this".
    * 
    */
-  TiddlyMapWidget.prototype.getViewHolderRef = function() {
+  MapWidget.prototype.getViewHolderRef = function() {
     
     // the viewholder is never recalculated once it exists
     if(this.viewHolderRef) {
@@ -1272,7 +1291,7 @@ module-type: widget
    * @viewRef (optional) a reference (tiddler title) to a view
    * @viewHolderRef (optional) a reference to the view holder that should be updated
    */
-  TiddlyMapWidget.prototype.setView = function(viewRef, viewHolderRef) {
+  MapWidget.prototype.setView = function(viewRef, viewHolderRef) {
     
     if(viewRef) {
       if(!viewHolderRef) {
@@ -1297,7 +1316,7 @@ module-type: widget
    *     from the holder and recreate the view abstraction object.
    * @return {ViewAbstraction} the view
    */
-  TiddlyMapWidget.prototype.getView = function(isRebuild) {
+  MapWidget.prototype.getView = function(isRebuild) {
     
     if(!isRebuild && this.view) {
       return this.view;
@@ -1316,7 +1335,7 @@ module-type: widget
     
   };
     
-  TiddlyMapWidget.prototype.repaintGraph = function() {
+  MapWidget.prototype.repaintGraph = function() {
     
     if(!document[utils.getFullScreenApis()["_fullscreenElement"]]
        || this.isFullscreenMode) {
@@ -1338,7 +1357,7 @@ module-type: widget
    * @param {boolean} enable - True if the button should be visible,
    *     false otherwise.
    */ 
-  TiddlyMapWidget.prototype.setGraphButtonEnabled = function(name, enable) {
+  MapWidget.prototype.setGraphButtonEnabled = function(name, enable) {
     var className = "network-navigation tmap-vis-button" + " " + "tmap-" + name;
     var b = this.parentDomNode.getElementsByClassName(className)[0];
     $tw.utils.toggleClass(b, "tmap-button-enabled", enable);
@@ -1353,7 +1372,7 @@ module-type: widget
    * @param {boolean} isEnabled - True, if the nodes are allowed to
    *     move or be moved.
    */    
-  TiddlyMapWidget.prototype.setNodesMoveable = function(nodes, isMoveable) {
+  MapWidget.prototype.setNodesMoveable = function(nodes, isMoveable) {
     
     this.network.storePositions(); // does it matter if we put this before setter? yes, I guess.
 
@@ -1375,7 +1394,7 @@ module-type: widget
 
   };
 
-  TiddlyMapWidget.prototype.setHierarchy = function(nodes, edges, hierarchyEdgeTypes) {
+  MapWidget.prototype.setHierarchy = function(nodes, edges, hierarchyEdgeTypes) {
 
     // Definition of the recursive function that is responsible for assigning ids.
     
@@ -1424,7 +1443,7 @@ module-type: widget
    * @param {Object<string, function>} buttonEvents - The label of the
    *     button that is used as css class and the click handler.
    */
-  TiddlyMapWidget.prototype.addGraphButtons = function(buttonEvents) {
+  MapWidget.prototype.addGraphButtons = function(buttonEvents) {
     
     var parent = this.parentDomNode.getElementsByClassName("vis network-frame")[0];
     
@@ -1438,7 +1457,7 @@ module-type: widget
   };
   
   // !! EXPORT !!
-  exports.tiddlymap = TiddlyMapWidget;
+  exports.tiddlymap = MapWidget;
   // !! EXPORT !!
   
 })();

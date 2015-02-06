@@ -25,7 +25,7 @@ description: Show available ~TiddlyMap actions
           <$edit-text tiddler="$:/temp/quickConnectSearch/type" field="text" type="text" tag="input" default="" />
           <$select tiddler="$:/temp/quickConnectSearch/type" default="">
             <option></option>
-            <$list filter=<<tmap-macro "option" "filter.allSharedEdgesByLabel">>  >
+            <$list filter=<<map-macro "option" "filter.allSharedEdgesByLabel">>  >
               <option>{{!!title}}</option>
             </$list>
           </$select>
@@ -72,14 +72,14 @@ description: Show available ~TiddlyMap actions
     <div>{{$:/core/images/delete-button}} ''Delete Connections'' <sup>[1]</sup></div>
     <p>  
 
-      <$tmap-links>
+      <$connections>
         <div>
           <$button class="tc-btn-invisible">
             <$action-sendmessage $message="tm-remove-edge" id=<<edge.id>> label=<<edge.label>> />
             {{$:/core/images/close-button}}
           </$button> <<role>> <$link><<neighbour>></$link>
         </div>
-      </$tmap-links>
+      </$connections>
     </p>
     
     <hr />

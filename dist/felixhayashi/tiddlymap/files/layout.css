@@ -10,7 +10,7 @@ html {
     max-height: 150px;
     display: block; }
   html .tmap-very-small-list {
-    max-height: 100px; }
+    max-height: 60px; }
   html .tmap-quick-connect {
     font-size: 0.7em; }
     html .tmap-quick-connect .tc-drop-down {
@@ -132,15 +132,15 @@ html {
         padding: 5px;
         pointer-events: none; }
     html .tmap-widget .tmap-vis-graph {
-      height: 100%; }
+      height: calc(100% - 35px); }
       html .tmap-widget .tmap-vis-graph .network-frame .tmap-vis-button.tmap-fullscreen.tmap-button-enabled {
         bottom: 90px;
         right: 15px;
         background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />); }
     html .tmap-widget.tmap-advanced-editor {
       background: #F2F2F2; }
-      html .tmap-widget.tmap-advanced-editor .tmap-vis-graph {
-        height: calc(100% - 35px); }
+      html .tmap-widget.tmap-advanced-editor .tmap-topbar {
+        background: #d6d9d8; }
     html .tmap-widget .network-manipulationUI.edit.editmode {
       height: 26px; }
     html .tmap-widget .network-manipulationDiv {
@@ -148,59 +148,68 @@ html {
       background: #E6E6E6;
       padding: 3px 0;
       height: 35px; }
-    html .tmap-widget .tmap-filterbar {
-      background: #d6d9d8;
+    html .tmap-widget .tmap-topbar {
+      background: #F5F5F5;
       border-bottom: 1px solid lightgray;
       padding: 3px 5px;
-      height: 35px; }
-      html .tmap-widget .tmap-filterbar .editor-search-button {
-        float: right; }
-      html .tmap-widget .tmap-filterbar .tmap-popup {
+      height: 35px;
+      position: relative; }
+      html .tmap-widget .tmap-topbar .tmap-view-label {
+        width: 100%;
+        text-align: center;
+        font-weight: bold;
+        padding-top: 3px; }
+      html .tmap-widget .tmap-topbar .focus-button {
+        position: absolute;
+        right: 10px; }
+        html .tmap-widget .tmap-topbar .focus-button input {
+          width: 140px; }
+      html .tmap-widget .tmap-topbar .tmap-popup {
         position: relative; }
-        html .tmap-widget .tmap-filterbar .tmap-popup .tc-drop-down {
+        html .tmap-widget .tmap-topbar .tmap-popup .tc-drop-down {
           position: absolute;
           z-index: 999;
           right: 0px; }
-      html .tmap-widget .tmap-filterbar .tc-drop-down {
+      html .tmap-widget .tmap-topbar .tc-drop-down {
         background-color: #F3F3F3;
         min-width: 170px;
         padding: 5px;
         margin: 5px 0; }
-        html .tmap-widget .tmap-filterbar .tc-drop-down button, html .tmap-widget .tmap-filterbar .tc-drop-down a {
+        html .tmap-widget .tmap-topbar .tc-drop-down button, html .tmap-widget .tmap-topbar .tc-drop-down a {
           padding: 0px;
           text-decoration: none; }
-          html .tmap-widget .tmap-filterbar .tc-drop-down button:hover, html .tmap-widget .tmap-filterbar .tc-drop-down a:hover {
+          html .tmap-widget .tmap-topbar .tc-drop-down button:hover, html .tmap-widget .tmap-topbar .tc-drop-down a:hover {
             color: #ffffff; }
-          html .tmap-widget .tmap-filterbar .tc-drop-down button svg, html .tmap-widget .tmap-filterbar .tc-drop-down a svg {
+          html .tmap-widget .tmap-topbar .tc-drop-down button svg, html .tmap-widget .tmap-topbar .tc-drop-down a svg {
             vertical-align: middle; }
-      html .tmap-widget .tmap-filterbar [hidden] {
+      html .tmap-widget .tmap-topbar [hidden] {
         display: none; }
-      html .tmap-widget .tmap-filterbar .tc-block-dropdown {
+      html .tmap-widget .tmap-topbar .tc-block-dropdown {
         width: 370px;
         min-width: 370px;
         padding: 5px;
         margin: 15px 0 0 -370px; }
-        html .tmap-widget .tmap-filterbar .tc-block-dropdown a {
+        html .tmap-widget .tmap-topbar .tc-block-dropdown a {
           display: inline;
           padding: 0px; }
-      html .tmap-widget .tmap-filterbar select {
+      html .tmap-widget .tmap-topbar select {
         width: 150px;
         word-wrap: initial;
         padding: 2px; }
-      html .tmap-widget .tmap-filterbar button {
+      html .tmap-widget .tmap-topbar button {
         line-height: inherit;
         color: #666666; }
-      html .tmap-widget .tmap-filterbar > * {
+      html .tmap-widget .tmap-topbar > * {
         display: inline-block; }
-      html .tmap-widget .tmap-filterbar .tmap-separator:after {
+      html .tmap-widget .tmap-topbar .tmap-separator:after {
         color: #bdbdbd;
         margin: 3px;
         content: " | "; }
-      html .tmap-widget .tmap-filterbar .tc-edit-add-tag .tc-add-tag-name input {
+      html .tmap-widget .tmap-topbar .tc-edit-add-tag .tc-add-tag-name input {
         width: 70%; }
-      html .tmap-widget .tmap-filterbar .tc-sidebar-header {
+      html .tmap-widget .tmap-topbar .tc-sidebar-header {
         text-shadow: none; }
-      html .tmap-widget .tmap-filterbar .tc-edit-tags {
+      html .tmap-widget .tmap-topbar .tc-edit-tags {
         border: none;
         padding: inherit;
         box-shadow: none; }

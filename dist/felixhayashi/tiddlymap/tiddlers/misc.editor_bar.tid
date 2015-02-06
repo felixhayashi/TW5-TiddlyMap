@@ -8,9 +8,9 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
   View:
   <$reveal type="match" text="false" default=<<param.isViewBound>> >
     <$select tiddler=<<param.ref.viewHolder>> field="text" default=<<param.ref.view>> >
-       <$list filter=<<tmap-macro "option" "filter.allViews">> >
+       <$list filter=<<map-macro "option" "filter.allViews">> >
          <option value={{!!title}}>
-           <$macrocall $name="tmap-macro" arg0="basename" arg1={{!!title}} />
+           <$macrocall $name="map-macro" arg0="basename" arg1={{!!title}} />
           </option>
        </$list>
     </$select>
@@ -60,7 +60,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
         <$list filter=<<param.allEdgesFilter>> >
           <$set name="curEdgeId" value={{!!id}}>
             <$checkbox tiddler=<<param.ref.edgeFilter>> field=<<showEdgeField>> checked="true" unchecked="false" default=<<default>> >
-              <$macrocall $name="tmap-macro" arg0="basename" arg1={{!!title}} />
+              <$macrocall $name="map-macro" arg0="basename" arg1={{!!title}} />
             </$checkbox>
             <br />
           </$set>
@@ -90,36 +90,6 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
       <$checkbox field="config.display_neighbours" checked="true" unchecked="false" default="false">
         Show neighbours
       </$checkbox>
-    </div>
-  </$reveal>
-
-</div>
-
-<!-- ===== Search =============================================== -->
-
-<div class="editor-search-button">
-  <$reveal type="nomatch" state=<<qualify "$:/temp/tmap/editor/state/search">> text="show">
-    <$button set=<<qualify "$:/temp/tmap/editor/state/search">> setTo="show" class=<<tv-config-toolbar-class>> >
-     {{$:/core/images/advanced-search-button}}
-    </$button>
-  </$reveal>
-  <$reveal type="match" state=<<qualify "$:/temp/tmap/editor/state/search">> text="show">
-    <$button set=<<qualify "$:/temp/tmap/editor/state/search">> setTo="hide" class=<<tv-config-toolbar-class>> >
-      {{$:/core/images/advanced-search-button}}
-    </$button>
-    <div class="tmap-popup">
-      <div class="tc-drop-down">
-        Search a node: <$edit-text tiddler=<<param.search-output>> field="text" type="text" tag="input" default="" />
-        <small><$count filter=<<param.nodeFilter>> /> results</small>
-        <hr />
-        <div class="tmap-very-small-list">
-          <$list filter=<<param.nodeFilter>> variable="item" emptyMessage="//No results//">
-            <$button class="tc-btn-invisible" message="tm-focus-node" param=<<item>>>
-              <$view tiddler=<<item>> field="title" />
-            </$button>
-          </$list>
-        </div>
-      </div>
     </div>
   </$reveal>
 

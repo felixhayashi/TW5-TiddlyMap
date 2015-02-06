@@ -1,6 +1,6 @@
 /*\
 
-title: $:/plugins/felixhayashi/tiddlymap/list_edges_widget.js
+title: $:/plugins/felixhayashi/tiddlymap/connections.js
 type: application/javascript
 module-type: widget
 
@@ -110,7 +110,7 @@ EdgeListWidget.prototype.refresh = function(changedTiddlers) {
 };
 
 // !! EXPORT !!
-exports["tmap-links"] = EdgeListWidget;
+exports["connections"] = EdgeListWidget;
 // !! EXPORT !!
 
 var EdgeListItemWidget = function(parseTreeNode,options) {

@@ -5,7 +5,7 @@ It is not possible to delete the current view as ''<<count>>'' tiddlers
 are referencing it. To delete the view you must first remove the tiddlymap
 widgets in the tiddlers listed below or change their view attributes.
 
-''Dependencies''
+''References''
 
 <ul>
 <$list filter=<<filter>> variable="item">

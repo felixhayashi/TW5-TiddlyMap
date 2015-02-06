@@ -358,7 +358,7 @@ module-type: library
         if(type === "image/svg+xml") {
           // see http://stackoverflow.com/questions/10768451/inline-svg-in-css
           body = body.replace(/\r?\n|\r/g, " ");
-          if(body.indexOf("xmlns") === -1) { // it's a bad habit of tiddlywiki...
+          if(!utils.inArray("xmlns", body)) { // it's a bad habit of tiddlywiki...
             body = body.replace(/<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
           }
         }
@@ -565,7 +565,7 @@ module-type: library
 
       // remove elements from the default storyList
       storyList = storyList.filter(function(tRef) {
-        return deleteCandidates.indexOf(tRef) == -1;
+        return !utils.inArray(tRef, deleteCandidates);
       });
 
       // save it again

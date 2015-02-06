@@ -85,7 +85,7 @@ module-type: library
         var prefix = this.opt.path.views + "/";
         view = view.substr(prefix.length); // remove prefix and slash
       }
-      if(view.indexOf("/") === -1) { // contains no slash; valid label
+      if(!utils.inArray("/", view)) { // contains no slash; valid label
         return this.opt.path.views + "/" + view; // add prefix (again)
       }
     }
@@ -153,7 +153,7 @@ module-type: library
     
     if(!this.exists()) return [];
 
-    if(components.indexOf(this.path.config) != -1) {
+    if(utils.inArray(this.path.config, components)) {
       this.logger("debug", "View's config is requested to be rebuild -> trigger full rebuild");
       // config changes (like changing to private edge mode) often affect
       // the whole views thinking, that's why it makes sense to blindly
@@ -248,9 +248,16 @@ module-type: library
     
   };
 
+  ViewAbstraction.prototype.getReferences = function() {
+    
+    var filter = "[regexp:text[<\\$tiddlymap.*?view=." + this.getLabel() + "..*?>]]";
+    return utils.getMatches(filter);
+    
+  };
+    
   ViewAbstraction.prototype.rename = function(newLabel) {
 
-    if(!this.exists() || typeof newLabel !== "string" || newLabel.indexOf("/") !== -1) {
+    if(!this.exists() || typeof newLabel !== "string" || utils.inArray("/", newLabel)) {
       return;
     }
     

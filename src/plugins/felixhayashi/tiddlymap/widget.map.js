@@ -700,60 +700,53 @@ module-type: widget
     this.dialogManager.open("getViewName", null, function(isConfirmed, outputTObj) {
     
       if(isConfirmed) {
-        var view = this.adapter.createView(utils.getText(outputTObj));
-        this.setView(view.getRoot());
+        
+        var label = utils.getText(outputTObj);
+        
+        if(!utils.inArray(label, this.opt.misc.lockedViews)) {
+          var view = this.adapter.createView(label);
+          this.setView(view.getRoot());
+        } else {
+          this.notify("Forbidden!");
+        }
+
       }
       
     });
     
   };
-
-  MapWidget.prototype.handleTriggeredRefresh = function(trigger) {
-    this.logger("log", "Tiddler", trigger, "triggered a refresh");
-    this.rebuildGraph({
-      resetData: false,
-      resetOptions: false,
-      resetFocus: {
-        delay: 1000,
-        duration: 1000
-      }
-    });
-  };
   
   MapWidget.prototype.handleRenameView = function() {
-    
-    if(this.getView().getLabel() === "default") {
-      this.notify("Thou shalt not rename the default view!");
-      return;
-    }
-    
-    this.dialogManager.open("getViewName", null, function(isConfirmed, outputTObj) {
-    
-      if(isConfirmed) {
-        this.view.rename(utils.getText(outputTObj));
-        this.setView(this.view.getRoot());
-      }
+       
+    if(!utils.inArray(this.getView().getLabel(), this.opt.misc.lockedViews)) {
 
-    });
-    
-  };
-  
-  MapWidget.prototype.handleConfigureSystem = function(isWelcomeDialog) {
-        
-    var params = {
-      dialog: {
-        preselects: utils.flatten({ config: { sys: this.opt.config.sys }})
-      }
-    };
-    
-    var dialogName = (isWelcomeDialog ? "welcome" : "configureTiddlyMap");
-        
-    this.dialogManager.open(dialogName, params, function(isConfirmed, outputTObj) {
-      if(isConfirmed && outputTObj) {
-        var config = utils.getPropertiesByPrefix(outputTObj.fields, "config.sys.", true);
-        this.wiki.setTiddlerData(this.opt.ref.sysConf + "/user", config);
-      }
-    });
+      var references = this.getView().getReferences();
+      
+      var fields = {
+        count : references.length.toString(),
+        filter : utils.joinAndWrap(references, "[[", "]]")
+      };
+
+      this.dialogManager.open("getViewName", fields, function(isConfirmed, outputTObj) {
+      
+        if(isConfirmed) {
+          
+          var label = utils.getText(outputTObj);
+          
+          if(!utils.inArray(label, this.opt.misc.lockedViews)) {
+            this.view.rename(label);
+            this.setView(this.view.getRoot());
+          } else {
+            this.notify("Forbidden!");
+          }
+          
+        }
+
+      });
+      
+    } else {
+      this.notify("Forbidden!");
+    }
     
   };
   
@@ -774,26 +767,26 @@ module-type: widget
     });
     
   };
-
+  
   MapWidget.prototype.handleDeleteView = function() {
     
     var viewname = this.getView().getLabel();
     
-    if(viewname === "default") {
-      this.notify("Thou shalt not kill the default view!");
+    if(utils.inArray(viewname, this.opt.misc.lockedViews)) {
+      this.notify("Forbidden!");
       return;
     }
     
     // regex is non-greedy
-    var filter = "[regexp:text[<\\$tiddlymap.*?view=." + viewname + "..*?>]]";
-    var matches = utils.getMatches(filter);
-    
-    if(matches.length) {
+
+    var references = this.getView().getReferences();
+    if(references.length) {
       
       var fields = {
-        count : matches.length.toString(),
-        filter : filter
+        count : references.length.toString(),
+        filter : utils.joinAndWrap(references, "[[", "]]")
       };
+
 
       this.dialogManager.open("cannotDeleteViewDialog", fields, null);
 
@@ -815,6 +808,40 @@ module-type: widget
     }, message);
     
   };
+  
+
+
+  MapWidget.prototype.handleTriggeredRefresh = function(trigger) {
+    this.logger("log", "Tiddler", trigger, "triggered a refresh");
+    this.rebuildGraph({
+      resetData: false,
+      resetOptions: false,
+      resetFocus: {
+        delay: 1000,
+        duration: 1000
+      }
+    });
+  };
+    
+  MapWidget.prototype.handleConfigureSystem = function(isWelcomeDialog) {
+        
+    var params = {
+      dialog: {
+        preselects: utils.flatten({ config: { sys: this.opt.config.sys }})
+      }
+    };
+    
+    var dialogName = (isWelcomeDialog ? "welcome" : "configureTiddlyMap");
+        
+    this.dialogManager.open(dialogName, params, function(isConfirmed, outputTObj) {
+      if(isConfirmed && outputTObj) {
+        var config = utils.getPropertiesByPrefix(outputTObj.fields, "config.sys.", true);
+        this.wiki.setTiddlerData(this.opt.ref.sysConf + "/user", config);
+      }
+    });
+    
+  };
+  
   
   MapWidget.prototype.handleReconnectEdge = function(updatedEdge) {
 

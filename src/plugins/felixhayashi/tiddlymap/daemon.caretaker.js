@@ -102,6 +102,7 @@ say here is: do not require the caretaker!
     // if no edge label is specified, this is used as label
     opt.misc.unknownEdgeLabel = "__noname__";
     opt.misc.cssPrefix = "tmap-";
+    opt.misc.lockedViews = [ "default", "live", "search" ];
 
     // some popular filters (usually used from within tiddlers via map-macro)
     if(!opt.filter) opt.filter = utils.getEmptyMap();

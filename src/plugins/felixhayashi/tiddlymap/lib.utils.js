@@ -159,7 +159,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     } else if(Array.isArray(setB)) { // output is an array
       setA = utils.convert(setA, "object");
       for(var p in setA) {
-        if(setB.indexOf(setA[p]) == -1) { // does not exist exists
+        if(!utils.inArray(setA[p], setB)) { // not contained yet
           setB.push(setA[p]);
         }
       }
@@ -483,6 +483,31 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     }
     var tObj = utils.getTiddler(tiddler);
     return (tObj ? tObj.fields.text : defaultText);
+    
+  };
+  
+  /**
+   * Checks if a value exists in an array. A strict search is used
+   * which means that also the type of the needle in the haystack
+   * is checked.
+   * 
+   * @param {*} needle - The searched value.
+   * @param {haystack} - The array.
+   * @return Returns true if needle is found in the array, false otherwise. 
+   */
+  utils.inArray = function(needle, haystack) {
+    
+    return (haystack.indexOf(needle) !== -1);
+    
+  };
+  
+  /**
+   * 
+   */
+  utils.joinAndWrap = function(arr, left, right, separator) {
+        
+    if(!separator) separator = " ";
+    return left + arr.join(right + separator + left) + right;
     
   };
 

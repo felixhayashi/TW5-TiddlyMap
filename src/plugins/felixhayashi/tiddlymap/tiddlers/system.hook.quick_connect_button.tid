@@ -71,7 +71,6 @@ description: Show available ~TiddlyMap actions
     
     <div>{{$:/core/images/delete-button}} ''Delete Connections'' <sup>[1]</sup></div>
     <p>  
-
       <$connections>
         <div>
           <$button class="tc-btn-invisible">

@@ -697,7 +697,7 @@ module-type: widget
    */
   MapWidget.prototype.handleCreateView = function() {
     
-    this.dialogManager.open("getViewName", null, function(isConfirmed, outputTObj) {
+    this.dialogManager.open("createView", null, function(isConfirmed, outputTObj) {
     
       if(isConfirmed) {
         
@@ -781,7 +781,7 @@ module-type: widget
 
     var references = this.getView().getReferences();
     if(references.length) {
-      
+            
       var fields = {
         count : references.length.toString(),
         filter : utils.joinAndWrap(references, "[[", "]]")

@@ -222,12 +222,10 @@ html { // used to increase css importance
       height: calc(100% - 35px);
 
       .network-frame {
-        .tmap-vis-button { 
-          &.tmap-fullscreen.tmap-button-enabled {
-            bottom: 90px;
-            right: 15px;
-            background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />'));
-          }
+        .tmap-vis-button.tmap-button-enabled {
+          bottom: 90px;
+          right: 15px;
+          background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />'));
         }
       }
     }

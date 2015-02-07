@@ -128,7 +128,7 @@ html {
         pointer-events: none; }
     html .tmap-widget .tmap-vis-graph {
       height: calc(100% - 35px); }
-      html .tmap-widget .tmap-vis-graph .network-frame .tmap-vis-button.tmap-fullscreen.tmap-button-enabled {
+      html .tmap-widget .tmap-vis-graph .network-frame .tmap-vis-button.tmap-button-enabled {
         bottom: 90px;
         right: 15px;
         background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />); }

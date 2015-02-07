@@ -365,8 +365,8 @@ html { // used to increase css importance
   }
 
   .tmap-has-fullscreen-child {
-    z-index: 1;
-    left: 0px;
+    z-index: 1 !important;
+    left: 0px !important;
     top: 0 !important;
     right: 0 !important;
     bottom: 0 !important;

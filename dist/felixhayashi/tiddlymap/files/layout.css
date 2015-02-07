@@ -213,7 +213,12 @@ html {
 html:fullscreen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:fullscreen .tmap-has-fullscreen-child {
-  z-index: 1; }
+  z-index: 1 !important;
+  left: 0px !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  position: fixed !important; }
   html:fullscreen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
     background: white !important;
     height: 100% !important;
@@ -230,7 +235,12 @@ html:fullscreen .tmap-has-fullscreen-child {
 html:-moz-full-screen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:-moz-full-screen .tmap-has-fullscreen-child {
-  z-index: 1; }
+  z-index: 1 !important;
+  left: 0px !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  position: fixed !important; }
   html:-moz-full-screen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
     background: white !important;
     height: 100% !important;
@@ -247,7 +257,12 @@ html:-moz-full-screen .tmap-has-fullscreen-child {
 html:-webkit-full-screen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:-webkit-full-screen .tmap-has-fullscreen-child {
-  z-index: 1; }
+  z-index: 1 !important;
+  left: 0px !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  position: fixed !important; }
   html:-webkit-full-screen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
     background: white !important;
     height: 100% !important;
@@ -264,7 +279,12 @@ html:-webkit-full-screen .tmap-has-fullscreen-child {
 html:-ms-fullscreen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:-ms-fullscreen .tmap-has-fullscreen-child {
-  z-index: 1; }
+  z-index: 1 !important;
+  left: 0px !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  position: fixed !important; }
   html:-ms-fullscreen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
     background: white !important;
     height: 100% !important;

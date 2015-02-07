@@ -215,68 +215,68 @@ html:fullscreen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
 html:fullscreen .tmap-has-fullscreen-child {
   z-index: 1; }
   html:fullscreen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
-    background: white;
+    background: white !important;
     height: 100% !important;
     width: 100% !important;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 999;
-    border: none;
-    margin: 0; }
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    z-index: 999 !important;
+    border: none !important;
+    margin: 0 !important; }
 
 html:-moz-full-screen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:-moz-full-screen .tmap-has-fullscreen-child {
   z-index: 1; }
   html:-moz-full-screen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
-    background: white;
+    background: white !important;
     height: 100% !important;
     width: 100% !important;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 999;
-    border: none;
-    margin: 0; }
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    z-index: 999 !important;
+    border: none !important;
+    margin: 0 !important; }
 
 html:-webkit-full-screen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:-webkit-full-screen .tmap-has-fullscreen-child {
   z-index: 1; }
   html:-webkit-full-screen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
-    background: white;
+    background: white !important;
     height: 100% !important;
     width: 100% !important;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 999;
-    border: none;
-    margin: 0; }
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    z-index: 999 !important;
+    border: none !important;
+    margin: 0 !important; }
 
 html:-ms-fullscreen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:-ms-fullscreen .tmap-has-fullscreen-child {
   z-index: 1; }
   html:-ms-fullscreen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
-    background: white;
+    background: white !important;
     height: 100% !important;
     width: 100% !important;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 999;
-    border: none;
-    margin: 0; }
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    z-index: 999 !important;
+    border: none !important;
+    margin: 0 !important; }
 
 fieldset.tmap-options dt, fieldset.tmap-options dd {
   margin-bottom: 15px; }

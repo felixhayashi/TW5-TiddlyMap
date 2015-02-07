@@ -168,6 +168,7 @@ html {
       html .tmap-widget .tmap-topbar .tc-drop-down {
         background-color: #F3F3F3;
         min-width: 170px;
+        max-width: 210px;
         padding: 5px;
         margin: 5px 0; }
         html .tmap-widget .tmap-topbar .tc-drop-down button, html .tmap-widget .tmap-topbar .tc-drop-down a {

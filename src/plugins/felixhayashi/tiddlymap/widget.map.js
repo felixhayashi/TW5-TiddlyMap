@@ -1381,7 +1381,7 @@ module-type: widget
       this.logger("info", "Repainting the whole graph");
     
       this.network.redraw();
-      this.network.zoomExtent();
+      this.fitGraph(0, 1000);
       
     }
     

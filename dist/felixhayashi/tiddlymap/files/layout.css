@@ -68,25 +68,20 @@ html {
       font-size: 14px; }
     html .tc-modal-wrapper .tc-modal-body fieldset legend {
       font-weight: bold; }
-    html .tc-modal-wrapper .tc-modal-body fieldset .tmap-fieldrow {
+    html .tc-modal-wrapper .tc-modal-body fieldset table {
       margin: 6px 0;
-      clear: both; }
-      html .tc-modal-wrapper .tc-modal-body fieldset .tmap-fieldrow > :first-child {
-        width: 140px;
-        float: left;
-        display: inline-block; }
-      html .tc-modal-wrapper .tc-modal-body fieldset .tmap-fieldrow .tmap-row-body {
-        display: inline-block;
-        float: left;
-        width: calc(100% - 145px); }
-        html .tc-modal-wrapper .tc-modal-body fieldset .tmap-fieldrow .tmap-row-body .tmap-note {
-          margin: 10px 10px 10px 0; }
-        html .tc-modal-wrapper .tc-modal-body fieldset .tmap-fieldrow .tmap-row-body input {
+      clear: both;
+      border: none; }
+      html .tc-modal-wrapper .tc-modal-body fieldset table tr td {
+        border: none;
+        vertical-align: top;
+        min-width: 140px; }
+        html .tc-modal-wrapper .tc-modal-body fieldset table tr td input {
           width: 140px; }
-        html .tc-modal-wrapper .tc-modal-body fieldset .tmap-fieldrow .tmap-row-body .tmap-description {
-          font-style: italic; }
-          html .tc-modal-wrapper .tc-modal-body fieldset .tmap-fieldrow .tmap-row-body .tmap-description:before {
-            content: " – "; }
+      html .tc-modal-wrapper .tc-modal-body fieldset table tr .tmap-note {
+        margin: 10px 10px 10px 0; }
+      html .tc-modal-wrapper .tc-modal-body fieldset table tr .tmap-description {
+        font-style: italic; }
     html .tc-modal-wrapper .tc-modal-body fieldset ul {
       padding-left: 30px; }
       html .tc-modal-wrapper .tc-modal-body fieldset ul li {

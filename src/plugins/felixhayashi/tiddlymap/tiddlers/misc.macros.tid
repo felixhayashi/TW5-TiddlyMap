@@ -1,0 +1,23 @@
+title: $:/plugins/felixhayashi/tiddlymap/misc/macros
+tags: $:/tags/Macro
+
+\define tmap-input-text(field, default)
+  <$edit-text tiddler=<<output>> field="$field$" type="text" tag="input" default="$default$" />
+\end
+
+\define tmap-input-checkbox(field, default)
+  <$checkbox tiddler=<<output>> field="$field$" checked="true" unchecked="false" default="$default$" />
+\end
+
+\define tmap-row(title, field, type, default:"", descr, note)
+  <tr>
+    <td class="tmap-title">$title$:</td>
+    <td>
+      <<$type$ "$field$" "$default$">>
+    </td>
+    <td>
+      <span class="tmap-description">$descr$</span>
+      <div class="tmap-note">$note$</div>
+    </td>
+  </tr>
+\end

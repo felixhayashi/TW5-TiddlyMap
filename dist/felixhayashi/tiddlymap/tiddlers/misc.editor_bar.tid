@@ -23,13 +23,14 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
 
   <$reveal type="popup" position="below" state=<<qualify "$:/temp/tmap/editor/showactions">> >
     <div class="tc-drop-down">
-      <a href="http://bit.ly/tiddlymap#Configuring the current view" target="_blank">{{$:/core/images/info-button}} Open online help</a>
+      <a href="http://bit.ly/tiddlymap#The View Menu" target="_blank">{{$:/core/images/info-button}} Open online help</a>
       <hr />
       <$button class="tc-btn-invisible" message="tm-create-view">{{$:/core/images/new-button}} Create empty view</$button>
       <$button class="tc-btn-invisible" message="tm-rename-view">{{$:/core/images/tag-button}} Rename view</$button>
       <$button class="tc-btn-invisible" message="tm-delete-view">{{$:/core/images/delete-button}} Delete view</$button>
       <$button class="tc-btn-invisible" message="tm-edit-view">{{$:/core/images/theme-button}} Configure view</$button>
       <$button class="tc-btn-invisible" message="tm-store-position">{{$:/core/images/globe}} Save positions</$button>
+      <$button class="tc-btn-invisible" message="tm-generate-widget">{{$:/core/images/permalink-button}} Grab widget code</$button>
       <hr />
       <$button class="tc-btn-invisible" message="tm-configure-system">{{$:/core/images/options-button}} Global configurations</$button>
     </div>

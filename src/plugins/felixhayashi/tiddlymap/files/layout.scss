@@ -108,30 +108,29 @@ html { // used to increase css importance
           font-weight: bold;
         }
         
-        .tmap-fieldrow {
+        table {
           margin: 6px 0;
           clear: both;
+          border: none;
           
-          > :first-child {
-            width: 140px;
-            float: left;
-            display: inline-block; }
-          
-          .tmap-row-body {
-            display: inline-block;
-            float: left;
-            width: calc(100% - 145px);
-            
+          tr {
+            td {
+              border: none;
+              vertical-align: top;
+              min-width: 140px;
+              input {
+                width: $default-input-width;
+              }
+            }
+
             .tmap-note {
-              margin: 10px 10px 10px 0; }
-            input {
-              width: $default-input-width; }
+              margin: 10px 10px 10px 0;
+            }
+            
             .tmap-description {
               font-style: italic;
-              
-              &:before {
-                content: " – "; }}
             }
+          }
                 
         }
         

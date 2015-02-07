@@ -62,7 +62,8 @@ module-type: widget
         {type: "tm-configure-system", handler: this.handleConfigureSystem },
         {type: "tm-store-position", handler: this.handleStorePositions },
         {type: "tm-edit-node-filter", handler: this.handleEditNodeFilter },
-        {type: "tm-import-tiddlers", handler: this.handleImportTiddlers }
+        {type: "tm-import-tiddlers", handler: this.handleImportTiddlers },
+        {type: "tm-generate-widget", handler: this.handleGenerateWidget }
       ]);
     }
     
@@ -974,6 +975,16 @@ module-type: widget
     
   };
      
+  MapWidget.prototype.handleGenerateWidget = function(event) {
+    
+    var params = {
+      "param.view": this.getView().getLabel()
+    };
+
+    this.dialogManager.open("getWidgetCode", params);
+    
+  };
+  
   MapWidget.prototype.handleImportTiddlers = function(event) {
     
     var tiddlers = JSON.parse(event.param);

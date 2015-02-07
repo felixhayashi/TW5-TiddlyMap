@@ -1,0 +1,46 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/getWidgetCode
+subtitle: {{$:/core/images/permalink-button}} Widget Code Generator
+
+<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
+
+The following wizard will assist you in creating the widget code you can use (copy'n'paste) to embed this view in a tiddler. Please visit the [[online demo|http://bit.ly/tiddlymap]] for some examples on how the attributes below affect the displayed graph.
+
+''Widget-code''
+
+<pre style="white-space: normal;">
+&lt;$tiddlymap
+
+view="<<param.view>>"
+
+<$list filter="[field:title<output>field:var.click-to-use[false]]">
+  click-to-use="false"
+</$list>
+
+<$list filter="[field:title<output>has[var.width]]">
+  width="<$view tiddler=<<output>> field="var.width" />"
+</$list>
+
+<$list filter="[field:title<output>has[var.height]]">
+  height="<$view tiddler=<<output>> field="var.height" />"
+</$list>
+
+<$list filter="[field:title<output>has[var.class]]">
+  class="<$view tiddler=<<output>> field="var.class" />"
+</$list>
+
+&gt;&lt;/$tiddlymap&gt;
+</pre>
+
+If you are unsure about a parameter, just leave everything as is and simply copy the widget code displayed above.
+
+<fieldset class="tmap-options">
+  <legend>Parameters</legend> 
+  <table>
+      <<tmap-row "Height" "var.height" "tmap-input-text" "" "The graph's height in css units. Defaults to '300px'.">>
+      <<tmap-row "Width" "var.width" "tmap-input-text" "" "The graph's width in css units. Defaults to '100%'.">>
+      <<tmap-row "Class" "var.class" "tmap-input-text" "" "A custom class you can assign to apply your own css.">>
+      <<tmap-row "Click to use" "var.click-to-use" "tmap-input-checkbox" "true" "Prevents the graph from reacting to mouse or click events. This default is highly recommended.">>
+  </table>
+</fieldset>
+
+</$importvariables>

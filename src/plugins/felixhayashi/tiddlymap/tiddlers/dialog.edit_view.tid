@@ -1,9 +1,9 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/editView
 subtitle: {{$:/core/images/theme-button}} View Configuration
 
-\define checkbox(field, title) <$checkbox tiddler=<<output>> field="$field$" checked="true" unchecked="false" default="false"> $title$</$checkbox>
-
 \define orderByEdgeField() config.layout.hierarchical.order-by-$(curEdgeId)$
+
+<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
 
 <fieldset><legend>Layout</legend>
   <$radio tiddler=<<output>> field="config.layout.active" value="hierarchical"> Hierachical layout</$radio>
@@ -31,9 +31,13 @@ subtitle: {{$:/core/images/theme-button}} View Configuration
 
 <fieldset><legend>Other</legend>
   
-  <<checkbox "config.physics_mode" "Floating nodes">>
-  -- //Set this to true if you want your nodes to freely swirl around.//<br />
-  <<checkbox "config.private_edge_mode" "Private edge mode">>
-  -- //Use local edges that __exclusively__ belong to this particular view.//
+  <table>
+    <<tmap-row title:"Floating nodes" field:"config.physics_mode" type:"input-checkbox"
+               descr:"Set this to true if you want your nodes to freely swirl around.">>
+    <<tmap-row title:"Private edge mode" field:"config.private_edge_mode" type:"input-checkbox"
+               descr:"Use local edges that __exclusively__ belong to this particular view.">>
+  </table>
   
 </fieldset>
+
+</$importvariables>

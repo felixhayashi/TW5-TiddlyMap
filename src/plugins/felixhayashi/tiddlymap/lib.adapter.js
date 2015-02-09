@@ -748,16 +748,16 @@ module-type: library
     node.label = fields.title;
     node.ref = fields.title;
     
+    // always re-assign id
     
-    if(!node.id) {
-      if(this.opt.field.nodeId === "title") {
-        node.id = fields.title;
-      } else {
-        node.id = utils.genUUID();
-        fields[this.opt.field.nodeId] = node.id;
-      }
-    }
+    if(this.opt.field.nodeId === "title") {
+      node.id = fields.title;
+    } else {
+      node.id = utils.genUUID();
 
+      fields[this.opt.field.nodeId] = node.id;
+    }
+    
     if(options.view) {
       var view = new ViewAbstraction(options.view);
       view.addNodeToView(node);

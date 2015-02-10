@@ -29,7 +29,7 @@ view="<<param.view>>"
 </$list>
 
 <$list filter="[field:title<output>has[var.editor]]">
-  class="<$view tiddler=<<output>> field="var.class" />"
+  class="<$view tiddler=<<output>> field="var.editor" />"
 </$list>
 
 &gt;&lt;/$tiddlymap&gt;
@@ -46,7 +46,7 @@ If you are unsure about a parameter, just leave everything as is and simply copy
                  descr:"The graph's width in css units. Defaults to '100%'.">>
       <<tmap-row type:"input-text" title:"Class" field:"var.class"
                  descr:"A custom class you can assign to apply your own css.">>
-      <<tmap-row type:"input-checkbox"title:"Click to use" field:"var.click-to-use" default:"true"
+      <<tmap-row type:"input-checkbox" title:"Click to use" field:"var.click-to-use" default:"true"
                  descr:"Prevents the graph from reacting to mouse or click events. This default is highly recommended.">>
   </table>
 </fieldset>

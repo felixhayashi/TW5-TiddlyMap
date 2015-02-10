@@ -16,7 +16,8 @@ Please visit the [[online docs|http://bit.ly/tiddlymap#Changing%20TiddlyMap's%20
     <<tmap-row title:"Node-label field" field:"config.sys.field.nodeLabel" type:"input-text" 
                descr:"Alternative node label to use instead of the title.">>
     <<tmap-row title:"Node-info field" field:"config.sys.field.nodeInfo" type:"input-text"
-               descr:"Field used as tooltip when hovering a node in a graph.">>
+               descr:"Field used as tooltip when hovering a node in a graph."
+               note:"It is prohibited to use the text field here.">>
     <<tmap-row title:"View-marker field" field:"config.sys.field.viewMarker" type:"input-text"
                descr:"Field used by the system to identify user views."
                note:"It is __not__ recommended to change this default unless it conflicts with an existing system tiddler property.">>

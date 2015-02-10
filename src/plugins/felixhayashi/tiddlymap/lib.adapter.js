@@ -374,9 +374,13 @@ module-type: library
     }
     
     // add tooltip
-    node.title = (tObj.fields[this.opt.field.nodeInfo]
-                  ? tObj.fields[this.opt.field.nodeInfo]
-                  : tObj.fields.title);
+    var info = tObj.fields[this.opt.field.nodeInfo];
+    if(info && this.opt.field.nodeInfo !== "text") {
+      //~ node.title = this.wiki.renderText("text/html", "text/vnd-tiddlywiki", info);
+      this.wiki.renderText("text/html", "text/vnd-tiddlywiki", info);
+    } else {
+      node.title = tObj.fields.title;
+    }
     
     // use the tiddler's color field as node color
     if(tObj.fields.color) {
@@ -754,7 +758,6 @@ module-type: library
       node.id = fields.title;
     } else {
       node.id = utils.genUUID();
-
       fields[this.opt.field.nodeId] = node.id;
     }
     

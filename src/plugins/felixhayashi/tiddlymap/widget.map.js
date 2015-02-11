@@ -977,11 +977,15 @@ module-type: widget
      
   MapWidget.prototype.handleGenerateWidget = function(event) {
     
-    var params = {
-      "param.view": this.getView().getLabel()
-    };
-
+    var params = { "param.view": this.getView().getLabel() };
     this.dialogManager.open("getWidgetCode", params);
+    
+  };
+  
+  MapWidget.prototype.handleShowContentPreview = function(tRef) {
+    
+    var params = { "param.ref": tRef };
+    this.dialogManager.open("previewContent", params);
     
   };
   
@@ -1135,9 +1139,9 @@ module-type: widget
       
     } else {
       
-      if(this.isFullscreenMode) {
-        this.handleToggleFullscreen(); // exit fullsreen
-      }
+      //~ if(this.isFullscreenMode) {
+        //~ this.handleToggleFullscreen(); // exit fullsreen
+      //~ }
       
       if(properties.nodes.length) { // clicked on a node
          
@@ -1146,10 +1150,15 @@ module-type: widget
         this.lastNodeDoubleClicked = node;
         var tRef = node.ref;
         
-        // window.location.hash = node.ref; is not the right way to do it
-        this.dispatchEvent({
-          type: "tm-navigate", navigateTo: tRef
-        }); 
+        if(this.isFullscreenMode) {
+          //this.handleToggleFullscreen(); // exit fullsreen
+          this.handleShowContentPreview(tRef);
+        } else { 
+          // window.location.hash = node.ref; is not the right way to do it
+          this.dispatchEvent({
+            type: "tm-navigate", navigateTo: tRef
+          }); 
+        }
                 
       } else if(properties.edges.length) { // clicked on an edge
         

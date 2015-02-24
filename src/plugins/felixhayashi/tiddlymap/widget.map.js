@@ -965,7 +965,7 @@ module-type: widget
       this.enlargedMode = null;
       
     } else {
-      var isHalfscreenOptionEnabled = (this.objectId === "main_editor"
+      var isHalfscreenOptionEnabled = (this.sidebar.contains(this.parentDomNode)
                                        && this.opt.config.sys.halfscreen === "true");
       this.enlargedMode = (isHalfscreenOptionEnabled ? "halfscreen" : "fullscreen");
 

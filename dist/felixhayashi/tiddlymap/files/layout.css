@@ -106,10 +106,10 @@ html {
     width: 100%;
     font-size: 11px;
     font-family: "Courier New", Courier, monospace; }
+  html .tc-sidebar-scrollable .tc-page-controls {
+    display: none; }
   html .tc-sidebar-scrollable .tmap-widget {
     min-height: 350px; }
-    html .tc-sidebar-scrollable .tmap-widget .tc-page-controls {
-      display: none; }
     html .tc-sidebar-scrollable .tmap-widget.tmap-halfscreen {
       position: absolute;
       right: 0px;
@@ -121,7 +121,8 @@ html {
       border: none;
       border-left: 1px solid lightgray;
       height: 100% !important;
-      margin: 0; }
+      margin: 0;
+      background: #ececec; }
   html .tmap-widget {
     border: 1px dotted lightgray;
     padding: 2px;

@@ -30,8 +30,8 @@ Please visit the [[online docs|http://bit.ly/tiddlymap#Changing%20TiddlyMap's%20
                descr:"Set this to true if you want debug information to be displayed in the browser console.">>
     <<tmap-row title:"Show notifications" field:"config.sys.notifications" type:"input-checkbox"
                descr:"Set this to true if you want to receive fade-out notifications for important events.">>
-    <<tmap-row title:"Editor halfscreen" field:"config.sys.halfscreen" type:"input-checkbox"
-               descr:"Enlarge the editor halfscreen instead of fullscreen so the story river stays visible.">>
+    <<tmap-row title:"Enlarge sidebar maps halfscreen" field:"config.sys.halfscreen" type:"input-checkbox"
+               descr:"Sidebar maps (live view, editor) are enlarged halfscreen instead of fullscreen so the story river stays visible.">>
   </table>
 </fieldset>
 

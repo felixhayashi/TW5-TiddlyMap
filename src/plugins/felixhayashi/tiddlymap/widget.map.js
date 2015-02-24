@@ -199,19 +199,26 @@ module-type: widget
    * to different graph modes.
    */
   MapWidget.prototype.registerParentDomNode = function(parent) {
+    
     this.parentDomNode = parent;
     if(!$tw.utils.hasClass(parent, "tmap-widget")) {
-      $tw.utils.addClass(parent, "tmap-widget");
+      var classes = [ "tmap-widget" ];
       if(this.getAttribute("click-to-use") !== "false") {
-        $tw.utils.addClass(parent, "tmap-click-to-use");
+        classes.push("tmap-click-to-use");
       }
       if(this.getAttribute("editor") === "advanced") {
-        $tw.utils.addClass(parent, "tmap-advanced-editor");
+        classes.push("tmap-advanced-editor");
+      }
+      if(this.getAttribute("show-buttons") === "false") {
+        classes.push("tmap-no-buttons");
       }
       if(this.getAttribute("class")) {
-        $tw.utils.addClass(parent, this.getAttribute("class"));
+        classes.push(this.getAttribute("class"));
       }
+      
+      $tw.utils.addClass(parent, classes.join(" "));
     }
+    
   };
   
   /**

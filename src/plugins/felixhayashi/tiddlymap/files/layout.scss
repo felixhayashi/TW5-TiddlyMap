@@ -54,7 +54,7 @@ html { // used to increase css importance
         border-top: 1px solid rgba(0, 0, 0, 0.1);
         border-bottom: 1px solid rgba(255, 255, 255, 0.3);
       }
-      
+            
       a {
         display: inline;
         padding: 0;
@@ -75,6 +75,13 @@ html { // used to increase css importance
         text-align: left;
         color: #333333;
         line-height: 1.0;
+        
+        &:hover {
+          color: #ffffff;
+        }
+        svg:hover {
+          fill: #ffffff;
+        }
       }
     }
   }
@@ -192,7 +199,7 @@ html { // used to increase css importance
     width: 100%;
     color: $color;
     display: block; // sometimes tw puts us into a span
-    
+        
     &.tmap-click-to-use .network-frame:not(.vis-active) {
       cursor: pointer;
       
@@ -228,6 +235,12 @@ html { // used to increase css importance
           right: 15px;
           background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />'));
         }
+      }
+    }
+    
+    &.tmap-no-buttons {
+      .network-navigation {
+        display: none;
       }
     }
     

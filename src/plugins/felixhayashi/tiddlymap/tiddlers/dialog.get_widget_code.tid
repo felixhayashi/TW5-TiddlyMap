@@ -32,6 +32,10 @@ view="<<param.view>>"
   class="<$view tiddler=<<output>> field="var.editor" />"
 </$list>
 
+<$list filter="[field:title<output>field:var.show-buttons[false]]">
+  show-buttons="false"
+</$list>
+
 &gt;&lt;/$tiddlymap&gt;
 </pre>
 
@@ -48,6 +52,8 @@ If you are unsure about a parameter, just leave everything as is and simply copy
                  descr:"A custom class you can assign to apply your own css.">>
       <<tmap-row type:"input-checkbox" title:"Click to use" field:"var.click-to-use" default:"true"
                  descr:"Prevents the graph from reacting to mouse or click events. This default is highly recommended.">>
+      <<tmap-row type:"input-checkbox" title:"Show buttons" field:"var.show-buttons" default:"true"
+                 descr:"Show or hide the graph's navigation buttons.">>
   </table>
 </fieldset>
 

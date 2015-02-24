@@ -55,6 +55,10 @@ html {
         text-align: left;
         color: #333333;
         line-height: 1; }
+        html .tmap-quick-connect .tc-drop-down button:hover {
+          color: #ffffff; }
+        html .tmap-quick-connect .tc-drop-down button svg:hover {
+          fill: #ffffff; }
   html .tc-modal-wrapper {
     z-index: 1010; }
     html .tc-modal-wrapper .tc-modal-header {
@@ -133,6 +137,8 @@ html {
         bottom: 90px;
         right: 15px;
         background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />); }
+    html .tmap-widget.tmap-no-buttons .network-navigation {
+      display: none; }
     html .tmap-widget.tmap-advanced-editor {
       background: #F2F2F2; }
       html .tmap-widget.tmap-advanced-editor .tmap-topbar {

@@ -31,13 +31,16 @@ var EdgeListWidget = function(parseTreeNode,options) {
 EdgeListWidget.prototype = Object.create(Widget.prototype);
 
 EdgeListWidget.prototype.render = function(parent,nextSibling) {
+  
   this.parentDomNode = parent;
   this.computeAttributes();
   this.execute();
   this.renderChildren(parent,nextSibling);
+  
 };
 
 EdgeListWidget.prototype.execute = function() {
+  
   var defaultFilter = "[field:title[" +
                       this.getVariable("currentTiddler") +
                       "]!has[draft.of]]";

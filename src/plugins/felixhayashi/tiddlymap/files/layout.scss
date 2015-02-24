@@ -103,7 +103,9 @@ html { // used to increase css importance
       
     }
     
-    .tc-modal-body {
+    .tc-modal-body { // add this to tw
+      max-height: 70vh;
+      overflow: auto;
       
       .tc-image-button {
         font-size: 14px;
@@ -188,13 +190,31 @@ html { // used to increase css importance
   }
   
   .tc-sidebar-scrollable {
-    .tiddlymap {
+    .tmap-widget {
       min-height: 350px;
+      
+      .tc-page-controls {
+        display: none;
+      }
+      
+      &.tmap-halfscreen {
+        position: absolute;
+        right: 0px;
+        top: 0;
+        left: 0px;
+        bottom: 0;
+        padding: 0px;
+        width: 100% !important;
+        border: none;
+        border-left: 1px solid lightgray;
+        height: 100% !important;
+        margin: 0;
+      }
     }
   }
 
   .tmap-widget {
-    border: 3px dotted lightgray;
+    border: 1px dotted lightgray;
     padding: 2px;
     width: 100%;
     color: $color;
@@ -374,6 +394,10 @@ html { // used to increase css importance
 
 @mixin fullscreen() {
 
+  body { // hide scrollbar
+    overflow: hidden;
+  }
+
   .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
     z-index: 0;
   }
@@ -402,7 +426,7 @@ html { // used to increase css importance
     }
     
   }
-    
+  
 }
 
 html:fullscreen { @include fullscreen(); }

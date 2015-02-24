@@ -202,6 +202,7 @@ module-type: widget
     
     this.parentDomNode = parent;
     if(!$tw.utils.hasClass(parent, "tmap-widget")) {
+      
       var classes = [ "tmap-widget" ];
       if(this.getAttribute("click-to-use") !== "false") {
         classes.push("tmap-click-to-use");
@@ -621,6 +622,11 @@ module-type: widget
     parent.style["width"] = this.getAttribute("width", "100%");
     
     window.addEventListener("resize", this.handleResizeEvent.bind(this), false);
+    
+    if(!this.sidebar.contains(this.parentDomNode)) {
+      this.callbackManager.add("$:/state/sidebar", this.handleResizeEvent.bind(this));
+    }
+    
     window.addEventListener("click", this.handleClickEvent.bind(this), false);
     window.addEventListener(utils.getFullScreenApis()["_fullscreenChange"], this.handleFullScreenChange.bind(this), false);
     
@@ -839,8 +845,8 @@ module-type: widget
       }
     };
     
-    var dialogName = (isWelcomeDialog ? "welcome" : "configureTiddlyMap");
-        
+    var dialogName = (isWelcomeDialog === true ? "welcome" : "configureTiddlyMap");
+        console.log(isWelcomeDialog, dialogName);
     this.dialogManager.open(dialogName, params, function(isConfirmed, outputTObj) {
       if(isConfirmed && outputTObj) {
         var config = utils.getPropertiesByPrefix(outputTObj.fields, "config.sys.", true);
@@ -881,47 +887,7 @@ module-type: widget
     if(elements.nodes.length) {
       this.handleRemoveNode(this.graphData.nodesById[elements.nodes[0]]);
     }     
-  }
-  
-  MapWidget.prototype.handleToggleFullscreen = function() {
-
-    this.logger("log", "Toggle fullscreen");
-
-    if(!this.isFullscreenMode) {
-      
-      this.logger("log", "Adding fullscreen markers");
-      
-      var fsMarker = "tmap-fullscreen";
-      var contextMarker = "tmap-has-fullscreen-child";
-      
-      // first we need to mark the element that we want fullscreen.
-      // we cannot set the element itself fullscreen as this would
-      // cause modals to be hidden.
-      
-      var el = document.getElementsByClassName(fsMarker)[0];
-      $tw.utils.addClass(this.parentDomNode, fsMarker);
-    
-      // it's not nice but we need to set a marker to be able to shift
-      // the stacking context as the z-index cannot do it on its own
-    
-      var storyRiver = document.getElementsByClassName("tc-story-river")[0];
-      if(this.storyRiver && this.storyRiver.contains(this.parentDomNode)) {
-        $tw.utils.addClass(this.storyRiver, contextMarker);
-      } else {
-        if(this.sidebar && this.sidebar.contains(this.parentDomNode)) {
-          $tw.utils.addClass(this.sidebar, contextMarker);
-        }
-      }
-      
-      this.isFullscreenMode = true;
-      
-    }
-    
-    // toggles(!) fullscreen
-    this.dispatchEvent({ type: "tm-full-screen" });
-    
   };
-    
     
   MapWidget.prototype.handleRemoveNode = function(node) {
 
@@ -963,23 +929,79 @@ module-type: widget
       
   };
   
+  /**
+   * Called by browser when a fullscreen change occurs (entering or
+   * exiting).
+   */
   MapWidget.prototype.handleFullScreenChange = function() {
     
-    if(this.isFullscreenMode
-       && !document[utils.getFullScreenApis()["_fullscreenElement"]]) {
-         
-      this.logger("log", "Removing fullscreen markers");
-
-      var fsMarker = "tmap-fullscreen";
-      var contextMarker = "tmap-has-fullscreen-child";
-    
-      // remove all markers everywhere
-      utils.findAndRemoveClassNames([ fsMarker, contextMarker ]);
-      
-      this.isFullscreenMode = false;
-      
+    var api = utils.getFullScreenApis();
+    if(this.enlargedMode === "fullscreen" && !document[api["_fullscreenElement"]]) {
+      this.handleToggleFullscreen();
     }
     
+  };
+  
+  MapWidget.prototype.handleToggleFullscreen = function() {
+    
+    var api = utils.getFullScreenApis();
+        
+    this.logger("log", "Toggle enlargement");
+    
+    if(this.enlargedMode) {
+      
+      this.logger("log", "Removing " + this.enlargedMode + " markers");
+      
+      // in any case
+      var markers = [ "tmap-" + this.enlargedMode ];
+      
+      if(this.enlargedMode === "fullscreen") {
+        markers.push("tmap-has-fullscreen-child");
+        document[api["_exitFullscreen"]]();
+      }
+      
+      utils.findAndRemoveClassNames(markers);
+      
+      this.enlargedMode = null;
+      
+    } else {
+      var isHalfscreenOptionEnabled = (this.objectId === "main_editor"
+                                       && this.opt.config.sys.halfscreen === "true");
+      this.enlargedMode = (isHalfscreenOptionEnabled ? "halfscreen" : "fullscreen");
+
+      this.logger("log", "Adding " + this.enlargedMode + " markers");
+
+      // first we need to mark the element that we want to fullscreen.
+      // we cannot set the element itself to native fullscreen as this
+      // would cause modals to be hidden.
+      
+      var fsMarker = "tmap-" + this.enlargedMode;
+      var el = document.getElementsByClassName(fsMarker)[0];
+      $tw.utils.addClass(this.parentDomNode, fsMarker);
+        
+      if(!isHalfscreenOptionEnabled) {
+        
+        // it's not nice but we need to set a marker to be able to shift
+        // the stacking context as the z-index cannot do it on its own
+        
+        var contextMarker = "tmap-has-fullscreen-child";
+        var storyRiver = document.getElementsByClassName("tc-story-river")[0];
+        if(this.storyRiver && this.storyRiver.contains(this.parentDomNode)) {
+          $tw.utils.addClass(this.storyRiver, contextMarker);
+        } else {
+          if(this.sidebar && this.sidebar.contains(this.parentDomNode)) {
+            $tw.utils.addClass(this.sidebar, contextMarker);
+          }
+        }
+        
+        document.documentElement[api["_requestFullscreen"]](Element.ALLOW_KEYBOARD_INPUT);
+        
+      }
+
+    }
+    
+    this.handleResizeEvent();
+
   };
      
   MapWidget.prototype.handleGenerateWidget = function(event) {
@@ -1145,11 +1167,7 @@ module-type: widget
       }
       
     } else {
-      
-      //~ if(this.isFullscreenMode) {
-        //~ this.handleToggleFullscreen(); // exit fullsreen
-      //~ }
-      
+
       if(properties.nodes.length) { // clicked on a node
          
         var node = this.graphData.nodes.get(properties.nodes[0]);
@@ -1157,11 +1175,9 @@ module-type: widget
         this.lastNodeDoubleClicked = node;
         var tRef = node.ref;
         
-        if(this.isFullscreenMode) {
-          //this.handleToggleFullscreen(); // exit fullsreen
+        if(this.enlargedMode === "fullscreen") {
           this.handleShowContentPreview(tRef);
-        } else { 
-          // window.location.hash = node.ref; is not the right way to do it
+        } else {
           this.dispatchEvent({
             type: "tm-navigate", navigateTo: tRef
           }); 
@@ -1392,7 +1408,7 @@ module-type: widget
   MapWidget.prototype.repaintGraph = function() {
     
     if(!document[utils.getFullScreenApis()["_fullscreenElement"]]
-       || this.isFullscreenMode) {
+       || this.enlargedMode) {
     
       this.logger("info", "Repainting the whole graph");
     

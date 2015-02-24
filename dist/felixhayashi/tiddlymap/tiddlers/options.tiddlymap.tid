@@ -11,5 +11,6 @@ type: application/json
   },
   "debug": "false",
   "notifications": "true",
-  "editNodeOnCreate": "false"
+  "editNodeOnCreate": "false",
+  "halfscreen": "false"
 }

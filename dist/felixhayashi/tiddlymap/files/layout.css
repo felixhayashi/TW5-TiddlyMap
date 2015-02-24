@@ -68,29 +68,32 @@ html {
         vertical-align: sub; }
       html .tc-modal-wrapper .tc-modal-header h3 {
         line-height: 10px; }
-    html .tc-modal-wrapper .tc-modal-body .tc-image-button {
-      font-size: 14px; }
-    html .tc-modal-wrapper .tc-modal-body fieldset legend {
-      font-weight: bold; }
-    html .tc-modal-wrapper .tc-modal-body fieldset table {
-      margin: 6px 0;
-      clear: both;
-      border: none; }
-      html .tc-modal-wrapper .tc-modal-body fieldset table tr td {
-        border: none;
-        vertical-align: top;
-        min-width: 140px;
-        padding: 3px 3px 3px 0; }
-        html .tc-modal-wrapper .tc-modal-body fieldset table tr td input {
-          width: 140px; }
-      html .tc-modal-wrapper .tc-modal-body fieldset table tr .tmap-note {
-        margin: 10px 10px 10px 0; }
-      html .tc-modal-wrapper .tc-modal-body fieldset table tr .tmap-description {
-        font-style: italic; }
-    html .tc-modal-wrapper .tc-modal-body fieldset ul {
-      padding-left: 30px; }
-      html .tc-modal-wrapper .tc-modal-body fieldset ul li {
-        list-style: none; }
+    html .tc-modal-wrapper .tc-modal-body {
+      max-height: 70vh;
+      overflow: auto; }
+      html .tc-modal-wrapper .tc-modal-body .tc-image-button {
+        font-size: 14px; }
+      html .tc-modal-wrapper .tc-modal-body fieldset legend {
+        font-weight: bold; }
+      html .tc-modal-wrapper .tc-modal-body fieldset table {
+        margin: 6px 0;
+        clear: both;
+        border: none; }
+        html .tc-modal-wrapper .tc-modal-body fieldset table tr td {
+          border: none;
+          vertical-align: top;
+          min-width: 140px;
+          padding: 3px 3px 3px 0; }
+          html .tc-modal-wrapper .tc-modal-body fieldset table tr td input {
+            width: 140px; }
+        html .tc-modal-wrapper .tc-modal-body fieldset table tr .tmap-note {
+          margin: 10px 10px 10px 0; }
+        html .tc-modal-wrapper .tc-modal-body fieldset table tr .tmap-description {
+          font-style: italic; }
+      html .tc-modal-wrapper .tc-modal-body fieldset ul {
+        padding-left: 30px; }
+        html .tc-modal-wrapper .tc-modal-body fieldset ul li {
+          list-style: none; }
     html .tc-modal-wrapper .tc-modal-footer {
       padding-top: 0px;
       padding-bottom: 0px; }
@@ -103,10 +106,24 @@ html {
     width: 100%;
     font-size: 11px;
     font-family: "Courier New", Courier, monospace; }
-  html .tc-sidebar-scrollable .tiddlymap {
+  html .tc-sidebar-scrollable .tmap-widget {
     min-height: 350px; }
+    html .tc-sidebar-scrollable .tmap-widget .tc-page-controls {
+      display: none; }
+    html .tc-sidebar-scrollable .tmap-widget.tmap-halfscreen {
+      position: absolute;
+      right: 0px;
+      top: 0;
+      left: 0px;
+      bottom: 0;
+      padding: 0px;
+      width: 100% !important;
+      border: none;
+      border-left: 1px solid lightgray;
+      height: 100% !important;
+      margin: 0; }
   html .tmap-widget {
-    border: 3px dotted lightgray;
+    border: 1px dotted lightgray;
     padding: 2px;
     width: 100%;
     color: #666666;
@@ -217,6 +234,8 @@ html {
         padding: inherit;
         box-shadow: none; }
 
+html:fullscreen body {
+  overflow: hidden; }
 html:fullscreen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:fullscreen .tmap-has-fullscreen-child {
@@ -239,6 +258,8 @@ html:fullscreen .tmap-has-fullscreen-child {
     border: none !important;
     margin: 0 !important; }
 
+html:-moz-full-screen body {
+  overflow: hidden; }
 html:-moz-full-screen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:-moz-full-screen .tmap-has-fullscreen-child {
@@ -261,6 +282,8 @@ html:-moz-full-screen .tmap-has-fullscreen-child {
     border: none !important;
     margin: 0 !important; }
 
+html:-webkit-full-screen body {
+  overflow: hidden; }
 html:-webkit-full-screen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:-webkit-full-screen .tmap-has-fullscreen-child {
@@ -283,6 +306,8 @@ html:-webkit-full-screen .tmap-has-fullscreen-child {
     border: none !important;
     margin: 0 !important; }
 
+html:-ms-fullscreen body {
+  overflow: hidden; }
 html:-ms-fullscreen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
   z-index: 0; }
 html:-ms-fullscreen .tmap-has-fullscreen-child {

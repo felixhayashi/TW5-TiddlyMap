@@ -83,7 +83,9 @@ html {
           border: none;
           vertical-align: top;
           min-width: 140px;
-          padding: 3px 3px 3px 0; }
+          padding: 3px 15px 3px 0; }
+          html .tc-modal-wrapper .tc-modal-body fieldset table tr td:last-child {
+            padding-right: 0px; }
           html .tc-modal-wrapper .tc-modal-body fieldset table tr td input {
             width: 140px; }
         html .tc-modal-wrapper .tc-modal-body fieldset table tr .tmap-note {

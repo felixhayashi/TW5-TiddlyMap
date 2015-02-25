@@ -127,7 +127,12 @@ html { // used to increase css importance
               border: none;
               vertical-align: top;
               min-width: 140px;
-              padding: 3px 3px 3px 0;
+              padding: 3px 15px 3px 0;
+              
+              &:last-child {
+                padding-right: 0px; 
+              }
+              
               input {
                 width: $default-input-width;
               }

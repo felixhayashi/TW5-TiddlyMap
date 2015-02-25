@@ -656,6 +656,11 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     return result;
     
   };
+  
+  /**
+   * Contains all TiddlyMap exceptions
+   */
+  utils.Exception = Exception;
 
   /************************* 3rd-party code **************************/
 
@@ -848,11 +853,6 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
 
   })();
   
-  /**
-   * Contains all TiddlyMap exceptions
-   */
-  utils.Exception = Exception;
-
   // !! EXPORT !!
   exports.utils = utils;
   // !! EXPORT !!

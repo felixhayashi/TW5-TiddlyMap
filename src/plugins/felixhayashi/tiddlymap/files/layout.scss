@@ -195,14 +195,10 @@ html { // used to increase css importance
   }
   
   .tc-sidebar-scrollable {
-  
-    .tc-page-controls {
-      display: none;
-    }
-  
+    
     .tmap-widget {
       min-height: 350px;
-      
+            
       &.tmap-halfscreen {
         position: absolute;
         right: 0px;
@@ -216,6 +212,7 @@ html { // used to increase css importance
         height: 100% !important;
         margin: 0;
         background: #ececec;
+        z-index: 1000;
       }
     }
   }

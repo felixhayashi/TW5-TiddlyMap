@@ -52,7 +52,7 @@ module-type: widget
     
     // register whether in editor mode or not
     this.editorMode = this.getAttribute("editor");
-    
+        
     if(this.editorMode) {
       this.addEventListeners([
         {type: "tm-create-view", handler: this.handleCreateView },
@@ -168,11 +168,13 @@ module-type: widget
   MapWidget.prototype.render = function(parent, nextSibling) {
     
     // remember our place in the dom
-    this.registerParentDomNode(parent);
+    this.parentDomNode = parent;
     
-    // register storyriver dom node
-    this.storyRiver = document.getElementsByClassName("tc-story-river")[0];
+    // add widget classes
+    this.registerClassNames(parent);
+    
     this.sidebar = document.getElementsByClassName("tc-sidebar-scrollable")[0];
+    this.containedInSidebar = (this.sidebar && this.sidebar.contains(this.parentDomNode));
     
     // who am I?
     this.objectId = (this.getAttribute("object-id")
@@ -198,9 +200,8 @@ module-type: widget
    * Add some classes to give the user a chance to apply some css
    * to different graph modes.
    */
-  MapWidget.prototype.registerParentDomNode = function(parent) {
+  MapWidget.prototype.registerClassNames = function(parent) {
     
-    this.parentDomNode = parent;
     if(!$tw.utils.hasClass(parent, "tmap-widget")) {
       
       var classes = [ "tmap-widget" ];
@@ -498,11 +499,10 @@ module-type: widget
 
   MapWidget.prototype.isViewBound = function() {
     
-    return utils.startsWith(this.getViewHolderRef(),
-                            this.opt.path.localHolders);  
+    return utils.startsWith(this.getViewHolderRef(), this.opt.path.localHolders);  
     
-  };  
-  
+  };
+    
   MapWidget.prototype.isViewSwitched = function(changedTiddlers) {
   
     if(this.isViewBound()) {
@@ -623,7 +623,7 @@ module-type: widget
     
     window.addEventListener("resize", this.handleResizeEvent.bind(this), false);
     
-    if(!this.sidebar.contains(this.parentDomNode)) {
+    if(!this.containedInSidebar) {
       this.callbackManager.add("$:/state/sidebar", this.handleResizeEvent.bind(this));
     }
     
@@ -945,31 +945,28 @@ module-type: widget
   MapWidget.prototype.handleToggleFullscreen = function() {
     
     var api = utils.getFullScreenApis();
-        
-    this.logger("log", "Toggle enlargement");
     
+    this.logger("log", "Toggled graph enlargement");
+        
     if(this.enlargedMode) {
       
-      this.logger("log", "Removing " + this.enlargedMode + " markers");
-      
-      // in any case
-      var markers = [ "tmap-" + this.enlargedMode ];
+      // remove markers
+      utils.findAndRemoveClassNames([
+        "tmap-" + this.enlargedMode,
+        "tmap-has-" + this.enlargedMode + "-child"
+      ]);
       
       if(this.enlargedMode === "fullscreen") {
-        markers.push("tmap-has-fullscreen-child");
         document[api["_exitFullscreen"]]();
       }
-      
-      utils.findAndRemoveClassNames(markers);
       
       this.enlargedMode = null;
       
     } else {
-      var isHalfscreenOptionEnabled = (this.sidebar.contains(this.parentDomNode)
-                                       && this.opt.config.sys.halfscreen === "true");
-      this.enlargedMode = (isHalfscreenOptionEnabled ? "halfscreen" : "fullscreen");
 
-      this.logger("log", "Adding " + this.enlargedMode + " markers");
+      this.enlargedMode = (this.containedInSidebar
+                           && this.opt.config.sys.halfscreen === "true"
+                           ? "halfscreen" : "fullscreen");
 
       // first we need to mark the element that we want to fullscreen.
       // we cannot set the element itself to native fullscreen as this
@@ -979,23 +976,15 @@ module-type: widget
       var el = document.getElementsByClassName(fsMarker)[0];
       $tw.utils.addClass(this.parentDomNode, fsMarker);
         
-      if(!isHalfscreenOptionEnabled) {
-        
-        // it's not nice but we need to set a marker to be able to shift
-        // the stacking context as the z-index cannot do it on its own
-        
-        var contextMarker = "tmap-has-fullscreen-child";
-        var storyRiver = document.getElementsByClassName("tc-story-river")[0];
-        if(this.storyRiver && this.storyRiver.contains(this.parentDomNode)) {
-          $tw.utils.addClass(this.storyRiver, contextMarker);
-        } else {
-          if(this.sidebar && this.sidebar.contains(this.parentDomNode)) {
-            $tw.utils.addClass(this.sidebar, contextMarker);
-          }
-        }
-        
+      // we need to set a another marker to be able to shift the stacking context
+      
+      if(this.containedInSidebar) {
+        var contextMarker = "tmap-has-" + this.enlargedMode + "-child";
+        $tw.utils.addClass(this.sidebar, contextMarker);
+      }
+      
+      if(this.enlargedMode === "fullscreen") {
         document.documentElement[api["_requestFullscreen"]](Element.ALLOW_KEYBOARD_INPUT);
-        
       }
 
     }
@@ -1212,7 +1201,7 @@ module-type: widget
    */
   MapWidget.prototype.handleResizeEvent = function(event) {
     
-    if(this.sidebar.contains(this.parentDomNode)) {
+    if(this.containedInSidebar) {
       
       var windowHeight = window.innerHeight;
       var canvasOffset = this.parentDomNode.getBoundingClientRect().top;

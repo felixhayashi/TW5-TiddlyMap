@@ -335,17 +335,7 @@ module-type: library
     }
     
     var node = utils.getEmptyMap();
-    
-    // assign label
-    
-    node.label = (tObj.fields[this.opt.field.nodeLabel]
-                  ? tObj.fields[this.opt.field.nodeLabel]
-                  : tObj.fields.title);
-                  
-    // assign default level
-    
-    //~ node.level = 0;
-    
+        
     // determine shape
     
     var iconRef = tObj.fields[this.opt.field.nodeIcon];
@@ -373,14 +363,20 @@ module-type: library
       }
     }
     
+    // assign label
+
+    var label = tObj.fields[this.opt.field.nodeLabel];
+    node.label = (label && this.opt.field.nodeLabel !== "title"
+                  ? this.wiki.renderText("text/plain", "text/vnd-tiddlywiki", label)
+                  : tObj.fields.title);
+
+    
     // add tooltip
+    
     var info = tObj.fields[this.opt.field.nodeInfo];
-    if(info && this.opt.field.nodeInfo !== "text") {
-      //~ node.title = this.wiki.renderText("text/html", "text/vnd-tiddlywiki", info);
-      this.wiki.renderText("text/html", "text/vnd-tiddlywiki", info);
-    } else {
-      node.title = tObj.fields.title;
-    }
+    node.title = (info && this.opt.field.nodeInfo !== "text"
+                  ? this.wiki.renderText("text/html", "text/vnd-tiddlywiki", info)
+                  : tObj.fields.title);
     
     // use the tiddler's color field as node color
     if(tObj.fields.color) {

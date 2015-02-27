@@ -648,10 +648,11 @@ module-type: widget
     
     // register events
     
-    this.network.on("doubleClick", this.handleDoubleClickEvent.bind(this));
-    this.network.on("stabilized", this.handleStabilizedEvent.bind(this));
-    this.network.on('dragStart', this.handleNodeDragStart.bind(this));
-    this.network.on("dragEnd", this.handleNodeDragEnd.bind(this));
+    this.network.on("click", this.handleVisClickEvent.bind(this));
+    this.network.on("doubleClick", this.handleVisDoubleClickEvent.bind(this));
+    this.network.on("stabilized", this.handleVisStabilizedEvent.bind(this));
+    this.network.on('dragStart', this.handleVisDragStart.bind(this));
+    this.network.on("dragEnd", this.handleVisDragEnd.bind(this));
     
     this.addGraphButtons({
       "fullscreen": this.handleToggleFullscreen
@@ -931,7 +932,8 @@ module-type: widget
   
   /**
    * Called by browser when a fullscreen change occurs (entering or
-   * exiting).
+   * exiting). Its purpose is to call the toggle fullscreen function
+   * once the exit fullscreen event has occured.
    */
   MapWidget.prototype.handleFullScreenChange = function() {
     
@@ -942,6 +944,14 @@ module-type: widget
     
   };
   
+  /**
+   * Calling this function will toggle the enlargement of the map
+   * instance. We cannot set the element itself to native fullscreen as
+   * as this would cause modals to be hidden. Therefore markers need to
+   * be added at various places to ensure the map stretches properly.
+   * This includes marking ancestor dom nodes to be able to shift the
+   * stacking context.
+   */
   MapWidget.prototype.handleToggleFullscreen = function() {
     
     var api = utils.getFullScreenApis();
@@ -960,6 +970,7 @@ module-type: widget
         document[api["_exitFullscreen"]]();
       }
       
+      // reset
       this.enlargedMode = null;
       
     } else {
@@ -968,19 +979,10 @@ module-type: widget
                            && this.opt.config.sys.halfscreen === "true"
                            ? "halfscreen" : "fullscreen");
 
-      // first we need to mark the element that we want to fullscreen.
-      // we cannot set the element itself to native fullscreen as this
-      // would cause modals to be hidden.
-      
-      var fsMarker = "tmap-" + this.enlargedMode;
-      var el = document.getElementsByClassName(fsMarker)[0];
-      $tw.utils.addClass(this.parentDomNode, fsMarker);
-        
-      // we need to set a another marker to be able to shift the stacking context
-      
+      $tw.utils.addClass(this.parentDomNode, "tmap-" + this.enlargedMode);
+              
       if(this.containedInSidebar) {
-        var contextMarker = "tmap-has-" + this.enlargedMode + "-child";
-        $tw.utils.addClass(this.sidebar, contextMarker);
+        $tw.utils.addClass(this.sidebar, "tmap-has-" + this.enlargedMode + "-child");
       }
       
       if(this.enlargedMode === "fullscreen") {
@@ -1075,7 +1077,7 @@ module-type: widget
    * as this will affect other graphs positions and will cause recursion!
    * Storing positions inside vis' nodes is fine though
    */
-  MapWidget.prototype.handleStabilizedEvent = function(properties) {
+  MapWidget.prototype.handleVisStabilizedEvent = function(properties) {
     
     if(!this.hasNetworkStabilized) {
       this.hasNetworkStabilized = true;
@@ -1124,6 +1126,7 @@ module-type: widget
   };
 
   MapWidget.prototype.handleInsertNode = function(node) {
+    
     this.dialogManager.open("getNodeName", null, function(isConfirmed, outputTObj) {
       if(isConfirmed) {
         node.label = utils.getText(outputTObj);
@@ -1134,11 +1137,26 @@ module-type: widget
         this.preventNextContextReset = true;
       }
     });
+    
+  };
+  
+  /**
+   * This handler is registered at and called by the vis network event
+   * system.
+   */
+  MapWidget.prototype.handleVisClickEvent = function(properties) {
+    
+    if(this.opt.config.sys.singleClickMode === "true") {
+      if(properties.nodes.length) { // clicked on a node    
+        this.openTiddler(properties.nodes[0]);
+      }
+    }
+    
   };
     
   /**
    * This handler is registered at and called by the vis network event
-   * system
+   * system.
    * 
    * @see
    *   - Coordinates not passed on click/tap events within the properties object
@@ -1147,7 +1165,7 @@ module-type: widget
    * @properties a list of nodes and/or edges that correspond to the
    * click event.
    */
-  MapWidget.prototype.handleDoubleClickEvent = function(properties) {
+  MapWidget.prototype.handleVisDoubleClickEvent = function(properties) {
     
     if(!properties.nodes.length && !properties.edges.length) { // clicked on an empty spot
       
@@ -1157,34 +1175,10 @@ module-type: widget
       
     } else {
 
-      if(properties.nodes.length) { // clicked on a node
-         
-        var node = this.graphData.nodes.get(properties.nodes[0]);
-        this.logger("debug", "Doubleclicked on node", node);        
-        this.lastNodeDoubleClicked = node;
-        var tRef = node.ref;
-        
-        if(this.enlargedMode === "fullscreen") {
-          this.handleShowContentPreview(tRef);
-        } else {
-          this.dispatchEvent({
-            type: "tm-navigate", navigateTo: tRef
-          }); 
-        }
-                
+      if(properties.nodes.length) { // clicked on a node    
+        this.openTiddler(properties.nodes[0]);
       } else if(properties.edges.length) { // clicked on an edge
-        
         this.logger("debug", "Doubleclicked on an Edge");
-        
-        //~ if(this.editorMode) {
-          //~ // TODO: open option menu
-          //~ var edge = this.graphData.edges.get(properties.edges[0]);
-          //~ var label = (edge.label
-                       //~ ? edge.label
-                       //~ : this.opt.misc.unknownEdgeLabel);
-          //~ var tRef = this.getView().getEdgeStoreLocation() + "/" + label;
-        //~ }
-      
       }
                   
     }
@@ -1236,7 +1230,7 @@ module-type: widget
     if(this.network) {
       var element = document.elementFromPoint(event.clientX, event.clientY);
       if(!this.parentDomNode.contains(element)) {
-        this.network.selectNodes([]);
+        this.network.selectNodes([]); // deselect nodes and edges
       }
     }
 
@@ -1249,9 +1243,9 @@ module-type: widget
    * @param {Array<Id>} properties.nodeIds - Array of ids of the nodes
    *     that were being dragged.
    */
-  MapWidget.prototype.handleNodeDragEnd = function(properties) {
-    if(properties.nodeIds.length
-       && this.getView().getConfig("layout.active") !== "hierarchical") {
+  MapWidget.prototype.handleVisDragEnd = function(properties) {
+    
+    if(properties.nodeIds.length && this.getView().getConfig("layout.active") !== "hierarchical") {
       var isFloatingMode = this.getView().isConfEnabled("physics_mode");
       
       var node = this.graphData.nodesById[properties.nodeIds[0]];
@@ -1260,6 +1254,7 @@ module-type: widget
         this.handleStorePositions();
       }
     }
+    
   };
   
   /**
@@ -1269,7 +1264,7 @@ module-type: widget
    * @param {Array<Id>} properties.nodeIds - Array of ids of the nodes
    *     that are being dragged.
    */
-  MapWidget.prototype.handleNodeDragStart = function(properties) {
+  MapWidget.prototype.handleVisDragStart = function(properties) {
     if(properties.nodeIds.length) {
       var node = this.graphData.nodesById[properties.nodeIds[0]];
       this.setNodesMoveable([ node ], true);
@@ -1282,6 +1277,26 @@ module-type: widget
   MapWidget.prototype.destruct = function() {
     window.removeEventListener("resize", this.handleResizeEvent);
     this.network.destroy();
+  };
+  
+  /**
+   * Opens the tiddler that corresponds to the given id either as
+   * modal (when in fullscreen mode) or in the story river.
+   */
+  MapWidget.prototype.openTiddler = function(id) {
+    
+    var node = this.graphData.nodesById[id];
+    var tRef = node.ref;
+    
+    this.logger("debug", "Opening tiddler", tRef, "with id", id);
+    
+    if(this.enlargedMode === "fullscreen") {
+      this.handleShowContentPreview(tRef);
+    } else {
+      this.dispatchEvent({
+        type: "tm-navigate", navigateTo: tRef
+      }); 
+    }
   };
    
   /**

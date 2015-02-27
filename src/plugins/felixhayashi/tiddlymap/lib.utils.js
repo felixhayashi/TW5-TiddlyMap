@@ -666,7 +666,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
 
   /**
    * TW-Code
-   * @deprecated delete this in one year and use $tw.utils.getFullScreenApis instead
+   * @deprecated delete this in 2016 and use $tw.utils.getFullScreenApis instead
    */
   utils.getFullScreenApis = function() {
     var d = document,

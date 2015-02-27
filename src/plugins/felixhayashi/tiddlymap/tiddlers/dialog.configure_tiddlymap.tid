@@ -32,6 +32,9 @@ Please visit the [[online docs|http://bit.ly/tiddlymap#Changing%20TiddlyMap's%20
                descr:"Set this to true if you want to receive fade-out notifications for important events.">>
     <<tmap-row title:"Halfscreen enlargement" field:"config.sys.halfscreen" type:"input-checkbox"
                descr:"When the fullscreen-button is pressed, sidebar maps (live view, editor) are enlarged halfscreen instead of fullscreen so the story river stays visible.">>
+    <<tmap-row title:"Allow single click mode" field:"config.sys.singleClickMode" type:"input-checkbox"
+               descr:"A single click on a node is sufficient enough to open the corresponding tiddler."
+               note:"Drag and drop will still work and does not cause a tiddler to be opened.">>
   </table>
 </fieldset>
 

@@ -25,7 +25,7 @@ say here is: do not require the caretaker!
   "use strict";
   
   // Export name and synchronous status
-  exports.name = "tiddlymap-setup";
+  exports.name = "tmap.caretaker";
   exports.platforms = ["browser"];
   exports.after = ["startup"];
   exports.before = ["rootwidget"];

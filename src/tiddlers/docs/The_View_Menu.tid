@@ -1,0 +1,68 @@
+created: 20150119190507345
+id: 2b517bc2-f857-42bb-b769-d22b9a2aa257
+modified: 20150207165943647
+tags: documentation editor
+title: The View Menu
+type: text/vnd.tiddlywiki
+
+!! The view's drop-down menu
+
+{{Selection_457.png}}
+
+; View selection
+: """
+  You can select an existing view to be displayed in the editor via the selectbox
+  on the very left.
+  """
+; Create empty view
+: """
+  Click this button to create a new view with an individual view name of your choice.
+  The new view can be separately modified and is independent from the other existing
+  views.
+  """
+; Rename view
+: """
+  You can always rename your views, however, be careful as existing views with the same
+  name will be overwritten.
+  """
+; Delete view
+: """
+  Removes the view and all its components, including all private edges. You cannot
+  remove the default view. Also you cannot remove any view that is still used by
+  widgets in the wiki (a dialog will tell you which dependencies exist).
+  """
+; Save positions
+: """
+  Use this button to explicitly save positions. Positions are normally automatically
+  saved when a dragged node was dropped.
+  """
+; Grab widget code
+: """
+  This will open a wizard that helps you to produce the desired widget code you can then copy'n'paste to embed this view in a tiddler.
+  """
+
+!! The //Configure View// modal
+
+{{Selection_472.png}}
+
+; Layout
+: """
+  You can choose between a hierarchical layout and the default, user defined layout.
+  The hierarchical layout prevents you from freely arranging nodes and displays the nodes
+  according to the hierarchical order based on the selected edge types.
+"""
+; Enable floating nodes
+: """
+  Set this to true if you want your nodes to freely swirl around. Yeah, I know, it is
+  cool, but if you are a rather serious person, you want to disable this.
+  -or not? I don't know.
+  """
+; Private edge mode
+: """
+  If you enable this option, all edges created in your editor (for that view) will __exclusively__
+  belong to this particular view/graph. This means you won't see any globally shared edges
+  in your graph, even if they exist. Also no other graphs will display these edges.
+  This mode is only useful if you are truly creating an isolated graph. However keep in
+  mind that you __cannot__ display private and shared edges at the same time so
+  private edges will always stay private and the public edges always public.
+  """

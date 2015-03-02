@@ -1,0 +1,28 @@
+created: 20150110235913197
+id: 332f41e5-e003-49f5-ad14-1b6b5cfba85a
+modified: 20150111000121104
+title: $:/plugins/felixhayashi/tiddlymap/graph/edges/please read
+type: application/json
+
+[
+    {
+        "from": "63EA2EE9-F821-44F7-A706-E1F973F7C6E0",
+        "to": "6159DA1A-73F2-451D-B55F-8744480BA7AC",
+        "id": "30af4ba7-306f-4e68-9e32-d0342d64a717"
+    },
+    {
+        "from": "63EA2EE9-F821-44F7-A706-E1F973F7C6E0",
+        "to": "a7e46ff2-2010-475f-a430-d757a7659798",
+        "id": "95209609-d1c8-44a4-8f31-f5dbf6c85098"
+    },
+    {
+        "from": "A94544D7-9A04-40D6-9274-AD56617C04BE",
+        "to": "a7e46ff2-2010-475f-a430-d757a7659798",
+        "id": "189a596f-b51d-4535-babe-447b7a6fd620"
+    },
+    {
+        "from": "63EA2EE9-F821-44F7-A706-E1F973F7C6E0",
+        "to": "BE07716E-E5AB-480A-B228-9E24357EBC88",
+        "id": "e0958100-7790-4a61-ad98-a4eb30a9691d"
+    }
+]

@@ -1,0 +1,14 @@
+created: 20150125155603745
+id: a4c3882d-0dd7-4e3c-818a-5065e8d09da0
+modified: 20150125155631495
+tags: documentation insight
+title: Representation and storage of nodes
+type: text/vnd.tiddlywiki
+
+Each node in a graph corresponds to a tiddler. Therefore, creating a new node in the map editor will necessarily result in the creation of a new tiddler and clicking on a node, will open that tiddler.
+
+Node information is stored at two different levels. Some information, like the //label//, //color// or //icon//, is directly drawn from the tiddler and its fields since this information is also useful when not using TiddlyMap. Thus, it is kept with the tiddler itself.
+
+Another part of the information is stored outside since it only makes sense in a graph context. More specifically, it is information that belongs to each different view. This information is stored in different system tiddlers that internally have the specific view path as prefix.
+
+For example the node positions of a view are stored in a position-store that is exclusively owned and referenced by this view.

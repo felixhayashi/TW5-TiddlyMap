@@ -1,0 +1,37 @@
+created: 20150202224852034
+id: 4f43e8ec-73d8-4d5d-baea-dcbbaafd9779
+modified: 20150203223250969
+tags: documentation configuration
+title: Changing TiddlyMap's default configuration
+type: text/vnd.tiddlywiki
+
+Some aspects of TiddlyMap are configurable. To change the global configurations, open the view menu and click on //Global configurations//.
+
+{{Selection_474.png}}
+
+A dialog will open that allows you configure the existing defaults.
+
+; The node-id field
+: TiddlyMap comes with the default configuration that every tiddler used in a graph gets automatically assigned an id. The field used as id is per default "id" and not "title". This may create problems when you use tiddlywiki's cloning feature since the id field will also be cloned. The benefit on the other hand is that renaming a tiddler that has been added in the editor via //add node// or a double click can be traced by the system. Tiddlers that were added to the graph via a filter that generically defines the node set (e.g. "all tiddlers with tag xy") do not need to be traced.
+:''Warning'': Only if you do not use the cloning feature, it is suggested to keep the default. Otherwise, set this field to title!
+
+;The node-icon field
+: TiddlyMap will use the locally stored image denoted by this field as node image instead of displaying a node as rectangle in the graph. If no image is available, the node is rendered according to the current vis settings.
+
+; The node-label field
+: TiddlyMap will look for this tiddler field and use its value as node label. If no field with this name exists, the tiddler's title is used as fallback.
+
+; The node-info field
+: The value of this field will be displayed as tooltip when hovering a node in the graph. The tiddler's title will be used as fallback.
+
+; The view-marker field
+: This field is automatically set for a view when it is created. Its purpose is to help TiddlyMap to identify a view in order to list it as an existing view. It is __not__ recommended to change this default unless it conflicts with an existing system tiddler property.
+
+
+!! Other settings
+
+; Enable debug output
+:Set this to true if you want debug information to be displayed in the browser console.
+;Enable notifications
+:Set this to true if you want to receive notifications on important events.
+  

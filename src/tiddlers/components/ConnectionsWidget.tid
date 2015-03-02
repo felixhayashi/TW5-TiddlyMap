@@ -1,0 +1,8 @@
+created: 20150206092107012
+id: b9170b6a-6657-43c8-96f8-539094d681dd
+modified: 20150206092353163
+tags: component
+title: ConnectionsWidget
+type: text/vnd.tiddlywiki
+
+Makes it possible to iterate over edges and nodes from within wiki text.

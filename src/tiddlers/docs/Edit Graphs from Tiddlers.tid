@@ -1,0 +1,26 @@
+created: 20141220185422497
+id: 8FA9A14C-D58E-4257-ADDC-D01E834DD18C
+modified: 20150227123528822
+tags: example insight
+title: Edit Graphs from Tiddlers
+type: text/vnd.tiddlywiki
+
+In rare cases, you want your graphs displayed in your tiddlers to possess an editor bar for direct manipulation (this is usually done in the main editor).
+
+Then you could do the following:
+
+```html
+<$tiddlymap view="All Tasks" height="250px" editor="vis"></$tiddlymap>
+```
+
+<$tiddlymap view="All Tasks" height="250px" editor="vis"></$tiddlymap>
+
+Alternatively, you can show the whole editor bar via:
+
+```html
+<$tiddlymap view="All Tasks" height="250px" editor="advanced"></$tiddlymap>
+```
+
+This will add the TiddlyMap editor bar on top of the graph.
+
+<$tiddlymap view="All Tasks" height="250px" editor="advanced"></$tiddlymap>

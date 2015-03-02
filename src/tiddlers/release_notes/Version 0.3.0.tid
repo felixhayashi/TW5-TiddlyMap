@@ -1,0 +1,11 @@
+created: 20141217194318537
+id: DDEBD365-03CF-4040-B542-63B2341D8340
+modified: 20141225154614154
+released: 20141109
+tags: ReleaseNote
+title: Version 0.3.0
+type: text/vnd.tiddlywiki
+
+# Enhance the filterbar
+#* Create snapshots of the current views (filters) that can be loaded again
+# Embed graphs as widgets in tiddlers based on a saved view (filter)

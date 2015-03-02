@@ -1,0 +1,79 @@
+caption: Version 0.6.x
+created: 20141218214017892
+id: 8AC0D41D-98D6-4DA5-8BE4-07703A89B58B
+modified: 20150227122644591
+released: not really
+tags: ReleaseNote
+title: Version 0.6.x-prerelease
+type: text/vnd.tiddlywiki
+
+!! End user
+
+* The caption field will be treated as wikitext and rendered as text/plain
+* One-click option to open tiddlers from the graph
+* added a "no buttons" widget attibute
+* Halfscreen option for sidebar editor (#50)
+* Widget code generator added to the view menu
+* view title is now displayed over non-editor graphs
+* Tiddler-toolbar-button with ways to connect tiddlers and possibility to remove edges again.
+* Widget to list directly connected edges and neighbours (experimental; can be used in wikitext)
+* Global config button
+* Initial setup dialog
+* Focus node mechanism for each graph
+* Changed vis button color
+* Improved "edit edge" behaviour
+* Improved "removing node" dialog
+* Tooltips when hovering a node.
+* Edge filter optimized (toggle for default and scrollbox)
+* Tiddler icons are also displayed in the graph
+* Live view introduced which synchronizes with the story river
+* User can open all graphs everywhere in full-screen mode
+* A tiddler's color field is used as default node color
+* Hierarchical layouts
+* Node search combined with the newly introduced diving mode
+* Drag and drop tiddlers on the graph
+* Node diving mode (see docs)
+* User can now specify an alias field that is used as node label instead of the tiddler's title
+* Nodes in view can be filtered via any tw-filter
+* Pretty-printed Node Filter separating filter operands via new lines
+* Nodes can be named immediately without opened in edit mode
+* Option to display immediate neighbours of a graph
+* Physics mode is now toggled per view
+* More compact editor layout
+* Correcting an existing edge (Vis: "Edit Edge")
+* No-name edges are created when no name is specified
+* Introduced private edge mode
+* Views may be renamed
+* A user needs to click before the graph can be used
+
+!! More technical
+
+* Tiddlers corresponding to newly created nodes now have created and modified fields
+* New uuid RFC4122, version 4 ID compliant generator (as suggested by @pmario)
+* Code docs are now published at the github repo via JSDoc
+* Adapter is now available in the js environment via $tw.tiddlymap.adapter
+* Overhaul of the whole API
+* Using the dataset again to refresh the graph data (see discussion starting at https://github.com/almende/vis/issues/568#issuecomment-70373916)
+* "tmap-" prefix used for tiddlymap classes and ids
+
+!! Important Bugfixes
+
+* Fixed sidebar bug (graphs did not readjust anymore after fixing #35)
+* Dragging the manipulation bar doesn't produce an error anymore (https://github.com/almende/vis/issues/557)
+* Fixed remaining listener bug (https://github.com/almende/vis/issues/521)
+* Fixed shadow-override bug (https://github.com/felixhayashi/TW5-TiddlyMap/issues/17)
+* Vis recursion error (https://github.com/almende/vis/issues/522)
+* Graph not clickable after view modification (https://github.com/almende/vis/issues/540)
+* Fullscreen bug (https://github.com/felixhayashi/TW5-TiddlyMap/issues/25)
+
+!! Incompatibilities to previous versions
+
+//Where is my tag filter?//
+
+The view does not use tags anymore as filters but offers you a textfield
+instead where you can enter your custom tw-filter. This means you have
+to add the tags to the filter again.
+
+//Why are my private edges public now?//
+
+This is a side effect as I completely changed the way private edges work. Sorry, you need to rebuild your edges again if you want them to be private.

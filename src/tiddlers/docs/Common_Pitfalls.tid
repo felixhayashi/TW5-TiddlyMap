@@ -1,0 +1,24 @@
+created: 20150103171758988
+id: a7e46ff2-2010-475f-a430-d757a7659798
+modified: 20150106114324761
+tags: 
+title: Common Pitfalls
+type: text/vnd.tiddlywiki
+
+!! Cloning and TiddlyMap
+
+TiddlyMap comes with the default configuration that every tiddler used in a graph gets automatically assigned an id. The field used as id is per default "id" and not "title". This may create problems when you use tiddlywiki's //cloning// feature as the id field will also be cloned. You may set TiddlyMap to use the title as id field by setting `"field_nodeId": "title"`. The consequence is that all nodes added to a graph via a filter such as `[field:title[XYZ]]` or `[[XYZ]]` will disappear after a renaming operation.
+
+!! Widget's closing tag
+
+Please do not use the following shortcut to close the widget as it may cause conflicts with the visualization.
+
+```html
+<$tiddlymap />
+```
+
+Instead, use this version:
+
+```html
+<$tiddlymap ...></$tiddlymap>
+```

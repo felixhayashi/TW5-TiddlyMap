@@ -1,0 +1,10 @@
+created: 20150110235157303
+id: 9d97c1e8-9458-44f9-97c5-82253da987c0
+modified: 20150110235703502
+tags: 
+title: TiddlyMap Example
+type: text/vnd.tiddlywiki
+
+<$list filter="[tag[example]]">
+<li><$link to={{!!title}}>{{!!title}}</$link></li>
+</$list>

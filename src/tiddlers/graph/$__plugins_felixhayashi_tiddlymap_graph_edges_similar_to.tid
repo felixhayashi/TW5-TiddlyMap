@@ -1,0 +1,13 @@
+created: 20150113210150572
+id: bad262c6-b832-4e70-9f0d-4937030edf84
+modified: 20150113210150572
+title: $:/plugins/felixhayashi/tiddlymap/graph/edges/similar to
+type: application/json
+
+[
+    {
+        "from": "a41e7681-dc8f-4923-ad34-3225d461114a",
+        "to": "ec5baa28-49ee-4e0c-a1ac-c1b83bd52fb0",
+        "id": "ce25a46c-c772-4f55-be61-179032451968"
+    }
+]

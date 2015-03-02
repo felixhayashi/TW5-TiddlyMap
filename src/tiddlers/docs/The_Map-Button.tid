@@ -1,0 +1,26 @@
+created: 20150206100707761
+id: eaca32dd-b5d7-4ccd-a6c9-d04d84739c77
+modified: 20150206101801236
+tags: documentation interface
+title: The Map-Button
+type: text/vnd.tiddlywiki
+
+The map button ({{$:/plugins/felixhayashi/tiddlymap/icon}}) allows you to quickly connect tiddlers and remove edges from within your tiddler. Clicking it will open the following dialog:
+
+{{Selection_476.png}}
+
+---
+
+''Note:'' //working with the map button best works when you open the [[live view|Working with the Live View]]//.
+
+---
+
+; Add this node
+: Simply drag'n'drop the displayed link on a graph editor to add it to an existing view.
+
+; Link this node
+:Select an edge-type (optional, defaults to //noname//) and search for a tiddler you want to connect. Then click the //from// and //to// buttons to create the edge.
+
+; Delete Connections
+: To remove existing edges, click on the cross next to the tiddler's title.
+

@@ -1,0 +1,12 @@
+created: 20150125155634248
+id: cc2aaa90-b53c-4b4e-8277-16cf4873d343
+modified: 20150125155648630
+tags: documentation insight
+title: Representation and storage of edges
+type: text/vnd.tiddlywiki
+
+Not every edge you draw is stored in a separate tiddler. Instead TiddlyMap follows a type-concept, which means, that edges with the same name are of the same type are all stored together in a single JSON-tiddler called an edge-store. Why? Imagine you would create hundred of edges (relations) that are all named "depends on". It would spam the wiki to store each edge as a tiddler, at the same time, it would be highly redundant. Moreover, if you want to rename all edges at once, you could simple rename the edge store and it will apply for all edges kept in that store.
+
+Another important aspect that impacts how edges are stored is whether the user wants to bind the edges exclusively to the graph or if they should appear globally. If edges are globally stored, they will potentially appear in any graph that contains two nodes that are connected through that edge (unless the view's edge filter prevents it). Removing the edge would also remove the edge from every graph.
+
+On the contrary, if you operate in //private edge mode//, all created edges are internally stored under the view's prefix. Therefore they will not appear anywhere except in the particular view. and if you remove the view, the edges are removed as well.

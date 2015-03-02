@@ -1,0 +1,13 @@
+created: 20150102012036964
+id: dd7dd82c-c978-4ee8-adc0-677aaebe61d9
+modified: 20150102012036964
+title: $:/plugins/felixhayashi/tiddlymap/graph/edges/married to
+type: application/json
+
+[
+    {
+        "from": "b11149a2-9050-4632-b095-d9d233319b91",
+        "to": "a1485262-99fe-4b1e-a246-cc70fbb1859a",
+        "id": "961f7f2b-5abe-4036-a155-aa9b30ae1260"
+    }
+]

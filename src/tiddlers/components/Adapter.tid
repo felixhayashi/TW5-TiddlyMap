@@ -1,0 +1,26 @@
+created: 20141217201950735
+id: 04CCC27E-A88B-4CE2-93C8-914D8D65BD46
+modified: 20141223134704606
+tags: component
+title: Adapter
+type: text/vnd.tiddlywiki
+
+This library provides all the functions to interact with the TW as if it was a simple database for nodes and edges. It may be understood as an abstraction layer.
+
+Everything that is related to retrieving or inserting nodes and edges is handled by the adapter.
+
+You can use the adapter to manipulate graphs or query nodes and edges from any tiddlywiki js-code.
+
+For example open firebug and enter the following in the console:
+
+```javascript
+// create a new view
+var myView = $tw.tiddlymap.adapter.createView("My new View");
+
+// insert a node in this view
+var node = { label: "I am a node" };
+var options = { view: myView };
+$tw.tiddlymap.adapter.insertNode(node, options);
+```
+
+For more information visit the [[api docs site|http://bit.ly/tiddlymap_api]].

@@ -1,0 +1,13 @@
+created: 20141217203128644
+id: C0AF42F6-3930-46A5-9A1E-F7128F660650
+modified: 20141217203127124
+title: $:/plugins/felixhayashi/tiddlymap/graph/edges/consists of
+type: application/json
+
+[
+    {
+        "from": "95C5F361-88AF-4533-8681-F1D164C50511",
+        "to": "E55F1078-DC52-4BF3-B7E6-BAE6E317A391",
+        "id": "DE5DA86E-B6CE-404F-BC8D-20B4E41A54DD"
+    }
+]

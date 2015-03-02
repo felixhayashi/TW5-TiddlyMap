@@ -1,0 +1,18 @@
+created: 20150102012118709
+id: c18184b7-49e2-431e-a6c9-ea66e3cb6be1
+modified: 20150113212113011
+title: $:/plugins/felixhayashi/tiddlymap/graph/edges/brother of
+type: application/json
+
+[
+    {
+        "from": "8ec7f3ee-35f9-4c56-a57b-12d91c0c372e",
+        "to": "afd75e95-e45a-4dea-848a-e16ca735bc57",
+        "id": "deb7eb05-f667-496b-aeda-205c37b2484b"
+    },
+    {
+        "from": "f24ab062-62a1-4555-a57f-dfcd597c3515",
+        "to": "9c050064-d805-48b3-80a6-181d3599daff",
+        "id": "cd4e71e7-9735-4a42-8632-e88cc01ab64f"
+    }
+]

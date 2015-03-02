@@ -1,0 +1,25 @@
+created: 20141218163905294
+id: A94544D7-9A04-40D6-9274-AD56617C04BE
+modified: 20150111033947900
+title: How to install TiddlyMap?
+type: text/vnd.tiddlywiki
+
+''Warning:'' ~TiddlyMap is cool but unstable. Just play with it, don't use it (until it leaves its beta state in the next months).
+
+In case you really want to use it now (it's always great to have beta-testers!), follow the steps below:
+
+# Have a quick look at [[Common Pitfalls]]
+# Create a backup of your current TiddlyWiki HTML file (just in case)
+# Open your TiddlyWiki in a browser 
+# Drag all the links below to the browser window containing your TiddlyWiki:
+#* [[$:/plugins/felixhayashi/tiddlymap]]
+#* [[$:/plugins/felixhayashi/vis]]
+#* [[$:/plugins/felixhayashi/topstoryview]]
+# Save your TiddlyWiki
+# Refresh the window
+# The plugin should now be available for use
+# Also make sure to always check back to this site to see whether your version is up-to-date as updates and bugfixes come quick! For any bug you discover, please create an issue at [[github.com|https://github.com/felixhayashi/TW5-TiddlyMap/issues]].
+
+By using this plugin you agree to the product's [[License Terms|$:/plugins/felixhayashi/tiddlymap/docs/license]] (don't worry, it's a [[BSD 2-Clause License|http://opensource.org/licenses/BSD-2-Clause]]).
+
+For more Information visit: http://tiddlywiki.com/#Plugins

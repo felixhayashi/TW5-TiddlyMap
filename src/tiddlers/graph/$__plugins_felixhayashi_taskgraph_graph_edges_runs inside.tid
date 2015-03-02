@@ -1,0 +1,13 @@
+created: 20141222214848358
+id: 8FCF3BC8-DB61-413F-9306-8C1A73A4A8EA
+modified: 20141222214846841
+title: $:/plugins/felixhayashi/tiddlymap/graph/edges/runs inside
+type: application/json
+
+[
+    {
+        "from": "34D082D0-9D63-4D61-A7E2-080E8E669241",
+        "to": "746FEF43-FCAD-4229-8601-50ACE50AE49B",
+        "id": "63DDBC79-8482-41BB-BFC8-26BB70C95225"
+    }
+]

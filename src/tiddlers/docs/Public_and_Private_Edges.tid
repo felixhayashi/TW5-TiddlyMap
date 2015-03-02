@@ -1,0 +1,26 @@
+created: 20150201132115819
+id: 04f1dd6d-79a9-4d6e-91be-b8322dd0d0be
+modified: 20150302115056882
+tags: documentation concept
+title: Public and Private Edges
+type: text/vnd.tiddlywiki
+
+TiddlyMap serves to use cases:
+
+!! Use Case 1 -- Global Linking
+
+''Purpose:'' Turning your wiki into a network of information
+
+TiddlyMap can be used to express the overall structure of your information contained in your wiki. On a top level, you want to show how each tiddler is related to all the other tiddlers in your wiki. With TiddlyMap, you may globally link your pieces of information in your wiki, thus creating a big holistic network of linked tiddlers. 
+
+Global linking is the default operating mode of TiddlyMap.
+
+!! Use Case 2 -- Private Linking
+
+''Purpose:'' To create (almost) isolated concept or mind maps
+
+When creating concept or mind maps, you may want to restrict the edges to be exclusively displayed in the current view. The edges then only describe relationships that are valid or meaningful in a very narrow context and are solely dedicated to a special topic. They should not be visible outside the view and on the other hand, no edges from outside should appear inside the view.
+
+In this case you need to enable the private edge mode in your view's configuration.
+
+See also: [[Dealing with interferences between graphs]].

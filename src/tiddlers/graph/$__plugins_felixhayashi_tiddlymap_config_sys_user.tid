@@ -1,0 +1,14 @@
+created: 20150202231339398
+modified: 20150204161707150
+tags: 
+title: $:/plugins/felixhayashi/tiddlymap/config/sys/user
+type: application/x-tiddler-dictionary
+
+field.nodeId: id
+field.nodeLabel: caption
+field.nodeIcon: icon
+field.nodeInfo: description
+field.viewMarker: isview
+debug: true
+notifications: true
+editNodeOnCreate: false

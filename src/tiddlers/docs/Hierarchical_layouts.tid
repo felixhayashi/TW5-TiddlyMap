@@ -1,0 +1,13 @@
+created: 20150102004828283
+id: 2bf771bb-ad95-4bb7-a88f-e4d086ea42c5
+modified: 20150227123829862
+tags: example
+title: Hierarchical layouts
+type: text/vnd.tiddlywiki
+
+You can configurate your view to display your nodes hierarchically based on certain edge types.
+
+<$tiddlymap view="Family Tree" height="300px"></$tiddlymap>
+
+Note that you ''cannot change the vertical positions'' of the nodes anymore. Also it is ''not possible to store positions''.
+

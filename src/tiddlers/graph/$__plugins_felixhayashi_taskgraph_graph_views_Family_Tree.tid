@@ -1,0 +1,9 @@
+config.layout.active: hierarchical
+config.layout.hierarchical.order-by-74c35b5e-0085-4468-8a87-511e47511272: true
+config.layout.hierarchical.order-by-d183ff6f-7e74-4c60-b692-3cbcf12f3116: true
+created: 20150102012423284
+id: 3b222bcd-c5c0-4087-846c-699b86d00076
+isview: true
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/Family Tree
+type: text/vnd.tiddlywiki
+

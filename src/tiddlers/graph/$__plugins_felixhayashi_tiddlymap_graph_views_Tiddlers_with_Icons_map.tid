@@ -1,0 +1,19 @@
+created: 20150112143311316
+modified: 20150112180556150
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/Tiddlers with Icons/map
+type: application/json
+
+{
+    "1bf11ba3-47bb-4606-946b-cad21b7496b0": {
+        "x": -156,
+        "y": -61
+    },
+    "122d6c4d-ee1b-4d0d-94ad-c91c1abf52ca": {
+        "x": 300,
+        "y": -59
+    },
+    "4fe33f8e-2a84-45dd-ab5c-4bfcf205e44e": {
+        "x": 44,
+        "y": 103
+    }
+}

@@ -1,0 +1,13 @@
+created: 20141219220404793
+id: E06E903C-A5CA-42EC-964D-2A6D0D3CEE8F
+modified: 20141219220403605
+title: $:/plugins/felixhayashi/tiddlymap/graph/edges/maybe also
+type: application/json
+
+[
+    {
+        "from": "7BEF6C80-B285-48B3-9736-F0845E612A4F",
+        "to": "E255F767-A447-46D7-865C-494C782FC034",
+        "id": "6A5795CA-2B17-4133-AB83-E63563935A7B"
+    }
+]

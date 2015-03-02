@@ -1,0 +1,21 @@
+created: 20150112140815454
+icon: $:/core/images/star-filled
+id: 4fe33f8e-2a84-45dd-ab5c-4bfcf205e44e
+modified: 20150227123842718
+tags: example
+title: Tiddler Icons as part of the graph
+type: text/vnd.tiddlywiki
+
+In TiddlyWiki you can assign icons to your tiddlers by referencing a *local* image in the tiddler's icon field. This icon appears next to the tiddler's title (just like the star you see next to this tiddler's title).
+
+Icons are also displayed in graphs. For example this view shows all tiddlers that have an icon field.
+
+<$tiddlymap view="Tiddlers with Icons" height="250px"></$tiddlymap>
+
+Node filter:
+
+```
+[has[icon]]
+```
+
+

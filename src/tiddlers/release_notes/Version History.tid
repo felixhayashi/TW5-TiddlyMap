@@ -1,0 +1,13 @@
+created: 20141217194700139
+id: BE07716E-E5AB-480A-B228-9E24357EBC88
+modified: 20150118210914891
+title: Version History
+type: text/vnd.tiddlywiki
+
+<$list filter="[tag[ReleaseNote]!sort[created]limit[1]]">
+  <$macrocall $name="tabs"
+                      tabsList="[tag[ReleaseNote]!sort[created]]"
+                      default={{!!title}}
+                      class="tc-vertical"
+                      template="ReleaseTemplate" />
+</$list>

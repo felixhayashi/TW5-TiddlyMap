@@ -370,7 +370,6 @@ module-type: library
                   ? this.wiki.renderText("text/plain", "text/vnd-tiddlywiki", label)
                   : tObj.fields.title);
 
-    
     // add tooltip
     
     var info = tObj.fields[this.opt.field.nodeInfo];

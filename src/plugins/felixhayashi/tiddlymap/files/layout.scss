@@ -12,7 +12,7 @@ html { // used to increase css importance
   
   .tmap-very-small-list {
     @extend .tmap-small-list;
-    max-height: 60px;
+    max-height: 70px;
   }
 
   .tmap-quick-connect {
@@ -34,6 +34,7 @@ html { // used to increase css importance
       
       table {
         border: none;
+        margin-bottom: 0px;
         
         td {
           padding: 3px;

@@ -10,7 +10,7 @@ html {
     max-height: 150px;
     display: block; }
   html .tmap-very-small-list {
-    max-height: 60px; }
+    max-height: 70px; }
   html .tmap-quick-connect {
     font-size: 0.7em; }
     html .tmap-quick-connect .tc-drop-down {
@@ -25,7 +25,8 @@ html {
         width: 80px;
         word-wrap: initial; }
       html .tmap-quick-connect .tc-drop-down table {
-        border: none; }
+        border: none;
+        margin-bottom: 0px; }
         html .tmap-quick-connect .tc-drop-down table td {
           padding: 3px;
           border: none;

@@ -50,10 +50,10 @@ module-type: startup
     
   };
   
-  exports.startup = function() {
-    
-    updateDataStructure();
-        
-  };
+  //~ exports.startup = function() {
+    //~ 
+    //~ updateDataStructure();
+        //~ 
+  //~ };
 
 })();

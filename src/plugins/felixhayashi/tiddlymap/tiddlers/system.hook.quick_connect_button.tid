@@ -15,12 +15,12 @@ description: Show available ~TiddlyMap actions
 
 <div class="tmap-quick-connect tc-reveal tc-popup">
   <div class="tc-drop-down">
-    <div>{{$:/core/images/import-button}} ''Add this node'': Drop  <$link to=<<currentTiddler>>>this link</$link> on a graph editor</div>
+    <div>{{$:/core/images/import-button}} ''Add tiddler to view'': Drop  <$link to=<<currentTiddler>>>this link</$link> on a graph editor</div>
     <hr />
-    <div>{{$:/core/images/close-others-button}} ''Link this node'' <sup>[1]</sup></div>
+    <div>{{$:/core/images/close-others-button}} ''Create connection'' <sup>[1]</sup></div>
     <table>
       <tr>
-        <td>Edge:</td>
+        <td>Type:</td>
         <td>
           <$edit-text tiddler="$:/temp/quickConnectSearch/type" field="text" type="text" tag="input" default="" />
           <$select tiddler="$:/temp/quickConnectSearch/type" default="">
@@ -68,8 +68,8 @@ description: Show available ~TiddlyMap actions
         </td>
       </tr>
     </table>
-    
-    <div>{{$:/core/images/delete-button}} ''Existing Connections'' <sup>[1]</sup></div>
+    <hr />
+    <div>''Existing Connections'' <sup>[1]</sup></div>
     <p>  
       <$connections>
         <div>

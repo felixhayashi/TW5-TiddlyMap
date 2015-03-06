@@ -18,6 +18,6 @@ Create a pull request on GitHub in which you add your name to the existing list 
 Remarks
 -------
 
-### When not owning the Copyright in the entire work of authorship
+**When not owning the copyright in the entire work of authorship**
 
 In this case, please clearly state so, since otherwise we assume that you are the legal copyright holder of the contributed work! Please provide links and additional information that clarify under which license the rest of the code is distributed.

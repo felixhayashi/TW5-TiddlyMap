@@ -12,7 +12,7 @@ Signing the CLA
 
 Create a pull request on GitHub in which you add your name to the existing list of contributors.
 
-* For individuals use, please sign [CLA-INDIVIDUAL](licenses/CLA-INDIVIDUAL.md)
+* For individuals, please sign [CLA-INDIVIDUAL](licenses/CLA-INDIVIDUAL.md)
 * Entities use [CLA-ENTITY](licenses/CLA-ENTITY.md)
 
 Remarks

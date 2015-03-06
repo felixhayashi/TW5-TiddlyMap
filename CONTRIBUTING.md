@@ -15,6 +15,8 @@ Create a pull request on GitHub in which you add your name to the existing list 
 * For individuals, please sign [CLA-INDIVIDUAL](licenses/CLA-INDIVIDUAL.md)
 * Entities use [CLA-ENTITY](licenses/CLA-ENTITY.md)
 
+The CLAs were generated via Harmony (HA-CLA-E-LIST) Version 1.0
+
 Remarks
 -------
 

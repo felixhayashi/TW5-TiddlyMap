@@ -10,7 +10,7 @@ This agreement is for your protection as well as the protection of TiddlyMap and
 Signing the CLA
 ---------------
 
-Create a pull request on GitHub in which you add your name to the existing list of contribors.
+Create a pull request on GitHub in which you add your name to the existing list of contributors.
 
 * For individuals use, please sign [CLA-INDIVIDUAL](licenses/CLA-INDIVIDUAL.md)
 * Entities use [CLA-ENTITY](licenses/CLA-ENTITY.md)

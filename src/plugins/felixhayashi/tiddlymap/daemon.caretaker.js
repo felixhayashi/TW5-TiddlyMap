@@ -94,12 +94,12 @@ var attachOptions = function(parent) {
 
   opt.config.sys = utils.merge(
     $tw.wiki.getTiddlerData(opt.ref.sysConf, {}),
-    utils.unflatten($tw.wiki.getTiddlerData(opt.ref.sysConf + "/user", {}))
+    utils.unflatten($tw.wiki.getTiddlerData(opt.ref.sysUserConf, {}))
   );
   
   opt.config.vis = utils.merge(
     $tw.wiki.getTiddlerData(opt.ref.visConf, {}),
-    utils.unflatten($tw.wiki.getTiddlerData(opt.ref.visConf + "/user", {}))
+    utils.unflatten($tw.wiki.getTiddlerData(opt.ref.visUserConf, {}))
   );
 
   // a shortcut for fields property

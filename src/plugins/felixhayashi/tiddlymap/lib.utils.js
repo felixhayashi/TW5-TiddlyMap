@@ -752,14 +752,15 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
   utils.merge = function(dest, src) {
     
     var _merge = function(dest, src) {
+      
       if(typeof dest !== "object") { dest = {}; }
       
       for(var p in src) {
         if(src.hasOwnProperty(p)) {
-          if(src[p] && typeof src[p] === "object") {
-            _merge(dest[p], src[p]);
-          } else {
-            dest[p] = src[p] // primitive type, stop recursion
+          if(src[p] != null) { // skip null or undefined
+            dest[p] = (typeof src[p] === "object"
+                       ? _merge(dest[p], src[p])
+                       : src[p]); // primitive type, stop recursion
           }
         }
       }

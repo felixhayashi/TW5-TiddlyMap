@@ -3,6 +3,7 @@ id: 04CCC27E-A88B-4CE2-93C8-914D8D65BD46
 modified: 20141223134704606
 tags: component
 title: Adapter
+tmap.edges: {"30A5C817-4F32-430E-A71A-7D71CDC765C3":{"to":"A9995A40-BAA5-4F26-9909-28C73FE097A1","type":"uses"},"25830E82-AECB-4FBF-8267-25D46372FAC3":{"to":"46F1FDF7-0517-44B8-8593-30DDA1DAE459","type":"uses"}}
 type: text/vnd.tiddlywiki
 
 This library provides all the functions to interact with the TW as if it was a simple database for nodes and edges. It may be understood as an abstraction layer.

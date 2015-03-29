@@ -1,14 +1,15 @@
-caption: Version 0.6.x
+caption: Version 0.6.9
 created: 20141218214017892
 id: 8AC0D41D-98D6-4DA5-8BE4-07703A89B58B
 modified: 20150227122644591
-released: not really
+released: 20150227122644591
 tags: ReleaseNote
-title: Version 0.6.x-prerelease
+title: Version 0.6.9
 type: text/vnd.tiddlywiki
 
 !! End user
 
+* When node is selected, "edit node" button is displayed in manipulation bar.
 * The caption field will be treated as wikitext and rendered as text/plain
 * One-click option to open tiddlers from the graph
 * added a "no buttons" widget attibute
@@ -48,6 +49,7 @@ type: text/vnd.tiddlywiki
 
 !! More technical
 
+* The //tmap-listener// startup module allows to trigger certain tmap events from everywhere
 * Tiddlers corresponding to newly created nodes now have created and modified fields
 * New uuid RFC4122, version 4 ID compliant generator (as suggested by @pmario)
 * Code docs are now published at the github repo via JSDoc
@@ -58,6 +60,7 @@ type: text/vnd.tiddlywiki
 
 !! Important Bugfixes
 
+* Manipulation bar is not reset after user manually deleted an edge in the editor. #74 
 * Fixed sidebar bug (graphs did not readjust anymore after fixing #35)
 * Dragging the manipulation bar doesn't produce an error anymore (https://github.com/almende/vis/issues/557)
 * Fixed remaining listener bug (https://github.com/almende/vis/issues/521)

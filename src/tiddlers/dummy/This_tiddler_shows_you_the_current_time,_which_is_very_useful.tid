@@ -5,6 +5,7 @@ id: a41e7681-dc8f-4923-ad34-3225d461114a
 modified: 20150227121739294
 tags: 
 title: This tiddler shows you the current time, which is very useful
+tmap.edges: {"287268ee-831a-47b0-9bbb-33eaae3f0ea4":{"to":"30e39689-af74-4182-99b2-33e1331d9f0f","type":"an example for"},"ce25a46c-c772-4f55-be61-179032451968":{"to":"ec5baa28-49ee-4e0c-a1ac-c1b83bd52fb0","type":"similar to"}}
 type: text/vnd.tiddlywiki
 
 <<now>>

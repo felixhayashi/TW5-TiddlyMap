@@ -4,6 +4,7 @@ modified: 20141225154614154
 released: 20141109
 tags: ReleaseNote
 title: Version 0.3.0
+tmap.edges: {"9203D5BA-290F-43FF-9EE9-CF143E6372BF":{"to":"EB8DBFAF-E1B1-4E91-A784-4CC2B34D9D40","type":"then"}}
 type: text/vnd.tiddlywiki
 
 # Enhance the filterbar

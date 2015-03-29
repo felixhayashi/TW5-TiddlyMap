@@ -4,6 +4,7 @@ id: 69427454-433F-4409-86A8-68BC54A7285F
 modified: 20150227123819190
 tags: example
 title: TaskManagementExample 2.0
+tmap.edges: {"250837f6-dec6-4dd1-8128-a0c6e0c3f7b4":{"to":"9d97c1e8-9458-44f9-97c5-82253da987c0","type":"is a"}}
 type: text/vnd.tiddlywiki
 
 You probably already know that TiddlyWiki is a great tool to organize yourself and your tasks. A classical example for quick and easy task management is shown here [[TaskManagementExample|http://tiddlywiki.com/#TaskManagementExample]]. With TiddlyMap, however, you can now specify the relations of your tasks and graphically represent everything as a graph by simply linking your tiddlers!

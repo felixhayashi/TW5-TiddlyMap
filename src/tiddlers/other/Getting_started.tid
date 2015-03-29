@@ -1,14 +1,19 @@
 created: 20141217161104178
 creator: @felixhayashi
 id: 63EA2EE9-F821-44F7-A706-E1F973F7C6E0
-modified: 20150302110707110
+modified: 20150327222813923
 modifier: @felixhayashi
 title: Getting started
+tmap.edges: {"30af4ba7-306f-4e68-9e32-d0342d64a717":{"to":"6159DA1A-73F2-451D-B55F-8744480BA7AC","type":"please read"},"95209609-d1c8-44a4-8f31-f5dbf6c85098":{"to":"a7e46ff2-2010-475f-a430-d757a7659798","type":"please read"},"e0958100-7790-4a61-ad98-a4eb30a9691d":{"to":"BE07716E-E5AB-480A-B228-9E24357EBC88","type":"please read"}}
 type: text/vnd.tiddlywiki
 
-|!Current TiddlyMap version |{{ version || plugin }} |
+|!Current ~TiddlyMap version |{{ version || plugin }} |
 |!Version's build date |{{ released || plugin }} |
 |!Compatible with TW5 |{{ core-version || plugin }} |
+
+---
+
+''WARNING:'' Version 0.7.x is a big step towards the initial release but still considered to be //highly experimental//. Please do not update your wiki yet, until this warning is removed or unless you want to help with the beta-testing :)
 
 ---
 

@@ -4,6 +4,7 @@ modified: 20141225154639709
 released: 20141107
 tags: ReleaseNote
 title: Version 0.2.0
+tmap.edges: {"FB94C642-C4FE-47B9-93DD-4B7398362DAC":{"to":"DDEBD365-03CF-4040-B542-63B2341D8340","type":"then"}}
 type: text/vnd.tiddlywiki
 
 # Mechanisms to create relationships between nodes (and tiddlers) 

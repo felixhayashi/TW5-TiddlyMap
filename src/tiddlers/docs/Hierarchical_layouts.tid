@@ -1,8 +1,8 @@
 created: 20150102004828283
 id: 2bf771bb-ad95-4bb7-a88f-e4d086ea42c5
-modified: 20150227123829862
-tags: example
+modified: 20150327215038435
 title: Hierarchical layouts
+tmap.edges: {"4d9b5c79-9c46-408a-862f-e4242b3158b0":{"to":"9d97c1e8-9458-44f9-97c5-82253da987c0","type":"is a"}}
 type: text/vnd.tiddlywiki
 
 You can configurate your view to display your nodes hierarchically based on certain edge types.

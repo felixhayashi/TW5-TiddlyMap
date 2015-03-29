@@ -3,6 +3,7 @@ id: 8FA9A14C-D58E-4257-ADDC-D01E834DD18C
 modified: 20150227123528822
 tags: example insight
 title: Edit Graphs from Tiddlers
+tmap.edges: {"34944601-27b4-4ae8-a053-713c8d6aebce":{"to":"9d97c1e8-9458-44f9-97c5-82253da987c0","type":"is a"}}
 type: text/vnd.tiddlywiki
 
 In rare cases, you want your graphs displayed in your tiddlers to possess an editor bar for direct manipulation (this is usually done in the main editor).

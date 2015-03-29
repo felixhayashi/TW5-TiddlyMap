@@ -31,6 +31,10 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.7.4
+
+* Changing the edge type id now works; fixes #80
+
 ### v0.7.2
 
 * User config is not merged correctly; fixes #79

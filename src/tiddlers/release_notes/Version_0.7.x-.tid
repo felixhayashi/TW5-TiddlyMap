@@ -10,6 +10,8 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.7.0
+
 * Neighbourhood size of Live view (or any other view) may be greater than 1; this resolves #40
 * Cloning of tiddlers is now supported
 * Internal Links may be displayed in the map; #58; #14
@@ -25,7 +27,16 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.7.2
+
+* User config is not merged correctly; fixes #79
+
+### v0.7.1
+
 * Datastructure update did not work; fixes #70
+
+### v0.7.0
+
 * Modal buttons match the topic; resolves #46
 * Fullscreen is broken for story river bug; fixes #69
 * Initial setup modal should only contain most important options; fixes #52

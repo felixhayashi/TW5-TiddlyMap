@@ -16,7 +16,7 @@ Major enhancements
 * Editor bar with less menus
 * The Edge Manager; resolves #48, #77, #4
 * When node is selected, "edit node" button is displayed in manipulation bar.
-* Datastructure-updater that transformes obsolete datastructures; 70
+* Datastructure-updater that transformes obsolete datastructures; #70
 * Improved datastructure; resolves #64
 * Adding existing tiddlers to a graph; resolves #75
 * Welcome dialog changed; resolves #52
@@ -25,6 +25,7 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+* Datastructure update did not work; fixes #70
 * Modal buttons match the topic; resolves #46
 * Fullscreen is broken for story river bug; fixes #69
 * Initial setup modal should only contain most important options; fixes #52

@@ -31,8 +31,7 @@ module-type: startup
 
   var moveEdges = function(path, view) {
       
-    var matches = utils.getMatches("[prefix[" + path + "/]]");
-    
+    var matches = utils.getByPrefix(path);
     for(var i = 0; i < matches.length; i++) {
       
       // create edge type
@@ -44,12 +43,9 @@ module-type: startup
 
       // move edges
       var edges = $tw.wiki.getTiddlerData(matches[i]);
-      for(var j = 0; j < edges.length; j++) {
-                
+      for(var j = 0; j < edges.length; j++) {        
         edges[j].type = (view ? view + ":" : "") + type.getId();
-        
         $tw.tmap.adapter.insertEdge(edges[j]);
-        
       }
     
       // finally remove the store
@@ -57,13 +53,15 @@ module-type: startup
       
     }
 
-    
   };
 
   exports.startup = function() {
     
     var meta = $tw.wiki.getTiddlerData($tw.tmap.opt.ref.sysMeta, {});
     var plugin = $tw.wiki.getTiddler($tw.tmap.opt.path.pluginRoot);
+    
+    $tw.tmap.logger("debug", "Fixer is started");
+    $tw.tmap.logger("debug", "Data-structure currently in use: ", meta.dataStructureState);
     
     if($tw.utils.checkVersions("0.6.11", meta.dataStructureState)) {
       
@@ -79,11 +77,10 @@ module-type: startup
         var view = new ViewAbstraction(viewRefs[i]);
         moveEdges(view.getRoot()+"/graph/edges", view);
       }
-    
+      
       // update meta
-      utils.merge(meta, { dataStructureState: "0.6.11" });
-      $tw.wiki.setTiddlerData($tw.tmap.opt.ref.sysMeta, meta);
-  
+      utils.setEntry($tw.tmap.opt.ref.sysMeta, "dataStructureState", "0.7.0" );
+       
     }
                   
   };

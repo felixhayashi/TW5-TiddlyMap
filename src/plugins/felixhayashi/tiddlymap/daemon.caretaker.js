@@ -359,7 +359,9 @@ var createMetaFile = function() {
     // the version originally installed
     originalVersion: plugin.fields.version,
     // the data structure in use corresponds to version x
-    dataStructureState: plugin.fields.version,
+    // if the structure is obsolete, it will be automatically
+    // fixed by the fixer module.
+    dataStructureState: "0.6.9",
     // whether or not to display a welcome message
     showWelcomeMessage: true
   });

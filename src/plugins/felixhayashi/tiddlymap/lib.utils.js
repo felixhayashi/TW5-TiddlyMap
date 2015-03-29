@@ -879,8 +879,18 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    */
   utils.deleteByPrefix = function(prefix) {
     
-    var matches = utils.getMatches("[prefix[" + prefix + "]]");
-    utils.deleteTiddlers(matches);
+    utils.deleteTiddlers(utils.getByPrefix(prefix));
+    
+  };
+  
+  /**
+   * Get all tiddlers with a given prefix.
+   * 
+   * @param {string} prefix - The prefix
+   */
+  utils.getByPrefix = function(prefix) {
+    
+    return utils.getMatches("[prefix[" + prefix + "]]");
     
   };
 

@@ -59,275 +59,397 @@ title: $:/plugins/felixhayashi/tiddlymap/caretaker.js
 type: application/javascript
 module-type: startup
 
-This module is responsible for registering a global namespace under $tw
-and loading (and refreshing) the configuration.
-
-Since changes in configuration tiddlers are instantly acknowledged,
-the user does not need to refresh its browser (in theory :)).
-
-Like a caretaker in real life, nobody can communicate with him. He does
-all his work in the background without being ever seen. What I want to
-say here is: do not require the caretaker!
-
 @preserve
 
 \*/
 
+/**
+ * 
+ * This module is responsible for registering a global namespace under $tw
+ * and loading (and refreshing) the configuration.
+ * 
+ * Since changes in configuration tiddlers are instantly acknowledged,
+ * the user does not need to refresh its browser.
+ * 
+ * Like a caretaker in real life, nobody can communicate with him. He does
+ * all his work in the background without being ever seen. What I want to
+ * say here is: do not require the caretaker!
+ * 
+ */ 
 (function(){
   
-  /*jslint node: true, browser: true */
-  /*global $tw: false */
-  "use strict";
-  
-  // Export name and synchronous status
-  exports.name = "tmap.caretaker";
-  exports.platforms = ["browser"];
-  exports.after = ["startup"];
-  exports.before = ["rootwidget"];
-  exports.synchronous = true;
-  
-  /**************************** IMPORTS ****************************/
-   
-  var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
-  var Adapter = require("$:/plugins/felixhayashi/tiddlymap/adapter.js").Adapter;
-  
-  /***************************** CODE ******************************/
+/*jslint node: true, browser: true */
+/*global $tw: false */
+"use strict";
 
-  
-  /**
-   * This function will append the global options to the tree. In case
-   * this function is called again, only the option leafs are rebuild
-   * so a process may safely store a reference to a branch of the option
-   * tree as the reference doesn't change.
-   *
-   * ATTENTION: For the path options, no trailing or double slashes!
-   * This is NOT unix where paths are normalized (// is not rewritten to /).
-   * 
-   * @see 
-   *   - [TW5] Is there a designated place for TW plugins to store stuff in the dom? 
-   *     https://groups.google.com/forum/#!topic/tiddlywikidev/MZZ37XiVcvY
-   * @param {object} parent The root where to insert the options into
-   */  
-  var attachOptions = function(parent) {
-                      
-    var opt = parent;
-    
-    // **ATTENTION: NO TRAILING SLASHES IN PATHS EVER**
-    if(!opt.path) opt.path = utils.getEmptyMap();
-    
-    // persistent plugin environment
-    opt.path.pluginRoot =   "$:/plugins/felixhayashi/tiddlymap";
-    opt.path.edges =        "$:/plugins/felixhayashi/tiddlymap/graph/edges";
-    opt.path.views =        "$:/plugins/felixhayashi/tiddlymap/graph/views";
-    opt.path.options =      "$:/plugins/felixhayashi/tiddlymap/config";
-    // temporary environment
-    opt.path.tempRoot =     "$:/temp/felixhayashi/tiddlymap";
-    opt.path.localHolders = "$:/temp/felixhayashi/tiddlymap/holders";
-    opt.path.dialogs =      "$:/plugins/felixhayashi/tiddlymap/dialog";
-    
-    // static references to important tiddlers
-    if(!opt.ref) opt.ref = utils.getEmptyMap();
-    
-    opt.ref.dialogStandardFooter =   "$:/plugins/felixhayashi/tiddlymap/dialog/standardFooter";
-    opt.ref.defaultGraphViewHolder = "$:/plugins/felixhayashi/tiddlymap/misc/defaultViewHolder";
-    opt.ref.graphBar =               "$:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar";
-    opt.ref.sysConf =                "$:/plugins/felixhayashi/tiddlymap/config/sys";
-    opt.ref.visConf =                "$:/plugins/felixhayashi/tiddlymap/config/vis";
-    opt.ref.welcomeFlag =            "$:/plugins/felixhayashi/tiddlymap/flag/welcome";
-    opt.ref.focusButton =            "$:/plugins/felixhayashi/tiddlymap/misc/focusButton";
-    
-    // default configurations mixed with user config
-    if(!opt.config) opt.config = utils.getEmptyMap();
-  
-    opt.config.sys = $tw.wiki.getTiddlerData(opt.ref.sysConf, {});
-    var data = utils.unflatten($tw.wiki.getTiddlerData(opt.ref.sysConf + "/user", {}));
-    opt.config.sys = $tw.utils.extendDeepCopy(opt.config.sys, data);
-    
-    opt.config.vis = $tw.wiki.getTiddlerData(opt.ref.visConf, {});
-    var data = utils.unflatten($tw.wiki.getTiddlerData(opt.ref.visConf + "/user", {}));
-    opt.config.vis = $tw.utils.extendDeepCopy(opt.config.vis, data);
+// Export name and synchronous status
+exports.name = "tmap.caretaker";
+exports.platforms = ["browser"];
+exports.after = ["startup"];
+exports.before = ["rootwidget"];
+exports.synchronous = true;
 
-    // a shortcut for fields property
-    if(!opt.field) opt.field = utils.getEmptyMap();
-    $tw.utils.extend(opt.field, opt.config.sys.field);
-        
-    // some other options
-    if(!opt.misc) opt.misc = utils.getEmptyMap();
-    
-    // if no edge label is specified, this is used as label
-    opt.misc.unknownEdgeLabel = "__noname__";
-    opt.misc.cssPrefix = "tmap-";
-    opt.misc.lockedViews = [ "default", "live", "search" ];
+/**************************** IMPORTS ****************************/
+ 
+var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
+var Adapter = require("$:/plugins/felixhayashi/tiddlymap/adapter.js").Adapter;
+var DialogManager = require("$:/plugins/felixhayashi/tiddlymap/dialog_manager.js").DialogManager;
+var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/callback_manager.js").CallbackManager;
 
-    // some popular filters (usually used from within tiddlers via map-macro)
-    if(!opt.filter) opt.filter = utils.getEmptyMap();
-    
-    opt.filter.allSharedEdges = "[prefix[" + opt.path.edges + "]]";
-    opt.filter.allSharedEdgesByLabel = "[prefix[" + opt.path.edges + "]removeprefix[" + opt.path.edges + "/]]";
-    opt.filter.allViews = "[all[tiddlers+shadows]has[" + opt.field.viewMarker + "]]";
-    opt.filter.allViewsByLabel = "[all[tiddlers+shadows]has[" + opt.field.viewMarker + "]removeprefix[" + opt.path.views + "/]]";    
-    
-  };
+/***************************** CODE ******************************/
+
+
+/**
+ * This function will append the global options to the tree. In case
+ * this function is called again, only the option leafs are rebuild
+ * so a process may safely store a reference to a branch of the option
+ * tree as the reference doesn't change.
+ *
+ * ATTENTION: For the path options, no trailing or double slashes!
+ * This is NOT unix where paths are normalized (// is not rewritten to /).
+ * 
+ * @see 
+ *   - [TW5] Is there a designated place for TW plugins to store stuff in the dom? 
+ *     https://groups.google.com/forum/#!topic/tiddlywikidev/MZZ37XiVcvY
+ * @param {object} parent The root where to insert the options into
+ */  
+var attachOptions = function(parent) {
+                    
+  var opt = parent;
   
-  /**
-   * This function attaches all the top level functions to the options to the 
-   */
-  var attachFunctions = function(parent) {
-    
-    var fn = parent;
-    
-    var nirvana = function() { /* /dev/null */ }; 
+  // **ATTENTION: NO TRAILING SLASHES IN PATHS EVER**
+  if(!opt.path) opt.path = utils.getDataMap();
+  
+  // persistent plugin environment
+  opt.path.pluginRoot =   "$:/plugins/felixhayashi/tiddlymap";
+  opt.path.edgeTypes =    "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes";
+  opt.path.views =        "$:/plugins/felixhayashi/tiddlymap/graph/views";
+  opt.path.options =      "$:/plugins/felixhayashi/tiddlymap/config";
+  // temporary environment
+  opt.path.tempRoot =     "$:/temp/felixhayashi/tiddlymap";
+  opt.path.localHolders = "$:/temp/felixhayashi/tiddlymap/holders";
+  opt.path.dialogs =      "$:/plugins/felixhayashi/tiddlymap/dialog";
+  opt.path.footers =      "$:/plugins/felixhayashi/tiddlymap/dialogFooter";
+  
+  // static references to important tiddlers
+  if(!opt.ref) opt.ref = utils.getDataMap();
+  
+  opt.ref.defaultGraphViewHolder = "$:/plugins/felixhayashi/tiddlymap/misc/defaultViewHolder";
+  opt.ref.graphBar =               "$:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar";
+  opt.ref.sysConf =                "$:/plugins/felixhayashi/tiddlymap/config/sys";
+  opt.ref.sysUserConf =            "$:/plugins/felixhayashi/tiddlymap/config/sys/user";
+  opt.ref.visConf =                "$:/plugins/felixhayashi/tiddlymap/config/vis";
+  opt.ref.visUserConf =            "$:/plugins/felixhayashi/tiddlymap/config/vis/user";
+  opt.ref.welcomeFlag =            "$:/plugins/felixhayashi/tiddlymap/flag/welcome";
+  opt.ref.focusButton =            "$:/plugins/felixhayashi/tiddlymap/misc/focusButton";
+  opt.ref.sysMeta =                "$:/plugins/felixhayashi/tiddlymap/misc/meta";
+  
+  // default configurations mixed with user config
+  if(!opt.config) opt.config = utils.getDataMap();
 
-    if($tw.tiddlymap.opt.config.sys.debug === "true" &amp;&amp; console) {
-    
-      // http://stackoverflow.com/questions/5538972/console-log-apply-not-working-in-ie9
-      // http://stackoverflow.com/questions/9521921/why-does-console-log-apply-throw-an-illegal-invocation-error
-      /**
-       * A logging mechanism that uses the first argument as type and
-       * passes all consequent arguments as console arguments. The
-       * reason for this functions existence is to be able to switch
-       * off the logging without redirecting every single console function
-       * such as log, debug, warn etc. Plus, we have more control over
-       * the logging.
-       */
-      fn.logger = function() {
-        if(arguments.length &lt; 2) return;
-        var args = Array.prototype.slice.call(arguments);
-        var arg1 = args.shift(args);
-        var type = (console.hasOwnProperty(arg1) ? arg1 : "debug");
-        console[type].apply(console, args);
-      };
+  opt.config.sys = utils.merge(
+    $tw.wiki.getTiddlerData(opt.ref.sysConf, {}),
+    utils.unflatten($tw.wiki.getTiddlerData(opt.ref.sysConf + "/user", {}))
+  );
+  
+  opt.config.vis = utils.merge(
+    $tw.wiki.getTiddlerData(opt.ref.visConf, {}),
+    utils.unflatten($tw.wiki.getTiddlerData(opt.ref.visConf + "/user", {}))
+  );
+
+  // a shortcut for fields property
+  if(!opt.field) opt.field = utils.getDataMap();
+  $tw.utils.extend(opt.field, opt.config.sys.field);
       
-    } else { fn.logger = nirvana }
-
-    fn.notify = ($tw.tiddlymap.opt.config.sys.notifications === "true" ? utils.notify : nirvana);
-    
-    return fn;
-    
-  };
+  // some other options
+  if(!opt.misc) opt.misc = utils.getDataMap();
   
-  var getChangeFilter = function() {
-    
-    var filter = (function() {
-      var filterComponents = [];
-      filterComponents.push("prefix[" + $tw.tiddlymap.opt.path.options + "]");
-      filterComponents.push("!has[draft.of]");
-      return "[" + filterComponents.join('') + "]";
-    }).call(this);
-    
-    $tw.tiddlymap.logger("log", "Caretaker's filter: \"" + filter + "\"");
-    
-    return $tw.wiki.compileFilter(filter);
+  // if no edge label is specified, this is used as label
+  opt.misc.unknownEdgeLabel = "tmap:undefined";
+  opt.misc.cssPrefix = "tmap-";
+  opt.misc.sysEdgeTypeNS = "tmap";
 
-  };
+  // some popular filters
+  if(!opt.filter) opt.filter = utils.getDataMap();
+  
+  opt.filter.edgeTypes = "[prefix[" + opt.path.edgeTypes + "]]";  
+  opt.filter.views = "[has[" + opt.field.viewMarker + "]]";
+  opt.filter.defaultEdgeFilter = opt.filter.edgeTypes
+                                 + "-[suffix[tmap:link]]";
+  
+  // some popular selectors (usually used from within tiddlers via map-macro)
+  if(!opt.selector) opt.selector = utils.getDataMap();
+  
+  var allSelector = "[all[tiddlers+shadows]!has[draft.of]]";
+  opt.selector.allEdgeTypes = allSelector + " +" + opt.filter.edgeTypes;
+  opt.selector.allEdgeTypesByLabel = opt.selector.allEdgeTypes + " +[removeprefix[" + opt.path.edgeTypes + "/]]";
+  opt.selector.allViews = allSelector + " +" + opt.filter.views;
+  opt.selector.allViewsByLabel = opt.selector.allViews + "+[removeprefix[" + opt.path.views + "/]]";
+  opt.selector.allPotentialNodes = "[all[tiddlers]!is[system]!has[draft.of]]";
+  
+};
 
-  /**
-   * This periodic check is needed to trigger a cleanup if a graph is
-   * removed since a graph itself cannot react to its destruction.
-   * This includes removing listeners that were not attached to the
-   * local container or calling the vis destructor.
-   */
-  var routineCheck = function() {
+var attachIndeces = function(parent) {
+  
+  $tw.tmap.start("Attaching Indeces");
+  
+  if(!parent.indeces) {
+    parent.indeces = {
+      tById: utils.getDataMap(),
+      idByT: utils.getDataMap()
+    };
+  }
+  
+  var allTiddlers = $tw.wiki.allTitles();
+  for(var i = 0; i &lt; allTiddlers.length; i++) {
+    var tRef = allTiddlers[i];
+    var tObj = $tw.wiki.getTiddler(tRef);
+    if(!utils.isSystemOrDraft(tObj)) {
+      var id = tObj.fields[$tw.tmap.opt.field.nodeId];
+      if(!id) {
+        id = utils.genUUID();
+        utils.setField(tObj, $tw.tmap.opt.field.nodeId, id);
+      }
+      
+      parent.indeces.tById[id] = tRef;
+      parent.indeces.idByT[tRef] = id;
+    }
+  }
+  
+  $tw.tmap.stop("Attaching Indeces");
+  
+};
+
+/**
+ * This function attaches all the top level functions to the
+ * tiddlymap namespace.
+ * 
+ * @param {Hashmap} parent - The parent object to attach the options to.
+ */
+var attachFunctions = function(parent) {
+  
+  var fn = parent;
+  
+  var nirvana = function() { /* /dev/null */ }; 
+
+  if($tw.tmap.opt.config.sys.debug === "true" &amp;&amp; console) {
+  
+    /**
+     * A logging mechanism that uses the first argument as type and
+     * passes all consequent arguments as console arguments. The
+     * reason for this functions existence is to be able to switch
+     * off the logging without redirecting every single console function
+     * such as log, debug, warn etc. Plus, we have more control over
+     * the logging.
+     * 
+     * @see http://stackoverflow.com/questions/5538972/console-log-apply-not-working-in-ie9
+     * @see http://stackoverflow.com/questions/9521921/why-does-console-log-apply-throw-an-illegal-invocation-error
+     */
+    fn.logger = function() {
+      if(arguments.length &lt; 2) return;
+      var args = Array.prototype.slice.call(arguments);
+      var arg1 = args.shift(args);
+      var type = (console.hasOwnProperty(arg1) ? arg1 : "debug");
+      console[type].apply(console, args);
+    };
     
-    for(var i = ($tw.tiddlymap.registry.length-1); i >= 0; i--) {
-      var graph = $tw.tiddlymap.registry[i];
-      if(!document.body.contains(graph.getContainer())) { // removed
-        $tw.tiddlymap.logger("warn", "A graph has been removed.");
-        graph.destruct();
-        $tw.tiddlymap.registry.splice(i, 1);
+    fn.start = function(timerName) {
+      console.time("timer: " + timerName);
+    };
+    
+    fn.stop = function(timerName) {
+      console.timeEnd("timer: " + timerName);
+    };
+    
+  } else {
+    
+    fn.logger = nirvana
+    fn.start = nirvana;
+    fn.stop = nirvana;
+    
+  }
+
+  fn.notify = ($tw.tmap.opt.config.sys.notifications === "true" ? utils.notify : nirvana);
+  
+};
+
+/**
+ * This periodic check is needed to trigger a cleanup if a graph is
+ * removed since a graph itself cannot react to its destruction.
+ * This includes removing listeners that were not attached to the
+ * local container or calling the vis destructor.
+ */
+var routineCheck = function() {
+  
+  for(var i = ($tw.tmap.registry.length-1); i >= 0; i--) {
+    var graph = $tw.tmap.registry[i];
+    if(!document.body.contains(graph.getContainer())) { // removed
+      $tw.tmap.logger("warn", "A graph has been removed.");
+      graph.destruct();
+      $tw.tmap.registry.splice(i, 1);
+    }
+  }
+  
+};
+
+
+var checkForDublicates = function(tObj, idField, id, dialogManager) {
+
+  var opt = $tw.tmap.opt;
+  var dublicates = utils.getTiddlersWithField(idField, id, { limit: 2 });
+  delete dublicates[tObj.fields.title];
+  
+  var dublicate = Object.keys(dublicates)[0];
+  
+  if(dublicate) {
+    
+    var vars = {
+      param: {
+        changedTiddler: tObj.fields.title,
+        existingTiddler: dublicate,
+        idField: idField,
+        id: id
+      },
+      dialog: {
+        buttons: "ok_suppress"
       }
     }
     
-  };
+    if(!utils.isTrue(opt.config.sys.suppressedDialogs["dublicateIdInfo"], false)) {
+      dialogManager.open("dublicateIdInfo", vars);
+    }
+  }
+  
+  return dublicate;
+  
+};
 
-  exports.startup = function() {
+/**
+ * Builds and registers globals and the functions that depend on them.
+ */
+var rebuildGlobals = function(parent) {
+  
+  if(!parent) parent = $tw.tmap;
+  if(!parent.opt) parent.opt = utils.getDataMap();
+  
+  attachOptions(parent.opt);
+  attachFunctions(parent, parent.opt);
+  
+  // attention: logger() cannot be called before functions are rebuild
+  $tw.tmap.logger("warn", "Rebuilt globals");
+  
+};
+
+var registerChangeListener = function() {
+  
+  var callbackManager = new CallbackManager();
+  var dialogManager = new DialogManager(callbackManager);
+  
+  var filter = $tw.wiki.compileFilter(
+    "[prefix[" + $tw.tmap.opt.path.options + "]!has[draft.of]]"
+  );
+  
+  $tw.wiki.addEventListener("change", function(changedTiddlers) {
     
-    // create namespaces
-    $tw.tiddlymap = utils.getEmptyMap();
+    $tw.tmap.start("Caretaker handling changes");
     
-    // all graphs need to register here.
-    // @see routineWalk()
-    $tw.tiddlymap.registry = [];
-    window.setInterval(routineCheck, 1000);
+    callbackManager.handleChanges(changedTiddlers);
+  
+    $tw.tmap.logger("warn", "These tiddlers changed:", changedTiddlers);
     
-    // build and integrate global options
-    $tw.tiddlymap.opt = utils.getEmptyMap();
-    attachOptions($tw.tiddlymap.opt);
+    // check for changed globals
+    var hasChangedGlobals = utils.getMatches(filter, Object.keys(changedTiddlers)).length;
+    if(hasChangedGlobals) {
+      rebuildGlobals();
+    }
     
-    // build and integrate functions that depend on the options
-    attachFunctions($tw.tiddlymap, $tw.tiddlymap.opt);
-        
-    // attach the adapter
-    $tw.tiddlymap.adapter = new Adapter();
-    
-    $tw.tiddlymap.logger("warn", "TiddlyMap's caretaker was started");
-    $tw.tiddlymap.logger("log", "Registered namespace and options");
-    
-    // Create an array to insert edge changes.
-    //
-    // This may need a more thoroughly explanation:
-    // Tiddler changes are propagated to each graph via the refresh
-    // mechanism. Thus, a graph may update its nodes by checking during
-    // widget.refresh() if a node got added, updated or removed.
-    // However, because edges do not correspond to tiddlers, a graph
-    // can only be aware of edgestore changes during refresh. However,
-    // calculating the delta between an edgestore's former and current
-    // state to reflect the changes in the graph is way too cumbersome.
-    // therefore, each adapter.insertEdge() operation registers any change
-    // at this global object. Once a graphs refresh() sees an edgestore
-    // has changed, it looks here to trace the latest changes.
-    //
-    // Each registered change is an object has two properties
-    // 1) "type" which is either "insert", "update" or "delete"
-    // 2) "edge" which is a copy of the edge object this update is concerned with
-    //
-    $tw.tiddlymap.edgeChanges = [];
-    
-    var filter = getChangeFilter();
-    
-    // hook to allow adding an edge via quick connect
-    $tw.rootWidget.addEventListener("tm-create-edge", function(event) {
+    for(var tRef in changedTiddlers) {
       
-      var edge = {
-        from: $tw.tiddlymap.adapter.createNode(event.paramObject.from).id,
-        to: $tw.tiddlymap.adapter.createNode(event.paramObject.to).id,
-        label: event.paramObject.label
+      if(utils.isSystemOrDraft(tRef)) continue;
+      
+      var tObj = utils.getTiddler(tRef);
+      
+      if(tObj) {
+        var idField = $tw.tmap.opt.field.nodeId;
+        var id = tObj.fields[idField];
+        
+        if(id) {
+          var hasDublicates = checkForDublicates(tObj, idField, id, dialogManager);
+        
+          if(hasDublicates) {
+            // remove any defined edges
+            utils.setField(tObj, $tw.tmap.opt.field.edges, undefined);
+            // override id
+            $tw.tmap.adapter.assignId(tObj, true);
+          }
+          
+        } else {
+          // assign id if it doesn't exist
+          $tw.tmap.adapter.assignId(tObj);
+        }
+        
+      } else { // deleted
+        
+        // remove node; any edges pointing in/out; update indeces
+        // CAREFUL about recursion!
+        $tw.tmap.adapter.deleteNode($tw.tmap.indeces.idByT[tRef]);
+        
       }
-      
-      $tw.tiddlymap.adapter.insertEdge(edge);
-      $tw.tiddlymap.notify("Edge inserted");
-      
-    });
+    }
     
-    //~ // hook to allow adding an edge via quick connect
-    //~ $tw.rootWidget.addEventListener("tm-register-click-listeners", function(event) {
-      //~ 
-      //~ event.paramObject.ref
-        //~ to: $tw.tiddlymap.adapter.createNode(event.paramObject.to).id,
-        //~ label: event.paramObject.label
-      //~ }
-      //~ 
-      //~ $tw.tiddlymap.adapter.insertEdge(edge);
-      //~ $tw.tiddlymap.notify("Edge inserted");
-      //~ 
-    //~ });
+    $tw.tmap.stop("Caretaker handling changes");
     
-    $tw.wiki.addEventListener("change", function(changedTiddlers) {
+  });
+  
+};
+
+var createMetaFile = function() {
+
+  if(utils.tiddlerExists($tw.tmap.opt.ref.sysMeta)) return;
+  
+  $tw.tmap.logger("warn", "Creating meta file");
+  
+  var plugin = $tw.wiki.getTiddler($tw.tmap.opt.path.pluginRoot);
+  $tw.wiki.setTiddlerData($tw.tmap.opt.ref.sysMeta, {
+    // the version originally installed
+    originalVersion: plugin.fields.version,
+    // the data structure in use corresponds to version x
+    dataStructureState: plugin.fields.version,
+    // whether or not to display a welcome message
+    showWelcomeMessage: true
+  });
+  
+};
+
+exports.startup = function() {
+  
+  // create namespaces
+  $tw.tmap = utils.getDataMap();
+  $tw.tmap.utils = utils;
+  
+  // all graphs need to register here. @see routineWalk()
+  $tw.tmap.registry = [];
+  window.setInterval(routineCheck, 1000);
+  
+  // build and integrate global options   
+  rebuildGlobals($tw.tmap);
+  
+  // create indeces
+  attachIndeces($tw.tmap);
       
-      $tw.tiddlymap.logger("warn", "These tiddlers changed:", changedTiddlers);
+  // attach the adapter object to the tiddlymap namespace
+  $tw.tmap.adapter = new Adapter();
       
-      var matches = utils.getMatches(filter, Object.keys(changedTiddlers));
-      if(!matches.length) return;
+  // register meta file (if not done yet)
+  createMetaFile();
       
-      $tw.tiddlymap.logger("warn", "Global options will be rebuild");
-      
-      // rebuild
-      attachOptions($tw.tiddlymap.opt);      
-      attachFunctions($tw.tiddlymap);
-      
-    });
-        
-  };
+  // finally register change listener
+  registerChangeListener();
+  
+  // issue notification
+  $tw.tmap.logger("warn", "TiddlyMap's caretaker successfully started");
+                
+};
 
 })();
 </pre>
@@ -351,7 +473,7 @@ say here is: do not require the caretaker!
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha11</a>
-		on 2015-03-02T18:01:53+01:00 using the <a
+		on 2015-03-29T01:20:45+01:00 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

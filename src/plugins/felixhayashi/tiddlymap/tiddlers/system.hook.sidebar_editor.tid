@@ -7,4 +7,5 @@ title: $:/plugins/felixhayashi/tiddlymap/hook/editor
   object-id="main_editor"
   click-to-use="false"
   width="calc(100% - 15px)"
-  bottom-spacing="15px"></$tiddlymap>
+  bottom-spacing="35px">
+</$tiddlymap>

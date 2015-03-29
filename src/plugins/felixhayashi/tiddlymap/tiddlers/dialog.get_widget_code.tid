@@ -41,7 +41,7 @@ view="<<param.view>>"
 
 If you are unsure about a parameter, just leave everything as is and simply copy the widget code displayed above.
 
-<fieldset class="tmap-options">
+<fieldset>
   <legend>Parameters</legend> 
   <table>
       <<tmap-row type:"input-text" title:"Height" field:"var.height"

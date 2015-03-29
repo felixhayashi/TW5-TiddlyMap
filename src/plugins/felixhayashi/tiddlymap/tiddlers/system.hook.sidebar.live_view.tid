@@ -14,11 +14,12 @@ title: $:/plugins/felixhayashi/tiddlymap/hook/liveView
 <$reveal type="match" state="$:/view" text="top" default="">
   <$tiddlymap
     object-id="live_view"
-    view="live"
+    view="Live View"
     refresh-trigger="$:/temp/focussedTiddler"
     click-to-use="false"
     width="calc(100% - 15px)"
-    bottom-spacing="15px"></$tiddlymap>
+    bottom-spacing="35px">
+  </$tiddlymap>
 </$reveal>
   
 

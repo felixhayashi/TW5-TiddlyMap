@@ -25,35 +25,67 @@ module-type: startup
   var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
   var Adapter = require("$:/plugins/felixhayashi/tiddlymap/adapter.js").Adapter;
   var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/view_abstraction.js").ViewAbstraction;
+  var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/edgetype.js").EdgeType;
   
   /***************************** CODE ******************************/
 
-  var updateDataStructure = function() {
+  var moveEdges = function(path, view) {
+      
+    var matches = utils.getMatches("[prefix[" + path + "/]]");
     
-    var moveEdges = function(path) {
-      //~ utils.getMatches("[prefix[path]/");
-      //~ $tw.wiki.getTiddlerData(
-    };
-    
-    // move default edges
-    moveEdges($tw.tiddlymap.opt.path.edges);
-    
-    // move view-edges
-    var filter = $tw.tiddlymap.opt.filter.allViews;
-    var viewRefs = utils.getMatches(filter);
-    for(var i = 0; i < viewRefs.length; i++) {
-      var view = new ViewAbstraction(viewRefs[i]);
-      if(view.isConfEnabled("private_edge_mode")) {
-        moveEdges(view.getEdgeStoreLocation());
+    for(var i = 0; i < matches.length; i++) {
+      
+      // create edge type
+      var type = utils.getBasename(matches[i]);
+      if(type === "__noname__") { type = "tmap:unknown"; }
+      type = new EdgeType(type);
+      
+      if(!type.exists()) type.persist();
+
+      // move edges
+      var edges = $tw.wiki.getTiddlerData(matches[i]);
+      for(var j = 0; j < edges.length; j++) {
+                
+        edges[j].type = (view ? view + ":" : "") + type.getId();
+        
+        $tw.tmap.adapter.insertEdge(edges[j]);
+        
       }
+    
+      // finally remove the store
+      $tw.wiki.deleteTiddler(matches[i]);
+      
     }
+
     
   };
+
+  exports.startup = function() {
+    
+    var meta = $tw.wiki.getTiddlerData($tw.tmap.opt.ref.sysMeta, {});
+    var plugin = $tw.wiki.getTiddler($tw.tmap.opt.path.pluginRoot);
+    
+    if($tw.utils.checkVersions("0.6.11", meta.dataStructureState)) {
+      
+      $tw.tmap.logger("debug", "Updating data structure from version", meta.dataStructureState);
+      
+      // move edges that were formerly "global"
+      moveEdges("$:/plugins/felixhayashi/tiddlymap/graph/edges", null);
+      
+      // move edges that were formerly bound to view ("private")
+      var filter = $tw.tmap.opt.selector.allViews;
+      var viewRefs = utils.getMatches(filter);
+      for(var i = 0; i < viewRefs.length; i++) {
+        var view = new ViewAbstraction(viewRefs[i]);
+        moveEdges(view.getRoot()+"/graph/edges", view);
+      }
+    
+      // update meta
+      utils.merge(meta, { dataStructureState: "0.6.11" });
+      $tw.wiki.setTiddlerData($tw.tmap.opt.ref.sysMeta, meta);
   
-  //~ exports.startup = function() {
-    //~ 
-    //~ updateDataStructure();
-        //~ 
-  //~ };
+    }
+                  
+  };
 
 })();

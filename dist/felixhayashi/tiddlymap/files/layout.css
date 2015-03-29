@@ -4,6 +4,11 @@ html {
     background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/tiddlymap/media/surface.png!!type}} text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}}/>'));
   }
   */ }
+  html .tmap-link {
+    color: #5778D8; }
+    html .tmap-link:hover {
+      color: white;
+      background: #5778D8; }
   html .tmap-small-list, html .tmap-very-small-list {
     overflow: auto;
     min-height: 20px;
@@ -62,44 +67,77 @@ html {
           fill: #ffffff; }
   html .tc-modal-wrapper {
     z-index: 1010; }
-    html .tc-modal-wrapper .tc-modal-header {
-      padding-top: 0px;
-      padding-bottom: 0px; }
-      html .tc-modal-wrapper .tc-modal-header svg {
-        vertical-align: sub; }
-      html .tc-modal-wrapper .tc-modal-header h3 {
-        line-height: 10px; }
+    html .tc-modal-wrapper .tc-modal-header svg {
+      vertical-align: sub; }
+    html .tc-modal-wrapper .tc-modal-header h3 {
+      line-height: 10px; }
     html .tc-modal-wrapper .tc-modal-body {
+      min-height: 250px;
       max-height: 70vh;
       overflow: auto; }
+      html .tc-modal-wrapper .tc-modal-body > div > p:first-child {
+        margin-top: 0px; }
+      html .tc-modal-wrapper .tc-modal-body > div > p:last-child {
+        margin-bottom: 0px; }
       html .tc-modal-wrapper .tc-modal-body .tc-image-button {
         font-size: 14px; }
+      html .tc-modal-wrapper .tc-modal-body #edge-type-manager .tc-tab-buttons {
+        padding-top: 0px; }
+      html .tc-modal-wrapper .tc-modal-body #edge-type-manager > div:first-child {
+        height: 100%;
+        float: left;
+        width: 20%;
+        position: fixed; }
+        html .tc-modal-wrapper .tc-modal-body #edge-type-manager > div:first-child .searchbar input {
+          width: 100%; }
+        html .tc-modal-wrapper .tc-modal-body #edge-type-manager > div:first-child ul {
+          height: calc(100% - 135px);
+          overflow: auto;
+          margin: 5px 0 0 0;
+          padding-left: 0px;
+          list-style: none; }
+          html .tc-modal-wrapper .tc-modal-body #edge-type-manager > div:first-child ul li {
+            white-space: nowrap; }
+      html .tc-modal-wrapper .tc-modal-body #edge-type-manager > div:last-child {
+        height: 100%;
+        width: calc(80% - 20px);
+        margin-left: 22%; }
       html .tc-modal-wrapper .tc-modal-body fieldset legend {
         font-weight: bold; }
-      html .tc-modal-wrapper .tc-modal-body fieldset table {
+      html .tc-modal-wrapper .tc-modal-body table {
         margin: 6px 0;
         clear: both;
-        border: none; }
-        html .tc-modal-wrapper .tc-modal-body fieldset table tr td {
+        border: none;
+        width: 100%; }
+        html .tc-modal-wrapper .tc-modal-body table tr:nth-child(odd) {
+          background-color: #E8E8E8; }
+        html .tc-modal-wrapper .tc-modal-body table tr:nth-child(even) {
+          background-color: #FFFFFF; }
+        html .tc-modal-wrapper .tc-modal-body table tr:hover {
+          background-color: #FFFFF3; }
+        html .tc-modal-wrapper .tc-modal-body table tr td {
           border: none;
           vertical-align: top;
-          min-width: 140px;
           padding: 3px 15px 3px 0; }
-          html .tc-modal-wrapper .tc-modal-body fieldset table tr td:last-child {
-            padding-right: 0px; }
-          html .tc-modal-wrapper .tc-modal-body fieldset table tr td input {
-            width: 140px; }
-        html .tc-modal-wrapper .tc-modal-body fieldset table tr .tmap-note {
+          html .tc-modal-wrapper .tc-modal-body table tr td:first-child {
+            width: 15%; }
+          html .tc-modal-wrapper .tc-modal-body table tr td:last-child {
+            padding-right: 0px;
+            width: 35%; }
+          html .tc-modal-wrapper .tc-modal-body table tr td input, html .tc-modal-wrapper .tc-modal-body table tr td textarea, html .tc-modal-wrapper .tc-modal-body table tr td select {
+            width: 100%; }
+        html .tc-modal-wrapper .tc-modal-body table tr .tmap-note {
           margin: 10px 10px 10px 0; }
-        html .tc-modal-wrapper .tc-modal-body fieldset table tr .tmap-description {
+        html .tc-modal-wrapper .tc-modal-body table tr .tmap-description {
           font-style: italic; }
-      html .tc-modal-wrapper .tc-modal-body fieldset ul {
-        padding-left: 30px; }
-        html .tc-modal-wrapper .tc-modal-body fieldset ul li {
-          list-style: none; }
-    html .tc-modal-wrapper .tc-modal-footer {
-      padding-top: 0px;
-      padding-bottom: 0px; }
+        html .tc-modal-wrapper .tc-modal-body table ul {
+          padding-left: 30px; }
+          html .tc-modal-wrapper .tc-modal-body table ul li {
+            list-style: none; }
+    html .tc-modal-wrapper .tc-modal-footer, html .tc-modal-wrapper .tc-modal-header {
+      padding: 8px; }
+      html .tc-modal-wrapper .tc-modal-footer p, html .tc-modal-wrapper .tc-modal-header p {
+        margin: 0; }
   html #tmap-node-filter-dialog #tmap-filter-tips {
     font-size: 0.8em; }
   html #tmap-node-filter-dialog textarea {
@@ -167,7 +205,7 @@ html {
       height: 26px; }
     html .tmap-widget .network-manipulationDiv {
       border-top: #d6d9d8;
-      background: #E6E6E6;
+      background: rgba(245, 245, 245, 0.7);
       padding: 3px 0;
       height: 35px; }
     html .tmap-widget .tmap-topbar {
@@ -332,8 +370,3 @@ html:-ms-fullscreen .tmap-has-fullscreen-child {
     z-index: 999 !important;
     border: none !important;
     margin: 0 !important; }
-
-fieldset.tmap-options dt, fieldset.tmap-options dd {
-  margin-bottom: 15px; }
-fieldset.tmap-options input {
-  font-weight: normal; }

@@ -3,6 +3,15 @@ $default-input-width: 140px;
 
 html { // used to increase css importance
 
+  .tmap-link { // for buttons and links
+    color: #5778D8;
+    
+    &:hover {
+      color: white;
+      background: #5778D8;
+    }
+  }
+
   .tmap-small-list {
     overflow: auto;
     min-height: 20px;
@@ -91,9 +100,7 @@ html { // used to increase css importance
     z-index: 1010; // fix this in core?
 
     .tc-modal-header {
-      padding-top: 0px;
-      padding-bottom: 0px;
-      
+          
       svg {
         vertical-align: sub;
       }
@@ -105,11 +112,65 @@ html { // used to increase css importance
     }
     
     .tc-modal-body { // add this to tw
+      min-height: 250px;
       max-height: 70vh;
       overflow: auto;
       
+      > div {
+        >p:first-child {
+          margin-top: 0px;
+        }
+        >p:last-child {
+          margin-bottom: 0px;
+        }
+      }
+                        
       .tc-image-button {
         font-size: 14px;
+      }
+      
+      #edge-type-manager {
+      
+        .tc-tab-buttons {
+          padding-top: 0px;
+        }
+              
+        >div:first-child {
+          height: 100%;
+          float: left;
+          width: 20%;
+          position: fixed;
+          
+          .searchbar {
+            input {
+              width: 100%;
+            }
+          }
+
+          ul {
+            height: calc(100% - 135px);
+            overflow: auto;
+            margin: 5px 0 0 0;
+            padding-left: 0px;
+            list-style: none;
+            
+            
+            li {
+              white-space: nowrap;
+            }
+          }
+
+        }
+        >div:last-child {
+          height: 100%;
+          width: calc(80% - 20px);
+          margin-left: 22%;
+          
+          .tc-reveal {
+
+          }
+        }
+          
       }
       
       fieldset {
@@ -117,38 +178,55 @@ html { // used to increase css importance
         legend {
           font-weight: bold;
         }
+      
+      }
         
-        table {
-          margin: 6px 0;
-          clear: both;
-          border: none;
-          
-          tr {
-            td {
-              border: none;
-              vertical-align: top;
-              min-width: 140px;
-              padding: 3px 15px 3px 0;
-              
-              &:last-child {
-                padding-right: 0px; 
-              }
-              
-              input {
-                width: $default-input-width;
-              }
-            }
-
-            .tmap-note {
-              margin: 10px 10px 10px 0;
+      table {
+        margin: 6px 0;
+        clear: both;
+        border: none;
+        width: 100%;
+        
+        tr {
+                
+          &:nth-child(odd) {
+            background-color: #E8E8E8;
+          }
+          &:nth-child(even) {
+            background-color: #FFFFFF;
+          }
+          &:hover {
+            background-color: #FFFFF3;
+          }
+        
+          td {
+            border: none;
+            vertical-align: top;
+            padding: 3px 15px 3px 0;
+            
+            &:first-child {
+              width: 15%;
             }
             
-            .tmap-description {
-              font-style: italic;
+            &:last-child {
+              padding-right: 0px;
+              width: 35%;
+            }
+            
+            input, textarea, select {
+              width: 100%;
             }
           }
-                
+
+          .tmap-note {
+            margin: 10px 10px 10px 0;
+          }
+          
+          .tmap-description {
+            font-style: italic;
+          }
         }
+                
         
         ul {
           
@@ -162,9 +240,12 @@ html { // used to increase css importance
       }
     }
 
-    .tc-modal-footer {
-      padding-top: 0px;
-      padding-bottom: 0px;
+    .tc-modal-footer, .tc-modal-header {
+      padding: 8px;
+      
+      p {
+        margin: 0;
+      }
     }
   }
 
@@ -283,7 +364,7 @@ html { // used to increase css importance
     
     .network-manipulationDiv {
       border-top: #d6d9d8;
-      background: #E6E6E6;
+      background: rgba(245, 245, 245, 0.7);
       padding: 3px 0;
       height: 35px;
     }
@@ -438,12 +519,3 @@ html:fullscreen { @include fullscreen(); }
 html:-moz-full-screen { @include fullscreen(); }
 html:-webkit-full-screen { @include fullscreen(); }
 html:-ms-fullscreen { @include fullscreen(); }
-
-fieldset.tmap-options {
-  dt, dd {
-    margin-bottom: 15px;
-  }
-  input {
-    font-weight: normal;
-  }
-}

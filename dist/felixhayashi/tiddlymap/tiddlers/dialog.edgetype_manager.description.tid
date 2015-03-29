@@ -1,0 +1,7 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager/description
+caption: Description
+
+<table>
+  <<tmap-row title:"Description" field:"description" type:"input-textarea"
+             descr:"An optional description for this edge-type.">>
+</table>

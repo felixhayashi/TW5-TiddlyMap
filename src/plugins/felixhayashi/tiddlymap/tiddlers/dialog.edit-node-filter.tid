@@ -1,20 +1,23 @@
-title: $:/plugins/felixhayashi/tiddlymap/dialog/editNodeFilter
+title: $:/plugins/felixhayashi/tiddlymap/dialog/editFilters
 subtitle: {{$:/core/images/edit-button}} Filter Editor
 
-<div id="tmap-node-filter-dialog">
+<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
 
-  <$edit-text tag="textarea" tiddler=<<output>> field="text" default=<<prettyFilter>> autoHeight="no" />
+<fieldset>
+  <legend>Filters <sup>[1]</sup></legend>
+  <table>
+    <<tmap-row title:"Node filter" field:"prettyNodeFilter" type:"input-textarea"
+               descr:"Show tiddlers in the graph that match this filter">>
+    <<tmap-row title:"Edge filter" field:"prettyEdgeFilter" type:"input-textarea"
+               descr:"Show edges that match this filter">>
+  </table>   
+</fieldset>
 
-  <div id="tmap-filter-tips">
+</$importvariables>
 
-  Tips for creating a node filter:
+---
 
-  * """
-  <b>Warning:</b> Never use filters that are selectors (e.g. "[all[tiddlers]]")! Seriously!
-  Use filters that really __are__ filters such as "[!is[system]!has[draft.of]]" etc. See this [[discussion|https://groups.google.com/d/msg/tiddlywikidev/aCRvcsVwfU8/FGsG1EOBUOQJ]].
-  """
-  * A new line is equivalent to an "or".
-  * New to filters? Read this [[introduction|http://tiddlywiki.com/#Introduction%20to%20Filters]].
+<sup>[1]</sup> A new line is equivalent to an "or".<br />
+''Warning:''Never use filters that act as selectors (e.g. '[all[tiddlers]]'). Instead, use filters such as '[!is[system]!has[draft.of]]'. See this [[discussion|https://groups.google.com/d/msg/tiddlywikidev/aCRvcsVwfU8/FGsG1EOBUOQJ]]."
 
-  </div>
-</div>
+New to filters? Read this [[introduction|http://tiddlywiki.com/#Introduction%20to%20Filters]].

@@ -47,9 +47,28 @@ util functions.
       
         return utils.getBasename(arguments[1]);
         
+      case "testJSON": 
+      
+        var tObj = $tw.wiki.getTiddler(this.getVariable("currentTiddler"));
+        //console.log("haalloo", tObj, this.getVariable("currentTiddler"), arguments);
+        try {
+          JSON.parse(tObj.fields[arguments[1]]);
+          return "✔ (Valid JSON)";
+        } catch(SyntaxError) {
+          return "✘ (Malformed JSON)";
+        }
+        
+      case "splitAndSelect":
+      
+        var str = this.getVariable("currentTiddler");
+        var result = str.split(arguments[1])[arguments[2]];
+        
+        return (result ? result : "Cannot split and select");
+        
+      
       case "option":
       
-        var prop = $tw.tiddlymap.opt;
+        var prop = $tw.tmap.opt;
         var propertyPath = arguments[1].split(".");
 
         for(var i = 0; i < propertyPath.length; i++) {

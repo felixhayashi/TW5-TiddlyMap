@@ -1,7 +1,11 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/welcome
-subtitle: {{$:/core/images/options-button}} Initial Setup
+subtitle: {{$:/core/images/info-button }} Welcome
 
-It seems that you freshly installed ~TiddlyMap. Before you start creating
-maps, please make sure ~TiddlyMap is configured correctly to suit your needs.
+It seems that you freshly installed ~TiddlyMap.
 
-{{$:/plugins/felixhayashi/tiddlymap/dialog/configureTiddlyMap}}
+* To configure ~TiddlyMap, open the //map editor// in the //sidebar// and click on the menu-entry //Configure ~TiddlyMap//.
+* For any bug you discover, please create an [[issue|https://github.com/felixhayashi/TW5-TiddlyMap/issues]] at github.com.
+* Please note that ~TiddlyMap is still in beta, so use it at your own risk.
+* Make sure to revisit http://bit.ly/tiddlymap to see whether your version is up-to-date.
+
+Have a great time.

@@ -3,15 +3,20 @@ type: application/json
 
 { 
   "field": {
-    "nodeId": "id",
+    "nodeId": "tmap.id",
     "nodeLabel": "caption",
     "nodeIcon": "icon",
     "nodeInfo": "description",
-    "viewMarker": "isview"
+    "viewMarker": "isview",
+    "edgeTypeMarker": "tmap.is-edge-type",
+    "edges": "tmap.edges"
   },
+  "suppressedDialogs": {
+  },
+  "edgeClickBehaviour": "manager",
   "debug": "false",
   "notifications": "true",
   "editNodeOnCreate": "false",
-  "halfscreen": "false",
+  "halfscreen": "true",
   "singleClickMode": "false"
 }

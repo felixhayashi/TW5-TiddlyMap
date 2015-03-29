@@ -10,6 +10,8 @@ var addsrc = require("gulp-add-src"); // https://github.com/gulpjs/gulp/issues/3
 var uglify = require("gulp-uglify");
 var esprima = require('gulp-esprima');
 var debug = require('gulp-debug');
+var gulpif = require('gulp-if');
+var argv = require('yargs').argv;
 var del = require("del"); // rm -rf
 //~ var jsdoc = require("gulp-jsdoc"); // not maintained!
 
@@ -39,7 +41,9 @@ gulp.task("compile", ["clean"], function () {
     
   // uglify js
   gulp.src("plugins/**/*.js")
-    .pipe(uglify({ compress: false, preserveComments: "some" }))
+    .pipe(
+      gulpif(argv.production,
+             uglify({ compress: false, preserveComments: "some" })))
     .pipe(gulp.dest("../dist/"));
     
 });

@@ -1,0 +1,13 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager/overview
+caption: Overview
+
+  !! {{!!id}}
+  
+  <$list filter="description created modified" variable="item">
+    <$reveal type="nomatch" text="" default=<<item>> >
+
+      ; <<item>>
+      : <$transclude field=<<item>> />
+
+    </$reveal>
+  </$list>

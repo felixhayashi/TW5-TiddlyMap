@@ -1,0 +1,11 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialogFooter/ok
+
+<$button>Ok
+
+  <!-- trigger dialog callback -->
+  <$action-setfield $tiddler=<<result>> text="1" />
+  
+  <!-- close modal -->
+  <$action-sendmessage $message="tm-close-tiddler" />
+                       
+</$button>

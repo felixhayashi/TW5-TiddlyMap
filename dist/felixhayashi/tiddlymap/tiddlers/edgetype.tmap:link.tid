@@ -1,0 +1,5 @@
+title: $:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tmap:link
+description: A link that is contained in the tiddler's body pointing to another resource.
+style: { "color": "orange", "fontColor": "white", "fontStrokeWidth": 3, "fontStrokeColor": "gray", "labelAlignment": "line-above" }
+label: linked to
+

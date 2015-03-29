@@ -2,97 +2,81 @@ tags: $:/tags/ViewToolbar
 title: $:/plugins/felixhayashi/tiddlymap/misc/quickConnectButton
 description: Show available ~TiddlyMap actions
 
-<$reveal type="nomatch" state=<<qualify "$:/temp/tiddlymap/">> text="show">
-  <$button set=<<qualify "$:/temp/tiddlymap/">> setTo="show" class=<<tv-config-toolbar-class>> >
+<$reveal type="nomatch" state="$:/temp/tiddlymap/quickConnectButton" text={{!!title}}>
+  <$button set="$:/temp/tiddlymap/quickConnectButton" setTo={{!!title}} class=<<tv-config-toolbar-class>> >
    {{$:/plugins/felixhayashi/tiddlymap/icon}}
   </$button>
 </$reveal>
 
-<$reveal type="match" state=<<qualify "$:/temp/tiddlymap/">> text="show">
-  <$button set=<<qualify "$:/temp/tiddlymap/">> setTo="hide" class=<<tv-config-toolbar-class>> >
+<$reveal type="match" state="$:/temp/tiddlymap/quickConnectButton" text={{!!title}}>
+  <$button set="$:/temp/tiddlymap/quickConnectButton" setTo="" class=<<tv-config-toolbar-class>> >
     {{$:/plugins/felixhayashi/tiddlymap/icon}}
   </$button>
-
-<div class="tmap-quick-connect tc-reveal tc-popup">
-  <div class="tc-drop-down">
-    <div>{{$:/core/images/import-button}} ''Add tiddler to view'': Drop  <$link to=<<currentTiddler>>>this link</$link> on a graph editor</div>
-    <hr />
-    <div>{{$:/core/images/close-others-button}} ''Create connection'' <sup>[1]</sup></div>
-    <table>
-      <tr>
-        <td>Type:</td>
-        <td>
-          <$edit-text tiddler="$:/temp/quickConnectSearch/type" field="text" type="text" tag="input" default="" />
-          <$select tiddler="$:/temp/quickConnectSearch/type" default="">
-            <option></option>
-            <$list filter=<<map-macro "option" "filter.allSharedEdgesByLabel">>  >
-              <option>{{!!title}}</option>
-            </$list>
-          </$select>
-        </td>
-      </tr>
-      <tr>
-        <td>Search:</td>
-        <td>
-          <$edit-text tiddler="$:/temp/quickConnectSearch" type="search" tag="input" default=""></$edit-text>
-          <small><$count filter="[!is[system]search{$:/temp/quickConnectSearch}sort[title]limit[50]]" /> results</small>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2">
-          <table class="tmap-very-small-list">
-            <$list filter="[!is[system]search{$:/temp/quickConnectSearch}sort[title]count[]]" variable="item" emptyMessage="//No results//">
-            <tr>
-              <td>
-                <$button>From
-                  <$action-sendmessage $message="tm-create-edge"
-                                       from=<<item>>
-                                       to=<<currentTiddler>>
-                                       label={{$:/temp/quickConnectSearch/type}}
-                                       view={{$:/temp/quickConnectSearch/view}} />
-                </$button>
-              </td>
-              <td>
-                <$button>To
-                  <$action-sendmessage $message="tm-create-edge"
-                                       from=<<currentTiddler>>
-                                       to=<<item>>
-                                       label={{$:/temp/quickConnectSearch/type}}
-                                       view={{$:/temp/quickConnectSearch/view}} />
-                </$button>
-              </td>
-              <td><$view tiddler=<<item>> field="title" /></td>
-            </tr>
-            </$list>
-          </table>
-        </td>
-      </tr>
-    </table>
-    <hr />
-    <div>''Existing Connections'' <sup>[1]</sup></div>
-    <p>  
-      <$connections>
-        <div>
-          <$button class="tc-btn-invisible">
-            <$action-sendmessage $message="tm-remove-edge" id=<<edge.id>> label=<<edge.label>> />
-            {{$:/core/images/close-button}}
-          </$button> <<role>> <$link><<neighbour>></$link>
-        </div>
-      </$connections>
-    </p>
-    
-    <hr />
-    
-    <small>[1] Note, that nodes will be globally linked or removed. Have a look at the [[docs|http://bit.ly/tiddlymap#Public%20and%20Private%20Edges]] for more information on private and public relations.</small><br />
-    
+  <div class="tmap-quick-connect tc-reveal tc-popup">
+    <div class="tc-drop-down">
+      <div>{{$:/core/images/close-others-button}} ''Create connection'' <sup>[1]</sup></div>
+      <table>
+        <tr>
+          <td>Type:</td>
+          <td>
+            <$edit-text tiddler="$:/temp/quickConnectSearch/type" field="text" type="text" tag="input" default="" />
+            <$select tiddler="$:/temp/quickConnectSearch/type" default="">
+              <option></option>
+              <$list filter=<<map-macro "option" "selector.allEdgeTypesByLabel">>  >
+                <option>{{!!title}}</option>
+              </$list>
+            </$select>
+          </td>
+        </tr>
+        <tr>
+          <td>Search:</td>
+          <td>
+            <$edit-text tiddler="$:/temp/quickConnectSearch" type="search" tag="input" default=""></$edit-text>
+            <small><$count filter="[!is[system]search:title{$:/temp/quickConnectSearch}limit[50]sort[title]]" /> results</small>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <table class="tmap-very-small-list">
+              <$list filter="[!is[system]search:title{$:/temp/quickConnectSearch}sort[title]]" variable="item" emptyMessage="//No results//">
+              <tr>
+                <td>
+                  <$button>⇦
+                    <$action-sendmessage $message="tmap:tm-create-edge"
+                                         from=<<item>>
+                                         to=<<currentTiddler>>
+                                         label={{$:/temp/quickConnectSearch/type}}
+                                         view={{$:/temp/quickConnectSearch/view}} />
+                  </$button>
+                </td>
+                <td>
+                  <$button>⇨
+                    <$action-sendmessage $message="tmap:tm-create-edge"
+                                         from=<<currentTiddler>>
+                                         to=<<item>>
+                                         label={{$:/temp/quickConnectSearch/type}}
+                                         view={{$:/temp/quickConnectSearch/view}} />
+                  </$button>
+                </td>
+                <td><$view tiddler=<<item>> field="title" /></td>
+              </tr>
+              </$list>
+            </table>
+          </td>
+        </tr>
+      </table>
+      <hr />
+      <div>''Existing Connections''</div>
+      <p>  
+        <$tmap-connections>
+          <div>
+            <$button class="tc-btn-invisible">
+              <$action-sendmessage $message="tmap:tm-remove-edge" id=<<edge.id>> from=<<edge.from>> />
+              {{$:/core/images/close-button}}
+            </$button> <<role>> <$link><<neighbour>></$link> (<<edge.label>>)
+          </div>
+        </$tmap-connections>
+      </p>      
+    </div>
   </div>
-</div>
-
-
-
-
 </$reveal>
-
-
-
-

@@ -1,2 +1,0 @@
-title: $:/plugins/felixhayashi/tiddlymap/graph/views/live/filter/nodes
-filter: [!is[system]field:title{$:/temp/focussedTiddler}]

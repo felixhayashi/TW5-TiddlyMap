@@ -27,8 +27,8 @@ module-type: library
   var CallbackManager = function() {
     
     this.wiki = $tw.wiki;
-    this.logger = $tw.tiddlymap.logger;
-    this.callbacks = utils.getEmptyMap();
+    this.logger = $tw.tmap.logger;
+    this.callbacks = utils.getDataMap();
 
   };
           

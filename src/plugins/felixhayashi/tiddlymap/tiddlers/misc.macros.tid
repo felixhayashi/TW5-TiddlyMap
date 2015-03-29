@@ -1,22 +1,52 @@
 title: $:/plugins/felixhayashi/tiddlymap/misc/macros
 
-\define input-text(field, default)
-  <$edit-text tiddler=<<output>> field="$field$" type="text" tag="input" default="$default$" />
+\define input-text(field, index, default, readonly)
+  <$reveal type="match" text="" default="$readonly$">
+    <$edit-text tiddler=<<output>> field="$field$" index="$index$" type="text" tag="input" default="$default$" />
+  </$reveal>
+  <$reveal type="nomatch" text="" default="$readonly$">
+    <input type="text" value="$default$" readonly="true" disabled="true" />
+  </$reveal>
 \end
 
-\define input-checkbox(field, default)
-  <$checkbox tiddler=<<output>> field="$field$" checked="true" unchecked="false" default="$default$" />
+\define input-textarea(field, index, default, default)
+  <$edit-text tiddler=<<output>> field="$field$" index="$index$" type="text" tag="textarea" default="$default$" />
 \end
 
-\define input-radio(field, default)
-  <$radio tiddler=<<output>> field="$field$" value="$value$" />
+\define input-checkbox(field, index, readonly, default)
+  <$reveal type="match" text="" default="$readonly$">
+    <$checkbox tiddler=<<output>> field="$field$" index="$index$" checked="true" unchecked="false" default="$default$" />
+  </$reveal>
+  <$reveal type="nomatch" text="" default="$readonly$">
+    <input type="checkbox" value="$default$" readonly="true" disabled="true" />
+  </$reveal>
 \end
 
-\define tmap-row(title, field, type, default, descr, note)
+\define input-select(field, index, selectFilter, default)
+  <$select tiddler=<<output>> field="$field$" index="$index$" default="$default$">
+    <$list filter="$selectFilter$">
+      <option value=<<map-macro "splitAndSelect" "|" "0">> >
+        <<map-macro "splitAndSelect" "|" "1">>
+      </option>
+    </$list>
+  </$select>
+\end
+
+\define input-radio(field, index, default)
+  <$radio tiddler=<<output>> field="$field$" index="$index$" value="$value$" />
+\end
+
+\define tmap-row(title, field, index, type, descr, note, default, readonly, selectFilter)
   <tr>
     <td class="tmap-title">$title$:</td>
     <td>
-      <<$type$ field:"$field$" default:"$default$" values:"$values$">>
+      <<$type$
+        field:"$field$"
+        index:"$index$"
+        values:"$values$"
+        readonly:"$readonly$"
+        default:"$default$"
+        selectFilter:"$selectFilter$">>
     </td>
     <td>
       <span class="tmap-description">$descr$</span>

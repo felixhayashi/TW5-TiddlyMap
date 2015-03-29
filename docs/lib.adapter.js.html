@@ -69,6 +69,7 @@ module-type: library
 
     var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
     var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/view_abstraction.js").ViewAbstraction;
+    var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/edgetype.js").EdgeType;
     var vis = require("$:/plugins/felixhayashi/vis/vis.js");
     
   /***************************** CODE ******************************/
@@ -84,96 +85,396 @@ module-type: library
    * @constructor
    * @param {object} wiki - An optional wiki object
    */
-  var Adapter = function(wiki) {
+  var Adapter = function() {
     
-    this.wiki = wiki ? wiki : $tw.wiki;
+    // create shortcuts and aliases
+    this.wiki = $tw.wiki;
+    this.opt = $tw.tmap.opt;
+    this.logger = $tw.tmap.logger;
     
-    // create shortcuts
-    this.opt = $tw.tiddlymap.opt;
-    this.logger = $tw.tiddlymap.logger;
+  };
+    
+  Adapter.prototype.deleteEdge = function(edge) {
+        
+    return this._processEdge(edge, "delete");
+    
+  };
+
+  /**
+   * Removes multiple edges from several stores.
+   * 
+   * @param {EdgeCollection} edges - The edges to be deleted
+   */
+  Adapter.prototype.deleteEdges = function(edges) {
+    
+    edges = utils.convert(edges, "array");
+    for(var i = 0; i &lt; edges.length; i++) {
+      //~ if(utils.startsWith(edges[i].type, this.opt.misc.sysEdgeTypeNS));
+      this.deleteEdge(edges[i]);
+    }
     
   };
     
   /**
-   * Persist an edge with at least a given id, from and to label
-   * in the TW.
-   * 
-   * If an edge is lacking an id, it will be created. The reason to give
-   * edges an id instead of merely relying on from, to and the type to
-   * identify an edge is twofold: First, the same vector (from, to) may
-   * exist multiple times, second, the id is needed to interact with vis
-   * in a comfortable way because vis ensures only that ids are unique
-   * in each dataset.
+   * Persists an edge by storing the vector (from, to, type). This
+   * vector is unique and may **not** exist multiple times.
    * 
    * @param {Edge} edge - The edge to be saved
-   * @param {View} [view] - An optional view to determine which prefix to use.
-   */
-  Adapter.prototype.insertEdge = function(edge, view) {
+   */  
+  Adapter.prototype.insertEdge = function(edge) {
     
-    if(typeof edge !== "object" || !edge.from || !edge.to) return;
-    
-    view = new ViewAbstraction(view);
-    
-    var label = (edge.label
-                 ? edge.label
-                 : this.opt.misc.unknownEdgeLabel);
-                
-    var storeRef = view.getEdgeStoreLocation() + "/" + label;
-    var records = this.wiki.getTiddlerData(storeRef, []);
-        
-    // temporarely remove label
-    delete edge.label;
-
-    if(edge.id) { // try to replace
-      var key = utils.keyOfItemWithProperty(records, "id", edge.id);
-      if(typeof key === "undefined") { // didn't work -> id is user provided
-        key = records.length;
-      }
-    } else {
-      edge.id = utils.genUUID();
-      var key = records.length;
-    }
-    
-    this.logger("info", "Inserting edge", edge, "into store", storeRef);
-    
-    records[key] = edge;
-    
-    var fields = {};
-    var storeTObj = this.wiki.getTiddler(storeRef);
-    if(!storeTObj || !storeTObj.fields.id) {
-      fields.id = utils.genUUID();
-    }
-    this.wiki.setTiddlerData(storeRef, records, fields);
-    
-    // add label again
-    edge.label = label;
-    
-    // register change
-    $tw.tiddlymap.edgeChanges.push({
-      type : "insert", edge : edge
-    });
-    
-    return edge;
+    return this._processEdge(edge, "insert");
     
   };
+    
+  Adapter.prototype._processEdge = function(edge, action) {
+    
+    this.logger("debug", "Edge", action, edge);
+
+    if(typeof edge !== "object" || !action || !edge.from) return;
+    if(action === "insert" &amp;&amp; !edge.to) return;
+    if(action === "delete" &amp;&amp; !edge.id) return;
+    
+    // get from-node and corresponding tiddler
+    
+    var fromTObj = utils.getTiddler($tw.tmap.indeces.tById[edge.from]);
+    if(!fromTObj) return;
+
+    if(!edge.id) edge.id = utils.genUUID();
+    
+    var type = new EdgeType(edge.type);
+    var connections = utils.parseFieldData(fromTObj.fields.title,
+                                     this.opt.field.edges, {});
+        
+    if(action === "insert") { 
       
+      connections[edge.id] = {
+        to: edge.to,
+        type: type.getId()
+      };
+      
+      if(!type.exists()) {
+        type.persist();
+      }
+      
+    } else if(action === "delete") {
+      
+      delete connections[edge.id];
+      
+    }
+    
+    // save updated data
+    utils.writeFieldData(fromTObj.fields.title, this.opt.field.edges, connections);
+
+    return edge;
+        
+  };
+    
+  Adapter.prototype.getAdjacencyList = function(groupBy, opts) {
+    
+    $tw.tmap.start("Creating adjacency list");
+    
+    if(!opts) opts = {};
+    
+    if(!opts.edges) {
+      var tRefs = utils.getMatches(this.opt.selector.allPotentialNodes);
+      opts.edges = this.getAllOutgoingEdges(tRefs, opts);
+    }
+    var adjList = utils.groupByProperty(opts.edges, groupBy);
+    
+    $tw.tmap.stop("Creating adjacency list");
+    
+    return adjList;
+    
+  };
+  
+  Adapter.prototype.getNeighbours = function(tiddlers, opts) {
+    
+    $tw.tmap.start("Get neighbours");
+    
+    opts = opts || {};
+    
+    // clone array
+    tiddlers = tiddlers.slice();
+    
+    var protoNode = opts.addProperties;
+    var adjList = this.getAdjacencyList("to", opts);
+    var neighEdges = utils.getDataMap();
+    var neighNodes = utils.getDataMap();
+    
+    var maxSteps = (opts.steps === "*"
+                 ? Number.MAX_VALUE
+                 : (parseInt(opts.steps) > 0 ? opts.steps : 1));
+        
+    var discover = function() {
+      
+      var lookupTable = utils.getArrayValuesAsHashmapKeys(tiddlers);
+      
+      // backwards so we can add neighbours to the set for next run
+      for(var i = tiddlers.length-1; i >= 0; i--) {
+        
+        if(utils.isSystemOrDraft(tiddlers[i])) continue;
+        
+        // only outgoing edges that point to tiddlers not included in the set
+        // to-part = neighbour
+        var outgoing = this.getEdges(tiddlers[i], opts);
+        for(var id in outgoing) {
+          var toTRef = $tw.tmap.indeces.tById[outgoing[id].to];
+          if(lookupTable[toTRef]) continue; // included in original set
+          if(!neighNodes[outgoing[id].to]) {
+            var node = this.makeNode(toTRef, protoNode, opts.view);
+            if(node) { // ATTENTION: edges may be obsolete
+              neighNodes[outgoing[id].to] = node;
+              tiddlers.push(toTRef);
+            }
+          }
+        }
+        $tw.utils.extend(neighEdges, outgoing);
+        
+        // from part = neighbour or part of original set
+        var incoming = adjList[$tw.tmap.indeces.idByT[tiddlers[i]]];
+        if(incoming) {
+          for(var j = 0; j &lt; incoming.length; j++) {
+            var fromTRef = $tw.tmap.indeces.tById[incoming[j].from];
+            if(lookupTable[fromTRef]) continue; // included in original set
+            if(!neighNodes[incoming[j].from]) {              
+              var node = this.makeNode(fromTRef, protoNode, opts.view);
+              if(node) {
+                neighNodes[incoming[j].from] = node; // ATTENTION: edges may be obsolete
+                tiddlers.push(fromTRef);
+              }
+            }
+            neighEdges[incoming[j].id] = incoming[j];
+          }
+        }
+      }
+    }.bind(this);
+    
+    for(var steps = 0; steps &lt; maxSteps; steps++) {
+      var beforeSize = tiddlers.length;
+      discover();
+      if(beforeSize === tiddlers.length) break;
+    }
+    
+    var neighbourhood = { nodes: neighNodes, edges: neighEdges };
+    
+    this.logger("debug", "retrieved neighbourhood", neighbourhood, "steps", steps);
+    
+    $tw.tmap.stop("Get neighbours");
+    
+    return neighbourhood;
+    
+  };
+  
+  Adapter.prototype.getGraph = function(filter, options) {
+    
+    //~ [prefix[$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes]suffix[for]]
+    $tw.tmap.start("Assembling Graph");
+    
+    if(!options || typeof options !== "object") options = {};
+
+    var view = new ViewAbstraction(options.view);
+    var matches = utils.getMatches(filter);
+        
+    var graph = {};
+    graph.nodes = this.selectNodesByReferences(matches, {
+      view: view,
+      outputType: "hashmap",
+      addProperties: {  group: "matches" }
+    });
+    
+    graph.edges = this.getAllOutgoingEdges(matches, {
+      toFilter: utils.getArrayValuesAsHashmapKeys(matches),
+      toFilterStyle: "whitelist",
+      typeFilter: view.getTypeWhiteList(),
+      typeFilterStyle: "whitelist"
+    });
+    
+    if(options.neighbourhoodScope) {
+      var neighbours = this.getNeighbours(matches, {
+        steps: options.neighbourhoodScope,
+        view: view,
+        typeFilter: view.getTypeWhiteList(),
+        typeFilterStyle: "whitelist",
+        addProperties: {
+          group: "neighbours"
+        }
+      });
+      $tw.utils.extend(graph.edges, neighbours.edges);
+      $tw.utils.extend(graph.nodes, neighbours.nodes);
+    }
+    
+    $tw.tmap.stop("Assembling Graph");
+    
+    this.logger("debug", "Assembled graph:", graph);
+    
+    return graph;
+    
+  };
+  
+  /**
+   * Returns all outgoing relations of a tiddler. Which relations are
+   * included in the result can be controlled via an optional type-filter
+   * and/or an optional to-filter. Per default, all filters act as
+   * blacklists.
+   * 
+   * @param {Tiddler} tiddler - A tiddler object or reference.
+   * @param {Hashmap} [options] - An optional options object.
+   * @param {Hashmap&lt;TiddlerReference, *>} [options.toFilter.filter]
+   *     A hashmap on which basis it is decided, whether to include
+   *     an edge with a certain to-value in the result or not.
+   *     `toFilter` hashmap are included.
+   * @param {string} [options.toFilter.type="blacklist"]
+   *       Either "blacklist" or "whitelist".
+   * @param {Hashmap&lt;string, *>} [options.typeFilter.filter]
+   *     A hashmap on which basis it is decided, whether to include
+   *     an edge of a given type in the result or not.
+   * @param {string} [options.typeFilter.type="blacklist"]
+   *       Either "blacklist" or "whitelist".
+   * @return {Hashmap&lt;Id, Edge>} All relations of a tiddler represented as edges.
+   */
+  Adapter.prototype._getRelations = function(tiddler, opts) {
+    
+    if(!utils.tiddlerExists(tiddler) || utils.isSystemOrDraft(tiddler)) {
+      return;
+    }
+    
+    if(!opts) opts = {};
+    var toFiltr = opts.toFilter || utils.getDataMap();
+    var isWhitelistToFiltr = (opts.toFilterStyle === "whitelist");
+    var tyFiltr = opts.typeFilter || utils.getDataMap();
+    var isWhitelistTyFiltr = (opts.typeFilterStyle === "whitelist");
+    
+    var tRef = utils.getTiddlerRef(tiddler);
+    var edges = utils.getDataMap();
+    var connections = utils.parseFieldData(tRef, this.opt.field.edges, {});
+    
+    for(var conId in connections) {
+      var con = connections[conId];
+      var toTRef = $tw.tmap.indeces.tById[con.to];
+      if(isWhitelistToFiltr ? toFiltr[toTRef] : !toFiltr[toTRef]) {
+        if(isWhitelistTyFiltr ? tyFiltr[con.type] : !tyFiltr[con.type]) {
+          edges[conId] = this.makeEdge(this.getId(tRef), con.to, con.type, conId);
+        }
+      }
+    }
+    
+    return edges;
+    
+  };
+  
+  /**
+   * Returns all outgoing *links* of a tiddler. Which links are
+   * included in the result can be controlled via an optional to-filter.
+   * Per default, the filter acts as blacklists.
+   * 
+   * @param {Tiddler} tiddler - A tiddler object or reference.
+   * @param {Hashmap} [opts] - An optional options object.
+   * @param {Hashmap&lt;TiddlerReference, *>} [opts.toFilter.filter]
+   *     A hashmap on which basis it is decided, whether to include
+   *     an edge with a certain to-value in the result or not.
+   *     `toFilter` hashmap are included.
+   * @param {string} [opts.toFilter.type="blacklist"]
+   *       Either "blacklist" or "whitelist".
+   * @return {Hashmap&lt;Id, Edge>} All relations of a tiddler represented as edges.
+   */
+  Adapter.prototype._getLinks = function(tiddler, opts) {
+    
+    if(!utils.tiddlerExists(tiddler) || utils.isSystemOrDraft(tiddler)) {
+      return;
+    }
+    
+    if(!opts) opts = {};
+    var toFiltr = opts.toFilter || utils.getDataMap();
+    var isWhitelistToFiltr = (opts.toFilterStyle === "whitelist");
+    var tRef = utils.getTiddlerRef(tiddler);
+    
+    var edges = utils.getDataMap();
+    var type = new EdgeType("tmap:link");
+    var links = this.wiki.getTiddlerLinks(tRef);
+    
+    for(var i = 0; i &lt; links.length; i++) {
+      if(!$tw.wiki.tiddlerExists(links[i]) || utils.isSystemOrDraft(links[i])) continue;
+      if(isWhitelistToFiltr ? toFiltr[links[i]] : !toFiltr[links[i]]) {
+        var edge = this.makeEdge(this.getId(tRef), this.getId(links[i]), type);
+        edges[edge.id] = edge;
+      }
+    }
+    
+    return edges;
+    
+  };
+  
+  /**
+   * Returns all outgoing edges of a given tiddler. This includes
+   * virtual edges (links) and user created relations.
+   * 
+   * @param {Hashmap&lt;TiddlerReference, *>} [opts.toFilter.filter]
+   *     A hashmap on which basis it is decided, whether to include
+   *     an edge with a certain to-value in the result or not.
+   *     `toFilter` hashmap are included.
+   * @param {string} [opts.toFilter.type="blacklist"]
+   *       Either "blacklist" or "whitelist".
+   * @param {Hashmap&lt;string, *>} [opts.typeFilter.filter]
+   *     A hashmap on which basis it is decided, whether to include
+   *     an edge of a given type in the result or not.
+   * @param {string} [opts.typeFilter.type="blacklist"]
+   *       Either "blacklist" or "whitelist".
+   * @return {Hashmap&lt;Id, Edge>} An edge collection.
+   */
+  Adapter.prototype.getEdges = function(tiddler, opts) {
+        
+    if(!opts) opts = {};
+    var tyFiltr = opts.typeFilter || utils.getDataMap();
+    var isWhitelistTyFiltr = (opts.typeFilterStyle === "whitelist");
+    
+    var edges = utils.getDataMap();
+    
+    // get relations
+    var relations = this._getRelations(tiddler, opts);
+    $tw.utils.extend(edges, relations);
+    
+    // get links
+    if(isWhitelistTyFiltr ? tyFiltr["tmap:link"] : !tyFiltr["tmap:link"]) {
+      $tw.utils.extend(edges, this._getLinks(tiddler, opts));
+    }
+    
+    return edges;
+
+  };
+    
+  /**
+   * @param {Hashmap.&lt;Id, Tiddler>} tiddlers
+   * @param {Hashmap&lt;string, *>} [typeFilter] - Only edges where
+   *     the type is contained in the `typeFilter` are included.
+   * @return {Hashmap&lt;Id, Edge>} An edge collection.
+   */
+  Adapter.prototype.getAllOutgoingEdges = function(tiddlers, opts) {
+
+    var edges = utils.getDataMap();
+
+    for(var i = 0; i &lt; tiddlers.length; i++) {
+      $tw.utils.extend(edges, this.getEdges(tiddlers[i], opts));
+    }
+    
+    return edges;
+
+  };
+  
   /**
    * Returns a set of edges that corresponds to the given filter.
    *
    * @param {TiddlyWikiFilter} filter - The filter to apply.
    * @param {Hashmap} [options] - An optional options object.
-   * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectEdgesByLabel}.
+   * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectEdgesByType}.
    * @return {EdgeCollection} A collection of a type specified in the options.
    */
   Adapter.prototype.selectEdgesByFilter = function(filter, options) {
+      
+    var allEdgeTypes = utils.getMatches(this.opt.selector.allEdgeTypes);
+    var typeList = utils.getMatches(filter, allEdgeTypes);
     
-    var stores = utils.getMatches(filter);
-    var labels = [];
-    for(var i = 0; i &lt; stores.length; i++) {
-      labels.push(utils.getBasename(stores[i]));
-    }
-    
-    return this.selectEdgesByLabel(labels, options);
+    return this.selectEdgesByType(typeList, options);
     
   };
 
@@ -181,40 +482,72 @@ module-type: library
    * Returns a set of edges where the edge labels match the labels
    * specified.
    *
-   * @param {array&lt;string>} labels - A set of labels (just the labels
-   *     without any edge prefixes).
+   * @param {array&lt;string>} typeList - An array of edge types (without any path prefix).
    * @param {Hashmap} [options] - An optional options object.
    * @param {CollectionTypeString} [options.outputType="dataset"] - The result type.
    * @param {View} [options.view] - A view that is used to filter private edges.
    * @return {EdgeCollection} A collection of a type specified in the options.
    */
-  Adapter.prototype.selectEdgesByLabel = function(labels, options) {
-    
-    if(typeof options !== "object") options = utils.getEmptyMap();
+  Adapter.prototype.selectEdgesByType = function(typeList, options) {
 
-    var view = new ViewAbstraction(options.view);
-    var storePrefix = view.getEdgeStoreLocation();            
-    var result = utils.getEmptyMap();
-    for(var i = 0; i &lt; labels.length; i++) {
-      var storeTRef = storePrefix + "/" + labels[i];
-      
-      if(!utils.tiddlerExists(storeTRef)) continue;
+    if(!options || typeof options !== "object") options = {};
 
-      var edges = this.wiki.getTiddlerData(storeTRef);
-      for(var j = 0; j &lt; edges.length; j++) {
+    var whiteList = utils.getArrayValuesAsHashmapKeys(typeList);
+    var allTiddlersLT = utils.getMatches(this.opt.selector.allPotentialNodes, null, true);
+    var result = this.getEdges(allTiddlersLT, whiteList);
         
-        if(labels[i] !== this.opt.misc.unknownEdgeLabel) { // has a name
-          // use edge store label as edge label
-          edges[j].label = labels[i];
-        }
-        
-        result[edges[j].id] = edges[j];
-
-      }
-    }
-    
     return utils.convert(result, options.outputType);
     
+  };
+  
+  /**
+   * 
+   * 
+   */
+  Adapter.prototype._processEdgesWithType = function(type, task) {
+
+    type = new EdgeType(type);
+    var tObjHashmap = utils.getTiddlersWithField("title");
+    
+    // get edges
+    
+    var typeWhiteList = utils.getDataMap();
+    typeWhiteList[type.getId()] = true;
+    var edges = this._getRelations(tObjHashmap, typeWhiteList);
+    
+    if(task.action === "rename") {
+      
+      // clone type first to prevent auto-creation
+      
+      var newType = new EdgeType(task.newName);
+      newType.loadDataFromType(type);
+      newType.persist();
+        
+    }
+    
+    // iterate over edges
+    
+    for(var id in edges) {
+      
+      if(task.action === "rename") {
+        
+        this._processEdge(edges[id], "delete");
+        edges[id].type = task.newName;
+        this._processEdge(edges[id], "insert");
+        
+      } else if(task.action === "delete") {
+
+        this._processEdge(edges[id], "delete");
+        
+      }
+
+    }
+    
+
+    
+    // finally remove the type
+    $tw.wiki.deleteTiddler(type.getPath());
+
   };
 
   /**
@@ -229,14 +562,12 @@ module-type: library
    */
   Adapter.prototype.selectEdgesByEndpoints = function(nodes, options) {
 
-    if(typeof options !== "object") options = utils.getEmptyMap();
+    if(!options || typeof options !== "object") options = {};
 
     var view = new ViewAbstraction(options.view);
     
     // if no view is supplied, use global filter
-    var edgeFilter = (view.exists()
-                      ? options.view.getEdgeFilter("compiled")
-                      : this.opt.filter.allSharedEdges);
+    var edgeFilter = this.opt.selector.allEdgeTypesByLabel;
     
     var edges = this.selectEdgesByFilter(edgeFilter, {
       outputType: "array",
@@ -263,7 +594,7 @@ module-type: library
    */
   Adapter.prototype.filterEdgesByEndpoints = function(edges, nodes, options) {
 
-    if(typeof options !== "object") options = utils.getEmptyMap();
+    if(!options || typeof options !== "object") options = {};
     
     edges = utils.convert(edges, "array");
 
@@ -275,7 +606,7 @@ module-type: library
     
     var nodes = utils.getLookupTable(nodes, "id");
 
-    var result = utils.getEmptyMap();
+    var result = utils.getDataMap();
     for(var i = 0; i &lt; edges.length; i++) {
       var edge = edges[i];
 
@@ -307,20 +638,20 @@ module-type: library
    *
    * @param {TiddlyWikiFilter} filter - The filter to use.
    * @param {Hashmap} [options] - An optional options object.
-   * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectNodesByReference}.
+   * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectNodesByReferences}.
    * @return {NodeCollection} A collection of a type specified in the options.
    */
   Adapter.prototype.selectNodesByFilter = function(filter, options) {
     
     var matches = utils.getMatches(filter);
-    return this.selectNodesByReference(matches, options);
+    return this.selectNodesByReferences(matches, options);
 
   };
 
   /**
    * Returns a set of nodes that corresponds to a set of tiddlers.
    * 
-   * @param {TiddlerCollection} tiddlers - The tiddlers that represent the nodes
+   * @param {TiddlerCollection} tiddlers - A collection of tiddlers.
    * @param {Hashmap} [options] - An optional options object.
    * @param {CollectionTypeString} [options.outputType="dataset"] - The result type.
    * @param {View} [options.view] - A viewname used to retrieve positions
@@ -335,20 +666,17 @@ module-type: library
    * 
    * @return {NodeCollection} A collection of a type specified in the options.
    */
-  Adapter.prototype.selectNodesByReference = function(tiddlers, options) {
+  Adapter.prototype.selectNodesByReferences = function(tiddlers, options) {
 
-    if(typeof options !== "object") options = utils.getEmptyMap();
+    if(!options || typeof options !== "object") options = {};
 
     var protoNode = options.addProperties;
-    
-    var result = utils.getEmptyMap();
-    for(var i = 0; i &lt; tiddlers.length; i++) {
+    var result = utils.getDataMap();
+    var keys = Object.keys(tiddlers);
+    for(var i = 0; i &lt; keys.length; i++) {
       
-      var node = this.createNode(tiddlers[i], protoNode, options.view);
-      
-      if(node) {
-        result[node.id] = node;
-      }
+      var node = this.makeNode(tiddlers[keys[i]], protoNode, options.view);
+      if(node) { result[node.id] = node; }  // ATTENTION: edges may be obsolete
           
     }
     
@@ -359,37 +687,60 @@ module-type: library
     return utils.convert(result, options.outputType);
     
   };
-  
-  //~ Adapter.prototype.selectNodeByReference = function(tiddler, options) {
-    //~ 
-    //~ if(typeof options !== "object") options = utils.getEmptyMap();
-    //~ options.outputType = "array";
-    //~ 
-    //~ return this.selectNodesByReference([ tiddler ], options)[0];
-    //~ 
-  //~ };
 
-  Adapter.prototype.createNode = function(tiddler, protoNode, view) {
+  /**
+   * Sets up an edge object that is ready to be consumed by vis.
+   * 
+   * @param {$tw.Tiddler|Id} from - A tiddler **object** or a node id
+   *     representing the from part of the relationship.
+   * @param {Object} connection - The connection object having
+   *     the properties *to*, *id*, *type*.
+   * @param {string|EdgeType} [type] - An optional edge type that
+   *     overrides the type possibly specified by the connection object.
+   * @return {Edge} An edge object.
+   */
+  Adapter.prototype.makeEdge = function(from, to, type, id) {
+    
+    if(!from || !to) return;
+    
+    if(from instanceof $tw.Tiddler) {
+      from = from.fields[this.opt.field.nodeId];
+    } else if(typeof from === "object") { // expect node
+      from = from.id;
+    } // else use from value as id
+    
+    type = new EdgeType(type);
+        
+    var edge = {
+      id: (id ? id : utils.genUUID()),
+      from: from,
+      to: to,
+      type: type.getId()
+    };
+    
+    edge.label = (utils.isTrue(type.getData("show-label"), true)
+                  ? type.getLabel()
+                  : null); // needs to be set expliceitly to null
+
+    edge = $tw.utils.extend(edge, type.getData("style"));
+    
+    return edge;
+    
+  };
+    
+  Adapter.prototype.makeNode = function(tiddler, protoNode, view) {
 
     // ALWAYS reload from store to avoid setting wrong ids on tiddler
     // being in the role of from and to at the same time.  
     // Therefore, do not use utils.getTiddler(tiddler)!
-    var tObj = this.wiki.getTiddler(utils.getTiddlerReference(tiddler));
+    var tObj = utils.getTiddler(tiddler, true);
 
     if(!tObj || tObj.isDraft() || this.wiki.isSystemTiddler(tObj.fields.title)) {
       return; // silently ignore
     }
-    
-    // make sure underlying tiddler has an id
-    
-    if(!tObj.fields[this.opt.field.nodeId]) {
-      var fields = utils.getEmptyMap();
-      fields[this.opt.field.nodeId] = utils.genUUID();
-      tObj = new $tw.Tiddler(tObj, fields);
-      $tw.wiki.addTiddler(tObj);
-    }
-    
-    var node = utils.getEmptyMap();
+        
+    // create node object 
+    var node = utils.getDataMap();
         
     // determine shape
     
@@ -427,10 +778,13 @@ module-type: library
 
     // add tooltip
     
-    var info = tObj.fields[this.opt.field.nodeInfo];
-    node.title = (info &amp;&amp; this.opt.field.nodeInfo !== "text"
-                  ? this.wiki.renderText("text/html", "text/vnd-tiddlywiki", info)
-                  : tObj.fields.title);
+    // WARNING: Feature disabled due to vis bug: https://github.com/almende/vis/issues/731
+    // TODO: Enable this when Bug is fixed by vis
+    
+    //~ var info = tObj.fields[this.opt.field.nodeInfo];
+    //~ node.title = (info &amp;&amp; this.opt.field.nodeInfo !== "text"
+                  //~ ? this.wiki.renderText("text/html", "text/vnd-tiddlywiki", info)
+                  //~ : tObj.fields.title);
     
     // use the tiddler's color field as node color
     if(tObj.fields.color) {
@@ -439,17 +793,16 @@ module-type: library
     
     // allow override
     if(typeof protoNode === "object") {
-      node = $tw.utils.extendDeepCopy(node, protoNode);
+      node = $tw.utils.extend(node, protoNode);
     }
     
     // force these fields
-    node.id = tObj.fields[this.opt.field.nodeId];
-    node.ref = tObj.fields.title;
+    node.id = this.assignId(tObj);
 
 
     if(view) {
       var view = new ViewAbstraction(view);
-      if(view.isConfEnabled("physics_mode")) {
+      if(view.isEnabled("physics_mode")) {
         node.allowedToMoveX = true; 
         node.allowedToMoveY = true;
       }
@@ -478,9 +831,9 @@ module-type: library
    * @return {NodeCollection} A collection of neighbour nodes
    */
   Adapter.prototype.selectNeighbours = function(nodes, options) {
-    
-    if(typeof options !== "object") options = utils.getEmptyMap();
 
+    if(!options || typeof options !== "object") options = {};
+    
     if(options.edges) {
       var edges = this.filterEdgesByEndpoints(options.edges, nodes, {
         outputType: "array",
@@ -493,9 +846,9 @@ module-type: library
         endpointsInSet: "=1"
       });
     }
-
+    
     var nodes = utils.getLookupTable(nodes, "id"); 
-    var neighbourIds = utils.getEmptyMap();
+    var neighbourIds = utils.getDataMap();
     for(var i = 0; i &lt; edges.length; i++) {
       
       // opposite is neighbour
@@ -503,7 +856,7 @@ module-type: library
       neighbourIds[key] = true;
       
     }
-    
+
     return this.selectNodesByIds(neighbourIds, options);
     
   };
@@ -514,56 +867,16 @@ module-type: library
    * 
    * @param {Array.&lt;Id>|Hashmap.&lt;Id, *>|vis.DataSet} nodeIds - The ids of the tiddlers
    *     that represent the nodes.
-   * @param {Hashmap} [options] - An optional options object.
-   * @param {CollectionTypeString} [options.outputType="dataset"] - The result type.
-   * @param {View} [options.view] - A viewname used to retrieve positions
-   * @param {Hashmap} [options.addProperties] - a hashmap
-   *     containing properties to be added to each node.
-   *     For example:
-   * 
-   *     {
-   *       group: "g1",
-   *       color: "red"
-   *     }
-   * 
+   * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectNodesByReferences}.
    * @return {NodeCollection} A collection of a type specified in the options.
    */
   Adapter.prototype.selectNodesByIds = function(nodeIds, options) {
     
-    if(typeof options !== "object") options = utils.getEmptyMap();
-
-    // transform into a hashmap with all values being true
-    if(Array.isArray(nodeIds)) {
-      nodeIds = utils.getArrayValuesAsHashmapKeys(nodeIds);
-    } else if(nodeIds instanceof vis.DataSet) {
-      nodeIds = utils.getLookupTable(nodeIds, "id"); // use id field as key
-    }
-    
-    var result = utils.getEmptyMap();
-    var allTiddlers = this.wiki.allTitles();
-    var idField = this.opt.field.nodeId;
-    var protoNode = options.addProperties;
-    
-    for(var id in nodeIds) {
-      for(var i = 0; i &lt; allTiddlers.length; i++) {
-        
-        var node = this.createNode(allTiddlers[i], protoNode, options.view);
-        
-        if(node &amp;&amp; nodeIds[node.id]) { // valid and contained in set
-          result[node.id] = node;
-        }
-        
-      }
-    }
-    
-    if(options.view) {
-      this._restorePositions(result, options.view);
-    }
-    
-    return utils.convert(result, options.outputType);
+    var tRefs = this.getTiddlersById(nodeIds);
+    return this.selectNodesByReferences(tRefs, options);
     
   };
-
+  
   /**
    * Select a single node by id.
    * 
@@ -576,107 +889,91 @@ module-type: library
    */
   Adapter.prototype.selectNodeById = function(id, options) {
     
-    if(typeof options !== "object") {
-      options = utils.getEmptyMap();
-    }
-    
-    options.outputType = "hashmap"; // overwrite option
+    options = utils.merge(options, { outputType: "hashmap" });
     var result = this.selectNodesByIds([ id ], options);
     return result[id];
     
   };
+  
+  
+  /**
+   * Retrieve tiddlers based on the a list of corresponding ids.
+   * 
+   * @param {Array.&lt;Id>|Hashmap.&lt;Id, *>|vis.DataSet} nodeIds - The ids.
+   * @return {Array&lt;TiddlerReference>} The resulting tiddlers.
+   */
+  Adapter.prototype.getTiddlersById = function(nodeIds) {
 
+    // transform into a hashmap with all values being true
+    if(Array.isArray(nodeIds)) {
+      nodeIds = utils.getArrayValuesAsHashmapKeys(nodeIds);
+    } else if(nodeIds instanceof vis.DataSet) {
+      nodeIds = utils.getLookupTable(nodeIds, "id"); // use id field as key
+    }
+    
+    var result = [];
+    for(var id in nodeIds) {
+      var ref = $tw.tmap.indeces.tById[id];
+      if(ref) result.push(ref);
+    }
+    
+    return result;
+    
+  };
+  
+  Adapter.prototype.getId = function(tiddler) {
+    return $tw.tmap.indeces.idByT[utils.getTiddlerRef(tiddler)];
+    //return utils.getField(tiddler, this.opt.field.nodeId);
+  };
+  
+  //~ Adapter.prototype.getSubGraphById = function(nodeIds, options) {
+  
   /**
    * This function will remove all tiddlers from the wiki that correspond
    * to a node in the collection. Drafts are also removed. The default
    * storylist is updated eventually.
+   * call deleteNode which does the following
+   * 1. get id using IdByT
+   * 2. remove id using adapter.deleteEdgesByTo(idByT[tRef])
+   * 3. remove from all indeces
+   *
+   * @see: https://github.com/Jermolene/TiddlyWiki5/issues/1550
    * 
    * @param {NodeCollection} nodes - A collection of nodes.
    */
-  Adapter.prototype.deleteNodesFromStore = function(nodes, view) {
+  Adapter.prototype.deleteNode = function(node) {
 
-    if(!nodes) return;
+    if(!node) return;
+    
+    var id = (typeof node === "object" ? node.id : node);
+    var tRef = $tw.tmap.indeces.tById[id];
+    
+    if(!utils.tiddlerExists(tRef)) return;
     
     var idField = this.opt.field.nodeId;
-    var allTiddlers = this.wiki.allTitles();
-    var deleteCandidates = [];
-    var nodes = utils.getLookupTable(nodes, "id");
-    
-    // identify tiddlers to delete
-    for(var id in nodes) {
-      for(var i = 0; i &lt; allTiddlers.length; i++) {
-        var tRefs = utils.getTiddlersWithProperty(idField, id, {
-          isIncludeDrafts: true,
-          isReturnRef: true,
-          tiddlers: allTiddlers
-        });
-        deleteCandidates = deleteCandidates.concat(tRefs);
-      }
-    }
     
     var storyList = this.wiki.getTiddlerList("$:/StoryList");
-    if(storyList.length) {
-
-      // remove elements from the default storyList
-      storyList = storyList.filter(function(tRef) {
-        return !utils.inArray(tRef, deleteCandidates);
-      });
-
-      // save it again
+    var index = storyList.indexOf(tRef);
+    if(index !== -1) {
+      storyList.splice(index, 1);
       var tObj = this.wiki.getTiddler("$:/StoryList");
-      this.wiki.addTiddler(new $tw.Tiddler(tObj, { list: storyList }));
+      utils.setField(tObj, "list", storyList);
     }
-    
-    // delete tiddlers
-    utils.deleteTiddlers(deleteCandidates);
-    
+        
     // remove connected edges
     
-    var edges = this.selectEdgesByEndpoints(nodes, {
-      view: view,
-      outputType: "array"
-    });
+    //~ var edges = this.selectEdgesByEndpoints([ node ], {
+      //~ outputType: "array"
+    //~ });
+    //~ 
+    //~ this.deleteEdges(edges);
     
-    this.deleteEdgesFromStore(edges);
+    // NEVER DELETE AN INDEX THAT ALREADY EXISTED!
+    //~ delete $tw.tmap.indeces.tById[id];
+    //~ delete $tw.tmap.indeces.idByT[tRef];
     
-  };
-
-  Adapter.prototype.deleteEdgeFromStore = function(edge, view) {
-    
-    if(!edge) return;
-    
-    var label = (edge.label ? edge.label : this.opt.misc.unknownEdgeLabel); 
-    var view = new ViewAbstraction(view);
-    var storeRef = view.getEdgeStoreLocation() + "/" + label;
-    var storeData = this.wiki.getTiddlerData(storeRef, []);
-    
-    this.logger("info", "Edge with label", label, "will be deleted: ", edge);
-    
-    var key = utils.keyOfItemWithProperty(storeData, "id", edge.id);
-    if(key != null) { // neither undefined nor null
-      storeData.splice(key, 1);
-      this.wiki.setTiddlerData(storeRef, storeData);
-      
-      // register change
-      $tw.tiddlymap.edgeChanges.push({
-        type : "delete", edge : edge
-      });
-    }
-
-  };
-
-  /**
-   * Removes multiple edges from several stores.
-   * 
-   * @param {EdgeCollection} edges - The edges to be deleted
-   */
-  Adapter.prototype.deleteEdgesFromStore = function(edges, view) {
-      
-    edges = utils.convert(edges, "array");
-    
-    for(var i = 0; i &lt; edges.length; i++) {
-      this.deleteEdgeFromStore(edges[i], view);
-    }
+    // delete tiddlers
+    this.wiki.deleteTiddler(tRef);
     
   };
 
@@ -746,30 +1043,39 @@ module-type: library
   }
 
   /**
-   * This method makes sure a Tiddler has all the necessary fields
-   * that the plugin needs to work with it. This means particularly
-   * that a Tiddler has a proper value in its designated id field.
-   * The idField may be changed by the user and can also be the title
-   * field. If the id field does not exist or doesn't have a value,
-   * it will be created.
+   * This method will assign an id to an *existing* tiddler that does
+   * not already possess and id. Any assigned id will be registered
+   * at the id->tiddler index.
+   * 
+   * @param {Tiddler} tiddler - The tiddler to assign the id to.
+   * @param {boolean} isForce - True if the id should be overridden,
+   *     false otherwise. Only works if the id field is not set to title.
+   * @return {Id} The assigned or retrieved id.
    */
-  Adapter.prototype.setupTiddler = function(tiddler) {
+  Adapter.prototype.assignId = function(tiddler, isForce) {
 
     // ALWAYS reload from store to avoid setting wrong ids on tiddler
     // being in the role of from and to at the same time.  
     // Therefore, do not use utils.getTiddler(tiddler)!
-    var tObj = this.wiki.getTiddler(utils.getTiddlerReference(tiddler));
+    var tObj = utils.getTiddler(tiddler, true);
+
     if(!tObj) return;
     
-    var idField = this.opt.field.nodeId; 
-    if(!tObj.fields[idField]) {
-      var fields = utils.getEmptyMap();
-      fields[idField] = utils.genUUID();
-      tObj = new $tw.Tiddler(tObj, fields);
-      $tw.wiki.addTiddler(tObj);
+    var idField = this.opt.field.nodeId;
+    var id = tObj.fields[idField];
+    
+    // note: when idField is "title" it is always defined
+    if(!id || (isForce &amp;&amp; idField !== "title")) {
+      id = utils.genUUID();
+      utils.setField(tObj, idField, id);
+      this.logger("info", "Assigning new id to", tObj.fields.title);
     }
     
-    return tObj;
+    // blindly update the index
+    $tw.tmap.indeces.tById[id] = tObj.fields.title;
+    $tw.tmap.indeces.idByT[tObj.fields.title] = id;
+    
+    return id;
     
   };
 
@@ -790,19 +1096,18 @@ module-type: library
    */
   Adapter.prototype.insertNode = function(node, options) {
     
-    if(typeof options !== "object") options = utils.getEmptyMap();
+    if(!options || typeof options !== "object") options = {};
     
     if(typeof node !== "object") {
-      node = utils.getEmptyMap();
+      node = utils.getDataMap();
     }
     
-    var fields = utils.getEmptyMap();
+    var fields = utils.getDataMap();
     fields.title = this.wiki.generateNewTitle((node.label ? node.label : "New node"));
     // title might has changed after generateNewTitle()
     node.label = fields.title;
-    node.ref = fields.title;
     
-    // always re-assign id
+    // always override any incoming id 
     
     if(this.opt.field.nodeId === "title") {
       node.id = fields.title;
@@ -816,9 +1121,11 @@ module-type: library
       view.addNodeToView(node);
     }
     
-    this.wiki.addTiddler(new $tw.Tiddler(fields,
-                                         this.wiki.getModificationFields(),
-                                         this.wiki.getCreationFields()));
+    this.wiki.addTiddler(new $tw.Tiddler(
+      fields,
+      this.wiki.getModificationFields(),
+      this.wiki.getCreationFields())
+    );
             
     return node;
     
@@ -848,7 +1155,7 @@ module-type: library
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha11</a>
-		on 2015-03-02T18:01:53+01:00 using the <a
+		on 2015-03-29T01:20:45+01:00 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

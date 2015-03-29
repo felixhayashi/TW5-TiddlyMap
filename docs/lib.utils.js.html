@@ -96,9 +96,34 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     var keys = Object.keys(tiddlers);
     for(var i = 0; i &lt; keys.length; i++) {
       if(utils.tiddlerExists(tiddlers[keys[i]])) {
-        var tRef = utils.getTiddlerReference(tiddlers[keys[i]]);
+        var tRef = utils.getTiddlerRef(tiddlers[keys[i]]);
         $tw.wiki.deleteTiddler(tRef);
       }
+    }
+    
+  };
+  
+  // TODO: function "delete tiddlers below path
+  
+  utils.moveFieldValues = function(oldName, newName, isRemoveOldField, isIncludeSystemTiddlers) {
+          
+    var allTiddlers = $tw.wiki.allTitles();
+    for(var i = 0; i &lt; allTiddlers.length; i++) {
+      var tObj = utils.getTiddler(allTiddlers[i]);
+      if(tObj.isDraft()
+         || !tObj.fields[oldName]
+         || (!isIncludeSystemTiddlers
+             &amp;&amp; $tw.wiki.isSystemTiddler(allTiddlers[i]))) {
+               continue;
+      }
+      
+      var fields = {};
+      fields[newName] = tObj.fields[oldName];
+      if(isRemoveOldField) {
+        fields[oldName] = undefined;
+      }
+      $tw.wiki.addTiddler(new $tw.Tiddler(tObj, fields));
+      
     }
     
   };
@@ -122,20 +147,6 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
       }
     }
     return ids;
-    
-  };
-
-  utils.getTiddlerById = function(id, idField) {
-    
-    if(!idField) idField = "id";
-    
-    var allTiddlers = $tw.wiki.allTitles();
-    for(var i = 0; i &lt; allTiddlers.length; i++) {
-      var tObj = utils.getTiddler(allTiddlers[i]);
-      if(tObj.fields[idField] === id) {
-        return tObj;
-      }
-    }
     
   };
 
@@ -232,23 +243,25 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    * 
    * @param {Hashmap&lt;id, Node>} lt1 - Lookup table that contains the
    *     *new* set of nodes.
-   * @param {Hashmap&lt;id, Node>} lt1 - lookup table that holds the
+   * @param {Hashmap&lt;id, Node>} lt2 - lookup table that holds the
    *     *old* set of nodes.
    * @param {vis.DataSet} [ds] - The dataset to be updated
    */
-  utils.refresh = function(lt1, lt2, ds) {
+  utils.refresh = function(ltNew, lTOld, ds) {
     
     if(!ds) {
-      return new vis.DataSet(utils.convert(lt1, "array"));
+      return new vis.DataSet(utils.convert(ltNew, "array"));
     }
         
     var changes = {
-      updated: utils.convert(lt1, "array"),
+      updated: utils.convert(ltNew, "array"),
       removed: []
     };
     
-    for(var id in lt2) {
-      if(!lt1[id]) changes.removed.push(id);
+    for(var id in lTOld) {
+      if(!ltNew[id]) {
+        changes.removed.push(id);
+      }
     }
     
     ds.remove(changes.removed); // remove before update!
@@ -288,7 +301,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    * 
    * Why this? Well,
    * 
-   * 1. How do I know if the object was created via {} or utils.getEmptyMap()?
+   * 1. How do I know if the object was created via {} or utils.getDataMap()?
    *    If the latter is the case, `hasOwnProperty()` doesn't exist.
    * 2. When the object is used as hashtable, hasOwnProperty could be overridden.
    *    
@@ -311,7 +324,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    * exchangeble with other framworks that depend on this method like 
    * e.g. visjs.
    */
-  utils.getEmptyMap = function() {
+  utils.getDataMap = function() {
     
     var map = Object.create(null);
     Object.defineProperty(map, "hasOwnProperty", {
@@ -333,15 +346,19 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    * 
    * @param {TiddlyWikiFilter} filter - The filter to use.
    * @param {TiddlerCollection} [tiddlers] - A set of tiddlers used as source.
-   * @param {boolean} [isReturnObjects=false] - True if the result is a hashmap.
+   * @param {Hashmap} [options] - An optional options object.
+   * @param {string} [options.outputType="array"] - May either be
+   *     set to "array" or "hashmap". When set to "hashmap", the result
+   *     container will not be an array but a hashmap with tiddler
+   *     titles being the keys and `$tw.Tiddler` objects the values.
    * @return {Array.&lt;TiddlerReference>|Hashmap.&lt;Id, $tw.Tiddler>}
    */
-  utils.getMatches = function(filter, tiddlers, isReturnObjects) {
-    
+  utils.getMatches = function(filter, tiddlers, asHashmap) {
+        
     // use wiki as default source
     var source = undefined;
     
-    if(typeof tiddlers === "object") {
+    if(tiddlers !== null &amp;&amp; typeof tiddlers === "object") {
       var keys = Object.keys(tiddlers);
       source = function(iterator) {
         for(var i = 0; i &lt; keys.length; i++) {
@@ -357,17 +374,17 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
       filter = $tw.wiki.compileFilter(filter);
     }
     
-    var tRefsArray = filter.call($tw.wiki, source);
+    var tRefs = filter.call($tw.wiki, source);
     
-    //~ if(isReturnObjects) {
-      //~ var tObjHashmap = utils.getEmptyMap();
-      //~ for(var i = 0; i &lt; tRefsArray.length; i++) {
-        //~ tObjHashmap[tRefsArray[i]] = $tw.wiki.getTiddler(tRefsArray[i]);
-      //~ }
-      //~ return tObjHashmap;
-    //~ }
-    
-    return tRefsArray;
+    if(asHashmap) {
+      var lookupTable = utils.getDataMap();
+      for(var i = 0; i &lt; tRefs.length; i++) {
+        lookupTable[tRefs[i]] = $tw.wiki.getTiddler(tRefs[i]);
+      }
+      return lookupTable;
+    } else {
+      return tRefs;
+    }
         
   };
 
@@ -381,8 +398,49 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    */
   utils.isMatch = function(tiddler, filter) {
     
-    var tRef = utils.getTiddlerReference(tiddler);
+    var tRef = utils.getTiddlerRef(tiddler);
     return (utils.getMatches(filter, [ tRef ]).length > 0);
+    
+  };
+  
+  /**
+   * Sadly, setting fields with tw means that we lose the type information
+   * since field values are persisted as strings and the type is not
+   * included.
+   * 
+   * To ensure that flags are always interpreted correctly, the following
+   * function exists.
+   * 
+   * We regard the following values as `true` (order matters):
+   * 
+   * # Any string that can be translated into a number unequal `0`
+   * # `"true"`
+   * # Any number unequal `0`
+   * # Boolean `true`
+   * 
+   * The following as false (order matters):
+   * 
+   * # Any string that can be translated into number `0`
+   * # Every string unequal `"true"`
+   * # The number `0`
+   * # Boolean `false`
+   * 
+   */
+  utils.isTrue = function(confVal, defVal) {
+    
+    if(confVal == null) {
+      return defVal;
+    } else if(typeof confVal === "string") {
+      var n = parseInt(confVal);
+      return (isNaN(n) ? (confVal === "true") : (n !== 0));
+      if(confVal === "1" || this.data[conf] === "true");
+    } else if(typeof confVal === "boolean") {
+      return confVal;
+    } else if(typeof confVal === "number") {
+      return (n !== 0);
+    }
+    
+    return false;
     
   };
 
@@ -392,7 +450,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    * @param {Tiddler} tiddler - A tiddler reference or object.
    * @return {TiddlerReference|undefined} A tiddler reference (title)
    */
-  utils.getTiddlerReference = function(tiddler) {
+  utils.getTiddlerRef = function(tiddler) {
     
     if(tiddler instanceof $tw.Tiddler) {
       return tiddler.fields.title;
@@ -409,12 +467,21 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    * 
    * @see https://github.com/Jermolene/TiddlyWiki5/blob/master/boot/boot.js#L866
    * @param {Tiddler} tiddler - A tiddler reference or object.
+   * @param {boolean} isReload - If set to true the tiddler freshly reloaded
+   *     from the db and any potentially passed tiddler object is ignored.
    * @return {Tiddler} A tiddler object.
    */
-  utils.getTiddler = function(tiddler) {
-    return (tiddler instanceof $tw.Tiddler
-           ? tiddler
-           : $tw.wiki.getTiddler(tiddler));
+  utils.getTiddler = function(tiddler, isReload) {
+    
+    if(tiddler instanceof $tw.Tiddler) {
+      if(!isReload) {
+        return tiddler;
+      }
+      tiddler = tiddler.fields.title;
+    }
+    
+    return $tw.wiki.getTiddler(tiddler);
+    
   };
 
   /**
@@ -454,9 +521,22 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    */
   utils.tiddlerExists = function(tiddler) {
     
-    var tRef = utils.getTiddlerReference(tiddler);
+    var tRef = utils.getTiddlerRef(tiddler);
     return tRef &amp;&amp; ($tw.wiki.tiddlerExists(tRef) || $tw.wiki.isShadowTiddler(tRef));
     
+  };
+  
+  /**
+   * Register listeners to widget using a hashmap.
+   * 
+   * @param {Hashmap&lt;Key, Function>} listeners - The listeners to attach.
+   * @param {Widget} widget - the widget to attach the listeners to.
+   * @param {Object} context - The context to bind the listeners to.
+   */
+  utils.addListeners = function(listeners, widget, context) {
+    for(var id in listeners) {
+      widget.addEventListener(id, listeners[id].bind(context));
+    }
   };
 
   /**
@@ -471,7 +551,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    */
   utils.getPropertiesByPrefix = function(obj, prefix, removePrefix) {
     
-      var r = utils.getEmptyMap();
+      var r = utils.getDataMap();
       for(var p in obj) {
         if(utils.startsWith(p, prefix)) {
           r[(removePrefix ? p.substr(prefix.length) : p)] = obj[p];
@@ -480,6 +560,14 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     
     return r;
     
+  };
+  
+  utils.getWithoutPrefix = function(str, prefix) {
+
+    return (utils.startsWith(str, prefix)
+            ? str.substr(prefix.length)
+            : str);
+
   };
 
   /**
@@ -507,6 +595,33 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     return (Object.keys(obj).length > 0);
     
   };
+  
+  /**
+   * 
+   * 
+   */
+  utils.groupByProperty = function(col, prop) {
+    
+    col = utils.getIterableCollection(col);
+    
+    var result = utils.getDataMap();
+    var keys = Object.keys(col);
+    for(var i in keys) {
+      var item = col[keys[i]];
+      var val = item[prop];
+      if(val == null) { // null or undefined
+        throw "Cannot group by property " + prop;
+      } else {
+        if(!Array.isArray(result[val])) {
+          result[val] = [];
+        }
+        result[val].push(item);
+      }
+    }
+    
+    return result;
+    
+  };
 
   /**
    * Searches the dom for elements that possess a certain class
@@ -524,20 +639,204 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     }
 
   };
+  
+  /**
+   * Parse json from field or return default value on error.
+   * 
+   * @param {Tiddler} tiddler - The tiddler containing the json.
+   * @param {string} field - The field with the json data.
+   * @param {Object} [data] - An optional default value.
+   * @return {*} Either the parsed data or the default data.
+   */
+  utils.parseFieldData = function(tiddler, field, data) {
+    
+    var tObj = utils.getTiddler(tiddler);
+    if(!tObj) throw "tmap: Cannot parse field of " + tiddler;
+    
+    if(!field) field = "text";
+    
+    return utils.parseJSON(tObj.fields[field], data);
+    
+  };
+  
+  /**
+   * Try to turn the string into a javascript object. If the
+   * transformation fails, return the optionally provided `data` object.
+   * 
+   * @param {string} str - The string to parse.
+   * @param {*} data - The default value if the operation fails.
+   * @return {*} Either the object resulting from the parsing operation
+   *     or `null` or `data` if the operation failed.
+   */
+  utils.parseJSON = function(str, data) {
 
+    try {
+      return JSON.parse(str);
+    } catch(Error) {
+      return data;
+    }
+    
+  };
+
+  /**
+   * Serialize json data and store it in a tiddler's field.
+   * 
+   * @param {Tiddler} tiddler - The tiddler to store the json in.
+   * @param {string} field - The field that will store the json.
+   * @param {Object} data - The json data.
+   */
+  utils.writeFieldData = function(tiddler, field, data) {
+
+    if(typeof data === "object") {
+      utils.setField(tiddler, field, JSON.stringify(data));
+    }
+    
+  };
+
+  /**
+   * Turns the filter expression in a nicely formatted (but unusable)
+   * text, making it easier to edit long filter expressions.
+   * 
+   * @param {string} expr - A valid filter expression.
+   * @result {string} A formatted (unusable) filter expression.
+   */
+  utils.getPrettyFilter = function(expr) {
+    
+    // remove outer spaces and separate operands
+    expr = expr.trim().replace("][", "] [");
+    
+    // regex to identify operands 
+    var re = /[\+\-]?\[.+?[\]\}\>]\]/g;
+    
+    // get operands
+    var operands = expr.match(re);
+    
+    // replace operands with dummies and trim again to avoid trailing spaces
+    expr = expr.replace(re, " [] ").trim();
+    
+    // turn it into an array
+    var stringsPlusDummies = expr.split(/\s+/);
+
+    var operandIndex = 0;
+    var parts = [];
+    for(var i = 0; i &lt; stringsPlusDummies.length; i++) {
+      parts[i] = (stringsPlusDummies[i] === "[]"
+                ? operands[operandIndex++]
+                : stringsPlusDummies[i]);
+    }
+      
+    return parts.join("\n");
+
+  };
+  
+  /**
+   * Set a tiddler field to a given value 
+   */
+  utils.setField = function(tiddler, field, value) {
+
+    if(tiddler &amp;&amp; field) {
+      var fields = {
+        title: utils.getTiddlerRef(tiddler)
+      };
+      fields[field] = value;
+      // do not use any tObj provided since it may result in a lost update
+      var tObj = utils.getTiddler(tiddler, true);
+      $tw.wiki.addTiddler(new $tw.Tiddler(tObj, fields));
+    }
+    
+  };
+
+  /**
+   * Set the value of a data tiddler entry (index) to a given value
+   */
+  utils.setEntry = function(tiddler, prop, value) {
+
+    $tw.wiki.setText(utils.getTiddlerRef(tiddler), null, prop, value);
+
+  };
+  
+  /**
+   * Get the value of a data tiddler entry (index)
+   */
+  utils.getEntry = function(tiddler, prop, defValue) {
+
+    var data = $tw.wiki.getTiddlerData(utils.getTiddlerRef(tiddler), {});
+    return (data[prop] == null ? defValue : data[prop]);
+    
+  };
+  
+  
+  /**
+   * Get a tiddler's field value. If the field does not exist or
+   * its value is an empty string, return the default or an empty
+   * string.
+   */
+  utils.getField = function(tiddler, field, defValue) {
+    
+    var tObj = utils.getTiddler(tiddler);
+    return (tObj ? tObj.fields[field] : (defValue ? defValue : ""));
+    
+  };
+  
+  utils.getText = function(tiddler, defValue) {
+    
+    return utils.getField(tiddler, "text", defValue);
+    
+  };
+    
+  /**
+   * Checks whether a tiddler is a draft or not.
+   * @param {Tiddler} tiddler - The tiddler to check on.
+   */
   utils.isDraft = function(tiddler) {
 
     return (utils.getTiddler(tiddler) &amp;&amp; utils.getTiddler(tiddler).isDraft());
 
   };
-
-  utils.getText = function(tiddler, defaultText) {
+  
+  /**
+   * Merges `src` into `dest` which means that the merge transforms
+   * the `dest` object itself. If src and dest both have the same
+   * property path, src does only replace the primitive data type
+   * at the end of the path.
+   * 
+   * @param {Object} dest - The destination object.
+   * @param {Object} src - The object to merge into `dest`.
+   * @return {Object} The original `dest` object.
+   */
+  utils.merge = function(dest, src) {
     
-    if(!defaultText) {
-      defaultText = "";
+    var _merge = function(dest, src) {
+      if(typeof dest !== "object") { dest = {}; }
+      
+      for(var p in src) {
+        if(src.hasOwnProperty(p)) {
+          if(src[p] &amp;&amp; typeof src[p] === "object") {
+            _merge(dest[p], src[p]);
+          } else {
+            dest[p] = src[p] // primitive type, stop recursion
+          }
+        }
+      }
+        
+      return dest;
+    };
+    
+    return _merge(dest, src);
+
+  };
+  
+  /**
+   * Get a tiddler's text or otherwise return a default text.
+   */
+  utils.isSystemOrDraft = function(tiddler) {
+
+    if($tw.wiki.isSystemTiddler(utils.getTiddlerRef(tiddler))) {
+      return true;
+    } else {
+      var tObj = utils.getTiddler(tiddler);
+      return (tObj &amp;&amp; tObj.isDraft());
     }
-    var tObj = utils.getTiddler(tiddler);
-    return (tObj ? tObj.fields.text : defaultText);
     
   };
   
@@ -547,7 +846,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    * is checked.
    * 
    * @param {*} needle - The searched value.
-   * @param {haystack} - The array.
+   * @param {Array} - The array.
    * @return Returns true if needle is found in the array, false otherwise. 
    */
   utils.inArray = function(needle, haystack) {
@@ -557,7 +856,24 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
   };
   
   /**
+   * Checks if a string exists in a string.
+   */
+  utils.hasSubString = function(sub, str) {
+    
+    return (str.indexOf(sub) !== -1);
+    
+  };
+  
+  /**
+   * Joins all elements of an array into a string where all elements
+   * are wrapped between `left` and `right`.
    * 
+   * @param {Array} arr - The array to perform the join on.
+   * @param {string} left - The wrapping string for the left side.
+   * @param {string} right - The wrapping string for the right side.
+   * @param {string} separator - The separator between a wrapped element
+   *     and the next one.
+   * @return {string} The wrapped string, e.g. `[[hello]] [[world]]`.
    */
   utils.joinAndWrap = function(arr, left, right, separator) {
         
@@ -602,10 +918,26 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     
   };
 
+  /**
+   * 
+   * 
+   */
   utils.keyOfItemWithProperty = function(col, key, val) {
     var keys = utils.keysOfItemsWithProperty(col, key, val, 1)
     return (keys.length ? keys[0] : undefined);
-  }
+  };
+  
+  /**
+   * Delete all tiddlers with a given prefix.
+   * 
+   * @param {string} prefix - The prefix
+   */
+  utils.deleteByPrefix = function(prefix) {
+    
+    var matches = utils.getMatches("[prefix[" + prefix + "]]");
+    utils.deleteTiddlers(matches);
+    
+  };
 
   /**
    * This function will return a collection object whose data can be
@@ -636,7 +968,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     
     col = utils.getIterableCollection(col);
     
-    var lookupTable = utils.getEmptyMap();
+    var lookupTable = utils.getDataMap();
     
     var keys = Object.keys(col);
     for(var i = 0; i &lt; keys.length; i++) {
@@ -675,41 +1007,56 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    * Returns all tiddlers that possess a property with a certain value.
    * 
    * @param {string} fieldName - The property name to look for.
-   * @param {string} value - The value that the field must have in order to match.
-   * @param {Hashmap} [options] - An optional options object.
+   * @param {string} [value] - If provided, the field's value must
+   *     equal this value in order to match.
+   * @param {Hashmap} [options] - Further options.
    * @param {TiddlerCollection} [options.tiddlers=$tw.wiki.allTitles()] - A collection
    *     of tiddlers to perform the search on.
-   * @param {boolean} [options.isReturnRef=false] - True if the a {@link TiddlerReference}
-   *     should be returned, false if a {@link $tw.Tiddler} object should be returned.
    * @param {boolean} [options.isIncludeDrafts=false] - True if drafts of the found
    *     tiddlers are also included in the result set.
-   * @return {Array.&lt;Tiddler>} Result
+   * @param {number} [options.limit] - A positive number delimiting the maximum
+   *     number of results.
+   *     tiddlers are also included in the result set.
+   * @return {Hashmap.&lt;TiddlerReference, Tiddler>} Result
    */
-  utils.getTiddlersWithProperty = function(fieldName, value, options) {
+  utils.getTiddlersWithField = function(fieldName, value, options) {
     
-    if(typeof options !== "object") options = utils.getEmptyMap();
-    if(!options.tiddlers) {
-      options.tiddlers = $tw.wiki.allTitles();
-    }
     
-    var result = [];
-    var isReturnRef = options.isReturnRef;
-    var keys = Object.keys(options.tiddlers);
+    if(!options || typeof options !== "object") options = {};
+    
+    var result = utils.getDataMap();
+    
+    var tiddlers = (options.tiddlers ? options.tiddlers : $tw.wiki.allTitles());
+    var limit = (options.limit ? options.limit : 0);
+    var isIncludeDrafts = (options.isIncludeDrafts === true);
+    var result = utils.getDataMap();
+    var keys = Object.keys(tiddlers);
     for(var i = 0; i &lt; keys.length; i++) {
-      var tObj = utils.getTiddler(options.tiddlers[keys[i]]);
-      if(tObj.fields[fieldName] === value) {
-        result.push(isReturnRef ? tObj.fields.title : tObj);
-        if(options.isIncludeDrafts) {
-          var draftTRef = $tw.wiki.findDraft(tObj.fields.title);
-          if(draftTRef) {
-            result.push(isReturnRef ? draftTRef : $tw.wiki.getTiddler(draftTRef));
-          }
+      var tObj = utils.getTiddler(tiddlers[keys[i]]);
+      if(tObj.hasField(fieldName) &amp;&amp; (!tObj.isDraft() || isIncludeDrafts)) {
+        if(!value || tObj.fields[fieldName] === value ) {
+          result[tObj.fields.title] = tObj;
+          if(--limit === 0) break;
         }
       }
     }
         
     return result;
     
+  };
+  
+  /**
+   * Creates an uncompiled filter expression.
+   */
+  utils.getPrefixFilter = function(prefix, marker, isOnlyBasename) {
+    
+    return "["
+           + "all[tiddlers+shadows]prefix[" + prefix + "]"
+           + "!has[draft.of]"
+           + (marker ? "has[" + marker + "]" : "")
+           + (isOnlyBasename ? "removeprefix[" + prefix + "/]" : "")
+           + "]";
+           
   };
   
   /**
@@ -933,7 +1280,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha11</a>
-		on 2015-03-02T18:01:53+01:00 using the <a
+		on 2015-03-29T01:20:45+01:00 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

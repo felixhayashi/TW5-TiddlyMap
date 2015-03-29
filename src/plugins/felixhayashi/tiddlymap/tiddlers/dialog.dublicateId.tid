@@ -1,0 +1,14 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/dublicateIdInfo
+subtitle: {{$:/core/images/info-button}} Dublicate id detected
+
+~TiddlyMap requires the value of the id field ("<<param.idField>>") to be
+unique in order to correctly identify nodes and tiddlers.
+
+The tiddler "<<param.changedTiddler>>" had the same id as the
+tiddler "<<param.existingTiddler>>".
+
+Therefore ~TiddlyMap
+
+* assigned a new id to tiddler "<<param.changedTiddler>>"
+* removed all edges from "<<param.changedTiddler>>"
+

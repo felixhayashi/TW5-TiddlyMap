@@ -1,0 +1,14 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialogFooter/edge_type_manager
+
+\define defaultTab() $:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager/overview
+
+<$button>Save
+  <$action-sendmessage $message="tmap:tm-save-edge-type-form" output=<<output>> />
+</$button>
+<$button>Create
+  <$action-sendmessage $message="tmap:tm-create-edge-type" output=<<output>> />
+</$button>
+<$button>Quit
+  <$action-setfield $tiddler=<<result>> text="1" />
+  <$action-sendmessage $message="tm-close-tiddler" />
+</$button>

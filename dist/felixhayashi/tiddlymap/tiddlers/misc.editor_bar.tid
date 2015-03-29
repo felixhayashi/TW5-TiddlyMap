@@ -8,7 +8,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
   View:
   <$reveal type="match" text="false" default=<<param.isViewBound>> >
     <$select tiddler=<<param.ref.viewHolder>> field="text" default=<<param.ref.view>> >
-       <$list filter=<<map-macro "option" "filter.allViews">> >
+       <$list filter=<<map-macro "option" "selector.allViews">> >
          <option value={{!!title}}>
            <$macrocall $name="map-macro" arg0="basename" arg1={{!!title}} />
           </option>
@@ -25,72 +25,16 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
     <div class="tc-drop-down">
       <a href="http://bit.ly/tiddlymap#The View Menu" target="_blank">{{$:/core/images/info-button}} Open online help</a>
       <hr />
-      <$button class="tc-btn-invisible" message="tm-create-view">{{$:/core/images/new-button}} Create empty view</$button>
-      <$button class="tc-btn-invisible" message="tm-rename-view">{{$:/core/images/tag-button}} Rename view</$button>
-      <$button class="tc-btn-invisible" message="tm-delete-view">{{$:/core/images/delete-button}} Delete view</$button>
-      <$button class="tc-btn-invisible" message="tm-edit-view">{{$:/core/images/theme-button}} Configure view</$button>
-      <$button class="tc-btn-invisible" message="tm-store-position">{{$:/core/images/globe}} Save positions</$button>
-      <$button class="tc-btn-invisible" message="tm-generate-widget">{{$:/core/images/permalink-button}} Grab widget code</$button>
+      <$button class="tc-btn-invisible" message="tmap:tm-create-view">{{$:/core/images/new-button}} Create empty view</$button>
+      <$button class="tc-btn-invisible" message="tmap:tm-rename-view">{{$:/core/images/tag-button}} Rename view</$button>
+      <$button class="tc-btn-invisible" message="tmap:tm-delete-view">{{$:/core/images/delete-button}} Delete view</$button>
+      <$button class="tc-btn-invisible" message="tmap:tm-edit-view">{{$:/core/images/theme-button}} Configure view</$button>
+      <$button class="tc-btn-invisible" message="tmap:tm-store-position">{{$:/core/images/globe}} Save positions</$button>
+      <$button class="tc-btn-invisible" message="tmap:tm-generate-widget">{{$:/core/images/permalink-button}} Grab widget code</$button>
+      <$button class="tc-btn-invisible" message="tmap:tm-edit-filters">{{$:/core/images/edit-button}} Edit filters</$button>
       <hr />
-      <$button class="tc-btn-invisible" message="tm-configure-system">{{$:/core/images/options-button}} Global configurations</$button>
-    </div>
-  </$reveal>
-
-</div>
-
-<!-- ===== Edge Filter ========================================== -->
-
-<span class="tmap-separator" />
-
-<div>
-  Edge Filter:
-  <$button popup=<<qualify "$:/temp/tmap/editor/filteredges">> >{{$:/core/images/menu-button}}</$button>
-  
-  <$reveal type="popup" position="below" state=<<qualify "$:/temp/tmap/editor/filteredges">> >
-    <div class="tc-drop-down">
-    
-    <$tiddler tiddler=<<param.ref.edgeFilter>>>
-      <a href="http://bit.ly/tiddlymap#Using the edge filter" target="_blank">{{$:/core/images/info-button}} Open online help</a>
-      <hr />
-      <$checkbox field="default-is-show" checked="true" unchecked="false" default="true">
-        Toggle default (show or hide)
-      </$checkbox>
-      <hr />
-      <$set name="default" filter="[all[current]!field:default-is-show[false]]" value="true" emptyValue="false">
-      <div class="tmap-small-list">
-        <$list filter=<<param.allEdgesFilter>> >
-          <$set name="curEdgeId" value={{!!id}}>
-            <$checkbox tiddler=<<param.ref.edgeFilter>> field=<<showEdgeField>> checked="true" unchecked="false" default=<<default>> >
-              <$macrocall $name="map-macro" arg0="basename" arg1={{!!title}} />
-            </$checkbox>
-            <br />
-          </$set>
-        </$list>
-      </div>
-      </$set>
-    </$tiddler>
-    
-    </div>
-  </$reveal>
-
-</div>
-
-<!-- ===== Node Filter ========================================== -->
-
-<span class="tmap-separator" />
-
-<div>
-  Node Filter:
-  <$button popup=<<qualify "$:/temp/tmap/editor/state/nodeFilterActions">> >{{$:/core/images/menu-button}}</$button>
-  <$reveal type="popup" position="below" state=<<qualify "$:/temp/tmap/editor/state/nodeFilterActions">> >
-    <div class="tc-drop-down">
-      <a href="http://bit.ly/tiddlymap#Using the node filter" target="_blank">{{$:/core/images/info-button}} Open online help</a>
-      <hr />
-      <$button class="tc-btn-invisible" message="tm-edit-node-filter">{{$:/core/images/edit-button}} Edit filter</$button>
-      <hr />
-      <$checkbox field="config.display_neighbours" checked="true" unchecked="false" default="false">
-        Show neighbours
-      </$checkbox>
+      <$button class="tc-btn-invisible" message="tmap:tm-configure-system">{{$:/core/images/options-button}} Global configurations</$button>
+      <$button class="tc-btn-invisible" message="tmap:tm-manage-edge-types">{{$:/core/images/tag-button}} Manage edge-types</$button>
     </div>
   </$reveal>
 

@@ -1,6 +1,6 @@
 /*\
 
-title: $:/plugins/felixhayashi/tiddlymap/connections.js
+title: $:/plugins/felixhayashi/tiddlymap/widget/connections.js
 type: application/javascript
 module-type: widget
 
@@ -17,15 +17,12 @@ module-type: widget
 
 var Widget = require("$:/core/modules/widgets/widget.js").widget;
 var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
+var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/edgetype.js").EdgeType;
 
 var EdgeListWidget = function(parseTreeNode,options) {
   
   Widget.call(this, parseTreeNode, options);
-  
-  this.addEventListener("tm-remove-edge", function(event) {
-    $tw.tiddlymap.adapter.deleteEdgeFromStore(event.paramObject);
-  });
-  
+    
 };
 
 EdgeListWidget.prototype = Object.create(Widget.prototype);
@@ -46,23 +43,16 @@ EdgeListWidget.prototype.execute = function() {
                       "]!has[draft.of]]";
   var filter = this.getAttribute("filter", defaultFilter);
 
-  // retrieve nodes
-  this.nodes = $tw.tiddlymap.adapter.selectNodesByFilter(filter, {
-    outputType: "hashmap"
+  var nhood = $tw.tmap.adapter.getNeighbours([ this.getVariable("currentTiddler") ], {
+    typeFilter: { "tmap:link": true }, typeFilterStyle: "blacklist"
   });
+
+  // retrieve nodes
+  this.neighbours = nhood.nodes;
 
   // retrieve edges
-  this.edges = $tw.tiddlymap.adapter.selectEdgesByEndpoints(this.nodes, {
-    outputType: "hashmap",
-    endpointsInSet: ">=1"
-  });
+  this.edges = nhood.edges;
   
-  // retrieve neighbours
-  this.neighbours = $tw.tiddlymap.adapter.selectNeighbours(this.nodes, {
-    edges: this.edges,
-    outputType: "hashmap"
-  });
-
   var entries = [];
   for(var id in this.edges) {
     var item = this.makeItemTemplate(this.edges[id]);
@@ -78,13 +68,13 @@ EdgeListWidget.prototype.execute = function() {
 EdgeListWidget.prototype.makeItemTemplate = function(edge) {
   
   var text = "";
-  var linkedNodeRole = (this.nodes[edge.to] ? "From" : "To");
+  var linkedNodeRole = (this.neighbours[edge.to] ? "To" : "From");
   var linkedNode = this.neighbours[edge[linkedNodeRole.toLowerCase()]];
 
   if(!linkedNode) return; // obsolete edge from old times;
   
   return {
-    type: "edgelistitem",
+    type: "tmap-edgelistitem",
     edge: edge,
     link: linkedNode,
     linkRole: linkedNodeRole,
@@ -96,15 +86,13 @@ EdgeListWidget.prototype.makeItemTemplate = function(edge) {
 EdgeListWidget.prototype.refresh = function(changedTiddlers) {
 
   for(var tRef in changedTiddlers) {
+    if(!utils.isSystemOrDraft(tRef)) {
     
-    var isEdgeStore = utils.startsWith(tRef, $tw.tiddlymap.opt.path.edges);
-    var isCurrentTiddler = (tRef === this.getVariable("currentTiddler"));
-    
-    if(isEdgeStore || isCurrentTiddler) {
+      //~ var isCurrentTiddler = (tRef === this.getVariable("currentTiddler"));
       this.refreshSelf();
       return true;
-    }
     
+    } 
   }
     
   // let children decide for themselves
@@ -113,7 +101,7 @@ EdgeListWidget.prototype.refresh = function(changedTiddlers) {
 };
 
 // !! EXPORT !!
-exports["connections"] = EdgeListWidget;
+exports["tmap-connections"] = EdgeListWidget;
 // !! EXPORT !!
 
 var EdgeListItemWidget = function(parseTreeNode,options) {
@@ -125,11 +113,16 @@ EdgeListItemWidget.prototype = Object.create(Widget.prototype);
 EdgeListItemWidget.prototype.execute = function() {
   
   var item = this.parseTreeNode;
+  var tRef = $tw.tmap.indeces.tById[item.link.id];
   
-  this.setVariable("currentTiddler", item.link.ref);
+  var type = new EdgeType(item.edge.type);
+  
+  this.setVariable("currentTiddler", tRef);
+  this.setVariable("edge.from", item.edge.from);
   this.setVariable("edge.id", item.edge.id);
-  this.setVariable("edge.label", item.edge.label);
-  this.setVariable("neighbour", item.link.ref);
+  this.setVariable("edge.label", type.getLabel());
+  this.setVariable("edge.type", type.getId());
+  this.setVariable("neighbour", tRef);
   this.setVariable("role", item.linkRole);
   
   // Construct the child widgets
@@ -142,7 +135,7 @@ EdgeListItemWidget.prototype.refresh = function(changedTiddlers) {
 };
 
 // !! EXPORT !!
-exports.edgelistitem = EdgeListItemWidget;
+exports["tmap-edgelistitem"] = EdgeListItemWidget;
 // !! EXPORT !!
 
 })();

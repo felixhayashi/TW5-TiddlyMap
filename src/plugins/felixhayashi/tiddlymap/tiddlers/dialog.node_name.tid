@@ -1,9 +1,23 @@
-title: $:/plugins/felixhayashi/tiddlymap/dialog/getNodeName
-subtitle: {{$:/core/images/tag-button}} Please name your new node
+title: $:/plugins/felixhayashi/tiddlymap/dialog/getNodeTitle
+subtitle: {{$:/core/images/tag-button}} Please specify a node title
 
-Name: <$edit-text tiddler=<<output>> field="text" type="text" tag="input" default=""></$edit-text> <sup>[1]</sup> 
+Title: <$edit-text tiddler=<<output>> field="text" type="text" tag="input" default="" /> <sup>[1]</sup> 
+
+
+<ul class="tmap-small-list">
+<$set name="term" value={{!!text}}>
+<$list filter="[all[tiddlers]!is[system]] +[search:title<term>]" emptyMessage="//A tiddler with this title does not exist yet and will be created.//">
+  <li>
+    <$button class="tc-btn-invisible tmap-link">
+      <$view field="title" />
+      <$action-setfield $tiddler=<<output>> text={{!!title}} />
+    </$button>
+  </li>
+</$list>
+</$set>
+</ul>
 
 ---
 
 <sup>[1]</sup>
-<small>If you leave the name field blank, a name will be automatically generated for you.</small>
+<small>If you leave the title field blank, a name will be automatically generated for you. By choosing an existing title, you add the tiddler as node to the view.</small>

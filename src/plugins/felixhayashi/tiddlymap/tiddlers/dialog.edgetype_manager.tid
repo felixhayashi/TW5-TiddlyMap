@@ -1,0 +1,39 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager
+subtitle: {{$:/core/images/tag-button}} Edge-type manager
+
+\define defaultTab() $:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager/overview
+\define settingsTab() $:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager/generalSettings
+
+<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]] [[$:/core/macros/tabs]]">
+
+<div id="edge-type-manager">
+  <div>
+    <div class="searchbar">
+      <$edit-text tiddler="$:/temp/tmap/edgeTypeSearch" type="search" tag="input" default="" />
+    </div>
+    <ul>
+    <$list filter=<<param.filter>> emptyMessage="//No results//">
+      <li>
+        <$button class="tc-btn-invisible tmap-link">{{!!title}}
+          <$action-setfield $tiddler=<<qualify "$:/state/tabs/edgeTypeManager">> text=<<defaultTab>> />
+          <$action-sendmessage $message="tmap:tm-fill-edge-type-form" id={{!!title}} output=<<output>> />
+        </$button>
+      </li>
+    </$list>
+    </ul>
+  </div>
+  <div>
+    <$reveal type="nomatch" text="" default={{!!id}} >
+      <$macrocall $name="tabs" 
+                  tabsList="[all[shadows]prefix[$:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager/]]"
+                  default=<<defaultTab>>
+                  state="$:/state/tabs/edgeTypeManager"
+                  />
+    </$reveal>
+    <$reveal type="match" text="" default={{!!id}} >
+      <div style="text-align: center;">Please select an edge-type from the list or create a new one.</div>
+    </$reveal>
+  </div>
+</div>
+
+</$importvariables>

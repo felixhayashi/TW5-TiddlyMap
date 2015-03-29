@@ -2,6 +2,7 @@
 .*
 !.gitignore
 !.git
+!node_modules
 
 # ignore file in these paths
 src/note_modules/

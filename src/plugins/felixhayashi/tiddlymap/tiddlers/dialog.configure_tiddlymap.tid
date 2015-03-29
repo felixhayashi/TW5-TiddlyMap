@@ -44,11 +44,22 @@ Please visit the [[online docs|http://bit.ly/tiddlymap#Changing%20TiddlyMap's%20
 </fieldset>
 
 <fieldset><legend>Live view</legend>
-  <table>
-    <<tmap-row title:"Scope" field:"liveViewScope" type:"input-select"
-               selectFilter:"[[1|1 steps away]] [[2|2 steps away]] [[3|3 steps away]] [[4|4 steps away]] [[5|5 steps away]] [[*|No limit]]"
-               descr:"Display the neighbourhood that can be reached within the given number of steps starting from currently focussed tiddler.">>
-  </table>
+
+  <$reveal type="nomatch" state="$:/view" text="top" default="">
+
+    ''Warning:'' You cannot use the live view at the moment because either
+
+    * you did not install the ''TW5-TopStoryView'' plugin
+    * or haven't switched your scroll view to //top// (Configuration ➡ Appearance ➡ Story view ➡ Current view).
+
+  </$reveal>
+  <$reveal type="match" state="$:/view" text="top" default="">
+    <table>
+      <<tmap-row title:"Scope" field:"liveViewScope" type:"input-select"
+                 selectFilter:"[[1|1 steps away]] [[2|2 steps away]] [[3|3 steps away]] [[4|4 steps away]] [[5|5 steps away]] [[*|No limit]]"
+                 descr:"Display the neighbourhood that can be reached within the given number of steps starting from currently focussed tiddler.">>
+    </table>
+  </$reveal>
 </fieldset>
 
 </$importvariables>

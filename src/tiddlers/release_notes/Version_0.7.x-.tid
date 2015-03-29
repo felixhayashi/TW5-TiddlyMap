@@ -1,7 +1,7 @@
 caption: Version 0.7.x
 created: 20150327192440821
 id: 5a7dd179-4aa9-4441-badd-0614253852b8
-modified: 20150328233928841
+modified: 20150329204039262
 released: not really
 tags: ReleaseNote
 title: Version 0.7.x
@@ -9,6 +9,10 @@ type: text/x-markdown
 
 Major enhancements
 ----------------------------
+
+### v0.7.3
+
+* "Live" tab removed - Live view is merged into the sidebar editor; See #82
 
 ### v0.7.0
 

@@ -407,23 +407,6 @@ module-type: library
   };
   
   /**
-   * Returns a set of edges that corresponds to the given filter.
-   *
-   * @param {TiddlyWikiFilter} filter - The filter to apply.
-   * @param {Hashmap} [options] - An optional options object.
-   * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectEdgesByType}.
-   * @return {EdgeCollection} A collection of a type specified in the options.
-   */
-  Adapter.prototype.selectEdgesByFilter = function(filter, options) {
-      
-    var allEdgeTypes = utils.getMatches(this.opt.selector.allEdgeTypes);
-    var typeList = utils.getMatches(filter, allEdgeTypes);
-    
-    return this.selectEdgesByType(typeList, options);
-    
-  };
-
-  /**
    * Returns a set of edges where the edge labels match the labels
    * specified.
    *
@@ -435,13 +418,13 @@ module-type: library
    */
   Adapter.prototype.selectEdgesByType = function(typeList, options) {
 
-    if(!options || typeof options !== "object") options = {};
-
-    var whiteList = utils.getArrayValuesAsHashmapKeys(typeList);
-    var allTiddlersLT = utils.getMatches(this.opt.selector.allPotentialNodes, null, true);
-    var result = this.getEdges(allTiddlersLT, whiteList);
-        
-    return utils.convert(result, options.outputType);
+    //~ if(!options || typeof options !== "object") options = {};
+//~ 
+    //~ var whiteList = utils.getArrayValuesAsHashmapKeys(typeList);
+    //~ var allTiddlersLT = utils.getMatches(this.opt.selector.allPotentialNodes, null, true);
+    //~ var result = this.getEdges(allTiddlersLT, whiteList);
+        //~ 
+    //~ return utils.convert(result, options.outputType);
     
   };
   
@@ -452,13 +435,20 @@ module-type: library
   Adapter.prototype._processEdgesWithType = function(type, task) {
 
     type = new EdgeType(type);
-    var tObjHashmap = utils.getTiddlersWithField("title");
+
+    
+    this.logger("debug", "Processing edges", type, task);
     
     // get edges
     
     var typeWhiteList = utils.getDataMap();
     typeWhiteList[type.getId()] = true;
-    var edges = this._getRelations(tObjHashmap, typeWhiteList);
+    
+    var tRefs = utils.getMatches(this.opt.selector.allPotentialNodes);
+    var edges = this.getAllOutgoingEdges(tRefs, {
+      typeFilter: typeWhiteList,
+      typeFilterStyle: "whitelist"
+    });
     
     if(task.action === "rename") {
       
@@ -494,89 +484,6 @@ module-type: library
     $tw.wiki.deleteTiddler(type.getPath());
 
   };
-
-  /**
-   * Selects edges that are connected to nodes in a set either by
-   * their from-part or by their to-part.
-   * 
-   * @param {NodeCollection} nodes - A set of nodes.
-   * @param {Hashmap} [options] - An optional options object.
-   * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectEdgesByFilter}.
-   * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#filterEdgesByEndpoints}.
-   * @return {EdgeCollection} A collection of a type specified in the options.
-   */
-  Adapter.prototype.selectEdgesByEndpoints = function(nodes, options) {
-
-    if(!options || typeof options !== "object") options = {};
-
-    var view = new ViewAbstraction(options.view);
-    
-    // if no view is supplied, use global filter
-    var edgeFilter = this.opt.selector.allEdgeTypesByLabel;
-    
-    var edges = this.selectEdgesByFilter(edgeFilter, {
-      outputType: "array",
-      view: view
-    });
-    
-    return this.filterEdgesByEndpoints(edges, nodes, options);
-
-  };
-
-  /**
-   * This function will return a set of edges, which only contains edges that
-   * possess endpoints ("from" or "to") which are contained in the nodes set.
-   * 
-   * @param {EdgeCollection} edges - The edges to filter.
-   * @param {NodeCollection} nodes - The endpoints.
-   * @param {Hashmap} [options] - An optional options object.
-   * @param {"=1"|">=1"|"=2"} [options.endpointsInSet=">=1"] - How many endpoints
-   *     do have to match for the edge to be accepted? Per default, at least one
-   *     edge has to match. Setting `endpointsInSet` to "=1" or "=2" means exactly
-   *     one or respectively two endpoints have to match.
-   * @param {CollectionTypeString} [options.outputType="dataset"] - The result type.
-   * @return {EdgeCollection} A collection of a type specified in the options.
-   */
-  Adapter.prototype.filterEdgesByEndpoints = function(edges, nodes, options) {
-
-    if(!options || typeof options !== "object") options = {};
-    
-    edges = utils.convert(edges, "array");
-
-    var re = /^(=1|>=1|=2)$/;
-    
-    var filter = (re.test(options.endpointsInSet)
-                  ? options.endpointsInSet
-                  : ">=1");
-    
-    var nodes = utils.getLookupTable(nodes, "id");
-
-    var result = utils.getDataMap();
-    for(var i = 0; i < edges.length; i++) {
-      var edge = edges[i];
-
-      switch(filter) {
-        case "=2":
-          isMatch = (nodes[edge.from] && nodes[edge.to]);
-          break;
-        case ">=1":
-          isMatch = (nodes[edge.from] || nodes[edge.to]);
-          break;
-        case "=1": // XOR
-          isMatch = ((nodes[edge.from] === undefined && nodes[edge.to])
-                     || (nodes[edge.to] === undefined && nodes[edge.from]));
-          break;
-        default:
-          isMatch = false;
-      }
-      
-      if(isMatch) result[edge.id] = edge;
-      
-    }
-    
-    return utils.convert(result, options.outputType);
-    
-  }
 
   /**
    * Returns a set of nodes that corresponds to the given filter.
@@ -754,55 +661,6 @@ module-type: library
     }
     
     return node;
-    
-  };
-
-  /**
-   * This function will return all direct non-dublicate neighbours 
-   * with respect to the given set of nodes. If a node is a direct
-   * neighbour of another node in the set and also cointained in the
-   * set itself, it won't be added to the result set.
-   * 
-   * To calculated any degree of neighbourship, simple call this function
-   * on its own result set.
-   * 
-   * @param {NodeCollection} nodes - The nodes whose neighbours will be retrieved.
-   * @param {Hashmap} [options] - An optional options object.
-   * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectEdgesByFilter}.
-   * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectNodesByIds}.
-   * @param {EdgeCollection} [options.edges] - A collection of edges that may be
-   *     provided as source instead of considering all edges in the system.
-   *     The `view` option will not have an effect then.
-   * @return {NodeCollection} A collection of neighbour nodes
-   */
-  Adapter.prototype.selectNeighbours = function(nodes, options) {
-
-    if(!options || typeof options !== "object") options = {};
-    
-    if(options.edges) {
-      var edges = this.filterEdgesByEndpoints(options.edges, nodes, {
-        outputType: "array",
-        endpointsInSet: "=1"
-      });
-    } else {
-      var edges = this.selectEdgesByEndpoints(nodes, {
-        outputType: "array",
-        view: options.view,
-        endpointsInSet: "=1"
-      });
-    }
-    
-    var nodes = utils.getLookupTable(nodes, "id"); 
-    var neighbourIds = utils.getDataMap();
-    for(var i = 0; i < edges.length; i++) {
-      
-      // opposite is neighbour
-      var key = (nodes[edges[i].from] ? edges[i].to : edges[i].from)
-      neighbourIds[key] = true;
-      
-    }
-
-    return this.selectNodesByIds(neighbourIds, options);
     
   };
 

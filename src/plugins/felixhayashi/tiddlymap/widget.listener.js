@@ -89,11 +89,12 @@ GlobalListener.prototype.handleSaveEdgeTypeForm = function(event) {
     type.loadDataFromTiddler(tObj);
     type.persist();
 
-    if(!tObj.fields["temp.newId"]) {
+    if(!tObj.fields["temp.newId"]) { // no new id set
+      
       // set id back to original state
       utils.setField(tObj, "temp.newId", tObj.fields["id"]);
       
-    } else  if(tObj.fields["temp.newId"] !== tObj.fields["id"]) { //renamed
+    } else if(tObj.fields["temp.newId"] !== tObj.fields["id"]) { //renamed
       
       this.adapter._processEdgesWithType(type, {
         action: "rename",

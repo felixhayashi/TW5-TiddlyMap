@@ -68,7 +68,6 @@ module-type: widget
         "tmap:tm-configure-system": this.handleConfigureSystem,
         "tmap:tm-store-position": this.handleStorePositions,
         "tmap:tm-edit-filters": this.handleEditFilters,
-        "tmap:tm-manage-edge-types": this.handleManageEdgeTypes,
         "tmap:tm-generate-widget": this.handleGenerateWidget
       }, this, this);
       
@@ -1033,24 +1032,7 @@ module-type: widget
     });
     
   };
-  
-  MapWidget.prototype.handleManageEdgeTypes = function(event) {
     
-    var params = {
-      param: {
-        filter: this.opt.selector.allEdgeTypesByLabel
-                + " +[search:title{$:/temp/tmap/edgeTypeSearch}]"
-                + " +[sort[title]]"
-      },
-      dialog: {
-        buttons: "edge_type_manager"
-      }
-    };
-    
-    return this.dialogManager.open("edgeTypeManager", params);
-    
-  };
-  
   MapWidget.prototype.handleShowContentPreview = function(tRef) {
     
     var params = { "param.ref": tRef };
@@ -1227,20 +1209,16 @@ module-type: widget
     } else if(properties.edges.length) { // clicked on an edge
       
       if(!this.editorMode) return;
-      this.logger("debug", "Clicked on an Edge");
-      var behaviour = this.opt.config.sys.edgeClickBehaviour;
       
+      this.logger("debug", "Clicked on an Edge");
+      
+      var behaviour = this.opt.config.sys.edgeClickBehaviour;
       var type = new EdgeType(this.graphData.edgesById[properties.edges[0]].type);
       
-      if(behaviour === "manager") {
-        var dialogTObj = this.handleManageEdgeTypes();
-        
+      if(behaviour === "manager") {        
         $tw.rootWidget.dispatchEvent({
-          type: "tmap:tm-fill-edge-type-form",
-          paramObject: {
-            id: type.getId(),
-            output: dialogTObj.fields["output"]
-          }
+          type: "tmap:tm-manage-edge-types",
+          paramObject: { type: type.getId() }
         });        
       }
     }

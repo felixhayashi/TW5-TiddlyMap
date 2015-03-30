@@ -40,10 +40,40 @@ var GlobalListener = function() {
     "tmap:tm-create-edge-type": this.handleCreateEdgeType,
     "tmap:tm-create-edge": this.handleCreateEdge,
     "tmap:tm-suppress-dialog": this.handleSuppressDialog,
-    "tmap:tm-generate-widget": this.handleGenerateWidget
+    "tmap:tm-generate-widget": this.handleGenerateWidget,
+    "tmap:tm-manage-edge-types": this.handleManageEdgeTypes
   }, $tw.rootWidget, this);
   
 };
+  
+GlobalListener.prototype.handleManageEdgeTypes = function(event) {
+  
+  if(!event.paramObject) event.paramObject = {};
+  
+  var params = {
+    param: {
+      filter: this.opt.selector.allEdgeTypesByLabel
+              + " +[search:title{$:/temp/tmap/edgeTypeSearch}]"
+              + " +[sort[title]]"
+    },
+    dialog: {
+      buttons: "edge_type_manager"
+    }
+  };
+  
+  var dialogTObj = $tw.tmap.dialogManager.open("edgeTypeManager", params);
+  
+  var type = event.paramObject.type;
+  if(type) {
+    this.handleFillEdgeTypeForm({
+      paramObject: {
+        id: type,
+        output: dialogTObj.fields["output"]
+      }
+    });
+  }
+  
+};  
   
 GlobalListener.prototype.handleSuppressDialog = function(event) {
 
@@ -60,9 +90,7 @@ GlobalListener.prototype.handleGenerateWidget = function(event) {
   var options = {
     dialog: {
       buttons: "ok",
-      preselects: {
-        view: event.paramObject.view || "Default"
-      }
+      preselects: { view: event.paramObject.view || "Default" }
     }
   };
   $tw.tmap.dialogManager.open("getWidgetCode", options);

@@ -256,7 +256,7 @@ html {
       html .tmap-widget .tmap-topbar select {
         width: 150px;
         word-wrap: initial;
-        padding: 2px; }
+        padding: 0px; }
       html .tmap-widget .tmap-topbar button {
         line-height: inherit;
         color: #666666; }

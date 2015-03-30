@@ -643,7 +643,9 @@ module-type: widget
     // delay (100ms) the painting of the graph to allow the gui to render; freezes otherwise
     window.setTimeout(function() {
       if(!utils.hasElements(this.graphData.nodesById)) { // prevents unnecessary repainting
-        this.rebuildGraph();
+        this.rebuildGraph({
+          resetFocus: true
+        });
       }
     }.bind(this), 100);
         

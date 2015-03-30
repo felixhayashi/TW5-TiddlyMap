@@ -467,10 +467,8 @@ module-type: widget
       
     var nodes = graph.nodes;
     var edges = graph.edges;
-    
+        
     // refresh datasets
-    
-    this.graphData = this.graphData || utils.getDataMap();
     
     this.graphData.nodes = utils.refresh(nodes, // new nodes
                                          this.graphData.nodesById, // old nodes
@@ -607,9 +605,14 @@ module-type: widget
     this.handleResizeEvent();
 
     // register options and data
-    this.graphOptions = this.getGraphOptions(); 
-    this.graphData = this.getGraphData(); 
-
+    this.graphOptions = this.getGraphOptions();
+    this.graphData = {
+      nodes: new vis.DataSet(),
+      edges: new vis.DataSet(),
+      nodesById: utils.getDataMap(),
+      edgesById: utils.getDataMap()
+    };
+    
     // init the graph with dummy data as events are not registered yet
     this.network = new vis.Network(this.graphDomNode, this.graphData, this.graphOptions);
         
@@ -628,6 +631,13 @@ module-type: widget
     });
     
     this.setGraphButtonEnabled("fullscreen", true);
+    
+    // delay the painting of the graph to allow the gui to render; freezes otherwise
+    window.setTimeout(function() {
+      if(!utils.hasElements(this.graphData.nodesById)) { // prevents unnecessary repainting
+        this.rebuildGraph();
+      }
+    }.bind(this), 100);
         
   };
   

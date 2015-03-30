@@ -1,59 +1,4 @@
-<!DOCTYPE html>
-
-<html lang="en">
-<head>
-	<meta charset="utf-8">
-	<title>TiddlyMap Source: daemon.caretaker.js</title>
-
-	<!--[if lt IE 9]>
-	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
-	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
-
-	<link type="text/css" rel="stylesheet" href="styles/site.spacelab.css">
-
-</head>
-
-<body>
-<div class="container-fluid">
-	<div class="navbar navbar-fixed-top navbar-inverse">
-		<div class="navbar-inner">
-			<a class="brand" href="index.html">TiddlyMap</a>
-			<ul class="nav">
-				
-				<li class="dropdown">
-					<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b
-						class="caret"></b></a>
-
-					<ul class="dropdown-menu ">
-						
-						<li>
-							<a href="global.html">Global</a>
-						</li>
-						
-
-					</ul>
-				</li>
-				
-			</ul>
-		</div>
-	</div>
-
-	<div class="row-fluid">
-
-		
-			<div class="span12">
-				
-				<div id="main">
-					
-
-
-		<h1 class="page-title">Source: daemon.caretaker.js</h1>
-    
-<section>
-	<article>
-		<pre
-			class="sunlight-highlight-javascript linenums">/*\
+/*\
 
 title: $:/plugins/felixhayashi/tiddlymap/caretaker.js
 type: application/javascript
@@ -84,9 +29,9 @@ module-type: startup
 
 // Export name and synchronous status
 exports.name = "tmap.caretaker";
-exports.platforms = ["browser"];
-exports.after = ["startup"];
-exports.before = ["rootwidget"];
+exports.platforms = [ "browser" ];
+exports.after = [ "startup" ];
+exports.before = [ "rootwidget" ];
 exports.synchronous = true;
 
 /**************************** IMPORTS ****************************/
@@ -201,7 +146,7 @@ var attachIndeces = function(parent) {
   }
   
   var allTiddlers = $tw.wiki.allTitles();
-  for(var i = 0; i &lt; allTiddlers.length; i++) {
+  for(var i = 0; i < allTiddlers.length; i++) {
     var tRef = allTiddlers[i];
     var tObj = $tw.wiki.getTiddler(tRef);
     if(!utils.isSystemOrDraft(tObj)) {
@@ -232,7 +177,7 @@ var attachFunctions = function(parent) {
   
   var nirvana = function() { /* /dev/null */ }; 
 
-  if($tw.tmap.opt.config.sys.debug === "true" &amp;&amp; console) {
+  if($tw.tmap.opt.config.sys.debug === "true" && console) {
   
     /**
      * A logging mechanism that uses the first argument as type and
@@ -246,7 +191,7 @@ var attachFunctions = function(parent) {
      * @see http://stackoverflow.com/questions/9521921/why-does-console-log-apply-throw-an-illegal-invocation-error
      */
     fn.logger = function() {
-      if(arguments.length &lt; 2) return;
+      if(arguments.length < 2) return;
       var args = Array.prototype.slice.call(arguments);
       var arg1 = args.shift(args);
       var type = (console.hasOwnProperty(arg1) ? arg1 : "debug");
@@ -293,7 +238,7 @@ var routineCheck = function() {
 };
 
 
-var checkForDublicates = function(tObj, idField, id, dialogManager) {
+var checkForDublicates = function(tObj, idField, id) {
 
   var opt = $tw.tmap.opt;
   var dublicates = utils.getTiddlersWithField(idField, id, { limit: 2 });
@@ -316,7 +261,7 @@ var checkForDublicates = function(tObj, idField, id, dialogManager) {
     }
     
     if(!utils.isTrue(opt.config.sys.suppressedDialogs["dublicateIdInfo"], false)) {
-      dialogManager.open("dublicateIdInfo", vars);
+      $tw.tmap.dialogManager.open("dublicateIdInfo", vars);
     }
   }
   
@@ -340,11 +285,8 @@ var rebuildGlobals = function(parent) {
   
 };
 
-var registerChangeListener = function() {
-  
-  var callbackManager = new CallbackManager();
-  var dialogManager = new DialogManager(callbackManager);
-  
+var registerChangeListener = function(callbackManager) {
+    
   var filter = $tw.wiki.compileFilter(
     "[prefix[" + $tw.tmap.opt.path.options + "]!has[draft.of]]"
   );
@@ -374,7 +316,7 @@ var registerChangeListener = function() {
         var id = tObj.fields[idField];
         
         if(id) {
-          var hasDublicates = checkForDublicates(tObj, idField, id, dialogManager);
+          var hasDublicates = checkForDublicates(tObj, idField, id);
         
           if(hasDublicates) {
             // remove any defined edges
@@ -444,9 +386,13 @@ exports.startup = function() {
       
   // register meta file (if not done yet)
   createMetaFile();
+  
+  // create global callback and dialog managers 
+  $tw.tmap.callbackManager = new CallbackManager();
+  $tw.tmap.dialogManager = new DialogManager($tw.tmap.callbackManager);
       
-  // finally register change listener
-  registerChangeListener();
+  // finally register change listener with the callback manager
+  registerChangeListener($tw.tmap.callbackManager);
   
   // issue notification
   $tw.tmap.logger("warn", "TiddlyMap's caretaker successfully started");
@@ -454,105 +400,3 @@ exports.startup = function() {
 };
 
 })();
-</pre>
-	</article>
-</section>
-
-
-
-
-
-				</div>
-
-				<div class="clearfix"></div>
-				<footer>
-					
-					
-		<span class="copyright">
-		Copyright © 2014 FelixHayashi
-		</span>
-					<br />
-					
-		<span class="jsdoc-message">
-		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha11</a>
-		on 2015-03-30T11:57:57+02:00 using the <a
-			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
-		</span>
-				</footer>
-			</div>
-
-			
-			<br clear="both">
-		</div>
-
-	</div>
-	<!--<script src="scripts/sunlight.js"></script>-->
-	<script src="scripts/docstrap.lib.js"></script>
-	<script src="scripts/bootstrap-dropdown.js"></script>
-	<script src="scripts/toc.js"></script>
-
-	<script>
-		$( function () {
-			$( "[id*='$']" ).each( function () {
-				var $this = $( this );
-
-				$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
-			} );
-
-			$( "#toc" ).toc( {
-				anchorName  : function ( i, heading, prefix ) {
-					return $( heading ).attr( "id" ) || ( prefix + i );
-				},
-				selectors   : "h1,h2,h3,h4",
-				showAndHide : false,
-				scrollTo    : "100px"
-			} );
-
-			$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
-			$( "#main span[id^='toc']" ).addClass( "toc-shim" );
-			$( '.dropdown-toggle' ).dropdown();
-//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
-
-			$( ".tutorial-section pre, .readme-section pre" ).each( function () {
-				var $this = $( this );
-
-				var example = $this.find( "code" );
-				exampleText = example.html();
-				var lang = /{@lang (.*?)}/.exec( exampleText );
-				if ( lang && lang[1] ) {
-					exampleText = exampleText.replace( lang[0], "" );
-					example.html( exampleText );
-					lang = lang[1];
-				} else {
-					lang = "javascript";
-				}
-
-				if ( lang ) {
-
-					$this
-						.addClass( "sunlight-highlight-" + lang )
-						.addClass( "linenums" )
-						.html( example.html() );
-
-				}
-			} );
-
-			Sunlight.highlightAll( {
-				lineNumbers : true,
-				showMenu : true,
-				enableDoclinks : true
-			} );
-		} );
-	 </script>
-
-
-
-	<!--Navigation and Symbol Display-->
-	
-
-
-	<!--Google Analytics-->
-	
-
-</body>
-</html>

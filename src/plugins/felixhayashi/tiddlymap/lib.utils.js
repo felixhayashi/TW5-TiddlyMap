@@ -804,7 +804,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
   /**
    * Checks if a string exists in a string.
    */
-  utils.hasSubString = function(sub, str) {
+  utils.hasSubString = function(str, sub) {
     
     return (str.indexOf(sub) !== -1);
     

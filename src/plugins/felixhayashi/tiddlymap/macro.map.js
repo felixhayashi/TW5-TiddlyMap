@@ -63,7 +63,7 @@ util functions.
         var str = this.getVariable("currentTiddler");
         var result = str.split(arguments[1])[arguments[2]];
         
-        return (result ? result : "Cannot split and select");
+        return (result != null ? result : str);
         
       
       case "option":

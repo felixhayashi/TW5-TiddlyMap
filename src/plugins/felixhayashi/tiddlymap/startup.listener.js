@@ -16,9 +16,9 @@ module-type: startup
 
 // Export name and synchronous status
 exports.name = "tmap.listener";
-exports.platforms = ["browser"];
-exports.after = ["rootwidget"];
-exports.before = ["story"];
+exports.platforms = [ "browser" ];
+exports.after = [ "rootwidget", "tmap.caretaker" ];
+exports.before = [ "story" ];
 exports.synchronous = true;
 
 var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
@@ -39,7 +39,8 @@ var GlobalListener = function() {
     "tmap:tm-save-edge-type-form": this.handleSaveEdgeTypeForm,
     "tmap:tm-create-edge-type": this.handleCreateEdgeType,
     "tmap:tm-create-edge": this.handleCreateEdge,
-    "tmap:tm-suppress-dialog": this.handleSuppressDialog
+    "tmap:tm-suppress-dialog": this.handleSuppressDialog,
+    "tmap:tm-generate-widget": this.handleGenerateWidget
   }, $tw.rootWidget, this);
   
 };
@@ -52,7 +53,21 @@ GlobalListener.prototype.handleSuppressDialog = function(event) {
   
 };
 
-
+GlobalListener.prototype.handleGenerateWidget = function(event) {
+  
+  if(!event.paramObject) event.paramObject = {};
+  
+  var options = {
+    dialog: {
+      buttons: "ok",
+      preselects: {
+        view: event.paramObject.view || "Default"
+      }
+    }
+  };
+  $tw.tmap.dialogManager.open("getWidgetCode", options);
+  
+};
 
 GlobalListener.prototype.handleRemoveEdge = function(event) {
   this.adapter.deleteEdge(event.paramObject);

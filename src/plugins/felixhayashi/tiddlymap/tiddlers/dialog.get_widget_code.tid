@@ -10,28 +10,23 @@ The following wizard will assist you in creating the widget code you can use (co
 <pre style="white-space: normal;">
 &lt;$tiddlymap
 
-view="<<param.view>>"
+view="{{!!view}}"
 
 <$list filter="[field:title<output>field:var.click-to-use[false]]">
   click-to-use="false"
 </$list>
-
-<$list filter="[field:title<output>has[var.width]]">
-  width="<$view tiddler=<<output>> field="var.width" />"
-</$list>
-
-<$list filter="[field:title<output>has[var.height]]">
-  height="<$view tiddler=<<output>> field="var.height" />"
-</$list>
-
-<$list filter="[field:title<output>has[var.class]]">
-  class="<$view tiddler=<<output>> field="var.class" />"
-</$list>
-
 <$list filter="[field:title<output>has[var.editor]]">
-  class="<$view tiddler=<<output>> field="var.editor" />"
+  editor="<$view tiddler=<<output>> field='var.editor' />"
 </$list>
-
+<$list filter="[field:title<output>has[var.width]]">
+  width="<$view tiddler=<<output>> field='var.width' />"
+</$list>
+<$list filter="[field:title<output>has[var.height]]">
+  height="<$view tiddler=<<output>> field='var.height' />"
+</$list>
+<$list filter="[field:title<output>has[var.class]]">
+  class="<$view tiddler=<<output>> field='var.class' />"
+</$list>
 <$list filter="[field:title<output>field:var.show-buttons[false]]">
   show-buttons="false"
 </$list>
@@ -44,14 +39,20 @@ If you are unsure about a parameter, just leave everything as is and simply copy
 <fieldset>
   <legend>Parameters</legend> 
   <table>
+      <$macrocall $name="tmap-row" type="input-select" title="View" field="view" 
+                 selectFilter=<<map-macro "option" "selector.allViewsByLabel">>
+                 descr="The view to display" />
+      <<tmap-row type:"input-select" title:"Editor bar" field:"var.editor"
+                 selectFilter:"[[|Hidden]] [[vis|Simple]] [[advanced|Advanced]]"
+                 descr:"Whether the widget should act as an editor or not">>
       <<tmap-row type:"input-text" title:"Height" field:"var.height"
-                 descr:"The graph's height in css units. Defaults to '300px'.">>
+                 descr:"Graph's height in css units. Defaults to '300px'.">>
       <<tmap-row type:"input-text" title:"Width" field:"var.width"
-                 descr:"The graph's width in css units. Defaults to '100%'.">>
+                 descr:"Graph's width in css units. Defaults to '100%'.">>
       <<tmap-row type:"input-text" title:"Class" field:"var.class"
-                 descr:"A custom class you can assign to apply your own css.">>
+                 descr:"A custom class to apply your own css.">>
       <<tmap-row type:"input-checkbox" title:"Click to use" field:"var.click-to-use" default:"true"
-                 descr:"Prevents the graph from reacting to mouse or click events. This default is highly recommended.">>
+                 descr:"A click is needed to enable the graph.">>
       <<tmap-row type:"input-checkbox" title:"Show buttons" field:"var.show-buttons" default:"true"
                  descr:"Show or hide the graph's navigation buttons.">>
   </table>

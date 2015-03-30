@@ -113,7 +113,15 @@ module-type: widget
     
       if(isConfirmed) {
         
-        edge.type = utils.getText(outputTObj);
+        var type = utils.getText(outputTObj);
+        
+        // check whether type string comes with a namespace
+        var hasNamespace = utils.hasSubString(type, ":");
+        
+        // get the default name space of the view
+        var ns = this.getView().getConfig("edge_type_namespace");
+        
+        edge.type = (ns && !hasNamespace ? ns : "") + type;
         var isSuccess = this.adapter.insertEdge(edge);
         
       }
@@ -632,7 +640,7 @@ module-type: widget
     
     this.setGraphButtonEnabled("fullscreen", true);
     
-    // delay the painting of the graph to allow the gui to render; freezes otherwise
+    // delay (100ms) the painting of the graph to allow the gui to render; freezes otherwise
     window.setTimeout(function() {
       if(!utils.hasElements(this.graphData.nodesById)) { // prevents unnecessary repainting
         this.rebuildGraph();
@@ -1017,8 +1025,10 @@ module-type: widget
      
   MapWidget.prototype.handleGenerateWidget = function(event) {
     
-    var params = { "param.view": this.getView().getLabel() };
-    this.dialogManager.open("getWidgetCode", params);
+    $tw.rootWidget.dispatchEvent({
+      type: "tmap:tm-generate-widget",
+      paramObject: { view: this.getView().getLabel() }
+    });
     
   };
   
@@ -1461,14 +1471,17 @@ module-type: widget
     }
     
     var viewHolderRef = this.getViewHolderRef();
-    var curViewRef = this.wiki.getTiddler(viewHolderRef).fields.text;
-    this.logger("info", "Retrieved view \"" + curViewRef + "\" from holder \"" + viewHolderRef + "\"");
+                       
+    // transform into view object
+    var view = new ViewAbstraction(utils.getText(viewHolderRef));
     
-    if(utils.tiddlerExists(curViewRef)) {
-      return new ViewAbstraction(curViewRef);
+    this.logger("info", "Retrieved view \"" + view.getLabel() + "\" from holder \"" + viewHolderRef + "\"");
+    
+    if(view.exists()) {
+      return view;
     } else {
-      this.logger("log", "Warning: View \"" + curViewRef + "\" doesn't exist. Default is used instead.");
-      return new ViewAbstraction("default");
+      this.logger("log", "Warning: View \"" + view.getLabel() + "\" doesn't exist. Default is used instead.");
+      return new ViewAbstraction("Default");
     }
     
   };

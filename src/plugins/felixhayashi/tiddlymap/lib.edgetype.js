@@ -88,7 +88,7 @@ module-type: library
   
   EdgeType.prototype.getLabel = function() {
   
-    return (this.data.label ? this.data.label : this.id);
+    return this.data.label || this.id.substring(this.id.indexOf(":") + 1);
   
   };
   

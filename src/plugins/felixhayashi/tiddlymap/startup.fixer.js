@@ -16,8 +16,8 @@ module-type: startup
   
   // Export name and synchronous status
   exports.name = "tmap.fixer";
-  exports.after = ["tmap.caretaker"];
-  exports.before = ["rootwidget"];
+  exports.after = [ "tmap.caretaker" ];
+  exports.before = [ "rootwidget" ];
   exports.synchronous = true;
   
   /**************************** IMPORTS ****************************/

@@ -93,7 +93,7 @@ module-type: library
       // remove prefix and slash
       view = utils.getWithoutPrefix(view, this.opt.path.views + "/");
 
-      if(!utils.hasSubString("/", view)) { // contains no slash; valid label
+      if(!utils.hasSubString(view, "/")) { // contains no slash; valid label
         return this.opt.path.views + "/" + view; // add prefix (again)
       }
     }
@@ -327,7 +327,7 @@ module-type: library
    * @result {string|Object} If `type` is not specified an object containing
    *     all configurations is returned, otherwise a single value will be returned.
    */
-  ViewAbstraction.prototype.getConfig = function(name, isRebuild) {
+  ViewAbstraction.prototype.getConfig = function(name, isRebuild, defValue) {
     
     if(!this.exists()) {
       var config = utils.getDataMap();
@@ -400,11 +400,30 @@ module-type: library
     
     this.logger("log", "Updating config", this.config, "with", arguments);
     
-    if(arguments.length === 1) {
-      $tw.utils.extend(this.config, arguments[0]);
+    if(arguments[0] == null) return; // null or undefined
+    
+    if(arguments.length === 1 && typeof arguments[0] === "object") {
+      
+      for(var prop in arguments[0]) {
+        this.setConfig(prop, arguments[0][prop]);
+      }
+      
+    } else if(arguments.length === 2 && typeof arguments[0] === "string") {
+      
+      var prop = utils.getWithoutPrefix(arguments[0], "config.");
+      var val = arguments[1];
+      if(val) {
+        if(prop === "edge_type_namespace") {
+          // if the user left out the colon, we will add it!
+          val = val.replace(/([^:])$/, "$1:");
+        }
+        this.config["config."+prop] = val;
+      }
+      
     } else {
-      var prefix = (utils.startsWith(arguments[0], "config.") ? "" : "config.");
-      this.config[prefix + arguments[0]] = arguments[1];
+      
+      return;
+      
     }
     
     this.wiki.addTiddler(new $tw.Tiddler(

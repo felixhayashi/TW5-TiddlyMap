@@ -1,0 +1,21 @@
+created: 20150330124519329
+id: c10296ef-ffcf-44bd-bc82-d051dea607fb
+modified: 20150330132312030
+tags: documentation concept
+title: Edge-type namespaces
+type: text/vnd.tiddlywiki
+
+As of v0.7.5 TiddlyMap acknowledges namespaces for edge-types. Namespaces may be used to
+
+* group edge-types that belong together.
+* distinguish edge-types that share the same name but belong to different contexts.
+* quickly enable or disable a whole set of edges via the edge-filter (see Isolated maps vs public graph).
+
+To see an example how edge-type namespaces may be used, just
+
+# <$button>open the Family tree view
+  <$action-setfield $tiddler=<<map-macro "option" "ref.defaultGraphViewHolder">> text="Family Tree" />
+</$button>
+# and click on an edge to view its type in the edge-type manager
+# Also have a look at the view's the edge-type filter
+# and how the default namespace is set in the view's configuration

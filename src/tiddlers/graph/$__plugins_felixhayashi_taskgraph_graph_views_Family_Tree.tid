@@ -1,3 +1,4 @@
+config.edge_type_namespace: family:
 config.layout.active: hierarchical
 config.layout.hierarchical.order-by-74c35b5e-0085-4468-8a87-511e47511272: true
 config.layout.hierarchical.order-by-d183ff6f-7e74-4c60-b692-3cbcf12f3116: true

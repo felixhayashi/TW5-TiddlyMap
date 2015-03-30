@@ -1,13 +1,13 @@
 created: 20150201132115819
 id: 04f1dd6d-79a9-4d6e-91be-b8322dd0d0be
-modified: 20150302115056882
-tags: documentation concept
-title: Public and Private Edges
+modified: 20150330114720747
+tags: documentation recipe
+title: Isolated maps vs public graph
 type: text/vnd.tiddlywiki
 
 TiddlyMap serves to use cases:
 
-!! Use Case 1 -- Global Linking
+!! Use case 1 -- Global topic linking
 
 ''Purpose:'' Turning your wiki into a network of information
 
@@ -15,12 +15,12 @@ TiddlyMap can be used to express the overall structure of your information conta
 
 Global linking is the default operating mode of TiddlyMap.
 
-!! Use Case 2 -- Private Linking
+!! Use case 2 -- Independent mindmaps
 
 ''Purpose:'' To create (almost) isolated concept or mind maps
 
-When creating concept or mind maps, you may want to restrict the edges to be exclusively displayed in the current view. The edges then only describe relationships that are valid or meaningful in a very narrow context and are solely dedicated to a special topic. They should not be visible outside the view and on the other hand, no edges from outside should appear inside the view.
+When creating concept or mind maps, you may want only a narrow set of edge-types to be displayed in the current view.
 
-In this case you need to enable the private edge mode in your view's configuration.
+In this case it is best to prefix all edge types that you create with a certain namespace (domain). For example "family:mother of", "family:brother of" (Open the "Family tree" demo view for an example setup). Then change the edge filter to only include edges with that namespace. You can set the default prefix for edges created inside a certain view via the view configuration menu.
 
 See also: [[Dealing with interferences between graphs]].

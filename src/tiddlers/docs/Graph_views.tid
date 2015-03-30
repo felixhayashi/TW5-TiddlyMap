@@ -1,18 +1,20 @@
 created: 20150119181237867
 id: e7ebfd9b-7ecd-4547-852f-6f2832f78421
-modified: 20150224172519574
+modified: 20150330110139661
 tags: documentation concept
 title: Graph views
 type: text/vnd.tiddlywiki
 
-Views determine which nodes and edges are selected in order to draw the graph. In its core, views are tw-filters. You can modify a view by selecting it in the tiddlymap editor and changing the filter properties via the form elements in the editor-bar.
+Views determine which nodes and edges are selected in order to draw the graph. In its core, views are tw-filters. You can modify a view by selecting it in the sidebar map editor.
 
 {{graph and views.png}}
 
-You can use the name of a view to embed graphs in your tiddlers. Just look at one of the many [[examples|TiddlyMap Example]] provided in this wiki. All changes are instantly reflected in each graph that uses the view.
+You can use the name of a view to embed graphs in your tiddlers. Just look at the many [[examples|TiddlyMap Example]] provided in this wiki. All changes are instantly reflected in each graph that uses the view.
+
+Use the [[widget generator|Embedding views within tiddlers]] to create a code similar to the one below.
 
 ```html
-<$tiddlymap view="YOURVIEWNAME"></$tiddlymap>
+<$tiddlymap view="Default" height="300px"></$tiddlymap>
 ```
 
 !!! Node-Views and Edge-Views

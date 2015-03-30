@@ -1,10 +1,15 @@
 created: 20150207164931578
 id: 1e3565b4-f11f-4191-9d24-c4a54faed0d5
-modified: 20150207170254230
+modified: 20150330105706058
 tags: concept documentation
 title: Embedding views within tiddlers
 type: text/vnd.tiddlywiki
 
 Once a view is created, you may generate the widget code by opening the [[view menu|The View Menu]] of the map editor and clicking on the "Grab widget code" button.
 
-Have a look at the many examples provided at this demo site how embedded graphs look like.
+<$button message="tmap:tm-generate-widget">
+  {{$:/core/images/permalink-button}} Grab widget code
+</$button>
+
+Have a look at the many examples provided at this demo site to see how an embedded graph looks like.
+

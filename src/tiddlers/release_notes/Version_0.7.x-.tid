@@ -10,6 +10,11 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.7.6
+
+* Added more options to the widget generator
+* Edge type namespaces (the string before a colon like "foaf" in "foaf:person") are automatically stripped of the edge label
+
 ### v0.7.3
 
 * "Live" tab removed - Live view is merged into the sidebar editor; See #82

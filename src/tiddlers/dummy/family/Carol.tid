@@ -3,6 +3,6 @@ id: 4762501a-6bcb-4d35-acfd-f2e9d6310389
 modified: 20150102011613088
 tags: family
 title: Carol
-tmap.edges: {"bbce9cc0-0353-45cd-bfa6-a13834ff7218":{"to":"f24ab062-62a1-4555-a57f-dfcd597c3515","type":"mother of"}}
+tmap.edges: {"bbce9cc0-0353-45cd-bfa6-a13834ff7218":{"to":"f24ab062-62a1-4555-a57f-dfcd597c3515","type":"family:mother of"}}
 type: text/vnd.tiddlywiki
 

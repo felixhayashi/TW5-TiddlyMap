@@ -2,7 +2,7 @@ created: 20150103202237610
 id: 77ee9fd0-95ce-4d78-a28a-7e43887ae686
 modified: 20150103202508522
 title: TiddlyMap
-tmap.edges: {"67748704-c227-4e45-b899-4aee7a2a172b":{"to":"B0528516-51F2-477C-94F3-F1195C0718C6","type":"developed by"}}
+tmap.edges: {"67748704-c227-4e45-b899-4aee7a2a172b":{"to":"B0528516-51F2-477C-94F3-F1195C0718C6","type":"demo:author"}}
 type: text/vnd.tiddlywiki
 
 {{TiddlyMap - The Big Picture}}

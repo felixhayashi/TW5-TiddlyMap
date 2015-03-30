@@ -1,8 +1,8 @@
 created: 20150110235157303
 id: 9d97c1e8-9458-44f9-97c5-82253da987c0
-modified: 20150110235703502
+modified: 20150330200259978
 tags: 
-title: TiddlyMap Example
+title: TiddlyMap Examples
 type: text/vnd.tiddlywiki
 
 <$list filter="[tag[example]]">

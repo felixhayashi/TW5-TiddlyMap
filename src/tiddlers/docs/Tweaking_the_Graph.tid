@@ -1,13 +1,14 @@
 created: 20150202222322842
 id: f4b1862f-c731-4163-83e1-c19edcdc3bc9
-modified: 20150203205729687
+modified: 20150330195932082
 tags: documentation configuration
 title: Tweaking the Graph
+tmap.edges: {"3825731d-5c24-45de-9d91-02cb932ac420":{"to":"3dcb4c1b-ec92-4394-a089-58f92924fbf0","type":"demo:suggestion"}}
 type: text/vnd.tiddlywiki
 
 The [[Vis.js]] library offers many ways to change the default graph layout and behaviour.
 
-As far as TiddlyMap is concerned, feel free to change the following options:
+As far as ~TiddlyMap is concerned, feel free to change the following options:
 
 # http://visjs.org/docs/network.html#Nodes_configuration
 # http://visjs.org/docs/network.html#Edges_configuration
@@ -19,23 +20,25 @@ Configuring Vis.js beyond the aspects denoted by the links above is only recomme
 
 To change the vis options, first create a JSON tiddler (see [[DataTiddlers|http://tiddlywiki.com#DataTiddlers]]) named
 
-<pre><<tgmacro "option" "ref.visConf">>/user</pre>
+<pre><<map-macro "option" "ref.visUserConf">></pre>
 
-Then you could add properties using nested JSON or a dot notation. For example, if you want to change the default edge color, you would add the following to the tiddler's body (make sure you also changed the tiddler's content type to //application/json// and mind the quotation marks!):
+Then you could add properties using nested JSON or a dot notation. For example, if you want to change the way neighbour's are colored, you would add the following to the tiddler's body (make sure you also changed the tiddler's content type to //application/json// and mind the quotation marks!):
 
 ```javascript
-"edges.color": "blue"
+"groups.neighbours.color": "pink"
 ```
 
 Alternatively
 
 ```javascript
 {
-  "edges"
+  "groups"
     {
-      "color": "blue"
+      "neighbours": {
+        "color": "pink"
+      }
     }
 }
 ```
 
-As in the example above, you can selectively override the TiddlyMap's default configuration. If you are uncomfortable with your configurations, just delete the tiddler and the defaults are used.
+As in the example above, you can selectively override the ~TiddlyMap's default configuration. If you are uncomfortable with your configurations, just delete the tiddler and the defaults are used.

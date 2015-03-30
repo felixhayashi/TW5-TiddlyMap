@@ -1,8 +1,8 @@
 created: 20141218163905294
 id: A94544D7-9A04-40D6-9274-AD56617C04BE
-modified: 20150327221534251
+modified: 20150330170033902
 title: How to install TiddlyMap?
-tmap.edges: {"189a596f-b51d-4535-babe-447b7a6fd620":{"to":"a7e46ff2-2010-475f-a430-d757a7659798","type":"please read"}}
+tmap.edges: {}
 type: text/vnd.tiddlywiki
 
 ''Warning:'' ~TiddlyMap is cool but unstable. Just play with it, don't use it (until it leaves its beta state in the next months).
@@ -10,13 +10,13 @@ type: text/vnd.tiddlywiki
 In case you really want to use it now (it's always great to have beta-testers!), follow the steps below:
 
 # Have a quick look at [[Common Pitfalls]]
-# Create a backup of your current TiddlyWiki HTML file (just in case)
-# Open your TiddlyWiki in a browser 
-# Drag all the links below to the browser window containing your TiddlyWiki:
+# Create a backup of your current ~TiddlyWiki HTML file (just in case)
+# Open your ~TiddlyWiki in a browser 
+# Drag all the links below to the browser window containing your ~TiddlyWiki:
 #* [[$:/plugins/felixhayashi/tiddlymap]]
 #* [[$:/plugins/felixhayashi/vis]]
 #* [[$:/plugins/felixhayashi/topstoryview]]
-# Save your TiddlyWiki
+# Save your ~TiddlyWiki
 # Refresh the window
 # The plugin should now be available for use
 # Also make sure to always check back to this site to see whether your version is up-to-date as updates and bugfixes come quick! For any bug you discover, please create an issue at [[github.com|https://github.com/felixhayashi/TW5-TiddlyMap/issues]].

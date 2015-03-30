@@ -3,6 +3,6 @@ id: A9995A40-BAA5-4F26-9909-28C73FE097A1
 modified: 20141217203244960
 tags: component
 title: Utils
-tmap.edges: {"c885f875-2d5e-46b9-8a7b-7dfca94709db":{"to":"2403acb0-92fe-4fa8-a53e-e7970a1f30d5","type":"uses"}}
+tmap.edges: {"c885f875-2d5e-46b9-8a7b-7dfca94709db":{"to":"2403acb0-92fe-4fa8-a53e-e7970a1f30d5","type":"demo:uses"}}
 type: text/vnd.tiddlywiki
 

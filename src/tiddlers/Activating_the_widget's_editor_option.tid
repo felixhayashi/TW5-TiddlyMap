@@ -1,14 +1,14 @@
 created: 20141220185422497
 id: 8FA9A14C-D58E-4257-ADDC-D01E834DD18C
-modified: 20150227123528822
+modified: 20150330201955031
 tags: example insight
-title: Edit Graphs from Tiddlers
-tmap.edges: {"34944601-27b4-4ae8-a053-713c8d6aebce":{"to":"9d97c1e8-9458-44f9-97c5-82253da987c0","type":"is a"}}
+title: Activating the widget's editor option
+tmap.edges: {"34944601-27b4-4ae8-a053-713c8d6aebce":{"to":"9d97c1e8-9458-44f9-97c5-82253da987c0","type":"belongs to"},"da8ac3b4-0bc3-4420-9440-321b4847804e":{"to":"1e3565b4-f11f-4191-9d24-c4a54faed0d5","type":"demo:suggestion"}}
 type: text/vnd.tiddlywiki
 
 In rare cases, you want your graphs displayed in your tiddlers to possess an editor bar for direct manipulation (this is usually done in the main editor).
 
-Then you could do the following:
+Then you could add the "editor" attribute:
 
 ```html
 <$tiddlymap view="All Tasks" height="250px" editor="vis"></$tiddlymap>
@@ -16,12 +16,12 @@ Then you could do the following:
 
 <$tiddlymap view="All Tasks" height="250px" editor="vis"></$tiddlymap>
 
-Alternatively, you can show the whole editor bar via:
+Alternatively, you can display the whole editor bar:
 
 ```html
 <$tiddlymap view="All Tasks" height="250px" editor="advanced"></$tiddlymap>
 ```
 
-This will add the TiddlyMap editor bar on top of the graph.
+This will add the ~TiddlyMap editor bar on top of the graph.
 
 <$tiddlymap view="All Tasks" height="250px" editor="advanced"></$tiddlymap>

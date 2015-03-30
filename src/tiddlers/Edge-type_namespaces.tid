@@ -1,6 +1,6 @@
 created: 20150330124519329
 id: c10296ef-ffcf-44bd-bc82-d051dea607fb
-modified: 20150330132312030
+modified: 20150330190823977
 tags: documentation concept
 title: Edge-type namespaces
 type: text/vnd.tiddlywiki
@@ -13,7 +13,7 @@ As of v0.7.5 TiddlyMap acknowledges namespaces for edge-types. Namespaces may be
 
 To see an example how edge-type namespaces may be used, just
 
-# <$button>open the Family tree view
+# <$button>Open the Family tree view
   <$action-setfield $tiddler=<<map-macro "option" "ref.defaultGraphViewHolder">> text="Family Tree" />
 </$button>
 # and click on an edge to view its type in the edge-type manager

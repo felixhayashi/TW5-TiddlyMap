@@ -1,5 +1,5 @@
 created: 20150202231339398
-modified: 20150204161707150
+modified: 20150330171906008
 tags: 
 title: $:/plugins/felixhayashi/tiddlymap/config/sys/user
 type: application/x-tiddler-dictionary
@@ -12,3 +12,4 @@ field.viewMarker: isview
 debug: true
 notifications: true
 editNodeOnCreate: false
+suppressedDialogs.dublicateIdInfo: true

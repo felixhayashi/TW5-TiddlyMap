@@ -1,7 +1,8 @@
-created: 20150327214826882
+created: 20150330201030303
 description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non blandit nisl. Nam finibus lorem et quam euismod pharetra. Vivamus eget mollis nibh. In hac habitasse platea dictumst. Nullam pellentesque faucibus ipsum vitae commodo. Sed porta imperdiet eros quis elementum. Maecenas non molestie dui, sed blandit velit.
-modified: 20150327214826882
-style: {"color":"#25dc9d"}
-title: $:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/please read
+label: an example for
+modified: 20150330201030303
+style: {"color":"red"}
+title: $:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/demo:example
 type: text/vnd.tiddlywiki
 

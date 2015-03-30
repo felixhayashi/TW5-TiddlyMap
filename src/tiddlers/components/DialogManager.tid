@@ -3,6 +3,6 @@ id: FFE39070-CFD2-46F6-8A73-FC28403194B8
 modified: 20141228001315788
 tags: component
 title: DialogManager
-tmap.edges: {"E60772B5-C7B2-4686-B69D-3F7039628939":{"to":"A9995A40-BAA5-4F26-9909-28C73FE097A1","type":"uses"}}
+tmap.edges: {"E60772B5-C7B2-4686-B69D-3F7039628939":{"to":"A9995A40-BAA5-4F26-9909-28C73FE097A1","type":"demo:uses"}}
 type: text/vnd.tiddlywiki
 

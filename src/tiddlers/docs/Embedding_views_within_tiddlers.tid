@@ -5,7 +5,7 @@ tags: concept documentation
 title: Embedding views within tiddlers
 type: text/vnd.tiddlywiki
 
-Once a view is created, you may generate the widget code by opening the [[view menu|The View Menu]] of the map editor and clicking on the "Grab widget code" button.
+Once a view is created, you may generate the widget code by opening the [[view menu|The editor menu]] of the map editor and clicking on the "Grab widget code" button.
 
 <$button message="tmap:tm-generate-widget">
   {{$:/core/images/permalink-button}} Grab widget code

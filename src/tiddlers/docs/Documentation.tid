@@ -1,7 +1,8 @@
 created: 20150119191256190
 id: 847d7896-9174-48f9-9509-6c89c1498335
-modified: 20150206101948900
+modified: 20150330200208201
 title: Documentation
+tmap.edges: {"f6086358-0dfa-4a1e-9a70-32c87096011e":{"to":"9d97c1e8-9458-44f9-97c5-82253da987c0","type":"demo:suggestion"}}
 type: text/vnd.tiddlywiki
 
 <ul>
@@ -12,25 +13,11 @@ type: text/vnd.tiddlywiki
       </$list>
     </ul>
   </li>
-  <li>Interacting with ~TiddlyMap
+  <li>Interacting with TiddlyMap
     <ul>
-      <li>Using the Map Editor
-        <ul>
-          <$list filter="[tag[documentation]tag[editor]]">
-          <li><$link to={{!!title}}><$view tiddler={{!!title}} field="title" /></$link></li>
-          </$list>
-        </ul>
-      </li>
-      <li>Using the Map-Button in the Tiddler-Toolbar
-        <ul>
-          <li>[[The Map-Button]]</li>
-        </ul>
-      </li>
-      <li>The live view
-        <ul>
-          <li>[[Working with the Live View]]</li>
-        </ul>
-      </li>
+        <$list filter="[tag[documentation]tag[interface]]">
+        <li><$link to={{!!title}}><$view tiddler={{!!title}} field="title" /></$link></li>
+        </$list>
     </ul>
   </li>
 

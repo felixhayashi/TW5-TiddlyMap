@@ -40,6 +40,10 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.7.9
+
+* Doesn't crash anymore when Tiddler is renamed while being displayed as node in a graph; fixes #88
+
 ### v0.7.7
 
 * Same links are only added once when displaying neighbourhoods of a size greater than one; fixes #85, #86

@@ -1084,11 +1084,13 @@ module-type: widget
       this.logger("log", "Network stabilized after " + properties.iterations + " iterations");
       this.getView().setStabilizationIterations(properties.iterations);
       var isFloatingMode = this.getView().isEnabled("physics_mode");
+
+      this.network.storePositions();
       this.setNodesMoveable(this.graphData.nodesById, isFloatingMode);
       
       //this.network.freezeSimulation(!isFloatingMode);
       
-      if(this.doZoomAfterStabilize) { // TODO: no zoom if user clicked before stabilze
+      if(this.doZoomAfterStabilize) {
         this.doZoomAfterStabilize = false;
         this.fitGraph(1000, 1000);
       }
@@ -1296,11 +1298,31 @@ module-type: widget
       var isFloatingMode = this.getView().isEnabled("physics_mode");
       
       var node = this.graphData.nodesById[properties.nodeIds[0]];
-      this.setNodesMoveable([ node ], isFloatingMode);
+      
       if(!isFloatingMode) { // only store positions if in floating mode
+        
+        // fix node again
+        this.setNodesMoveable([ node ], false);
+        
+        var raster = parseInt(this.opt.config.sys.raster);
+        if(raster) { // apply raster
+          var pos = this.network.getPositions()[node.id];
+          // only update x,y to prevent a lost update (allowedToMove stuff)
+          this.graphData.nodes.update({
+            id: node.id,
+            x: pos.x - (pos.x % raster),
+            y: pos.y - (pos.y % raster)
+          });
+        }
+        
+        // finally store positions
         this.handleStorePositions();
       }
     }
+    
+        
+        //~ x: (positions[id].x - (positions[id].x % 20)), // raster preparations
+        //~ y: (positions[id].y - (positions[id].y % 20)),
     
   };
   
@@ -1504,15 +1526,17 @@ module-type: widget
    *     move or be moved.
    */    
   MapWidget.prototype.setNodesMoveable = function(nodes, isMoveable) {
-    
-    this.network.storePositions(); // does it matter if we put this before setter? yes, I guess.
+  
+    this.network.storePositions();
 
     var updates = [];
     var keys = Object.keys(nodes);
     for(var i = 0; i < keys.length; i++) {
       
+      var id = nodes[keys[i]].id;
+      
       var update = {
-        id: nodes[keys[i]].id,
+        id: id,
         allowedToMoveX: isMoveable,
         allowedToMoveY: isMoveable
       };

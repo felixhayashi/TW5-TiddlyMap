@@ -603,7 +603,7 @@ module-type: library
     }
         
     // create node object 
-    var node = utils.getDataMap();
+    var node = {} // vis requires child of object
         
     // determine shape
     

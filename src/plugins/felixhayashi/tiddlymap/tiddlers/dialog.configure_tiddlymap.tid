@@ -40,6 +40,10 @@ Please visit the [[online docs|http://bit.ly/tiddlymap#Changing%20TiddlyMap's%20
     <<tmap-row title:"Edge click behaviour" field:"config.sys.edgeClickBehaviour" type:"input-select"
                selectFilter:"[[nothing|Nothing]] [[manager|Open edge-type manager]]"
                descr:"What should happen when you click on an edge?">>
+    <<tmap-row type:"input-select" title:"Raster size" field:"config.sys.raster"
+               selectFilter:"[[|disabled]] [[5|5px]] [[10|10px]] [[15|15px]] [[20|20px]] [[30|30px]] [[40|40px]]"
+               descr:"Snap nodes to an invisible raster of the given size after drag'n'drop."
+               note:"Only works when the view is not in floating mode">>
   </table>
 </fieldset>
 

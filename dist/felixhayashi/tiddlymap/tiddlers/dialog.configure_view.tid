@@ -13,8 +13,8 @@ subtitle: {{$:/core/images/theme-button}} View Configuration
 <fieldset><legend>Other</legend>
   <table>
     <<tmap-row title:"Edge-type namespace" field:"config.edge_type_namespace" type:"input-text"
-               descr:"A namespace (like 'foaf' in 'foaf:person') that will be automatically added to all edge-types you create in this view."
-               note:"All namespaces are automatically stipped when the edge label is displayed in the graph">>
+               descr:"A namespace (like 'foaf' in 'foaf:knows') that will be automatically added to all edge-types you create in this view."
+               note:"All namespaces are automatically stripped when the edge label is displayed in the graph">>
   </table>
 </fieldset>
 

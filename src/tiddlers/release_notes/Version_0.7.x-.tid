@@ -1,7 +1,7 @@
 caption: Version 0.7.x
 created: 20150327192440821
 id: 5a7dd179-4aa9-4441-badd-0614253852b8
-modified: 20150329204039262
+modified: 20150331151607871
 released: not really
 tags: ReleaseNote
 title: Version 0.7.x
@@ -36,6 +36,10 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.7.7
+
+* Same links are only added once when displaying neighbourhoods of a size greater than one; fixes #85, #86
+
 ### v0.7.5
 
 * GUI does not hang anymore when opening "map" tab in sidebar; fixes #83
@@ -46,11 +50,11 @@ Important Bugfixes
 
 ### v0.7.2
 
-* User config is not merged correctly; fixes #79
+* User config is was not merged correctly; fixes #79
 
 ### v0.7.1
 
-* Datastructure update did not work; fixes #70
+* Datastructure update now works; fixes #70
 
 ### v0.7.0
 

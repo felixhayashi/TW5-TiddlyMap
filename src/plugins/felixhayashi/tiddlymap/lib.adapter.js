@@ -339,10 +339,21 @@ module-type: library
     var links = this.wiki.getTiddlerLinks(tRef);
     
     for(var i = 0; i < links.length; i++) {
-      if(!$tw.wiki.tiddlerExists(links[i]) || utils.isSystemOrDraft(links[i])) continue;
+      
+      if(!$tw.wiki.tiddlerExists(links[i]) || utils.isSystemOrDraft(links[i])) {
+        continue;
+      }
+      
       if(isWhitelistToFiltr ? toFiltr[links[i]] : !toFiltr[links[i]]) {
-        var edge = this.makeEdge(this.getId(tRef), this.getId(links[i]), type);
-        edges[edge.id] = edge;
+        // using a hash here has the advantage that ids are unique and
+        // only change if the underlying link changes
+        var id = $tw.utils.hashString(tRef + links[i]); 
+        var edge = this.makeEdge(this.getId(tRef), this.getId(links[i]), type, id);
+        if(edge) {
+          edges[edge.id] = edge;
+        } else { // DELETE THIS AFTER TESTING
+          throw "upps," + tRef + ".." + this.getId(links[i]);
+        }
       }
     }
     

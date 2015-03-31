@@ -1,9 +1,8 @@
-created: 20150202222322842
-id: f4b1862f-c731-4163-83e1-c19edcdc3bc9
-modified: 20150330195932082
+created: 20150331124622206
+id: 885f501d-575b-4c79-a7f9-790e6de2120a
+modified: 20150331124631862
 tags: documentation configuration
 title: Tweaking the Graph
-tmap.edges: {"3825731d-5c24-45de-9d91-02cb932ac420":{"to":"3dcb4c1b-ec92-4394-a089-58f92924fbf0","type":"demo:suggestion"}}
 type: text/vnd.tiddlywiki
 
 The [[Vis.js]] library offers many ways to change the default graph layout and behaviour.

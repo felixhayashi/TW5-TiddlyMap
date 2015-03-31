@@ -1,0 +1,17 @@
+created: 20150202222322842
+id: f4b1862f-c731-4163-83e1-c19edcdc3bc9
+modified: 20150331124715837
+tags: documentation configuration
+title: Styling of groups
+tmap.edges: {"3825731d-5c24-45de-9d91-02cb932ac420":{"to":"3dcb4c1b-ec92-4394-a089-58f92924fbf0","type":"demo:suggestion"}}
+type: text/vnd.tiddlywiki
+
+In a graph, all nodes (invisibly) belong to a certain group (see below). The appearance of nodes in a group can be changed using visjs-styles as described [[here|Tweaking the Graph]].
+
+!!! Matches
+
+All nodes that match a view's filter are assigned the group "matches". 
+
+!!! Neighbours
+
+If you activated the neighbourhood option after opening the [[View configuration]], neighbouring nodes will be displayed in the graph as well. These nodes belong to the group "neighbours".

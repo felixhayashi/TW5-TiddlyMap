@@ -10,6 +10,10 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.7.8
+
+* Optional raster to snap nodes to when dragging; resolves #87
+
 ### v0.7.6
 
 * Added more options to the widget generator
@@ -39,6 +43,7 @@ Important Bugfixes
 ### v0.7.7
 
 * Same links are only added once when displaying neighbourhoods of a size greater than one; fixes #85, #86
+* No auto-out-zoom if user changed viewport before stabilzation (calming) of network
 
 ### v0.7.5
 

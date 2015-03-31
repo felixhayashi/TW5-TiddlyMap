@@ -325,16 +325,18 @@ var registerChangeListener = function(callbackManager) {
             $tw.tmap.adapter.assignId(tObj, true);
           }
           
-        } else {
-          // assign id if it doesn't exist
-          $tw.tmap.adapter.assignId(tObj);
         }
         
-      } else { // deleted
+        // call assignId IN ANY CASE to make sure the index stays intact
+        // also after a renaming operation
+        $tw.tmap.adapter.assignId(tObj);
+        
+      } else { // deleted or renamed
         
         // remove node; any edges pointing in/out; update indeces
         // CAREFUL about recursion!
-        $tw.tmap.adapter.deleteNode($tw.tmap.indeces.idByT[tRef]);
+        // WROOONG WE CANNOT DO ANYTHING HERE BECAUSE WE DON'T KNOW WHETHER RENAMED OR DELETED
+        //$tw.tmap.adapter.deleteNode($tw.tmap.indeces.idByT[tRef]);
         
       }
     }

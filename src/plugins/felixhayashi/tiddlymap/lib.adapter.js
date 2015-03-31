@@ -885,7 +885,8 @@ module-type: library
       this.logger("info", "Assigning new id to", tObj.fields.title);
     }
     
-    // blindly update the index
+    // blindly update the index IN ANY CASE because tiddler may have
+    // an id but it is not indexed yet (e.g. because of renaming operation)
     $tw.tmap.indeces.tById[id] = tObj.fields.title;
     $tw.tmap.indeces.idByT[tObj.fields.title] = id;
     

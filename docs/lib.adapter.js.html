@@ -313,112 +313,8 @@ module-type: library
   };
   
   /**
-   * Returns all outgoing relations of a tiddler. Which relations are
-   * included in the result can be controlled via an optional type-filter
-   * and/or an optional to-filter. Per default, all filters act as
-   * blacklists.
-   * 
-   * @param {Tiddler} tiddler - A tiddler object or reference.
-   * @param {Hashmap} [options] - An optional options object.
-   * @param {Hashmap&lt;TiddlerReference, *>} [options.toFilter.filter]
-   *     A hashmap on which basis it is decided, whether to include
-   *     an edge with a certain to-value in the result or not.
-   *     `toFilter` hashmap are included.
-   * @param {string} [options.toFilter.type="blacklist"]
-   *       Either "blacklist" or "whitelist".
-   * @param {Hashmap&lt;string, *>} [options.typeFilter.filter]
-   *     A hashmap on which basis it is decided, whether to include
-   *     an edge of a given type in the result or not.
-   * @param {string} [options.typeFilter.type="blacklist"]
-   *       Either "blacklist" or "whitelist".
-   * @return {Hashmap&lt;Id, Edge>} All relations of a tiddler represented as edges.
-   */
-  Adapter.prototype._getRelations = function(tiddler, opts) {
-    
-    if(!utils.tiddlerExists(tiddler) || utils.isSystemOrDraft(tiddler)) {
-      return;
-    }
-    
-    if(!opts) opts = {};
-    var toFiltr = opts.toFilter || utils.getDataMap();
-    var isWhitelistToFiltr = (opts.toFilterStyle === "whitelist");
-    var tyFiltr = opts.typeFilter || utils.getDataMap();
-    var isWhitelistTyFiltr = (opts.typeFilterStyle === "whitelist");
-    
-    var tRef = utils.getTiddlerRef(tiddler);
-    var edges = utils.getDataMap();
-    var connections = utils.parseFieldData(tRef, this.opt.field.edges, {});
-    
-    for(var conId in connections) {
-      var con = connections[conId];
-      var toTRef = $tw.tmap.indeces.tById[con.to];
-      if(isWhitelistToFiltr ? toFiltr[toTRef] : !toFiltr[toTRef]) {
-        if(isWhitelistTyFiltr ? tyFiltr[con.type] : !tyFiltr[con.type]) {
-          edges[conId] = this.makeEdge(this.getId(tRef), con.to, con.type, conId);
-        }
-      }
-    }
-    
-    return edges;
-    
-  };
-  
-  /**
-   * Returns all outgoing *links* of a tiddler. Which links are
-   * included in the result can be controlled via an optional to-filter.
-   * Per default, the filter acts as blacklists.
-   * 
-   * @param {Tiddler} tiddler - A tiddler object or reference.
-   * @param {Hashmap} [opts] - An optional options object.
-   * @param {Hashmap&lt;TiddlerReference, *>} [opts.toFilter.filter]
-   *     A hashmap on which basis it is decided, whether to include
-   *     an edge with a certain to-value in the result or not.
-   *     `toFilter` hashmap are included.
-   * @param {string} [opts.toFilter.type="blacklist"]
-   *       Either "blacklist" or "whitelist".
-   * @return {Hashmap&lt;Id, Edge>} All relations of a tiddler represented as edges.
-   */
-  Adapter.prototype._getLinks = function(tiddler, opts) {
-    
-    if(!utils.tiddlerExists(tiddler) || utils.isSystemOrDraft(tiddler)) {
-      return;
-    }
-    
-    if(!opts) opts = {};
-    var toFiltr = opts.toFilter || utils.getDataMap();
-    var isWhitelistToFiltr = (opts.toFilterStyle === "whitelist");
-    var tRef = utils.getTiddlerRef(tiddler);
-    
-    var edges = utils.getDataMap();
-    var type = new EdgeType("tmap:link");
-    var links = this.wiki.getTiddlerLinks(tRef);
-    
-    for(var i = 0; i &lt; links.length; i++) {
-      
-      if(!$tw.wiki.tiddlerExists(links[i]) || utils.isSystemOrDraft(links[i])) {
-        continue;
-      }
-      
-      if(isWhitelistToFiltr ? toFiltr[links[i]] : !toFiltr[links[i]]) {
-        // using a hash here has the advantage that ids are unique and
-        // only change if the underlying link changes
-        var id = $tw.utils.hashString(tRef + links[i]); 
-        var edge = this.makeEdge(this.getId(tRef), this.getId(links[i]), type, id);
-        if(edge) {
-          edges[edge.id] = edge;
-        } else { // DELETE THIS AFTER TESTING
-          throw "upps," + tRef + ".." + this.getId(links[i]);
-        }
-      }
-    }
-    
-    return edges;
-    
-  };
-  
-  /**
    * Returns all outgoing edges of a given tiddler. This includes
-   * virtual edges (links) and user created relations.
+   * virtual edges (links, tag-relations) and user created relations.
    * 
    * @param {Hashmap&lt;TiddlerReference, *>} [opts.toFilter.filter]
    *     A hashmap on which basis it is decided, whether to include
@@ -434,22 +330,73 @@ module-type: library
    * @return {Hashmap&lt;Id, Edge>} An edge collection.
    */
   Adapter.prototype.getEdges = function(tiddler, opts) {
-        
+
+    if(!utils.tiddlerExists(tiddler) || utils.isSystemOrDraft(tiddler)) {
+      return;
+    }
+    
     if(!opts) opts = {};
+    var toFiltr = opts.toFilter || utils.getDataMap();
+    var isWhitelistToFiltr = (opts.toFilterStyle === "whitelist");
     var tyFiltr = opts.typeFilter || utils.getDataMap();
     var isWhitelistTyFiltr = (opts.typeFilterStyle === "whitelist");
     
+    var fromTRef = utils.getTiddlerRef(tiddler);
+    var tObj = utils.getTiddler(fromTRef);
     var edges = utils.getDataMap();
     
-    // get relations
-    var relations = this._getRelations(tiddler, opts);
-    $tw.utils.extend(edges, relations);
+    var connections = utils.parseFieldData(tObj, this.opt.field.edges, {});
     
-    // get links
-    if(isWhitelistTyFiltr ? tyFiltr["tmap:link"] : !tyFiltr["tmap:link"]) {
-      $tw.utils.extend(edges, this._getLinks(tiddler, opts));
+    for(var conId in connections) {
+      var con = connections[conId];
+      var toTRef = $tw.tmap.indeces.tById[con.to];
+      if(!toTRef) continue;
+      if(isWhitelistToFiltr ? toFiltr[toTRef] : !toFiltr[toTRef]) { // TODO: create util function
+        if(isWhitelistTyFiltr ? tyFiltr[con.type] : !tyFiltr[con.type]) {
+          var edge = this.makeEdge(this.getId(fromTRef), con.to, con.type, conId);
+          if(edge) {
+            edges[conId] = edge;
+          }
+        }
+      }
     }
     
+    var buildAutoEdges = function(refsByType) {
+      
+      for(var type in refsByType) {
+        
+        var isDisplayed = (isWhitelistTyFiltr ? tyFiltr[type] : !tyFiltr[type]);
+        if(!isDisplayed) continue;
+        
+        var toRefs = refsByType[type];
+        type = new EdgeType(type);
+        
+        for(var i = 0; i &lt; toRefs.length; i++) {
+          
+          var toTRef = toRefs[i];
+          
+          if(!$tw.wiki.tiddlerExists(toTRef)) continue;
+          if(utils.isSystemOrDraft(toTRef)) continue;
+          
+          if(isWhitelistToFiltr ? toFiltr[toTRef] : !toFiltr[toTRef]) {
+            // using a hash here has the advantage that ids are unique and
+            // only change if the underlying link/tag changes
+            var id = type.getId() + $tw.utils.hashString(fromTRef + toTRef); 
+            var edge = this.makeEdge(this.getId(fromTRef), this.getId(toTRef), type, id);
+
+            if(edge) {
+              edges[edge.id] = edge;
+            }
+          }
+        }
+      }
+    }.bind(this);
+    
+    buildAutoEdges({
+      "tmap:tag": tObj.fields.tags || [],
+      "tmap:link": this.wiki.getTiddlerLinks(fromTRef)
+    });
+
     return edges;
 
   };
@@ -1025,7 +972,7 @@ module-type: library
 					
 		<span class="jsdoc-message">
 		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha11</a>
-		on 2015-03-31T22:48:28+02:00 using the <a
+		on 2015-04-01T21:25:29+02:00 using the <a
 			href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 		</span>
 				</footer>

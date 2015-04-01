@@ -622,7 +622,8 @@ module-type: widget
     
     // init the graph with dummy data as events are not registered yet
     this.network = new vis.Network(this.graphDomNode, this.graphData, this.graphOptions);
-        
+    this.canvas = this.graphDomNode.getElementsByTagName("canvas")[0];
+  
     // register events
     
     this.network.on("click", this.handleVisSingleClickEvent.bind(this));
@@ -1319,11 +1320,7 @@ module-type: widget
         this.handleStorePositions();
       }
     }
-    
         
-        //~ x: (positions[id].x - (positions[id].x % 20)), // raster preparations
-        //~ y: (positions[id].y - (positions[id].y % 20)),
-    
   };
   
   MapWidget.prototype.handleVisSelect = function(properties) {

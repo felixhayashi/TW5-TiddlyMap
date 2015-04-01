@@ -120,7 +120,8 @@ var attachOptions = function(parent) {
   opt.filter.edgeTypes = "[prefix[" + opt.path.edgeTypes + "]]";  
   opt.filter.views = "[has[" + opt.field.viewMarker + "]]";
   opt.filter.defaultEdgeFilter = opt.filter.edgeTypes
-                                 + "-[suffix[tmap:link]]";
+                                 + "-[suffix[tmap:link]]"
+                                 + "-[suffix[tmap:tag]]";
   
   // some popular selectors (usually used from within tiddlers via map-macro)
   if(!opt.selector) opt.selector = utils.getDataMap();

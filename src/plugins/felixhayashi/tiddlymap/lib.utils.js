@@ -773,6 +773,33 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
   };
   
   /**
+   * Rastafarianism, jaaaah
+   */
+  utils.drawRaster = function(canvas, raster, color) {
+    
+    raster = parseInt(raster) || 10;
+    var context = canvas.getContext("2d");
+    var vLines = canvas.width / raster;
+    var hLines = canvas.height / raster;
+        
+    // draw vertical lines
+    for(var x = 0; x < canvas.width; x += raster) {
+      context.moveTo(x, 0);
+      context.lineTo(x, canvas.height);
+    }
+        
+    // draw horizontal lines
+    for(var y = 0; y < canvas.height; y += raster) {
+      context.moveTo(0, y);
+      context.lineTo(canvas.width, y);
+    }
+
+    context.strokeStyle = color || "black";
+    context.stroke();
+
+  };
+  
+  /**
    * Get a tiddler's text or otherwise return a default text.
    */
   utils.isSystemOrDraft = function(tiddler) {

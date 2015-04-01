@@ -305,7 +305,7 @@ html { // used to increase css importance
     width: 100%;
     color: $color;
     display: block; // sometimes tw puts us into a span
-        
+    
     &.tmap-click-to-use .network-frame:not(.vis-active) {
       cursor: pointer;
       
@@ -336,6 +336,57 @@ html { // used to increase css importance
       height: calc(100% - 35px);
 
       .network-frame {
+      
+        div.network-navigation {
+          
+          &:hover {
+            
+            &:before {
+              background: beige;
+              display: block;
+              color: black;
+              padding: 3px;
+              position: relative;
+              border: 1px solid lightgray;
+              width: 80px;
+              left: -70px;
+              top: -30px;
+              z-index: 1000;
+            }
+            
+            &.up:before {
+              left: 30px;
+              content: "Scroll up";              
+            }
+            &.down:before {
+              left: 30px;
+              content: "Scroll down";              
+            }
+            &.right:before {
+              left: 30px;
+              content: "Scroll right";              
+            }
+            &.left:before {
+              left: 30px;
+              content: "Scroll left";              
+            }
+            &.zoomOut:before {
+              content: "Zoom out";              
+            }
+            &.zoomIn:before {
+              content: "Zoom in";              
+            }
+            &.zoomExtends:before {
+              content: "Reset focus";              
+            }
+            &.tmap-fullscreen:before {
+              content: "Fullscreen";              
+            }
+            
+          }
+          
+        }
+      
         .tmap-vis-button.tmap-button-enabled {
           bottom: 90px;
           right: 15px;

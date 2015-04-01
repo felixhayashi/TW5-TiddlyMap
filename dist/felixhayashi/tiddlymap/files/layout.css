@@ -191,6 +191,37 @@ html {
         pointer-events: none; }
     html .tmap-widget .tmap-vis-graph {
       height: calc(100% - 35px); }
+      html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover:before {
+        background: beige;
+        display: block;
+        color: black;
+        padding: 3px;
+        position: relative;
+        border: 1px solid lightgray;
+        width: 80px;
+        left: -70px;
+        top: -30px;
+        z-index: 1000; }
+      html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover.up:before {
+        left: 30px;
+        content: "Scroll up"; }
+      html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover.down:before {
+        left: 30px;
+        content: "Scroll down"; }
+      html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover.right:before {
+        left: 30px;
+        content: "Scroll right"; }
+      html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover.left:before {
+        left: 30px;
+        content: "Scroll left"; }
+      html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover.zoomOut:before {
+        content: "Zoom out"; }
+      html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover.zoomIn:before {
+        content: "Zoom in"; }
+      html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover.zoomExtends:before {
+        content: "Reset focus"; }
+      html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover.tmap-fullscreen:before {
+        content: "Fullscreen"; }
       html .tmap-widget .tmap-vis-graph .network-frame .tmap-vis-button.tmap-button-enabled {
         bottom: 90px;
         right: 15px;

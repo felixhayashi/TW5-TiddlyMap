@@ -1,4 +1,4 @@
-config.neighbourhood_scope: 1
+config.neighbourhood_scope: 2
 config.physics_mode: true
 config.refresh-trigger: $:/temp/focussedTiddler
 created: 20150331114808577

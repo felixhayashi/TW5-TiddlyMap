@@ -1,11 +1,11 @@
 created: 20150330124519329
 id: c10296ef-ffcf-44bd-bc82-d051dea607fb
-modified: 20150331112403122
-tags: documentation concept
+modified: 20150401212111190
+tags: [[Basic concepts]]
 title: Edge-type namespaces
 type: text/vnd.tiddlywiki
 
-As of v0.7.5 TiddlyMap acknowledges namespaces for edge-types.
+As of v0.7.5 ~TiddlyMap acknowledges namespaces for edge-types.
 
 <<<
 Namespaces provide a level of direction to specific identifiers, thus making it possible to distinguish between identical identifiers. This is similar to people names, where a surname could be thought of as a namespace that makes it possible to distinguish people who have the same given name.

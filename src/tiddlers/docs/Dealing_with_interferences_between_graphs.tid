@@ -1,7 +1,7 @@
 created: 20150119180138081
 id: a6cd2976-7837-4eb0-b43e-e6163a823121
-modified: 20150119203506691
-tags: documentation recipe
+modified: 20150401212618582
+tags: Recipe
 title: Dealing with interferences between graphs
 type: text/vnd.tiddlywiki
 
@@ -19,6 +19,6 @@ Your workflow could be as follows:
 # Doubleclick on an empty spot in the editor's canvas. This will create a tiddler that matches the current filter and is displayed in the graph.
 #* Alternatively, you may also use tw add-button and tag tiddlers with "cooking" so they are displayed in the graph.
 # Start creating relationships by using the menu functions in the editor.
-#* Alternatively you can use the TiddlyMap button at the top of each tw-tiddler to link tiddlers and thus create edges.
+#* Alternatively you can use the ~TiddlyMap button at the top of each tw-tiddler to link tiddlers and thus create edges.
 
 Also note: Any view manipulation is done in the main editor window (or in any graph declared as editor).

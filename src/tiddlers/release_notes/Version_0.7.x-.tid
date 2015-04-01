@@ -10,6 +10,10 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.7.10
+
+* Edges based on tags may be displayed in the graph; resolves #93, resolves #14
+
 ### v0.7.8
 
 * Optional raster to snap nodes to when dragging; resolves #87

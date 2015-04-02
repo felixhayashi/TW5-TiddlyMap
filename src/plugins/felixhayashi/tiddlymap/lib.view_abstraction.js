@@ -434,22 +434,23 @@ module-type: library
     
   };
   
+  ViewAbstraction.prototype.isExplicitNode = function(node) {
+    return this.getNodeFilter("expression")
+               .match(utils.escapeRegex(this._getAddNodeFilterPart(node)));
+  };
+  
   /**
    * 
    */
   ViewAbstraction.prototype.removeNodeFromFilter = function(node) {
     
+    if(!this.isExplicitNode(node)) return false;
+      
     var curExpr = this.getNodeFilter("expression");
-    var newFilter = curExpr
-                     .replace("[[" + node.label + "]]", "")
-                     .replace(this._getAddNodeFilterPart(node), "");
-                     
-    if(newFilter !== curExpr) {
-      this.setNodeFilter(newFilter);
-      return true;
-    } 
-    
-    return false;
+    var newFilter = curExpr.replace(this._getAddNodeFilterPart(node), "");
+                   
+    this.setNodeFilter(newFilter);
+    return true;
     
   };
   

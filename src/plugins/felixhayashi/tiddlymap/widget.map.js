@@ -923,7 +923,7 @@ module-type: widget
       "var.nodeRef": $tw.tmap.indeces.tById[node.id],
       dialog: {
         preselects: {
-          "opt.delete": "from system"
+          "opt.delete": "from" + " " + (this.getView().isExplicitNode(node) ? "filter" : "system")
         }
       }
     };
@@ -1133,7 +1133,7 @@ module-type: widget
   };
 
   MapWidget.prototype.handleInsertNode = function(node) {
-    
+        
     this.dialogManager.open("getNodeTitle", null, function(isConfirmed, outputTObj) {
       if(isConfirmed) {
         

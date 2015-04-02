@@ -349,6 +349,15 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
   };
   
   /**
+   * When we do not know the string, we need to escape it
+   */
+  utils.escapeRegex = function(str) {
+    
+    return str.replace(/[^$-*?+.()|{}[\]]/g, "\\$&");
+    
+  };
+  
+  /**
    * Sadly, setting fields with tw means that we lose the type information
    * since field values are persisted as strings and the type is not
    * included.

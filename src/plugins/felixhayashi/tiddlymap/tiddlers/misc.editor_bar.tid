@@ -60,7 +60,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
     </$list>
     <hr />
     <$button class="tc-btn-invisible">No limit
-      <$action-setfield $tiddler=<<param.ref.view>> config.neighbourhood_scope="*" />
+      <$action-setfield $tiddler=<<param.ref.view>> config.neighbourhood_scope="100" />
     </$button>
     </div>
   </$reveal>

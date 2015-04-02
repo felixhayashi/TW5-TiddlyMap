@@ -147,9 +147,7 @@ module-type: library
     var neighEdges = utils.getDataMap();
     var neighNodes = utils.getDataMap();
     
-    var maxSteps = (opts.steps === "*"
-                 ? Number.MAX_VALUE
-                 : (parseInt(opts.steps) > 0 ? opts.steps : 1));
+    var maxSteps = (parseInt(opts.steps) > 0 ? opts.steps : 1);
         
     var discover = function() {
       

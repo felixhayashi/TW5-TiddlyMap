@@ -1,6 +1,8 @@
+config.neighbourhood_scope: 0
 created: 20150113193229886
 id: 2299414d-bd47-4ba9-b906-feae1354a4eb
 isview: true
+modified: 20150402110627838
 title: $:/plugins/felixhayashi/tiddlymap/graph/views/Caption field example
 type: text/vnd.tiddlywiki
 

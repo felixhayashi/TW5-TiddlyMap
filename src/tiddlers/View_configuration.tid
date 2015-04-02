@@ -1,8 +1,0 @@
-created: 20150330171842146
-id: bf2c68b0-89a0-4df3-a248-d47b98fb1691
-modified: 20150401212524501
-tags: Configuration
-title: View configuration
-type: text/vnd.tiddlywiki
-
-The view configuration allows you to change the way a particular view behaves. Changing one view's configuration does not affect another view's settings.

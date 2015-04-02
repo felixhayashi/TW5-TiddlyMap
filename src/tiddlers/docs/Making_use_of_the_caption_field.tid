@@ -4,6 +4,7 @@ modified: 20150401212720216
 tags: Example
 title: Making use of the caption field
 type: text/vnd.tiddlywiki
+rank: 5
 
 To avoid having your valuable graph space covered by large titles, you can set caption fields in your tiddlers, which are used by ~TiddlyMap as node labels instead of the titles.
 

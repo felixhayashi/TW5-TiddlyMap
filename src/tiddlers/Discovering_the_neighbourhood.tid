@@ -1,0 +1,12 @@
+created: 20150402104139269
+id: dd2651b1-dec0-4388-b16e-de9057c6c2f0
+modified: 20150402110533214
+tags: [[Basic concepts]]
+title: Discovering the neighbourhood
+type: text/vnd.tiddlywiki
+
+A ~TiddlyMap widget will first and foremost display the nodes that match the node filter. The "matches" together with their edges form the "original graph". In addition, you may configure ~TiddlyMap to display another set of nodes called "neighbours". 
+
+Neighbours are all nodes that are not part of the original set of nodes ("matches") but are connected (either outgoing or incoming) to a node of the original set.
+
+On a per-view level, you can define, how big the displayed neighbourhood shall be. The size is measured in a distance unit called "step". A step stands for the traversal of an edge (regardless of it's direction). If e.g. a neighbourhood with the distance of 3 steps is displayed it means, that all nodes that can be reached within 3 steps, starting from the original set, will be displayed.

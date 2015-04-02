@@ -1,7 +1,8 @@
 created: 20141219205505686
 description: haloohaloo cdjckdckd ffvf
 id: 69427454-433F-4409-86A8-68BC54A7285F
-modified: 20150401212713207
+modified: 20150402082718715
+rank: 1
 tags: Example
 title: TaskManagementExample 2.0
 tmap.edges: {"250837f6-dec6-4dd1-8128-a0c6e0c3f7b4":{"to":"9d97c1e8-9458-44f9-97c5-82253da987c0","type":"belongs to"}}
@@ -14,7 +15,7 @@ You probably already know that TiddlyWiki is a great tool to organize yourself a
 In this example, the tiddlers from the TiddlyWiki example are incorporated into the graph view by using the following node filter:
 
 ```
-[tag[task]]
+[tag[Task]]
 ```
 
 Note that each tiddler's ''color field'' is used to infer the default node color.

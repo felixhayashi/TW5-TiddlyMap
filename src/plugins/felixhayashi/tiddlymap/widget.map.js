@@ -469,7 +469,7 @@ module-type: widget
 
     var graph = this.adapter.getGraph(nodeFilter, {
       view: this.view,
-      neighbourhoodScope: this.getView().getConfig("neighbourhood_scope")
+      neighbourhoodScope: parseInt(this.getView().getConfig("neighbourhood_scope"))
     });
       
     var nodes = graph.nodes;

@@ -1,0 +1,15 @@
+id: 684c1cde-edf1-4253-ba91-2ea37f635377
+title: antenna.svg
+type: image/svg+xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg fill-opacity="1" xmlns:xlink="http://www.w3.org/1999/xlink" color-rendering="auto" color-interpolation="auto" stroke="black" text-rendering="auto" stroke-linecap="square" stroke-miterlimit="10" stroke-opacity="1" shape-rendering="auto" fill="black" stroke-dasharray="none" font-weight="normal" stroke-width="1" xmlns="http://www.w3.org/2000/svg" font-family="'Dialog'" font-style="normal" stroke-linejoin="miter" font-size="12" stroke-dashoffset="0" image-rendering="auto">
+  <!--Unicode Character 'ANTENNA WITH BARS' (U+1F4F6)-->
+  <defs id="genericDefs"/>
+  <g>
+    <g>
+      <path d="M276.1875 335.9531 L251.0156 335.9531 L251.0156 78.75 L276.1875 78.75 L276.1875 335.9531 ZM219.375 335.9531 L193.3594 335.9531 L193.3594 146.3906 L219.375 146.3906 L219.375 335.9531 ZM172.5469 90.8438 Q172.5469 94.0781 170.5781 97.1719 Q169.7344 98.4375 160.4531 109.125 Q152.8594 117.8438 137.6719 135.1406 L104.7656 172.6875 L104.7656 335.9531 L79.3125 335.9531 L79.3125 172.6875 Q42.4688 131.9062 19.8281 105.0469 Q17.5781 102.6562 13.5 97.5938 Q11.5312 94.6406 11.5312 90.8438 Q11.5312 86.0625 15.2578 82.4062 Q18.9844 78.75 23.7656 78.75 L160.3125 78.75 Q165.375 78.75 168.9609 82.2656 Q172.5469 85.7812 172.5469 90.8438 ZM161.8594 335.9531 L136.2656 335.9531 L136.2656 213.6094 L161.8594 213.6094 L161.8594 335.9531 ZM132.3281 103.5 L105.0469 103.5 L105.0469 134.4375 L132.3281 103.5 ZM79.1719 134.4375 L79.1719 103.5 L52.3125 103.5 L79.1719 134.4375 Z" stroke="none"/>
+    </g>
+  </g>
+</svg>

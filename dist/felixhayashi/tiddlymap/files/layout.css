@@ -232,6 +232,9 @@ html {
       background: #F2F2F2; }
       html .tmap-widget.tmap-advanced-editor .tmap-topbar {
         background: #d6d9d8; }
+        html .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-radar-button {
+          font-size: 1.5em;
+          vertical-align: middle; }
     html .tmap-widget .network-manipulationUI.edit.editmode {
       height: 26px; }
     html .tmap-widget .network-manipulationDiv {

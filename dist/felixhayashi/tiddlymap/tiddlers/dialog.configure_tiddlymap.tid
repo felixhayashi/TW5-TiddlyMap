@@ -60,7 +60,7 @@ Please visit the [[online docs|http://bit.ly/tiddlymap#Changing%20TiddlyMap's%20
   <$reveal type="match" state="$:/view" text="top" default="">
     <table>
       <<tmap-row title:"Scope" field:"liveViewScope" type:"input-select"
-                 selectFilter:"[[1|1 steps away]] [[2|2 steps away]] [[3|3 steps away]] [[4|4 steps away]] [[5|5 steps away]] [[*|No limit]]"
+                 selectFilter:"[[0|Do not display a neighbourhood]] [[1|1 steps away]] [[2|2 steps away]] [[3|3 steps away]] [[4|4 steps away]] [[5|5 steps away]] [[*|No limit]]"
                  descr:"Display the neighbourhood that can be reached within the given number of steps starting from currently focussed tiddler.">>
     </table>
   </$reveal>

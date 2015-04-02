@@ -3,6 +3,7 @@ config.physics_mode: true
 config.refresh-trigger: $:/temp/focussedTiddler
 created: 20150331114808577
 isview: true
+modified: 20150402124031144
 title: $:/plugins/felixhayashi/tiddlymap/graph/views/Live View
 type: text/vnd.tiddlywiki
 

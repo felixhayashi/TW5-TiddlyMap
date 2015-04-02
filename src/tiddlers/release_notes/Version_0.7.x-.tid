@@ -10,6 +10,10 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.7.12
+
+* Added the "neighbourhood scope button"; see #95
+
 ### v0.7.11
 
 * Tooltips for graph's navigation-buttons

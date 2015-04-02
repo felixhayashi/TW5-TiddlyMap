@@ -13,6 +13,7 @@ Major enhancements
 ### v0.7.12
 
 * Added the "neighbourhood scope button"; see #95
+* Slightly improved the delete node mechanism.
 
 ### v0.7.11
 

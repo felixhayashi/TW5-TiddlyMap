@@ -50,18 +50,13 @@ type: application/json
     "inheritColor": false
   },
   "groups": {
-    "special": {
-      "borderWidth": 1,
-      "color": {
-        "background": "#E6B293",
-        "border": "#FF6700"
-      }
-    },
     "neighbours": {
-      "color": "#DCDCDC"
+      "color": "#E6E6E6",
+      "radius": 7
     },
     "matches": {
-      "color": "#97C2FC"
+      "color": "#97C2FC",
+      "radius": 7
     }
   },
   "tooltip": {

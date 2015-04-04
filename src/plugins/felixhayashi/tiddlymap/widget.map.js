@@ -473,6 +473,14 @@ module-type: widget
     });
           
     var nodes = graph.nodes;
+    
+    // special display of a single match
+    
+    //~ var keys = Object.keys(nodes);
+    //~ if(keys.length === 1) {
+      //~ nodes.
+    //~ }
+    
     var edges = graph.edges;
         
     // refresh datasets

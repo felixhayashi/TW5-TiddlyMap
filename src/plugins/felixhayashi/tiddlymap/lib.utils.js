@@ -197,20 +197,34 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     if(!ds) {
       return new vis.DataSet(utils.convert(ltNew, "array"));
     }
-        
-    var changes = {
-      updated: utils.convert(ltNew, "array"),
-      removed: []
-    };
     
+    // first remove
+    var removes = [];
     for(var id in lTOld) {
       if(!ltNew[id]) {
-        changes.removed.push(id);
+        removes.push(id);
       }
     }
+    ds.remove(removes);
     
-    ds.remove(changes.removed); // remove before update!
-    ds.update(changes.updated);
+    // then update
+    var updates = [];
+    var existing = ds.get({ returnType: "Object" });
+    for(var id in ltNew) {
+      var update = ltNew[id];
+      if(existing[id]) {
+        for(var prop in existing[id]) {
+          if(update[prop] === undefined) {
+            //~ console.log("RSETTING existing", existing[id], "update", update);
+            // explicitly set to null to prevent relicts
+            update[prop] = null;
+          }
+        }
+      }
+      // now push
+      updates.push(update);
+    }
+    ds.update(updates);
     
     return ds;
     

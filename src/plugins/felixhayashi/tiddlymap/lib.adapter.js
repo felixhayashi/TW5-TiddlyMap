@@ -199,9 +199,13 @@ module-type: library
       if(beforeSize === tiddlers.length) break;
     }
     
+    if(opts.view) {
+      this._restorePositions(neighNodes, opts.view);
+    }
+    
     var neighbourhood = { nodes: neighNodes, edges: neighEdges };
     
-    this.logger("debug", "retrieved neighbourhood", neighbourhood, "steps", steps);
+    this.logger("debug", "Retrieved neighbourhood", neighbourhood, "steps", steps);
     
     $tw.tmap.stop("Get neighbours");
     
@@ -211,10 +215,9 @@ module-type: library
   
   Adapter.prototype.getGraph = function(filter, options) {
     
-    //~ [prefix[$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes]suffix[for]]
     $tw.tmap.start("Assembling Graph");
     
-    if(!options || typeof options !== "object") options = {};
+    options = options || {};
 
     var view = new ViewAbstraction(options.view);
     var matches = utils.getMatches(filter);
@@ -246,7 +249,7 @@ module-type: library
       $tw.utils.extend(graph.edges, neighbours.edges);
       $tw.utils.extend(graph.nodes, neighbours.nodes);
     }
-    
+        
     $tw.tmap.stop("Assembling Graph");
     
     this.logger("debug", "Assembled graph:", graph);
@@ -476,7 +479,7 @@ module-type: library
    */
   Adapter.prototype.selectNodesByReferences = function(tiddlers, options) {
 
-    if(!options || typeof options !== "object") options = {};
+    options = options || {};
 
     var protoNode = options.addProperties;
     var result = utils.getDataMap();

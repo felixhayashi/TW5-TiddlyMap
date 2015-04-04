@@ -201,7 +201,8 @@ html {
         width: 80px;
         left: -70px;
         top: -30px;
-        z-index: 1000; }
+        z-index: 1000;
+        text-align: center; }
       html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover.up:before {
         left: 30px;
         content: "Scroll up"; }

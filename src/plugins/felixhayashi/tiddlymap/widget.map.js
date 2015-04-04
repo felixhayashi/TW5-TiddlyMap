@@ -471,7 +471,7 @@ module-type: widget
       view: this.view,
       neighbourhoodScope: parseInt(this.getView().getConfig("neighbourhood_scope"))
     });
-      
+          
     var nodes = graph.nodes;
     var edges = graph.edges;
         

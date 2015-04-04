@@ -13,6 +13,6 @@ type: text/vnd.tiddlywiki
 
 Hi, this is a demo site of ~TiddlyMap.
 
-See the [[version history|Version History]] for a list of existing features and [[overview|The Big Picture]] to understand what ~TiddlyMap can do for you. To dive into the basic concepts and building blocks of ~TiddlyMap check out the [[docs|Documentation]]. Use the double-click on the nodes to [[navigate|Navigation]] to the corresponding content.
+See the [[version history|Version History]] for a list of existing features and [[overview|The Big Picture]] to understand what ~TiddlyMap can do for you. To dive into the basic concepts and building blocks of ~TiddlyMap check out the [[docs|Documentation]]. Use the double-click on the nodes to [[navigate|Navigation]] to the corresponding content. The visualization runs most smoothly in [[Google chrome|http://www.google.com/chrome/]].
 
 ~TiddlyMap is currently in its late beta-phase. If you want to use it in your wiki, check out the [[installation instructions|How to install TiddlyMap?]].

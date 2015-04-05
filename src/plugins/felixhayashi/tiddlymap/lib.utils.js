@@ -212,15 +212,17 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     var existing = ds.get({ returnType: "Object" });
     for(var id in ltNew) {
       var update = ltNew[id];
-      if(existing[id]) {
-        for(var prop in existing[id]) {
-          if(update[prop] === undefined) {
-            //~ console.log("RSETTING existing", existing[id], "update", update);
-            // explicitly set to null to prevent relicts
-            update[prop] = null;
-          }
-        }
-      }
+      
+      // DISABLED BECAUSE SOME STUFF LIKE x and y SHOULD ALWAYS REMAIN.
+      
+      //~ if(existing[id]) {
+        //~ for(var prop in existing[id]) {
+          //~ if(update[prop] === undefined) {
+            //~ // explicitly set to null to prevent relicts
+            //~ update[prop] = null;
+          //~ }
+        //~ }
+      //~ }
       // now push
       updates.push(update);
     }

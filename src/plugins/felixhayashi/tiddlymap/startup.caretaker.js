@@ -260,10 +260,9 @@ var checkForDublicates = function(tObj, idField, id) {
         buttons: "ok_suppress"
       }
     }
-    
-    if(!utils.isTrue(opt.config.sys.suppressedDialogs["dublicateIdInfo"], false)) {
-      $tw.tmap.dialogManager.open("dublicateIdInfo", vars);
-    }
+
+    $tw.tmap.dialogManager.open("dublicateIdInfo", vars);
+
   }
   
   return dublicate;

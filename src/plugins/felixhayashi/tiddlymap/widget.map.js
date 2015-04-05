@@ -615,7 +615,12 @@ module-type: widget
     }
     
     window.addEventListener("click", this.handleClickEvent.bind(this), false);
-    window.addEventListener(utils.getFullScreenApis()["_fullscreenChange"], this.handleFullScreenChange.bind(this), false);
+    
+    var fsapi = utils.getFullScreenApis();
+    if(fsapi) {
+      window.addEventListener(fsapi["_fullscreenChange"],
+                              this.handleFullScreenChange.bind(this), false);
+    }
     
     this.handleResizeEvent();
 
@@ -643,10 +648,10 @@ module-type: widget
     this.network.on("viewChanged", this.handleVisViewportChanged.bind(this));
     
     this.addGraphButtons({
-      "fullscreen": this.handleToggleFullscreen
+      "fullscreen-button": this.handleToggleFullscreen
     });
     
-    this.setGraphButtonEnabled("fullscreen", true);
+    this.setGraphButtonEnabled("fullscreen-button", true);
     
     // delay (100ms) the painting of the graph to allow the gui to render; freezes otherwise
     window.setTimeout(function() {
@@ -971,8 +976,8 @@ module-type: widget
    */
   MapWidget.prototype.handleFullScreenChange = function() {
     
-    var api = utils.getFullScreenApis();
-    if(this.enlargedMode === "fullscreen" && !document[api["_fullscreenElement"]]) {
+    var fsapi = utils.getFullScreenApis();
+    if(fsapi && this.enlargedMode === "fullscreen" && !document[api["_fullscreenElement"]]) {
       this.handleToggleFullscreen();
     }
     
@@ -988,8 +993,8 @@ module-type: widget
    */
   MapWidget.prototype.handleToggleFullscreen = function() {
     
-    var api = utils.getFullScreenApis();
-    
+    var fsapi = utils.getFullScreenApis();
+        
     this.logger("log", "Toggled graph enlargement");
         
     if(this.enlargedMode) {
@@ -1001,18 +1006,26 @@ module-type: widget
       ]);
       
       if(this.enlargedMode === "fullscreen") {
-        document[api["_exitFullscreen"]]();
+        document[fsapi["_exitFullscreen"]]();
       }
       
       // reset
       this.enlargedMode = null;
       
     } else {
+      
+      var useHalfscreen = utils.isTrue(this.opt.config.sys.halfscreen);
+      
+      if(true || !useHalfscreen && !fsapi) {
+        this.dialogManager.open("fullscreenNotSupported",
+                           { dialog: { buttons: "ok_suppress" }});
+        return;
+      }
 
-      this.enlargedMode = (this.isContainedInSidebar
-                           && this.opt.config.sys.halfscreen === "true"
-                           ? "halfscreen" : "fullscreen");
-
+      this.enlargedMode = (this.isContainedInSidebar && useHalfscreen
+                           ? "halfscreen"
+                           : "fullscreen");
+                           
       $tw.utils.addClass(this.parentDomNode, "tmap-" + this.enlargedMode);
         
       var pContainer = (this.isContainedInSidebar
@@ -1022,7 +1035,7 @@ module-type: widget
       $tw.utils.addClass(pContainer, "tmap-has-" + this.enlargedMode + "-child");        
       
       if(this.enlargedMode === "fullscreen") {
-        document.documentElement[api["_requestFullscreen"]](Element.ALLOW_KEYBOARD_INPUT);
+        document.documentElement[fsapi["_requestFullscreen"]](Element.ALLOW_KEYBOARD_INPUT);
       }
       
       this.notify("Activated " + this.enlargedMode + " mode");
@@ -1492,11 +1505,19 @@ module-type: widget
     }
     
   };
-    
+
+  /**
+   * Repaint this graph instance if
+   * 1. fullscreen is not possible at all
+   * 2. no part of the document is running in fullscreen
+   *    (halfscreen does not count)
+   * 3. this graph instance is currently running fullscreen.
+   */
   MapWidget.prototype.repaintGraph = function() {
     
-    if(!document[utils.getFullScreenApis()["_fullscreenElement"]]
-       || this.enlargedMode) {
+    var fsapi = utils.getFullScreenApis();
+
+    if(!fsapi || !document[fsapi["_fullscreenElement"]] || this.enlargedMode) {
     
       this.logger("info", "Repainting the whole graph");
     

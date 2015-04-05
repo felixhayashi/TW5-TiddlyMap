@@ -1,0 +1,5 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/fullscreenNotSupported
+subtitle: {{$:/core/images/info-button}} Your machine does not support fullscreen
+
+Sorry for this :(
+

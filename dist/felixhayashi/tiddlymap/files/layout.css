@@ -221,7 +221,7 @@ html {
         content: "Zoom in"; }
       html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover.zoomExtends:before {
         content: "Reset focus"; }
-      html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover.tmap-fullscreen:before {
+      html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover.tmap-fullscreen-button:before {
         content: "Fullscreen"; }
       html .tmap-widget .tmap-vis-graph .network-frame .tmap-vis-button.tmap-button-enabled {
         bottom: 90px;

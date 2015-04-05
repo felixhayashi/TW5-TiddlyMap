@@ -550,8 +550,13 @@ module-type: library
       return; // silently ignore
     }
         
-    // create node object 
-    var node = {} // vis requires child of object
+    // create default node object; vis does not like utils.getDataMap()
+    // set some properties to null to overwrite existing values in a dataset
+    var node = {
+      shape: "box",
+      image: undefined,
+      color: undefined
+    }; 
         
     // determine shape
     

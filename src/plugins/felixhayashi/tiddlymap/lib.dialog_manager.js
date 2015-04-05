@@ -88,6 +88,11 @@ module-type: library
   */
   DialogManager.prototype.open = function(templateId, param, callback) {
     
+    if(utils.isTrue(this.opt.config.sys.suppressedDialogs[templateId], false)) {
+      this.logger("warning", "Suppressed dialog", templateId);
+      return;
+    }
+    
     if(!param) { param = {}; }
   
     if(typeof callback === "function" && this.context) {

@@ -53,6 +53,11 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.7.13
+
+* Adding edges did remove the position information, fixed that
+* Tiddlymap supports iOS again. Fullscreen maybe not. see #96
+
 ### v0.7.9
 
 * Doesn't crash anymore when Tiddler is renamed while being displayed as node in a graph; fixes #88

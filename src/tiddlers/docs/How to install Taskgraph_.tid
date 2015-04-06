@@ -19,6 +19,7 @@ In case you really want to use it now (it's always great to have beta-testers!),
 # Save your ~TiddlyWiki
 # Refresh the window
 # The plugin should now be available for use
+# If you want to use the "live view", change your wiki's story view to "Top" (Configuration ➡ Appearance ➡ Story view ➡ Current view).
 # Also make sure to always check back to this site to see whether your version is up-to-date as updates and bugfixes come quick! For any bug you discover, please create an issue at [[github.com|https://github.com/felixhayashi/TW5-TiddlyMap/issues]].
 
 By using this plugin you agree to the product's [[License Terms|$:/plugins/felixhayashi/tiddlymap/license]] (don't worry, it's a [[BSD 2-Clause License|http://opensource.org/licenses/BSD-2-Clause]]).

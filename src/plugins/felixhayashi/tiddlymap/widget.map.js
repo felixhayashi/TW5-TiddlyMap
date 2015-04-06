@@ -1016,7 +1016,7 @@ module-type: widget
       
       var useHalfscreen = utils.isTrue(this.opt.config.sys.halfscreen);
       
-      if(true || !useHalfscreen && !fsapi) {
+      if(!useHalfscreen && !fsapi) {
         this.dialogManager.open("fullscreenNotSupported",
                            { dialog: { buttons: "ok_suppress" }});
         return;
@@ -1063,10 +1063,12 @@ module-type: widget
   };
   
   MapWidget.prototype.handleStorePositions = function(withNotify) {
+    
     this.adapter.storePositions(this.network.getPositions(), this.getView());
     if(withNotify) {
       this.notify("positions stored");
     }
+    
   };
   
   MapWidget.prototype.handleEditFilters = function() {
@@ -1109,8 +1111,6 @@ module-type: widget
 
       this.network.storePositions();
       this.setNodesMoveable(this.graphData.nodesById, isFloatingMode);
-      
-      //this.network.freezeSimulation(!isFloatingMode);
       
       if(this.doZoomAfterStabilize) {
         this.doZoomAfterStabilize = false;

@@ -1,4 +1,5 @@
-# TiddlyMap
+TiddlyMap
+=====================================================================
 
 TiddlyMap is a TiddlyWiki plugin that allows you to link your wiki-topics (tiddlers) in order to create *clickable graphs*. By creating relations between your topics you can easily do the following:
 
@@ -10,7 +11,8 @@ In general you may create, visualize and describe any network-structure you have
 
 A demo with several examples and explanations can be found [here](http://bit.ly/tiddlymap).
 
-## How it works
+How it works
+---------------------------------------------------------------------
 
 TiddlyMap combines the strength of two open-source projects.
 
@@ -38,7 +40,8 @@ For graph visualization and manipulation, TiddlyMap draws upon the popular open-
 > The library is designed to be easy to use, handle large amounts of dynamic data, and enable manipulation of the data
 > – [visjs.org](|http://visjs.org/)
 
-## Impressions
+Impressions
+---------------------------------------------------------------------
 
 #### :paperclip: Use colors and icons in your graphs
 
@@ -59,3 +62,38 @@ For graph visualization and manipulation, TiddlyMap draws upon the popular open-
 #### :paperclip: Create hierarchical layouts based on certain edge types
 
 ![tiddlymap demo site create clickable graphs and mindmaps by simply linking your tiddlers - chromium_445](https://cloud.githubusercontent.com/assets/4307137/5756112/7966e902-9cac-11e4-838c-788393843814.png)
+
+Installation
+---------------------------------------------------------------------
+
+By using this plugin you agree to the product's [License Terms](https://github.com/felixhayashi/TW5-TiddlyMap/blob/master/LICENSE) (TiddlyMap is distributed under the [BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)).
+
+#### When running in Nodejs
+
+For general information on how to set up TiddlyWiki5 with Nodejs visit [tiddlywiki.com](http://tiddlywiki.com).
+
+1. Download a copy of the following plugins: [TiddlyMap](https://github.com/felixhayashi/TW5-TiddlyMap), [TW5-TopStoryView](https://github.com/felixhayashi/TW5-TopStoryView),[TW5-Vis.js](https://github.com/felixhayashi/TW5-Vis.js)
+    * by either cloning each repository.
+    * or by clicking "Download ZIP" and unzipping it.
+2. For each plugin, Copy the folder that resides directly below `dist/felixhayashi/` and move it into the `TiddlyWiki5/plugins/` folder.
+3. Update the plugin section of your wiki's `tddlywiki.info` file (resides in the root of your wiki) to contain the following:
+
+        {
+          "plugins": [
+            
+            ...
+            
+            "felixhayashi/topstoryview",
+            "felixhayashi/vis",
+            "felixhayashi/tiddlymap",
+            
+            ...
+            
+          ]
+        }
+4. Restart your wiki server via the command line
+5. If you want to use the "live view", change your wiki's story view to "Top" (Configuration ➡ Appearance ➡ Story view ➡ Current view).
+
+#### Standalone
+
+Please follow the instructions given [[here|http://felixhayashi.github.io/TW5-TiddlyMap/index.html#How%20to%20install%20TiddlyMap%3F]]

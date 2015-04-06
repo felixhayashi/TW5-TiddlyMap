@@ -1,13 +1,23 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager/overview
 caption: Overview
 
-  !! {{!!id}}
+! {{!!id}}
+
+<table>
+  <$set name="self" value=<<currentTiddler>>>
+    <$list filter="[[Created on|created]]
+                   [[Modified on|modified]]
+                   [[Edges of this type|temp.usageCount]] ">
+      <tr>
+        <th align="left"><<map-macro "splitAndSelect" "|" "0">></th>
+        <td>
+          <$transclude tiddler=<<self>> field=<<map-macro "splitAndSelect" "|" "1">> />
+        </td>
+      </tr>
+    </$list>
+  </$set>
+</table>
+
+{{!!description}}
+
   
-  <$list filter="description created modified" variable="item">
-    <$reveal type="nomatch" text="" default=<<item>> >
-
-      ; <<item>>
-      : <$transclude field=<<item>> />
-
-    </$reveal>
-  </$list>

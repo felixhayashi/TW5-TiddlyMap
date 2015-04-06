@@ -4,14 +4,14 @@ subtitle: {{$:/core/images/theme-button}} View Configuration
 <$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
 
 <fieldset><legend>Layout</legend>
-  <table>
+  <table class="tmap-config-table">
     <<tmap-row title:"Floating nodes" field:"config.physics_mode" type:"input-checkbox"
                descr:"Set this to true if you want your nodes to freely swirl around.">>
   </table>
 </fieldset>
 
 <fieldset><legend>Other</legend>
-  <table>
+  <table class="tmap-config-table">
     <<tmap-row title:"Edge-type namespace" field:"config.edge_type_namespace" type:"input-text"
                descr:"A namespace (like 'foaf' in 'foaf:knows') that will be automatically added to all edge-types you create in this view."
                note:"All namespaces are automatically stripped when the edge label is displayed in the graph">>
@@ -19,7 +19,7 @@ subtitle: {{$:/core/images/theme-button}} View Configuration
 </fieldset>
 
 <fieldset><legend>Neighbourhood</legend>
-  <table>
+  <table class="tmap-config-table">
     <<tmap-row title:"Neighbourhood scope" field:"config.neighbourhood_scope" type:"input-select"
                selectFilter:"[[0|Do not display a neighbourhood]] [[1|1 steps away]] [[2|2 steps away]] [[3|3 steps away]] [[4|4 steps away]] [[5|5 steps away]] [[*|No limit]]"
                descr:"Display the neighbourhood that can be reached within the given number of steps starting from the matches returned by the node filter.">>

@@ -187,45 +187,53 @@ html { // used to increase css importance
         border: none;
         width: 100%;
         
-        tr {
-                
-          &:nth-child(odd) {
-            background-color: #E8E8E8;
-          }
-          &:nth-child(even) {
-            background-color: #FFFFFF;
-          }
-          &:hover {
-            background-color: #FFFFF3;
-          }
-        
-          td {
-            border: none;
-            vertical-align: top;
-            padding: 3px 15px 3px 0;
-            
-            &:first-child {
-              width: 15%;
-            }
-            
-            &:last-child {
-              padding-right: 0px;
-              width: 35%;
-            }
-            
-            input, textarea, select {
-              width: 100%;
-            }
-          }
-
-          .tmap-note {
-            margin: 10px 10px 10px 0;
-          }
-          
-          .tmap-description {
-            font-style: italic;
-          }
+        td, th {
+          border: 1px solid lightgray;
         }
+              
+        &.tmap-config-table {
+
+          
+          tr {
+          
+            &:nth-child(odd) {
+              background-color: #E8E8E8;
+            }
+            &:nth-child(even) {
+              background-color: #FFFFFF;
+            }
+            &:hover {
+              background-color: #FFFFF3;
+            }
+          
+            td {
+              border: none;
+              vertical-align: top;
+              padding: 3px 15px 3px 0;
+              
+              &:first-child {
+                width: 15%;
+              }
+              
+              &:last-child {
+                padding-right: 0px;
+                width: 35%;
+              }
+              
+              input, textarea, select {
+                width: 100%;
+              }
+            }
+
+            .tmap-note {
+              margin: 10px 10px 10px 0;
+            }
+            
+            .tmap-description {
+              font-style: italic;
+            }
+          } //config table
+        } // table
                 
         
         ul {

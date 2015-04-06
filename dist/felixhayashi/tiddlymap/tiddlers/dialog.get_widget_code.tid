@@ -38,7 +38,7 @@ If you are unsure about a parameter, just leave everything as is and simply copy
 
 <fieldset>
   <legend>Parameters</legend> 
-  <table>
+  <table class="tmap-config-table">
       <$macrocall $name="tmap-row" type="input-select" title="View" field="view" 
                  selectFilter=<<map-macro "option" "selector.allViewsByLabel">>
                  descr="The view to display" />

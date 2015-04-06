@@ -5,7 +5,7 @@ subtitle: {{$:/core/images/edit-button}} Filter Editor
 
 <fieldset>
   <legend>Filters <sup>[1]</sup></legend>
-  <table>
+  <table class="tmap-config-table">
     <<tmap-row title:"Node filter" field:"prettyNodeFilter" type:"input-textarea"
                descr:"Show tiddlers in the graph that match this filter">>
     <<tmap-row title:"Edge filter" field:"prettyEdgeFilter" type:"input-textarea"

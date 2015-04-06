@@ -33,11 +33,6 @@ type: application/json
     "widthSelectionMultiplier": 4,
     "hoverWidth": 1.5,
     "style": "arrow",
-    "color": {
-      "color": "#848484",
-      "highlight": "#B90000",
-      "hover": "B90000"
-    },
     "fontColor": "gray",
     "fontSize": 14,
     "fontFace": "arial",

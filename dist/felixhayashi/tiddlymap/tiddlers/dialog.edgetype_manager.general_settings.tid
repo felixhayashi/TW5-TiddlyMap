@@ -1,7 +1,7 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager/generalSettings
 caption: General settings
 
-<table>
+<table class="tmap-config-table">
   <$macrocall $name="tmap-row" title="Identifier" field="temp.newId" type="input-text" default={{!!id}} readonly={{!!temp.idImmutable}}
               descr="A unique identifier (e.g. &quot;foaf:name&quot;)." />
   <<tmap-row title:"Label" field:"label" type:"input-text"

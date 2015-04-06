@@ -158,12 +158,17 @@ GlobalListener.prototype.handleFillEdgeTypeForm = function(event) {
   
   var type = new EdgeType(event.paramObject.id);
   var outTRef = event.paramObject.output;
+  var usage = this.adapter.selectEdgesByType(type);
   
   type.persist(outTRef, true);
   
   var isIdImmutable = (utils.startsWith(type.getId(), "tmap:") ? "true" : "");
   utils.setField(outTRef, "temp.idImmutable", isIdImmutable);
   utils.setField(outTRef, "temp.newId", type.getId());
+  utils.setField(outTRef, "temp.usageCount", Object.keys(usage).length);
+  
+  console.log(utils.getTiddler(outTRef));
+  console.log(usage);
   
   // reset the tabs to default
   utils.deleteByPrefix("$:/state/tabs/edgeTypeManager");

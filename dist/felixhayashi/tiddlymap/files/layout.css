@@ -109,26 +109,28 @@ html {
         clear: both;
         border: none;
         width: 100%; }
-        html .tc-modal-wrapper .tc-modal-body table tr:nth-child(odd) {
+        html .tc-modal-wrapper .tc-modal-body table td, html .tc-modal-wrapper .tc-modal-body table th {
+          border: 1px solid lightgray; }
+        html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr:nth-child(odd) {
           background-color: #E8E8E8; }
-        html .tc-modal-wrapper .tc-modal-body table tr:nth-child(even) {
+        html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr:nth-child(even) {
           background-color: #FFFFFF; }
-        html .tc-modal-wrapper .tc-modal-body table tr:hover {
+        html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr:hover {
           background-color: #FFFFF3; }
-        html .tc-modal-wrapper .tc-modal-body table tr td {
+        html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td {
           border: none;
           vertical-align: top;
           padding: 3px 15px 3px 0; }
-          html .tc-modal-wrapper .tc-modal-body table tr td:first-child {
+          html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td:first-child {
             width: 15%; }
-          html .tc-modal-wrapper .tc-modal-body table tr td:last-child {
+          html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td:last-child {
             padding-right: 0px;
             width: 35%; }
-          html .tc-modal-wrapper .tc-modal-body table tr td input, html .tc-modal-wrapper .tc-modal-body table tr td textarea, html .tc-modal-wrapper .tc-modal-body table tr td select {
+          html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td input, html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td textarea, html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td select {
             width: 100%; }
-        html .tc-modal-wrapper .tc-modal-body table tr .tmap-note {
+        html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr .tmap-note {
           margin: 10px 10px 10px 0; }
-        html .tc-modal-wrapper .tc-modal-body table tr .tmap-description {
+        html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr .tmap-description {
           font-style: italic; }
         html .tc-modal-wrapper .tc-modal-body table ul {
           padding-left: 30px; }

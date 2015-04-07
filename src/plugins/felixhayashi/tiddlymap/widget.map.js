@@ -100,10 +100,7 @@ module-type: widget
    */
   MapWidget.prototype.handleConnectionEvent = function(edge, callback) {
 
-    var edgeFilterExpr = this.opt.selector.allEdgeTypesByLabel;
-
     var vars = {
-      edgeFilterExpr: edgeFilterExpr,
       fromLabel: this.adapter.selectNodeById(edge.from).label,
       toLabel: this.adapter.selectNodeById(edge.to).label
     };
@@ -977,7 +974,7 @@ module-type: widget
   MapWidget.prototype.handleFullScreenChange = function() {
     
     var fsapi = utils.getFullScreenApis();
-    if(fsapi && this.enlargedMode === "fullscreen" && !document[api["_fullscreenElement"]]) {
+    if(fsapi && this.enlargedMode === "fullscreen" && !document[fsapi["_fullscreenElement"]]) {
       this.handleToggleFullscreen();
     }
     

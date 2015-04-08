@@ -407,15 +407,25 @@ html { // used to increase css importance
             &.tmap-fullscreen-button:before {
               content: "Fullscreen";              
             }
+            &.tmap-halfscreen-button:before {
+              content: "Halfscreen";              
+            }
             
           }
           
         }
       
         .tmap-vis-button.tmap-button-enabled {
-          bottom: 90px;
           right: 15px;
-          background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />'));
+          
+          &.tmap-fullscreen-button {
+            bottom: 90px;
+            background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />'));
+          }
+          &.tmap-halfscreen-button {
+            bottom: 130px;
+            background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/halfscreen.png}} />'));
+          }
         }
       }
     }

@@ -68,7 +68,6 @@ module-type: library
         debug: "false",
         notifications: "true",
         editNodeOnCreate: "false",
-        halfscreen: "false",
         singleClickMode: "false"
       }
     },

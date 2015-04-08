@@ -232,10 +232,16 @@ html {
         content: "Reset focus"; }
       html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover.tmap-fullscreen-button:before {
         content: "Fullscreen"; }
+      html .tmap-widget .tmap-vis-graph .network-frame div.network-navigation:hover.tmap-halfscreen-button:before {
+        content: "Halfscreen"; }
       html .tmap-widget .tmap-vis-graph .network-frame .tmap-vis-button.tmap-button-enabled {
-        bottom: 90px;
-        right: 15px;
-        background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />); }
+        right: 15px; }
+        html .tmap-widget .tmap-vis-graph .network-frame .tmap-vis-button.tmap-button-enabled.tmap-fullscreen-button {
+          bottom: 90px;
+          background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />); }
+        html .tmap-widget .tmap-vis-graph .network-frame .tmap-vis-button.tmap-button-enabled.tmap-halfscreen-button {
+          bottom: 130px;
+          background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/halfscreen.png}} />); }
     html .tmap-widget.tmap-no-buttons .network-navigation {
       display: none; }
     html .tmap-widget.tmap-advanced-editor {

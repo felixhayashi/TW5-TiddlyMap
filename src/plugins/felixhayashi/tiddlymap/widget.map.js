@@ -645,10 +645,14 @@ module-type: widget
     this.network.on("viewChanged", this.handleVisViewportChanged.bind(this));
     
     this.addGraphButtons({
-      "fullscreen-button": this.handleToggleFullscreen
+      "fullscreen-button": function() { this.handleToggleFullscreen(false); }
     });
     
-    this.setGraphButtonEnabled("fullscreen-button", true);
+    if(this.isContainedInSidebar) {
+      this.addGraphButtons({
+        "halfscreen-button": function() { this.handleToggleFullscreen(true); }
+      });
+    }
     
     // delay (100ms) the painting of the graph to allow the gui to render; freezes otherwise
     window.setTimeout(function() {
@@ -990,7 +994,7 @@ module-type: widget
    * This includes marking ancestor dom nodes to be able to shift the
    * stacking context.
    */
-  MapWidget.prototype.handleToggleFullscreen = function() {
+  MapWidget.prototype.handleToggleFullscreen = function(useHalfscreen) {
     
     var fsapi = utils.getFullScreenApis();
         
@@ -1012,9 +1016,7 @@ module-type: widget
       this.enlargedMode = null;
       
     } else {
-      
-      var useHalfscreen = utils.isTrue(this.opt.config.sys.halfscreen);
-      
+            
       if(!useHalfscreen && !fsapi) {
         this.dialogManager.open("fullscreenNotSupported",
                            { dialog: { buttons: "ok_suppress" }});
@@ -1611,10 +1613,14 @@ module-type: widget
     var parent = this.parentDomNode.getElementsByClassName("vis network-frame")[0];
     
     for(var name in buttonEvents) {
+      
       var div = document.createElement("div");
       div.className = "network-navigation tmap-vis-button " + " " + "tmap-" + name;
       div.addEventListener("click", buttonEvents[name].bind(this), false);
       parent.appendChild(div);
+      
+      this.setGraphButtonEnabled(name, true);
+      
     }
     
   };

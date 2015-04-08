@@ -715,12 +715,13 @@ module-type: widget
       if(isConfirmed) {
         
         var label = utils.getText(outputTObj);
+        var view = new ViewAbstraction(label);
         
-        if(!this.getView().isLocked()) {
+        if(view.isLocked()) {
+          this.notify("Forbidden!");
+        } else {
           var view = this.adapter.createView(label);
           this.setView(view.getRoot());
-        } else {
-          this.notify("Forbidden!");
         }
 
       }
@@ -745,12 +746,13 @@ module-type: widget
         if(isConfirmed) {
           
           var label = utils.getText(outputTObj);
+          var view = new ViewAbstraction(label);
           
-          if(!this.getView().isLocked()) {
+          if(view.isLocked()) {
+            this.notify("Forbidden!");
+          } else {
             this.view.rename(label);
             this.setView(this.view.getRoot());
-          } else {
-            this.notify("Forbidden!");
           }
           
         }

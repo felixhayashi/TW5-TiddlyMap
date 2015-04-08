@@ -1075,6 +1075,47 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
   /************************* 3rd-party code **************************/
 
   /**
+   * Modified TW-Code from Navigator widget
+   * https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/widgets/navigator.js
+   */
+  utils.makeDraftTiddler = function(targetTitle) {
+    // See if there is already a draft tiddler for this tiddler
+    var draftTitle = $tw.wiki.findDraft(targetTitle);
+    if(draftTitle) {
+      return $tw.wiki.getTiddler(draftTitle);
+    }
+    // Get the current value of the tiddler we're editing
+    var tiddler = $tw.wiki.getTiddler(targetTitle);
+    // Save the initial value of the draft tiddler
+    draftTitle = utils.generateDraftTitle(targetTitle);
+    var draftTiddler = new $tw.Tiddler(
+        tiddler,
+        {
+          title: draftTitle,
+          "draft.title": targetTitle,
+          "draft.of": targetTitle
+        },
+        $tw.wiki.getModificationFields()
+    );
+    $tw.wiki.addTiddler(draftTiddler);
+    return draftTiddler;
+  };
+  
+  /**
+   * Modified TW-Code from Navigator widget
+   * https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/widgets/navigator.js
+   */
+  utils.generateDraftTitle = function(title) {
+    var c = 0,
+      draftTitle;
+    do {
+      draftTitle = "Draft " + (c ? (c + 1) + " " : "") + "of '" + title + "'";
+      c++;
+    } while($tw.wiki.tiddlerExists(draftTitle));
+    return draftTitle;
+  };
+
+  /**
    * TW-Code
    * @deprecated delete this in 2016 and use $tw.utils.getFullScreenApis instead
    */

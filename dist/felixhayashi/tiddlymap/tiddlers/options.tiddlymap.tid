@@ -17,6 +17,6 @@ type: application/json
   "debug": "false",
   "notifications": "true",
   "editNodeOnCreate": "false",
-  "halfscreen": "true",
+  "halfscreen": "false",
   "singleClickMode": "false"
 }

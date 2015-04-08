@@ -129,6 +129,22 @@ html { // used to increase css importance
         font-size: 14px;
       }
       
+      .tmap-modal-editor {
+      
+        .tc-tiddler-frame {
+          padding: 0px !important;
+          width: auto !important;
+          margin: 28px !important;
+          border: none !important;
+          
+          .tc-tiddler-title {
+            display: none;
+          }
+        }
+        
+      }
+      
+      
       #edge-type-manager {
       
         .tc-tab-buttons {

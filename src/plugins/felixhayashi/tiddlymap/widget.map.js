@@ -1053,13 +1053,6 @@ module-type: widget
     });
     
   };
-    
-  MapWidget.prototype.handleShowContentPreview = function(tRef) {
-    
-    var params = { "param.ref": tRef };
-    this.dialogManager.open("previewContent", params);
-    
-  };
   
   MapWidget.prototype.handleStorePositions = function(withNotify) {
     
@@ -1384,11 +1377,31 @@ module-type: widget
     this.logger("debug", "Opening tiddler", tRef, "with id", id);
     
     if(this.enlargedMode === "fullscreen") {
-      this.handleShowContentPreview(tRef);
+      
+      var draftTObj = utils.makeDraftTiddler(tRef);
+      var params = {
+        param: { ref: draftTObj.fields.title }
+      };
+
+      this.dialogManager.open("editContent", params,  function(isConfirmed, outputTObj) {
+      
+        if(isConfirmed) {
+          this.dispatchEvent({
+            type: "tm-save-tiddler",
+            tiddlerTitle: draftTObj.fields.title
+          }); 
+        } else {
+          $tw.wiki.deleteTiddler(draftTObj.fields.title);
+        }
+        
+      });
+      
     } else {
+      
       this.dispatchEvent({
         type: "tm-navigate", navigateTo: tRef
       }); 
+      
     }
   };
    

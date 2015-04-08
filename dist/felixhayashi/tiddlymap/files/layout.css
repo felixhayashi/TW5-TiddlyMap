@@ -81,6 +81,13 @@ html {
         margin-bottom: 0px; }
       html .tc-modal-wrapper .tc-modal-body .tc-image-button {
         font-size: 14px; }
+      html .tc-modal-wrapper .tc-modal-body .tmap-modal-editor .tc-tiddler-frame {
+        padding: 0px !important;
+        width: auto !important;
+        margin: 28px !important;
+        border: none !important; }
+        html .tc-modal-wrapper .tc-modal-body .tmap-modal-editor .tc-tiddler-frame .tc-tiddler-title {
+          display: none; }
       html .tc-modal-wrapper .tc-modal-body #edge-type-manager .tc-tab-buttons {
         padding-top: 0px; }
       html .tc-modal-wrapper .tc-modal-body #edge-type-manager > div:first-child {

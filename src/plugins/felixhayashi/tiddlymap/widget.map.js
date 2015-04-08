@@ -1378,20 +1378,32 @@ module-type: widget
     
     if(this.enlargedMode === "fullscreen") {
       
-      var draftTObj = utils.makeDraftTiddler(tRef);
+      this.dispatchEvent({
+        type: "tm-edit-tiddler", tiddlerTitle: tRef
+      });
+      
+      var draftTRef = this.wiki.findDraft(tRef);
+      
+      if(!draftTRef) return;
+      
       var params = {
-        param: { ref: draftTObj.fields.title }
+        param: { ref: draftTRef }
       };
 
       this.dialogManager.open("editContent", params,  function(isConfirmed, outputTObj) {
       
         if(isConfirmed) {
+          
           this.dispatchEvent({
-            type: "tm-save-tiddler",
-            tiddlerTitle: draftTObj.fields.title
+            type: "tm-save-tiddler", tiddlerTitle: draftTRef
           }); 
+          
         } else {
-          $tw.wiki.deleteTiddler(draftTObj.fields.title);
+          
+          this.dispatchEvent({
+            type: "tm-cancel-tiddler", tiddlerTitle: draftTRef
+          });
+          
         }
         
       });

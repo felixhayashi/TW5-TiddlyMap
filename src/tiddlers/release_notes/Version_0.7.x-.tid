@@ -61,6 +61,10 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.7.16
+
+* Fixes #99: "Create new view -> Forbidden"
+
 ### v0.7.13
 
 * Adding edges did remove the position information, fixed that

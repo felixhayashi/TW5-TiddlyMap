@@ -10,6 +10,10 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.7.19
+
+* Added separate halfscreen button
+
 ### v0.7.17
 
 * Edit and rename tiddlers in fullscreen mode; see #100

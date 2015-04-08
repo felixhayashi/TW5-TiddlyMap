@@ -16,6 +16,6 @@ edgeClickBehaviour: manager
 debug: true
 notifications: true
 editNodeOnCreate: false
-halfscreen: true
+halfscreen: false
 singleClickMode: false
 raster: 10

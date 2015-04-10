@@ -75,7 +75,7 @@ For general information on how to set up TiddlyWiki5 with Nodejs visit [tiddlywi
 1. Download a copy of the following plugins: [TiddlyMap](https://github.com/felixhayashi/TW5-TiddlyMap), [TW5-TopStoryView](https://github.com/felixhayashi/TW5-TopStoryView),[TW5-Vis.js](https://github.com/felixhayashi/TW5-Vis.js)
     * by either cloning each repository.
     * or by clicking "Download ZIP" and unzipping it.
-2. For each plugin, Copy the folder that resides directly below `dist/felixhayashi/` and move it into the `TiddlyWiki5/plugins/` folder.
+2. For each plugin, Copy the folder that resides directly below `dist/felixhayashi/` and move it into the `TiddlyWiki5/plugins/` folder (varies with OS.  Linux: "/usr/lib/node_modules/tiddlywiki/plugins").
 3. Update the plugin section of your wiki's `tddlywiki.info` file (resides in the root of your wiki) to contain the following:
 
         {

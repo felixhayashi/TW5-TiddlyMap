@@ -45,7 +45,7 @@ util functions.
       
       case "basename":
       
-        return utils.getBasename(arguments[1]);
+        return utils.getBasename(arguments[1] || this.getVariable("currentTiddler"));
         
       case "testJSON": 
       

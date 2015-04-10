@@ -10,7 +10,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
     <$select tiddler=<<param.ref.viewHolder>> field="text" default=<<param.ref.view>> >
        <$list filter=<<map-macro "option" "selector.allViews">> >
          <option value={{!!title}}>
-           <$macrocall $name="map-macro" arg0="basename" arg1={{!!title}} />
+           <$view tiddler=<<map-macro "basename">> field="title" />
           </option>
        </$list>
     </$select>

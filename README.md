@@ -70,7 +70,7 @@ By using this plugin you agree to the product's [License Terms](https://github.c
 
 #### When running in Nodejs
 
-For general information on how to set up TiddlyWiki5 with Nodejs visit [tiddlywiki.com](http://tiddlywiki.com).
+For general information on how to set up TiddlyWiki5 with Nodejs visit [tiddlywiki.com](http://tiddlywiki.com). The instructions here are for installing plugins on the node.js server.  This way, the same plugin can be served to many TiddlyWikis.  Multiple wikis will all use the same plugin instance.  You can also install via the standard drag-and-drop method (see below) in a single wiki being served on node.js, but the plugin will only be installed for that wiki.  The process, including all updatees, will have to be repeated for all other wikis if you plan on serving more than one.
 
 1. Download a copy of the following plugins: [TiddlyMap](https://github.com/felixhayashi/TW5-TiddlyMap), [TW5-TopStoryView](https://github.com/felixhayashi/TW5-TopStoryView),[TW5-Vis.js](https://github.com/felixhayashi/TW5-Vis.js)
     * by either cloning each repository.

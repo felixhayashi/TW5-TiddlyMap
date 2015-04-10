@@ -69,6 +69,10 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.7.20
+
+* Fixes #103 "View name in drop-down menu: italicised & gray"
+
 ### v0.7.18
 
 * Fixes #101 "Editing tiddlers in fullscreen modals dublicates the tiddlers in the river."

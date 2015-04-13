@@ -1,6 +1,6 @@
 created: 20150330124519329
 id: c10296ef-ffcf-44bd-bc82-d051dea607fb
-modified: 20150401212111190
+modified: 20150411094932275
 tags: [[Basic concepts]]
 title: Edge-type namespaces
 type: text/vnd.tiddlywiki
@@ -18,7 +18,7 @@ When looking at an edge-type name, ~TiddlyMap regards everything that comes befo
 
 So when creating a new edge type (e.g. by drawing a new edge and specifying a type) you can give it the name [["foaf:knows"|http://xmlns.com/foaf/spec/#term_knows]] and only "knows" is displayed in the graph. However, when clicking on the edge to open the edge manager with the type description, you can see, to which domain "knows" belongs (foaf) and how it is defined.
 
-That's all the magic. 
+An edge-type can be defined, even when there are no edges of that type currently present in the wiki. A type is just a class that groups edges and defines how they look and behave.
 
 !! Advantage
 

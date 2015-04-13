@@ -11,7 +11,8 @@
     "danielo/contextPlugin"
   ],
   "themes": [
-    "tiddlywiki/vanilla"
+    "tiddlywiki/vanilla",
+    "tiddlywiki/snowwhite"
   ],
   "languages": [
     "en-US"

@@ -100,3 +100,4 @@ Contributors
 ------------
 
 Felix Küppers, @felixhayashi, 2014-11-20
+Rich Rath @rcrath 2014-04-12

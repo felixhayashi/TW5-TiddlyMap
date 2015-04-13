@@ -4,10 +4,13 @@ title: $:/plugins/felixhayashi/tiddlymap/caretaker.js
 type: application/javascript
 module-type: startup
 
+@module TiddlyMap
 @preserve
 
 \*/
 
+
+(
 /**
  * 
  * This module is responsible for registering a global namespace under $tw
@@ -20,8 +23,9 @@ module-type: startup
  * all his work in the background without being ever seen. What I want to
  * say here is: do not require the caretaker!
  * 
+ * @lends module:TiddlyMap
  */ 
-(function(){
+function(){
   
 /*jslint node: true, browser: true */
 /*global $tw: false */

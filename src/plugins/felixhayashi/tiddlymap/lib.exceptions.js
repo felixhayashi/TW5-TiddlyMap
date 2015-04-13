@@ -4,11 +4,12 @@ title: $:/plugins/felixhayashi/tiddlymap/exception.js
 type: application/javascript
 module-type: library
 
+@module TiddlyMap
 @preserve
 
 \*/
 
-(function(){
+(/** @lends module:TiddlyMap*/function(){
   
   Exception = {};
   

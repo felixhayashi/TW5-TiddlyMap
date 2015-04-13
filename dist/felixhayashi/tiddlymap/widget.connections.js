@@ -4,6 +4,7 @@ title: $:/plugins/felixhayashi/tiddlymap/widget/connections.js
 type: application/javascript
 module-type: widget
 
+@module TiddlyMap
 @preserve
 
 \*/

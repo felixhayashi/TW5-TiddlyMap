@@ -4,11 +4,12 @@ title: $:/plugins/felixhayashi/tiddlymap/startup/listener.js
 type: application/javascript
 module-type: startup
 
+@module TiddlyMap
 @preserve
 
 \*/
 
-(function(){
+(/** @lends module:TiddlyMap*/function(){
   
 /*jslint node: true, browser: true */
 /*global $tw: false */

@@ -4,6 +4,7 @@ title: $:/plugins/felixhayashi/tiddlymap/view_abstraction.js
 type: application/javascript
 module-type: library
 
+@module TiddlyMap
 @preserve
 
 \*/

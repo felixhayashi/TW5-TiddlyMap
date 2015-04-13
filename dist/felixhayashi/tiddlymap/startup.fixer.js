@@ -4,6 +4,7 @@ title: $:/plugins/felixhayashi/tiddlymap/fixer.js
 type: application/javascript
 module-type: startup
 
+@module TiddlyMap
 @preserve
 
 \*/

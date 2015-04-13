@@ -4,11 +4,12 @@ title: $:/plugins/felixhayashi/tiddlymap/widget/map.js
 type: application/javascript
 module-type: widget
 
+@module TiddlyMap
 @preserve
 
 \*/
 
-(function(){
+(/** @lends module:TiddlyMap*/function(){
 
   /*jslint node: true, browser: true */
   /*global $tw: false */

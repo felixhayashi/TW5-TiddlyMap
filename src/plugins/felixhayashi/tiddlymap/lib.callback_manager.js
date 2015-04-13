@@ -4,11 +4,12 @@ title: $:/plugins/felixhayashi/tiddlymap/callback_manager.js
 type: application/javascript
 module-type: library
 
+@module TiddlyMap
 @preserve
 
 \*/
 
-(function(){
+(/** @lends module:TiddlyMap*/function(){
 
   /*jslint node: true, browser: true */
   /*global $tw: false */

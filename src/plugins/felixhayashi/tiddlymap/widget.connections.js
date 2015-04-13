@@ -4,12 +4,13 @@ title: $:/plugins/felixhayashi/tiddlymap/widget/connections.js
 type: application/javascript
 module-type: widget
 
+@module TiddlyMap
 @preserve
 
 \*/
 
 // <$edges>{{!!title}}</$edges>
-(function(){
+(/** @lends module:TiddlyMap*/function(){
 
 /*jslint node: true, browser: true */
 /*global $tw: false */

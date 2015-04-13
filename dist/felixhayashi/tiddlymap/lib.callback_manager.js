@@ -4,6 +4,7 @@ title: $:/plugins/felixhayashi/tiddlymap/callback_manager.js
 type: application/javascript
 module-type: library
 
+@module TiddlyMap
 @preserve
 
 \*/

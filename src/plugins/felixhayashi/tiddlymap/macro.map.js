@@ -7,11 +7,12 @@ In connection with tiddlymap, this macro allows us to access
 system information from within tiddlers as well as to execute some
 util functions.
 
+@module TiddlyMap
 @preserve
 
 \*/
 
-(function(){
+(/** @lends module:TiddlyMap*/function(){
   
   /*jslint node: true, browser: true */
   /*global $tw: false */

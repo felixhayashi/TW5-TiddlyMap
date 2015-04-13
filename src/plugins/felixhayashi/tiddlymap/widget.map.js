@@ -606,13 +606,18 @@ module-type: widget
     // graph wrapper, the graph width is assigned to the parent
     parent.style["width"] = this.getAttribute("width", "100%");
     
-    window.addEventListener("resize", this.handleResizeEvent.bind(this), false);
+    // always save reference to a bound function that is used as listener
+    // see http://stackoverflow.com/a/22870717
+    this.handleResizeEvent = this.handleResizeEvent.bind(this);
+    this.handleClickEvent = this.handleClickEvent.bind(this);
+    
+    window.addEventListener("resize", this.handleResizeEvent, false);
     
     if(!this.isContainedInSidebar) {
-      this.callbackManager.add("$:/state/sidebar", this.handleResizeEvent.bind(this));
+      this.callbackManager.add("$:/state/sidebar", this.handleResizeEvent);
     }
     
-    window.addEventListener("click", this.handleClickEvent.bind(this), false);
+    window.addEventListener("click", this.handleClickEvent, false);
     
     var fsapi = utils.getFullScreenApis();
     if(fsapi) {
@@ -1258,9 +1263,7 @@ module-type: widget
       
       var windowHeight = window.innerHeight;
       var canvasOffset = this.parentDomNode.getBoundingClientRect().top;
-      if(this.isContainedInSidebar) {
-        //...
-      }
+
       var distanceBottom = this.getAttribute("bottom-spacing", "25px");
       var calculatedHeight = (windowHeight - canvasOffset) + "px";
       
@@ -1283,11 +1286,6 @@ module-type: widget
    * used to prevent nasty deletion as edges are not unselected when leaving vis
    */
   MapWidget.prototype.handleClickEvent = function(event) {
-
-    if(!document.body.contains(this.parentDomNode)) {
-      window.removeEventListener("click", this.handleClickEvent);
-      return;
-    }
     
     if(this.network) {
       var element = document.elementFromPoint(event.clientX, event.clientY);
@@ -1366,6 +1364,7 @@ module-type: widget
    */
   MapWidget.prototype.destruct = function() {
     window.removeEventListener("resize", this.handleResizeEvent);
+    window.removeEventListener("click", this.handleClickEvent);
     this.network.destroy();
   };
   

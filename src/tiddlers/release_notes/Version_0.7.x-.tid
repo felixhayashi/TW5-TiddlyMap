@@ -10,6 +10,10 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.7.22
+
+* Resolved #103 "light colored text in dark colored tiddlers on graph title"
+
 ### v0.7.21
 
 * Default view is not empty anymore but shows some stuff per default

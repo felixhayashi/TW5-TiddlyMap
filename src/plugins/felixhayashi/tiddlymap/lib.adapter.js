@@ -17,6 +17,7 @@ module-type: library
     var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/view_abstraction.js").ViewAbstraction;
     var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/edgetype.js").EdgeType;
     var vis = require("$:/plugins/felixhayashi/vis/vis.js");
+    var getContrastColour = require("$:/core/modules/macros/contrastcolour.js").run;
     
   /***************************** CODE ******************************/
 
@@ -533,7 +534,8 @@ module-type: library
     var node = {
       shape: "box",
       image: undefined,
-      color: undefined
+      color: undefined,
+      fontColor: undefined
     }; 
         
     // determine shape
@@ -583,6 +585,7 @@ module-type: library
     // use the tiddler's color field as node color
     if(tObj.fields.color) {
       node.color = tObj.fields.color;
+      node.fontColor = getContrastColour(node.color, "#FFFFFF", "#000000", "#FFFFFF");
     }
     
     // allow override

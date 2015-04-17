@@ -1,6 +1,14 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager/styling
 caption: Styling
 
+\define flashTypeClass() tmap-flash-message tmap-$(flashType)$
+
+<$set name="trigger" value={{!!style}}>
+<$set name="flashType" value=<<map-macro "testJSON" "style">>>
+<div class=<<flashTypeClass>>>The JSON you entered is: <<flashType>></div>
+</$set>
+</$set>
+
 <table class="tmap-config-table">
   <$macrocall $name="tmap-row" title="Styling" field="style" type="input-textarea" test="json"
              descr="Edge-types can be styled using a JSON format and the styling properties [[defined by Vis.js|http://visjs.org/docs/network.html#Edges_configuration]]. Please [[validate your JSON|http://jsonlint.com/]] before saving." />

@@ -536,8 +536,22 @@ module-type: library
       image: undefined,
       color: undefined,
       fontColor: undefined
-    }; 
-        
+    };
+    
+    if(view) {
+      var view = new ViewAbstraction(view);
+      
+      if(view.isLiveView()) {
+       node.x = undefined;
+       node.y = undefined; 
+      }
+      
+      if(view.isEnabled("physics_mode")) {
+        node.allowedToMoveX = true; 
+        node.allowedToMoveY = true;
+      }
+    } 
+            
     // determine shape
     
     var iconRef = tObj.fields[this.opt.field.nodeIcon];
@@ -595,15 +609,6 @@ module-type: library
     
     // force these fields
     node.id = this.assignId(tObj);
-
-
-    if(view) {
-      var view = new ViewAbstraction(view);
-      if(view.isEnabled("physics_mode")) {
-        node.allowedToMoveX = true; 
-        node.allowedToMoveY = true;
-      }
-    }
     
     return node;
     

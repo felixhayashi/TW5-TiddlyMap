@@ -117,6 +117,7 @@ var attachOptions = function(parent) {
   opt.misc.unknownEdgeLabel = "tmap:undefined";
   opt.misc.cssPrefix = "tmap-";
   opt.misc.sysEdgeTypeNS = "tmap";
+  opt.misc.liveViewLabel = "Live View";
 
   // some popular filters
   if(!opt.filter) opt.filter = utils.getDataMap();

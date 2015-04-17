@@ -13,7 +13,7 @@ module-type: library
 
   /**************************** IMPORTS ****************************/
 
-  var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
+  // -
     
   /***************************** CODE ******************************/
 
@@ -43,13 +43,13 @@ module-type: library
     } 
     
     this.createShortcuts();
-    this.data = utils.getDataMap();
+    this.data = this.utils.getDataMap();
     
     // which data fields are accepted to be set
     this.whitelist = [ "description", "style", "label",
                        "modified", "created", "show-label" ];
               
-    this.id = utils.getWithoutPrefix(type, this.opt.path.edgeTypes + "/");
+    this.id = this.utils.getWithoutPrefix(type, this.opt.path.edgeTypes + "/");
     this.loadDataFromType(this.id);
 
   };
@@ -62,6 +62,7 @@ module-type: library
     this.wiki = $tw.wiki;
     this.opt = $tw.tmap.opt;
     this.logger = $tw.tmap.logger;
+    this.utils = $tw.tmap.utils;
     
   };
 
@@ -83,7 +84,7 @@ module-type: library
    */
   EdgeType.prototype.exists = function() {
   
-    return utils.tiddlerExists(this.getPath());
+    return this.utils.tiddlerExists(this.getPath());
   
   };
   
@@ -122,7 +123,7 @@ module-type: library
         if(args[0] === "style") {
           this.setStyle(args[1]);
         } else {
-          if(args[1] && utils.inArray(args[0], this.whitelist)) {
+          if(args[1] && this.utils.inArray(args[0], this.whitelist)) {
             this.data[args[0]] = args[1];
           } else {
             delete this.data[args[0]];
@@ -141,13 +142,13 @@ module-type: library
 
     // preprocessing: try to turn string into json
     if(typeof style === "string") {
-      style = utils.parseJSON(style);
+      style = this.utils.parseJSON(style);
     }
     
     // merge or override
     if(typeof style === "object") {
       if(isMerge) {
-        utils.merge(this.data.style, style);
+        this.utils.merge(this.data.style, style);
       } else {
         this.data.style = style;
       }
@@ -179,7 +180,7 @@ module-type: library
         title: tRef,
       };
       
-      if( ! utils.startsWith(tRef, this.opt.path.edgeTypes)) {
+      if(!this.utils.startsWith(tRef, this.opt.path.edgeTypes)) {
         fields.id = this.id;
       } else {
         $tw.utils.extend(fields, this.wiki.getModificationFields());
@@ -188,10 +189,10 @@ module-type: library
         }
       }
       
-      if(this.data.style) {
-        var spaces = (isPrettifyJSON ? $tw.config.preferences.jsonSpaces : null);
-        this.data.style = JSON.stringify(this.data.style, null, spaces);
-      }
+
+      var spaces = (isPrettifyJSON ? $tw.config.preferences.jsonSpaces : null);
+      this.data.style = JSON.stringify(this.data.style, null, spaces);
+
       
       $tw.wiki.addTiddler(new $tw.Tiddler(this.data, fields));
       
@@ -226,7 +227,7 @@ module-type: library
     
       if(typeof type === "string") {
         
-        if(!utils.startsWith(type, this.opt.path.edgeTypes)) {
+        if(!this.utils.startsWith(type, this.opt.path.edgeTypes)) {
           type = this.opt.path.edgeTypes + "/" + type;
         }
         
@@ -250,7 +251,7 @@ module-type: library
    */
   EdgeType.prototype.loadDataFromTiddler = function(tiddler) {
     
-    var tObj = utils.getTiddler(tiddler);
+    var tObj = this.utils.getTiddler(tiddler);
     if(tObj) {
       
       var shadowTObj = $tw.wiki.getSubTiddler(this.opt.path.pluginRoot,

@@ -51,12 +51,12 @@ util functions.
       case "testJSON": 
       
         var tObj = $tw.wiki.getTiddler(this.getVariable("currentTiddler"));
-        //console.log("haalloo", tObj, this.getVariable("currentTiddler"), arguments);
+        
         try {
           JSON.parse(tObj.fields[arguments[1]]);
-          return "✔ (Valid JSON)";
+          return "valid";
         } catch(SyntaxError) {
-          return "✘ (Malformed JSON)";
+          return "malformed";
         }
         
       case "splitAndSelect":

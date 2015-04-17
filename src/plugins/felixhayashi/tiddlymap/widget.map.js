@@ -342,7 +342,7 @@ module-type: widget
    * 4. checking for graphbar refresh: Did some widgets need a rerendering
    * due to changes that affect the topbar (view switched or modified)?
    * 
-   * @override Widget.refresh();
+   * @override
    * @see https://groups.google.com/d/msg/tiddlywikidev/hwtX59tKsIk/EWSG9glqCnsJ
    */
   MapWidget.prototype.refresh = function(changedTiddlers) {

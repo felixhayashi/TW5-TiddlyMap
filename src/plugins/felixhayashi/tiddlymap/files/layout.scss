@@ -1,6 +1,20 @@
 $filterbar-height: 35px;
 $default-input-width: 140px;
 
+.tmap-flash-message {
+  
+  border: 1px solid lightgray;
+  padding: 5px;
+
+  &.tmap-valid {
+    background: #D1EED4;
+  }
+  
+  &.tmap-malformed {
+    background: #EED5D1;
+  }
+}
+
 html { // used to increase css importance
 
   .tmap-link { // for buttons and links
@@ -225,14 +239,13 @@ html { // used to increase css importance
             td {
               border: none;
               vertical-align: top;
-              padding: 3px 15px 3px 0;
+              padding: 5px;
               
               &:first-child {
                 width: 15%;
               }
               
               &:last-child {
-                padding-right: 0px;
                 width: 35%;
               }
               

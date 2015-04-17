@@ -1,3 +1,11 @@
+.tmap-flash-message {
+  border: 1px solid lightgray;
+  padding: 5px; }
+  .tmap-flash-message.tmap-valid {
+    background: #D1EED4; }
+  .tmap-flash-message.tmap-malformed {
+    background: #EED5D1; }
+
 html {
   /*
   body {
@@ -127,11 +135,10 @@ html {
         html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td {
           border: none;
           vertical-align: top;
-          padding: 3px 15px 3px 0; }
+          padding: 5px; }
           html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td:first-child {
             width: 15%; }
           html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td:last-child {
-            padding-right: 0px;
             width: 35%; }
           html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td input, html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td textarea, html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td select {
             width: 100%; }

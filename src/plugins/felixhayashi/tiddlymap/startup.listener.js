@@ -125,7 +125,6 @@ GlobalListener.prototype.handleSaveEdgeTypeForm = function(event) {
     this.logger("debug", "Deleting type", type);
     this.adapter._processEdgesWithType(type, { action: "delete" });
     this.wiki.addTiddler(new $tw.Tiddler({title: event.paramObject.output}));
-    
     $tw.tmap.notify("Deleted type");
     
   } else { 

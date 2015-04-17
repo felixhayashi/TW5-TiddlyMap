@@ -13,7 +13,6 @@ module-type: library
 
   /**************************** IMPORTS ****************************/
 
-  var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
   var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/edgetype.js").EdgeType;
     
   /***************************** CODE ******************************/
@@ -31,19 +30,19 @@ module-type: library
    */
   var ViewAbstraction = function(view, isCreate) {
 
+    // register shortcuts and aliases
+    this.createShortcuts();
+
     if(view instanceof ViewAbstraction) {
       // bounce back the object we received
       return view;
     }
 
-    // register shortcuts and aliases
-    this.createShortcuts();
-
     // start building paths
     
     // attention: path is only allowed to have direct child properties
     // otherwise the rebuild mechanism would need a change.
-    this.path = utils.getDataMap(); 
+    this.path = this.utils.getDataMap(); 
     this.path.config = this._getConfigPath(view);
           
     if(isCreate) {
@@ -60,10 +59,10 @@ module-type: library
     // of the ViewAbstraction instance this hashmap is used to
     // prevent rebuildCache() from rebuilding the parts of the
     // cache again (which is already up to date).
-    this._ignoreOnNextRebuild = utils.getDataMap();
+    this._ignoreOnNextRebuild = this.utils.getDataMap();
     
     // force complete rebuild
-    this.rebuildCache(utils.getValues(this.path));
+    this.rebuildCache(this.utils.getValues(this.path));
     
   };
   
@@ -74,6 +73,7 @@ module-type: library
     this.wiki = $tw.wiki;
     this.opt = $tw.tmap.opt;
     this.logger = $tw.tmap.logger;
+    this.utils = $tw.tmap.utils;
   };
 
   /**
@@ -92,9 +92,9 @@ module-type: library
     if(typeof view == "string") { // is string
         
       // remove prefix and slash
-      view = utils.getWithoutPrefix(view, this.opt.path.views + "/");
+      view = this.utils.getWithoutPrefix(view, this.opt.path.views + "/");
 
-      if(!utils.hasSubString(view, "/")) { // contains no slash; valid label
+      if(!this.utils.hasSubString(view, "/")) { // contains no slash; valid label
         return this.opt.path.views + "/" + view; // add prefix (again)
       }
     }
@@ -127,7 +127,7 @@ module-type: library
     var fields = {};
     fields.title = this.path.config;
     fields[this.opt.field.viewMarker] = true;
-    fields.id = utils.genUUID(); // you never know when you will need it
+    fields.id = this.utils.genUUID(); // you never know when you will need it
     
     this.wiki.addTiddler(new $tw.Tiddler(fields));
     
@@ -174,15 +174,15 @@ module-type: library
     
     if(!this.exists()) return [];
 
-    if(utils.inArray(this.path.config, components)) {
+    if(this.utils.inArray(this.path.config, components)) {
       this.logger("debug", "Reloading config of view", this.getLabel(),  "; trigger full rebuild");
-      components = utils.getValues(this.path);
+      components = this.utils.getValues(this.path);
     }
 
     // dereference the ignore list as it might get freshly updated
     // when some setters are called during this rebuild phase.
     var ignoredOnCurRebuild = this._ignoreOnNextRebuild;
-    this._ignoreOnNextRebuild = utils.getDataMap();
+    this._ignoreOnNextRebuild = this.utils.getDataMap();
 
     var modified = [];
     
@@ -206,7 +206,7 @@ module-type: library
         this.typeWhiteList = this.getTypeWhiteList(true);
         // TODO: Maybe set flag to prevent allowed edge types to be updated during this refresh
         
-      } else if(utils.startsWith(tRef, this.opt.path.edgeTypes)) {
+      } else if(this.utils.startsWith(tRef, this.opt.path.edgeTypes)) {
         this.typeWhiteList = this.getTypeWhiteList(true);
         
       } else {
@@ -229,7 +229,7 @@ module-type: library
    * @return {boolean} True if it exists, false otherwise.
    */
   ViewAbstraction.prototype.exists = function() {
-    return utils.tiddlerExists(this.path.config);
+    return this.utils.tiddlerExists(this.path.config);
   };
 
   /**
@@ -250,7 +250,7 @@ module-type: library
 
     if(!this.exists()) return; // TODO not nice
     
-    return utils.getBasename(this.path.config);
+    return this.utils.getBasename(this.path.config);
   };
 
   /**
@@ -263,22 +263,27 @@ module-type: library
     
     // delete the view and all tiddlers stored in its path (map, edge-filter etc.)
     var filter = "[prefix[" + this.getRoot() + "]]";
-    utils.deleteTiddlers(utils.getMatches(filter));
+    this.utils.deleteTiddlers(this.utils.getMatches(filter));
     
-    this.path = utils.getDataMap();
+    this.path = this.utils.getDataMap();
     
   };
 
   ViewAbstraction.prototype.getReferences = function() {
     
     var filter = "[regexp:text[<\\$tiddlymap.*?view=." + this.getLabel() + "..*?>]]";
-    return utils.getMatches(filter);
+    return this.utils.getMatches(filter);
     
   };
     
   ViewAbstraction.prototype.rename = function(newLabel) {
 
-    if(!this.exists() || typeof newLabel !== "string" || utils.inArray("/", newLabel)) {
+    if(!this.exists() || typeof newLabel !== "string") {
+      return;
+    }
+    
+    if(this.utils.inArray("/", newLabel)) {
+      $tw.tmap.notify("A view name must not contain any \"/\"");
       return;
     }
     
@@ -300,7 +305,7 @@ module-type: library
       
     }
     
-    this.rebuildCache(utils.getValues(this.path), true); // true => force rebuild
+    this.rebuildCache(this.utils.getValues(this.path), true); // true => force rebuild
     
   };
 
@@ -313,7 +318,7 @@ module-type: library
    */
   ViewAbstraction.prototype.isEnabled = function(name) {
     
-    return utils.isTrue(this.getConfig(name), false);
+    return this.utils.isTrue(this.getConfig(name), false);
     
   };
   
@@ -331,12 +336,12 @@ module-type: library
   ViewAbstraction.prototype.getConfig = function(name, isRebuild, defValue) {
     
     if(!this.exists()) {
-      var config = utils.getDataMap();
+      var config = this.utils.getDataMap();
     } else if(!isRebuild && this.config) {
       var config = this.config;
     } else {
       var fields = this.wiki.getTiddler(this.path.config).fields;
-      var config = utils.getPropertiesByPrefix(fields, "config.");
+      var config = this.utils.getPropertiesByPrefix(fields, "config.");
       defaults = {
         "config.layout.active": "user"
       };
@@ -344,7 +349,7 @@ module-type: library
     }
     
     return (name
-            ? config[(utils.startsWith(name, "config.") ? name : "config." + name)]
+            ? config[(this.utils.startsWith(name, "config.") ? name : "config." + name)]
             : config);
     
   };
@@ -378,14 +383,14 @@ module-type: library
     
     if(this.getConfig("layout.active") !== "hierarchical") return [];
     
-    var orderByEdges = utils.getPropertiesByPrefix(this.getConfig(), "config.layout.hierarchical.order-by-", true);
+    var orderByEdges = this.utils.getPropertiesByPrefix(this.getConfig(), "config.layout.hierarchical.order-by-", true);
     
-    var labels = utils.getDataMap();
+    var labels = this.utils.getDataMap();
     for(var id in orderByEdges) {
       if(orderByEdges[id] === "true") {
-        var tObj = utils.getTiddler($tw.tmap.indeces.tById[id]);
+        var tObj = this.utils.getTiddler($tw.tmap.indeces.tById[id]);
         if(tObj) {
-          labels[utils.getBasename(tObj.fields.title)] = true;
+          labels[this.utils.getBasename(tObj.fields.title)] = true;
         }
       }
     }
@@ -411,7 +416,7 @@ module-type: library
       
     } else if(arguments.length === 2 && typeof arguments[0] === "string") {
       
-      var prop = utils.getWithoutPrefix(arguments[0], "config.");
+      var prop = this.utils.getWithoutPrefix(arguments[0], "config.");
       var val = arguments[1];
       if(val) {
         if(prop === "edge_type_namespace") {
@@ -437,7 +442,11 @@ module-type: library
   
   ViewAbstraction.prototype.isExplicitNode = function(node) {
     return this.getNodeFilter("expression")
-               .match(utils.escapeRegex(this._getAddNodeFilterPart(node)));
+               .match(this.utils.escapeRegex(this._getAddNodeFilterPart(node)));
+  };
+  
+  ViewAbstraction.prototype.isLiveView = function(node) {
+    return (this.getLabel() === this.opt.misc.liveViewLabel);
   };
   
   /**
@@ -468,6 +477,11 @@ module-type: library
     
     if(!this.exists()) return;
     
+    if(this.isLiveView()) {
+      $tw.tmap.notify("It is forbidden to change the node filter of the live view!");
+      return;
+    }
+    
     expr = expr.replace("\n", " ");
     
     if(this.getNodeFilter.expression === expr) { // already up to date;
@@ -475,7 +489,7 @@ module-type: library
       return;
     }
         
-    utils.setField(this.path.nodeFilter, "filter", expr);
+    this.utils.setField(this.path.nodeFilter, "filter", expr);
     
     this.logger("debug","Node filter set to", expr);
 
@@ -496,7 +510,7 @@ module-type: library
       return;
     }
     
-    utils.setField(this.path.edgeFilter, "filter", expr);
+    this.utils.setField(this.path.edgeFilter, "filter", expr);
     
     this.logger("debug","Edge filter set to", expr, this.path.edgeFilter);
 
@@ -524,17 +538,6 @@ module-type: library
     this.setNodePosition(node);
     
   };
-  
-  //~ ViewAbstraction.prototype.getEdgeTypeWhiteList = function(isRebuild) {
-    //~ 
-    //~ if(!isRebuild && this.edgeTypeWhiteList) {
-      //~ return this.edgeTypeWhiteList;
-    //~ } else {
-      //~ 
-      //~ 
-    //~ }
-    //~ 
-  //~ };
 
   /**
    * Method will return a tiddlywiki edge filter that is used to
@@ -554,7 +557,7 @@ module-type: library
       
     } else {
       
-      var filter = utils.getDataMap();
+      var filter = this.utils.getDataMap();
 
       var tObj = this.wiki.getTiddler(this.path.edgeFilter);
       filter.expression = (tObj && tObj.fields.filter
@@ -579,12 +582,12 @@ module-type: library
       
     } else {
       
-      var typeWhiteList = utils.getDataMap();
+      var typeWhiteList = this.utils.getDataMap();
       
-      var source = utils.getMatches(this.opt.selector.allEdgeTypes);
-      var matches = utils.getMatches(this.getEdgeFilter("compiled"), source);
+      var source = this.utils.getMatches(this.opt.selector.allEdgeTypes);
+      var matches = this.utils.getMatches(this.getEdgeFilter("compiled"), source);
       for(var i = 0; i < matches.length; i++) {
-        var type = utils.getWithoutPrefix(matches[i], this.opt.path.edgeTypes + "/");
+        var type = this.utils.getWithoutPrefix(matches[i], this.opt.path.edgeTypes + "/");
         typeWhiteList[type] = new EdgeType(type);
       }
       
@@ -611,7 +614,7 @@ module-type: library
       
     } else {
       
-      var filter = utils.getDataMap();
+      var filter = this.utils.getDataMap();
       var tObj = this.wiki.getTiddler(this.path.nodeFilter);
       filter.expression = (tObj && tObj.fields.filter ? tObj.fields.filter : "");
       filter.compiled = this.wiki.compileFilter(filter.expression);
@@ -641,6 +644,17 @@ module-type: library
     return $tw.wiki.getTiddlerData(this.path.map, {}); 
     
   };
+  
+  ViewAbstraction.prototype.getPositions = function(isRebuild) {
+    
+    if(!isRebuild && this.positions) {
+      return this.positions;
+    }
+        
+    // cannot use prototypeless hashmap here
+    return $tw.wiki.getTiddlerData(this.getPositionStore(), {}); 
+    
+  };
 
   /**
    * This function will store the given positions into the views map.
@@ -650,23 +664,32 @@ module-type: library
    */
   ViewAbstraction.prototype.setPositions = function(positions) {
     
-    if(!this.exists()) return;
-    
-    $tw.tmap.logger("log", "Storing positions in view \"" + this.getLabel() + "\"");
-    
-    if(typeof positions !== "object") return;
-    
-    //~ if(this.positions) {
-      //~ // make sure we don't lose old positions. Therefore overwrite
-      //~ // the current positions with the updates and save it into the updates.
-      //~ positions = $tw.utils.extend(this.positions, positions);
-    //~ }
-    
-    this.wiki.setTiddlerData(this.path.map, positions);
+    if(!this.exists() || typeof positions !== "object") return;
+        
+    $tw.tmap.logger("log", "Storing positions in", this.getPositionStore());
+    this.utils.writeFieldData(this.getPositionStore(), "text", positions);
     
     // cache new values and prevent rebuild at refresh
     this.positions = positions;
     this._ignoreOnNextRebuild[this.path.map] = true;
+    
+      
+  };
+  
+  ViewAbstraction.prototype.getPositionStore = function() {
+    
+    if(this.isLiveView()) {
+      
+      var tRef = this.utils.getMatches(this.getNodeFilter("compiled"))[0];
+      if(tRef) {
+        // use a dedicated store for each focussed tiddler
+        return (this.path.map + "/" + $tw.tmap.indeces.idByT[tRef]);
+      }
+      
+    }
+     
+    // use the global store
+    return this.path.map;
       
   };
 

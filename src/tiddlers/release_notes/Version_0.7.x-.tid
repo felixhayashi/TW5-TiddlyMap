@@ -10,9 +10,14 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.7.25
+
+* View statistics
+* Export of view's graph as JSON
+
 ### v0.7.24
 
-* live view separately stores positions for each focussed tiddler; see #91
+* Live view separately stores positions for each focussed tiddler; see #91
 * Edge-type styling section directly shows whether JSON is valid or not.
 
 ### v0.7.22

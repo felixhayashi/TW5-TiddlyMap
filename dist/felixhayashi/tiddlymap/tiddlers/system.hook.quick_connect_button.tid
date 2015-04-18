@@ -73,7 +73,12 @@ description: Show available ~TiddlyMap actions
             <$button class="tc-btn-invisible">
               <$action-sendmessage $message="tmap:tm-remove-edge" id=<<edge.id>> from=<<edge.from>> />
               {{$:/core/images/close-button}}
-            </$button> <<role>> <$link><<neighbour>></$link> (<<edge.label>>)
+            </$button>
+            <<role>>
+            <$link to=<<neighbour>>>
+              <$view tiddler=<<map-macro "basename">> field="title" />
+            </$link>
+            (<<edge.label>>)
           </div>
         </$tmap-connections>
       </p>      

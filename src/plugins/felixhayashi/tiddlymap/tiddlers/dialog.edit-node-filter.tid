@@ -18,6 +18,4 @@ subtitle: {{$:/core/images/edit-button}} Filter Editor
 ---
 
 <sup>[1]</sup> A new line is equivalent to an "or".<br />
-''Warning:''Never use filters that act as selectors (e.g. '[all[tiddlers]]'). Instead, use filters such as '[!is[system]!has[draft.of]]'. See this [[discussion|https://groups.google.com/d/msg/tiddlywikidev/aCRvcsVwfU8/FGsG1EOBUOQJ]]."
-
-New to filters? Read this [[introduction|http://tiddlywiki.com/#Introduction%20to%20Filters]].
+<sup>[2]</sup> Never use filters that act as selectors (e.g. "[all[tiddlers]]"). Instead, use filters such as '[!is[system]!has[draft.of]]'. See this [[discussion|https://groups.google.com/d/msg/tiddlywikidev/aCRvcsVwfU8/FGsG1EOBUOQJ]]."

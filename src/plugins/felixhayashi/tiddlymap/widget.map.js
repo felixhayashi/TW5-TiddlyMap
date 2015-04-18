@@ -462,12 +462,9 @@ module-type: widget
     if(!isRebuild && this.graphData) {
       return this.graphData;
     }
-        
-    var nodeFilter = this.getView().getNodeFilter("compiled");
 
-    var graph = this.adapter.getGraph(nodeFilter, {
-      view: this.view,
-      neighbourhoodScope: parseInt(this.getView().getConfig("neighbourhood_scope"))
+    var graph = this.adapter.getGraph({
+      view: this.getView()
     });
           
     var nodes = graph.nodes;
@@ -778,7 +775,10 @@ module-type: widget
   MapWidget.prototype.handleEditView = function() {
     
     var params = {
-      "var.edgeFilter": this.getView().getEdgeFilter("expression"),
+      label: this.getView().getLabel(),
+      createdOn: this.getView().getCreationDate().toDateString(),
+      numberOfNodes: "" + Object.keys(this.graphData.nodesById).length,
+      numberOfEdges: "" + Object.keys(this.graphData.edgesById).length,
       dialog: {
         preselects: this.getView().getConfig()
       }

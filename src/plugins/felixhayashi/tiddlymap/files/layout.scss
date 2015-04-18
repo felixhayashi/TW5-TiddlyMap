@@ -220,10 +220,15 @@ html { // used to increase css importance
         td, th {
           border: 1px solid lightgray;
         }
+        
+        &.tmap-key-value-table {
+          th {
+            width: 30%;
+          }
+        }
               
         &.tmap-config-table {
 
-          
           tr {
           
             &:nth-child(odd) {
@@ -251,6 +256,8 @@ html { // used to increase css importance
               
               input, textarea, select {
                 width: 100%;
+                /* prevents bad looking select boxes and wrapping in textareas */
+                word-wrap: normal;
               }
             }
 

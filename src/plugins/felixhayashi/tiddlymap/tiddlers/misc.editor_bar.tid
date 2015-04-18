@@ -23,7 +23,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
   
   <$reveal type="popup" position="below" state=<<qualify "$:/temp/menu">> >
     <div class="tc-drop-down">
-      <a href="http://bit.ly/tiddlymap#The editor menu" target="_blank">{{$:/core/images/info-button}} Open online help</a>
+      <a href="http://bit.ly/tiddlymap#Documentation" target="_blank">{{$:/core/images/info-button}} Open online help</a>
       <hr />
       <$button class="tc-btn-invisible" message="tmap:tm-create-view">{{$:/core/images/new-button}} Create empty view</$button>
       <$button class="tc-btn-invisible" message="tmap:tm-rename-view">{{$:/core/images/tag-button}} Rename view</$button>

@@ -126,6 +126,8 @@ html {
         width: 100%; }
         html .tc-modal-wrapper .tc-modal-body table td, html .tc-modal-wrapper .tc-modal-body table th {
           border: 1px solid lightgray; }
+        html .tc-modal-wrapper .tc-modal-body table.tmap-key-value-table th {
+          width: 30%; }
         html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr:nth-child(odd) {
           background-color: #E8E8E8; }
         html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr:nth-child(even) {
@@ -141,7 +143,9 @@ html {
           html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td:last-child {
             width: 35%; }
           html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td input, html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td textarea, html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td select {
-            width: 100%; }
+            width: 100%;
+            /* prevents bad looking select boxes and wrapping in textareas */
+            word-wrap: normal; }
         html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr .tmap-note {
           margin: 10px 10px 10px 0; }
         html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr .tmap-description {

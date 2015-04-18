@@ -95,6 +95,8 @@ module-type: library
     }
     
     if(!param) { param = {}; }
+    
+    this.logger("debug", "Dialog param object", param);
   
     if(typeof callback === "function" && this.context) {
       callback = callback.bind(this.context);
@@ -172,13 +174,13 @@ module-type: library
     var dialogTiddler = new $tw.Tiddler(skeleton, param, dialog);
     this.wiki.addTiddler(dialogTiddler);
     
+    this.logger("debug", "Opening dialog", dialogTiddler);
+    
     $tw.rootWidget.dispatchEvent({
       type: "tm-modal",
       param : dialogTiddler.fields.title,
       paramObject: dialogTiddler.fields
     }); 
-    
-    this.logger("debug", "Opened dialog", dialogTiddler);
     
     return dialogTiddler;
     

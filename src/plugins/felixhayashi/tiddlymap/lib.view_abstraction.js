@@ -240,6 +240,17 @@ module-type: library
   ViewAbstraction.prototype.getRoot = function() {
     return this.path.config;
   };
+  
+  /**
+   * 
+   */
+  ViewAbstraction.prototype.getCreationDate = function() {
+    
+    if(this.exists()) {
+      return this.wiki.getTiddler(this.path.config).fields["created"];
+    }
+    
+  };
 
   /**
    * The label of the view (which is basically the roots basename).

@@ -42,6 +42,7 @@ var GlobalListener = function() {
     "tmap:tm-create-edge": this.handleCreateEdge,
     "tmap:tm-suppress-dialog": this.handleSuppressDialog,
     "tmap:tm-generate-widget": this.handleGenerateWidget,
+    "tmap:tm-download-graph": this.handleDownloadGraph,
     "tmap:tm-manage-edge-types": this.handleManageEdgeTypes
   }, $tw.rootWidget, this);
   
@@ -81,6 +82,21 @@ GlobalListener.prototype.handleSuppressDialog = function(event) {
   if(utils.isTrue(event.paramObject.suppress, false)) {
     utils.setEntry(this.opt.ref.sysUserConf, "suppressedDialogs." + event.paramObject.dialog, true);
   }
+  
+};
+
+GlobalListener.prototype.handleDownloadGraph = function(event) {
+
+  var graph = this.adapter.getGraph({ view: event.paramObject.view });  
+  utils.setField("$:/temp/tmap/export", "text", JSON.stringify(graph, null, 2));
+    
+  $tw.rootWidget.dispatchEvent({
+    type: "tm-download-file",
+    param: "$:/temp/tmap/export",
+    paramObject: {
+      filename: event.paramObject.view + ".json"
+    }
+  });
   
 };
 

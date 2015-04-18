@@ -3,6 +3,30 @@ subtitle: {{$:/core/images/theme-button}} View Configuration
 
 <$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
 
+<fieldset><legend>Statistics</legend>
+  <table class="tmap-key-value-table">
+    <tr>
+      <th align="left">Created on</th>
+      <td><<createdOn>></td>
+    </tr>
+    <tr>
+      <th align="left">Nodes contained in graph</th>
+      <td><<numberOfNodes>></td>
+    </tr>
+    <tr>
+      <th align="left">Edges contained in graph</th>
+      <td><<numberOfEdges>></td>
+    </tr>
+  </table>
+</fieldset>
+
+<fieldset><legend>Export graph as JSON</legend>
+  <$button>Download graph as JSON
+    <$action-sendmessage $message="tmap:tm-download-graph" view=<<label>> />
+  </$button>
+</fieldset>
+
+
 <fieldset><legend>Layout</legend>
   <table class="tmap-config-table">
     <<tmap-row title:"Floating nodes" field:"config.physics_mode" type:"input-checkbox"

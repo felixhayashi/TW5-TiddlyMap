@@ -127,6 +127,7 @@ module-type: library
       var tRefs = utils.getMatches(this.opt.selector.allPotentialNodes);
       opts.edges = this.getAllOutgoingEdges(tRefs, opts);
     }
+    
     var adjList = utils.groupByProperty(opts.edges, groupBy);
     
     $tw.tmap.stop("Creating adjacency list");
@@ -215,14 +216,15 @@ module-type: library
     
   };
   
-  Adapter.prototype.getGraph = function(filter, options) {
+  Adapter.prototype.getGraph = function(opts) {
     
     $tw.tmap.start("Assembling Graph");
     
-    options = options || {};
+    opts = opts || {};
 
-    var view = new ViewAbstraction(options.view);
-    var matches = utils.getMatches(filter);
+    var view = new ViewAbstraction(opts.view);
+    var matches = utils.getMatches(opts.filter || view.getNodeFilter("compiled"));
+    var neighScope = opts.neighbourhoodScope || view.getConfig("neighbourhood_scope");
         
     var graph = {};
     graph.nodes = this.selectNodesByReferences(matches, {
@@ -238,9 +240,9 @@ module-type: library
       typeFilterStyle: "whitelist"
     });
     
-    if(options.neighbourhoodScope) {
+    if(parseInt(neighScope)) {
       var neighbours = this.getNeighbours(matches, {
-        steps: options.neighbourhoodScope,
+        steps: parseInt(neighScope),
         view: view,
         typeFilter: view.getTypeWhiteList(),
         typeFilterStyle: "whitelist",

@@ -3,7 +3,7 @@ caption: Overview
 
 ! {{!!id}}
 
-<table>
+<table class="tmap-key-value-table">
   <$set name="self" value=<<currentTiddler>>>
     <$list filter="[[Created on|created]]
                    [[Modified on|modified]]

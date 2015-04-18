@@ -12,8 +12,8 @@ Major enhancements
 
 ### v0.7.25
 
-* View statistics
-* Export of view's graph as JSON
+* View statistics; Resolves #44
+* Export of view's graph as JSON; Resolves #68, resolves #33
 
 ### v0.7.24
 

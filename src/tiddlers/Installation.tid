@@ -1,13 +1,12 @@
 created: 20141218163905294
 id: A94544D7-9A04-40D6-9274-AD56617C04BE
-modified: 20150330170033902
-title: How to install TiddlyMap?
+modified: 20150418135909423
+tags: Documentation
+title: Installation
 tmap.edges: {}
 type: text/vnd.tiddlywiki
 
-''Warning:'' ~TiddlyMap is cool but unstable. Just play with it, don't use it (until it leaves its beta state in the next months).
-
-In case you really want to use it now (it's always great to have beta-testers!), follow the steps below:
+''Please note:'' By using this plugin you agree to the product's [[License Terms|$:/plugins/felixhayashi/tiddlymap/license]] (~TiddlyMap is distributed under the [[BSD 2-Clause License|http://opensource.org/licenses/BSD-2-Clause]]).
 
 # Have a quick look at [[Common Pitfalls]]
 # Create a backup of your current ~TiddlyWiki HTML file (just in case)
@@ -22,6 +21,5 @@ In case you really want to use it now (it's always great to have beta-testers!),
 # If you want to use the "live view", change your wiki's story view to "Top" (Configuration ➡ Appearance ➡ Story view ➡ Current view).
 # Also make sure to always check back to this site to see whether your version is up-to-date as updates and bugfixes come quick! For any bug you discover, please create an issue at [[github.com|https://github.com/felixhayashi/TW5-TiddlyMap/issues]].
 
-By using this plugin you agree to the product's [[License Terms|$:/plugins/felixhayashi/tiddlymap/license]] (don't worry, it's a [[BSD 2-Clause License|http://opensource.org/licenses/BSD-2-Clause]]).
 
 For more Information visit: http://tiddlywiki.com/#Plugins

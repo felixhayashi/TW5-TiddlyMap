@@ -1,7 +1,7 @@
 created: 20141217161104178
 creator: @felixhayashi
 id: 63EA2EE9-F821-44F7-A706-E1F973F7C6E0
-modified: 20150331113518258
+modified: 20150418131338742
 modifier: @felixhayashi
 title: Getting started
 tmap.edges: {"30af4ba7-306f-4e68-9e32-d0342d64a717":{"to":"6159DA1A-73F2-451D-B55F-8744480BA7AC","type":"demo:suggestion"},"95209609-d1c8-44a4-8f31-f5dbf6c85098":{"to":"a7e46ff2-2010-475f-a430-d757a7659798","type":"demo:suggestion"}}
@@ -15,4 +15,4 @@ Hi, this is a demo site of ~TiddlyMap.
 
 See the [[version history|Version History]] for a list of existing features and [[overview|The Big Picture]] to understand what ~TiddlyMap can do for you. To dive into the basic concepts and building blocks of ~TiddlyMap check out the [[docs|Documentation]]. Use the double-click on the nodes to [[navigate|Navigation]] to the corresponding content. The visualization runs most smoothly in [[Google chrome|http://www.google.com/chrome/]].
 
-~TiddlyMap is currently in its late beta-phase. If you want to use it in your wiki, check out the [[installation instructions|How to install TiddlyMap?]].
+~TiddlyMap is currently in its late beta-phase. If you want to use it in your wiki, check out the [[installation instructions|Installation]].

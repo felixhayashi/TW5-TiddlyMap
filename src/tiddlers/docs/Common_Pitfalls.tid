@@ -1,6 +1,6 @@
 created: 20150103171758988
 id: a7e46ff2-2010-475f-a430-d757a7659798
-modified: 20150330165539246
+modified: 20150418130434709
 tags: 
 title: Common Pitfalls
 type: text/vnd.tiddlywiki
@@ -18,3 +18,5 @@ Instead, use this version:
 ```html
 <$tiddlymap ...></$tiddlymap>
 ```
+
+It is recommended to use the ~TiddlyMap [[widget-wizard|Embedding views within tiddlers]] for the creation of the widget code.

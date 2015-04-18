@@ -775,7 +775,7 @@ module-type: widget
   MapWidget.prototype.handleEditView = function() {
     
     var params = {
-      label: this.getView().getLabel(),
+      view: this.getView().getLabel(),
       createdOn: this.getView().getCreationDate().toDateString(),
       numberOfNodes: "" + Object.keys(this.graphData.nodesById).length,
       numberOfEdges: "" + Object.keys(this.graphData.edgesById).length,
@@ -1076,7 +1076,8 @@ module-type: widget
     var pnf = utils.getPrettyFilter(this.getView().getNodeFilter("expression"));
     var pef = utils.getPrettyFilter(this.getView().getEdgeFilter("expression"));
 
-    var fields = {
+    var param = {
+      view: this.getView().getLabel(),
       dialog: {
         preselects: {
           prettyNodeFilter: pnf,
@@ -1085,7 +1086,7 @@ module-type: widget
       }
     };
     
-    this.dialogManager.open("editFilters", fields, function(isConfirmed, outputTObj) {
+    this.dialogManager.open("editFilters", param, function(isConfirmed, outputTObj) {
       if(isConfirmed) {
         this.getView().setNodeFilter(utils.getField(outputTObj, "prettyNodeFilter", pnf));
         this.getView().setEdgeFilter(utils.getField(outputTObj, "prettyEdgeFilter", pef));

@@ -1,5 +1,5 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/configureView
-subtitle: {{$:/core/images/theme-button}} View Configuration
+subtitle: {{$:/core/images/theme-button}} View configuration -- <<view>>
 
 <$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
 
@@ -20,9 +20,9 @@ subtitle: {{$:/core/images/theme-button}} View Configuration
   </table>
 </fieldset>
 
-<fieldset><legend>Export graph as JSON</legend>
-  <$button>Download graph as JSON
-    <$action-sendmessage $message="tmap:tm-download-graph" view=<<label>> />
+<fieldset><legend>Export</legend>
+  <$button>Download graph (JSON format)
+    <$action-sendmessage $message="tmap:tm-download-graph" view=<<view>> />
   </$button>
 </fieldset>
 

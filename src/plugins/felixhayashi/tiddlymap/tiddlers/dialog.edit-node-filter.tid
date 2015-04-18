@@ -1,5 +1,5 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/editFilters
-subtitle: {{$:/core/images/edit-button}} Filter Editor
+subtitle: {{$:/core/images/edit-button}} Filter Editor -- <<view>>
 
 <$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
 

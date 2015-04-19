@@ -184,56 +184,6 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
   };
   
   /**
-   * using an existing dataset to reflect the changes between
-   * two node sets.
-   * 
-   * @param {Hashmap<id, Node>} lt1 - Lookup table that contains the
-   *     *new* set of nodes.
-   * @param {Hashmap<id, Node>} lt2 - lookup table that holds the
-   *     *old* set of nodes.
-   * @param {vis.DataSet} [ds] - The dataset to be updated
-   */
-  utils.refresh = function(ltNew, lTOld, ds) {
-    
-    if(!ds) {
-      return new vis.DataSet(utils.convert(ltNew, "array"));
-    }
-    
-    // first remove
-    var removes = [];
-    for(var id in lTOld) {
-      if(!ltNew[id]) {
-        removes.push(id);
-      }
-    }
-    ds.remove(removes);
-    
-    // then update
-    var updates = [];
-    var existing = ds.get({ returnType: "Object" });
-    for(var id in ltNew) {
-      var update = ltNew[id];
-      
-      // DISABLED BECAUSE SOME STUFF LIKE x and y SHOULD ALWAYS REMAIN.
-      
-      //~ if(existing[id]) {
-        //~ for(var prop in existing[id]) {
-          //~ if(update[prop] === undefined) {
-            //~ // explicitly set to null to prevent relicts
-            //~ update[prop] = null;
-          //~ }
-        //~ }
-      //~ }
-      // now push
-      updates.push(update);
-    }
-    ds.update(updates);
-    
-    return ds;
-    
-  };
-
-  /**
    * Extract all the values from a collection. If `col` is an object,
    * only properties are considered that are its own and iterable.
    * 
@@ -622,7 +572,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
   utils.parseFieldData = function(tiddler, field, data) {
     
     var tObj = utils.getTiddler(tiddler);
-    if(!tObj) throw "tmap: Cannot parse field of " + tiddler;
+    if(!tObj) return data;
     
     if(!field) field = "text";
     

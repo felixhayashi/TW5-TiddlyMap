@@ -463,28 +463,23 @@ module-type: widget
       return this.graphData;
     }
 
-    var graph = this.adapter.getGraph({
-      view: this.getView()
-    });
-          
+    var graph = this.adapter.getGraph({ view: this.getView() });    
     var nodes = graph.nodes;
+    var edges = graph.edges;
     
-    // special display of a single match
-    
+    // TODO: special display of a single match
     //~ var keys = Object.keys(nodes);
     //~ if(keys.length === 1) {
       //~ nodes.
     //~ }
-    
-    var edges = graph.edges;
         
     // refresh datasets
     
-    this.graphData.nodes = utils.refresh(nodes, // new nodes
+    this.graphData.nodes = this.getRefreshedDataSet(nodes, // new nodes
                                          this.graphData.nodesById, // old nodes
                                          this.graphData.nodes); // dataset
                                                                                   
-    this.graphData.edges = utils.refresh(edges, // new edges
+    this.graphData.edges = this.getRefreshedDataSet(edges, // new edges
                                          this.graphData.edgesById, // old edges
                                          this.graphData.edges); // dataset
                                        
@@ -1530,6 +1525,57 @@ module-type: widget
       this.logger("log", "Warning: View \"" + view.getLabel() + "\" doesn't exist. Default is used instead.");
       return new ViewAbstraction("Default");
     }
+    
+  };
+  
+  /**
+   * using an existing dataset to reflect the changes between
+   * two node sets.
+   * 
+   * @param {Hashmap<id, Node>} lt1 - Lookup table that contains the
+   *     *new* set of nodes.
+   * @param {Hashmap<id, Node>} lt2 - lookup table that holds the
+   *     *old* set of nodes.
+   * @param {vis.DataSet} [ds] - The dataset to be updated
+   */
+  MapWidget.prototype.getRefreshedDataSet = function(ltNew, lTOld, ds) {
+    
+    if(!ds) {
+      return new vis.DataSet(utils.convert(ltNew, "array"));
+    }
+    
+    // first remove
+    var removes = [];
+    for(var id in lTOld) {
+      if(!ltNew[id]) {
+        removes.push(id);
+      }
+    }
+    ds.remove(removes);
+    
+    // get all nodes that remain after the remove operation
+    var existing = ds.get({ returnType: "Object" });
+    
+    var updates = [];
+    for(var id in ltNew) {
+      var update = ltNew[id];
+      
+      if(existing[id]) { // node already exists in graph
+        for(var prop in existing[id]) {
+          // some stuff like x and y should remain
+          if(prop == "x" || prop == "y") continue;
+          // explicitly set to null to prevent relicts
+          if(update[prop] === undefined) {
+            update[prop] = null;
+          }
+        }
+      }
+      // now push
+      updates.push(update);
+    }
+    ds.update(updates);
+    
+    return ds;
     
   };
 

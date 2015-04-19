@@ -532,21 +532,13 @@ module-type: library
     }
         
     // create default node object; vis does not like utils.getDataMap()
-    // set some properties to null to overwrite existing values in a dataset
+    // set some default properties to overwrite existing values in a dataset
     var node = {
       shape: "box",
-      image: undefined,
-      color: undefined,
-      fontColor: undefined
     };
     
-    if(view) {
-      var view = new ViewAbstraction(view);
-      
-      if(view.isLiveView()) {
-       node.x = undefined;
-       node.y = undefined; 
-      }
+    var view = new ViewAbstraction(view);
+    if(view.exists()) {
       
       if(view.isEnabled("physics_mode")) {
         node.allowedToMoveX = true; 

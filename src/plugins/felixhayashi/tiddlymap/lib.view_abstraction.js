@@ -648,22 +648,15 @@ module-type: library
    */
   ViewAbstraction.prototype.getPositions = function(isRebuild) {
     
-    if(!isRebuild && this.positions) {
+    if(!this.isLiveView() && !isRebuild && this.positions) {
       return this.positions;
     }
-    // cannot use prototypeless hashmap here
-    return $tw.wiki.getTiddlerData(this.path.map, {}); 
     
-  };
-  
-  ViewAbstraction.prototype.getPositions = function(isRebuild) {
-    
-    if(!isRebuild && this.positions) {
-      return this.positions;
-    }
-        
     // cannot use prototypeless hashmap here
-    return $tw.wiki.getTiddlerData(this.getPositionStore(), {}); 
+    var positions = this.utils.parseFieldData(this.getPositionStore(), "text", {});
+    this.logger("debug", "Loading positions", positions, "from", this.getPositionStore());
+    
+    return positions;
     
   };
 

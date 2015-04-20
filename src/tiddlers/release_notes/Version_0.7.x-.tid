@@ -87,6 +87,10 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.7.28
+
+* Fix for configure view (again)
+
 ### v0.7.27
 
 * Fixes #115: Javascript Error when selecting "Configure View"

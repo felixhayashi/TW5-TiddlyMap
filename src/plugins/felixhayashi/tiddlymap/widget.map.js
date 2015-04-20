@@ -771,7 +771,7 @@ module-type: widget
     
     var params = {
       view: this.getView().getLabel(),
-      createdOn: this.getView().getCreationDate().toDateString(),
+      createdOn: this.getView().getCreationDate("Not specified"),
       numberOfNodes: "" + Object.keys(this.graphData.nodesById).length,
       numberOfEdges: "" + Object.keys(this.graphData.edgesById).length,
       dialog: {

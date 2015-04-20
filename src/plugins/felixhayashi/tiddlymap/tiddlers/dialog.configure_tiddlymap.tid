@@ -52,7 +52,7 @@ Please visit the [[online docs|http://bit.ly/tiddlymap#Changing%20TiddlyMap's%20
     ''Warning:'' You cannot use the live view at the moment because either
 
     * you did not install the ''TW5-TopStoryView'' plugin
-    * or haven't switched your scroll view to //top// (Configuration ➡ Appearance ➡ Story view ➡ Current view).
+    * or haven't switched your story view to //top// (Configuration ➡ Appearance ➡ Story view ➡ Current view).
 
   </$reveal>
   <$reveal type="match" state="$:/view" text="top" default="">

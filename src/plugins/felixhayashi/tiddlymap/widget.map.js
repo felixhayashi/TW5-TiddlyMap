@@ -769,9 +769,11 @@ module-type: widget
   
   MapWidget.prototype.handleEditView = function() {
     
+    var createdOn = this.getView().getCreationDate();
+    
     var params = {
       view: this.getView().getLabel(),
-      createdOn: this.getView().getCreationDate("Not specified"),
+      createdOn: (this.getView().getCreationDate(true) || "Not specified"),
       numberOfNodes: "" + Object.keys(this.graphData.nodesById).length,
       numberOfEdges: "" + Object.keys(this.graphData.edgesById).length,
       dialog: {

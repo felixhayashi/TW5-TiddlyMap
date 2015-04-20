@@ -244,10 +244,13 @@ module-type: library
   /**
    * 
    */
-  ViewAbstraction.prototype.getCreationDate = function(defVal) {
+  ViewAbstraction.prototype.getCreationDate = function(returnAsString) {
     
-    if(this.exists()) {
-      return this.wiki.getTiddler(this.path.config).fields["created"] || defVal;
+    if(this.exists()) {   
+      var val = this.wiki.getTiddler(this.path.config).fields["created"];
+      if(returnAsString && val instanceof Date) {
+        return val.toDateString();
+      }
     }
     
   };

@@ -87,6 +87,11 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.7.29
+
+* Fixes #118: Focus button does not consider neighbours
+* Fixes #97:  Artefacts appearing on right side
+
 ### v0.7.28
 
 * Fix for configure view (again)
@@ -103,7 +108,7 @@ Important Bugfixes
 
 ### v0.7.24
 
-* Fixes #106 "Styles defined in the edge-type manager cannot be deleted, only overridden"
+* Fixes #106: Styles defined in the edge-type manager cannot be deleted, only overridden
 
 ### v0.7.23
 
@@ -111,11 +116,11 @@ Important Bugfixes
 
 ### v0.7.21
 
-* Fixes #110 "Listeners are not removed properly"
+* Fixes #110: Listeners are not removed properly
 
 ### v0.7.20
 
-* Fixes #103 "View name in drop-down menu: italicised & gray"
+* Fixes #103: View name in drop-down menu: italicised & gray
 
 ### v0.7.18
 
@@ -123,7 +128,7 @@ Important Bugfixes
 
 ### v0.7.16
 
-* Fixes #99: "Create new view -> Forbidden"
+* Fixes #99: Create new view -> Forbidden
 
 ### v0.7.13
 

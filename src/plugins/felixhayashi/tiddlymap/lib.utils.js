@@ -820,8 +820,8 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    * @param {Array} arr - The array to perform the join on.
    * @param {string} left - The wrapping string for the left side.
    * @param {string} right - The wrapping string for the right side.
-   * @param {string} separator - The separator between a wrapped element
-   *     and the next one.
+   * @param {string} [separator] - The separator between a wrapped element
+   *     and the next one. Defaults to space.
    * @return {string} The wrapped string, e.g. `[[hello]] [[world]]`.
    */
   utils.joinAndWrap = function(arr, left, right, separator) {
@@ -830,10 +830,10 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     return left + arr.join(right + separator + left) + right;
     
   };
-
+  
   /**
-   * Function that searches an array containing objects for an object
-   * with a property having certain value. 
+   * Function that searches an array for an object with a property
+   * having a certain value. 
    * 
    * Attention: Not the item itself but the item's key is returned.
    * 

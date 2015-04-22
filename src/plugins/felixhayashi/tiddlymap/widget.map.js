@@ -188,12 +188,11 @@ module-type: widget
     // get view and view holder
     this.viewHolderRef = this.getViewHolderRef();
     this.view = this.getView();
-            
-    // first append the bar if we are in editor mode
+                    
+    // *first* inject the bar
     this.initAndRenderEditorBar(parent);
-        
-    // now initialise graph variables and render the graph
-
+    
+    // *second* initialise graph variables and render the graph
     this.initAndRenderGraph(parent);
     
     // register this graph at the caretaker's graph registry
@@ -237,6 +236,10 @@ module-type: widget
    * The editor bar contains a bunch of widgets that allow the user
    * to manipulate the current view.
    * 
+   * Attention: The Editor bar needs to render *after* the graph
+   * because some elements depend on the graph's nodes which are
+   * calculated when the network is created.
+   * 
    * @param {Element} parent The dom node in which the editor bar will
    *     be injected in.
    */
@@ -271,9 +274,9 @@ module-type: widget
           edgeFilter: this.getView().getPaths().edgeFilter
         },
         allEdgesFilter: this.opt.selector.allEdgeTypes,
-        searchOutput: "$:/temp/tmap/editor/search",
-        nodeFilter: this.view.getNodeFilter("expression")
-                      + "+[search:title{$:/temp/tmap/editor/search}]"
+        searchOutput: "$:/temp/tmap/bar/search",
+        nodeFilter: "[list[$:/temp/tmap/nodes/" + this.view.getLabel() + "]"
+                    + "search:title{$:/temp/tmap/bar/search}]"
       }
     });
     
@@ -423,7 +426,7 @@ module-type: widget
       this.network.setOptions(this.graphOptions);
     }
     
-    this.graphData = this.getGraphData(true);
+    this.rebuildGraphData(true);
 
     if(options.resetFocus && !this.preventNextContextReset) {
       if(typeof options.resetFocus !== "object") {
@@ -455,7 +458,7 @@ module-type: widget
    *     a nodes collection will always recreate the cache despite the value
    *     of `isRebuild`.
    */
-  MapWidget.prototype.getGraphData = function(isRebuild) {
+  MapWidget.prototype.rebuildGraphData = function(isRebuild) {
     
     $tw.tmap.start("Reloading Network");
     
@@ -487,6 +490,8 @@ module-type: widget
     
     this.graphData.nodesById = nodes;
     this.graphData.edgesById = edges;
+    
+    utils.setField("$:/temp/tmap/nodes/" + this.view.getLabel(), "list", this.adapter.getTiddlersById(nodes));
     
     $tw.tmap.stop("Reloading Network");
     
@@ -651,7 +656,7 @@ module-type: widget
         "halfscreen-button": function() { this.handleToggleFullscreen(true); }
       });
     }
-    
+        
     // delay (100ms) the painting of the graph to allow the gui to render; freezes otherwise
     window.setTimeout(function() {
       if(!utils.hasElements(this.graphData.nodesById)) { // prevents unnecessary repainting
@@ -659,8 +664,9 @@ module-type: widget
           resetFocus: true
         });
       }
+      // fixes #97
+      this.network.redraw();
     }.bind(this), 100);
-        
   };
   
   MapWidget.prototype.getGraphOptions = function() {
@@ -831,8 +837,6 @@ module-type: widget
     
   };
   
-
-
   MapWidget.prototype.handleTriggeredRefresh = function(trigger) {
     this.logger("log", "Tiddler", trigger, "triggered a refresh");
     this.rebuildGraph({

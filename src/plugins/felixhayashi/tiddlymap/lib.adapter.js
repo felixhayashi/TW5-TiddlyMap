@@ -823,6 +823,18 @@ module-type: library
     return id;
     
   };
+  
+  /**
+   * Creates a filter expression that will return all tiddlers that
+   * are included in the collection.
+   */
+  Adapter.prototype.getCollectionFilter = function(view) {
+    
+    var graphData = this.getGraph({ view: view });
+    var refs = Object.keys(utils.getLookupTable(graphData.nodes, "id"));
+    return utils.joinAndWrap(refs, "[field:" + this.opt.field.nodeId + "[", "]]");
+    
+  };
 
   /**
    * Create a new tiddler that gets a non-existant title and is opened

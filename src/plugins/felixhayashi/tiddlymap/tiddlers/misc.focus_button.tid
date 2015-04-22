@@ -1,16 +1,16 @@
 title: $:/plugins/felixhayashi/tiddlymap/misc/focusButton
 
 <div class="focus-button">
-  <$reveal type="nomatch" state=<<qualify "$:/temp/tmap/state/focus">> text="show">
+  <$reveal type="nomatch" state="$:/temp/tmap/state/focus" text={{!!title}}>
     <$button class=<<tv-config-toolbar-class>>>{{$:/core/images/advanced-search-button}}
      <$action-setfield $tiddler=<<param.searchOutput>> text="" />
-     <$action-setfield $tiddler=<<qualify "$:/temp/tmap/state/focus">> text="show" />
+     <$action-setfield $tiddler="$:/temp/tmap/state/focus" text={{!!title}} />
      <$action-sendmessage $message="tmap:tm-reset-focus" />
     </$button>
   </$reveal>
-  <$reveal type="match" state=<<qualify "$:/temp/tmap/state/focus">> text="show">
+  <$reveal type="match" state="$:/temp/tmap/state/focus" text={{!!title}}>
     <$button class=<<tv-config-toolbar-class>> >{{$:/core/images/advanced-search-button}}
-     <$action-setfield $tiddler=<<qualify "$:/temp/tmap/state/focus">> text="hide" />
+     <$action-setfield $tiddler="$:/temp/tmap/state/focus" text="" />
      <$action-sendmessage $message="tmap:tm-reset-focus" />
     </$button>
     <div class="tmap-popup">
@@ -20,7 +20,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/focusButton
         <hr />
         <div class="tmap-very-small-list">
           <$list filter=<<param.nodeFilter>> variable="item" emptyMessage="//No results//">
-            <$button class="tc-btn-invisible" set=<<qualify "$:/temp/tmap/state/focus">> setTo="hide" message="tmap:tm-focus-node" param=<<item>>>
+            <$button class="tc-btn-invisible" set="$:/temp/tmap/state/focus" setTo="" message="tmap:tm-focus-node" param=<<item>>>
               <$view tiddler=<<item>> field="title" />
             </$button>
           </$list>
@@ -28,5 +28,4 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/focusButton
       </div>
     </div>
   </$reveal>
-
 </div>

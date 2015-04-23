@@ -87,6 +87,10 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.7.30
+
+* Fixes #120: Error when removing the color attibute while node is displayed in graph
+
 ### v0.7.29
 
 * Fixes #118: Focus button does not consider neighbours

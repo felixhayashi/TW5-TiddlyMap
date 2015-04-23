@@ -531,11 +531,8 @@ module-type: library
       return; // silently ignore
     }
         
-    // create default node object; vis does not like utils.getDataMap()
-    // set some default properties to overwrite existing values in a dataset
-    var node = {
-      shape: "box",
-    };
+    // Use the group as default node object
+    var node = $tw.utils.extendDeepCopy($tw.tmap.opt.config.vis.groups[protoNode && protoNode.group || "matches"]);
     
     var view = new ViewAbstraction(view);
     if(view.exists()) {
@@ -592,8 +589,10 @@ module-type: library
     
     // use the tiddler's color field as node color
     if(tObj.fields.color) {
-      node.color = tObj.fields.color;
-      node.fontColor = getContrastColour(node.color, "#FFFFFF", "#000000", "#FFFFFF");
+      node.color = {
+        background: tObj.fields.color
+      }
+      node.fontColor = getContrastColour(node.color.background, "#FFFFFF", "#000000", "#FFFFFF");
     }
     
     // allow override

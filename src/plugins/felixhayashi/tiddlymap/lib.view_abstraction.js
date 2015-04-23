@@ -479,6 +479,7 @@ module-type: library
   };
   
   ViewAbstraction.prototype._getAddNodeFilterPart = function(node) {
+    var test = "[bla:";
     return "[field:" + this.opt.field.nodeId + "[" + node.id + "]]";
   };
 
@@ -490,16 +491,16 @@ module-type: library
   ViewAbstraction.prototype.setNodeFilter = function(expr) {
     
     if(!this.exists()) return;
-    
-    if(this.isLiveView()) {
-      $tw.tmap.notify("It is forbidden to change the node filter of the live view!");
-      return;
-    }
-    
+        
     expr = expr.replace("\n", " ");
     
     if(this.getNodeFilter.expression === expr) { // already up to date;
       // This check is critical to prevent recursion!
+      return;
+    }
+    
+    if(this.isLiveView()) {
+      $tw.tmap.notify("It is forbidden to change the node filter of the live view!");
       return;
     }
         
@@ -577,6 +578,7 @@ module-type: library
       filter.expression = (tObj && tObj.fields.filter
                            ? tObj.fields.filter
                            : this.opt.filter.defaultEdgeFilter);
+      
       filter.compiled = this.wiki.compileFilter(filter.expression);
       
     }

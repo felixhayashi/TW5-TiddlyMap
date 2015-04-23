@@ -3,7 +3,7 @@ caption: Graph
 tags: $:/tags/SearchResults
 
 <$tiddlymap
-  view="search"
+  view="Graph search"
   click-to-use="false"
   object-id="search_visualizer"
   width="calc(100% - 15px)"

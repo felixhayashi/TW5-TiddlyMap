@@ -1,5 +1,5 @@
 title: $:/plugins/felixhayashi/tiddlymap/graph/views/Live View
 config.neighbourhood_scope: 1
-config.refresh-trigger: $:/temp/focussedTiddler
+config.refresh-triggers: $:/temp/focussedTiddler
 config.physics_mode: true
 isview: true

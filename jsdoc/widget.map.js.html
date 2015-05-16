@@ -184,7 +184,7 @@ module-type: widget
         var hasNamespace = utils.hasSubString(type, ":");
         
         // get the default name space of the view
-        var ns = this.getView().getConfig("edge_type_namespace");
+        var ns = this.view.getConfig("edge_type_namespace");
         
         edge.type = (ns &amp;&amp; !hasNamespace ? ns : "") + type;
         var isSuccess = this.adapter.insertEdge(edge);
@@ -266,8 +266,8 @@ module-type: widget
     // register this graph at the caretaker's graph registry
     $tw.tmap.registry.push(this);
     
-    // update refresh trigger
-    this.updateRefreshTrigger();
+    // if any refresh-triggers exist, register them
+    this.checkOnRefreshTriggers();
     
     this.checkForFreshInstall();
 
@@ -334,12 +334,12 @@ module-type: widget
     
     var variables = utils.flatten({
       param: {
-        viewLabel: this.getView().getLabel(),
+        viewLabel: this.view.getLabel(),
         isViewBound: String(this.isViewBound()),
         ref: {
-          view: this.getView().getRoot(),
+          view: this.view.getRoot(),
           viewHolder: this.getViewHolderRef(),
-          edgeFilter: this.getView().getPaths().edgeFilter
+          edgeFilter: this.view.getPaths().edgeFilter
         },
         allEdgesFilter: this.opt.selector.allEdgeTypes,
         searchOutput: "$:/temp/tmap/bar/search",
@@ -356,7 +356,7 @@ module-type: widget
     var body = {
       type: "tiddler",
       attributes: {
-        tiddler: { type: "string", value: this.getView().getRoot() }
+        tiddler: { type: "string", value: this.view.getRoot() }
       },
       children: []
     };
@@ -422,7 +422,7 @@ module-type: widget
     this.callbackManager.handleChanges(changedTiddlers);
     
     var isViewSwitched = this.isViewSwitched(changedTiddlers);
-    var viewModifications = this.getView().refresh(changedTiddlers);
+    var viewModifications = this.view.refresh(changedTiddlers);
             
     if(isViewSwitched || viewModifications.length) {
 
@@ -442,8 +442,8 @@ module-type: widget
       
       this.rebuildGraph(options);
       
-      // update refresh trigger
-      this.updateRefreshTrigger();
+      // maybe refresh-triggers changed
+      this.checkOnRefreshTriggers();
                         
     } else {
       
@@ -458,17 +458,36 @@ module-type: widget
   };
   
   /**
-   * listen to refresh-trigger changes if trigger is provided
+   * Refresh-triggers are tiddlers whose mere occurrence in the
+   * changedTiddlers list forces tiddlymap to reassert
+   * whether a filter expression returns the same set of matches as it
+   * is currently displayed in the graph.
+   * 
+   * The raison d'etre for refresh-triggers is that a filter may contain
+   * implicit text-references or variables that may require a filter to be
+   * reasserted even though, the filter expression itself did not change.
+   * 
+   * For example a filter `[field:title{$:/HistoryList!!current-tiddler}]`
+   * requires a `$:/HistoryList` refresh trigger to be added to the view so
+   * everytime the `$:/HistoryList` tiddler changes, the filter gets
+   * reasserted.
    */
-  MapWidget.prototype.updateRefreshTrigger = function() { 
+  MapWidget.prototype.checkOnRefreshTriggers = function() { 
     
-    // remove old trigger
-    if(this.refreshTrigger) { this.callbackManager.remove(this.refreshTrigger); }
+    // remove old triggers (if there are any)
+    this.callbackManager.remove(this.refreshTriggers);
+        
+    // load new trigger list either from attribute or view config
+    var str = this.getAttribute("refresh-triggers") || this.view.getConfig("refresh-triggers");
+    this.refreshTriggers = $tw.utils.parseStringArray(str) || [];
     
-    this.refreshTrigger = this.getAttribute("refresh-trigger") || this.getView().getConfig("refresh-trigger");
-    if(this.refreshTrigger) {
-      this.logger("debug", "Registering refresh trigger", this.refreshTrigger);
-      this.callbackManager.add(this.refreshTrigger, this.handleTriggeredRefresh.bind(this), false);
+    this.logger("debug", "Registering refresh trigger", this.refreshTriggers);
+    
+    // TODO: not nice, if more than one trigger changed it will cause multiple reassertments
+    for(var i = 0; i &lt; this.refreshTriggers.length; i++) {
+      this.callbackManager.add(this.refreshTriggers[i],
+                               this.handleTriggeredRefresh.bind(this),
+                               false);
     }
     
   };
@@ -534,18 +553,10 @@ module-type: widget
       return this.graphData;
     }
 
-    var graph = this.adapter.getGraph({ view: this.getView() });    
+    var graph = this.adapter.getGraph({ view: this.view });    
     var nodes = graph.nodes;
     var edges = graph.edges;
-    
-    // TODO: special display of a single match
-    //~ var keys = Object.keys(nodes);
-    //~ if(keys.length === 1) {
-      //~ nodes.
-    //~ }
         
-    // refresh datasets
-    
     this.graphData.nodes = this.getRefreshedDataSet(nodes, // new nodes
                                          this.graphData.nodesById, // old nodes
                                          this.graphData.nodes); // dataset
@@ -619,8 +630,7 @@ module-type: widget
    */
   MapWidget.prototype.checkOnGraph = function(changedTiddlers) {
             
-    var nodeFilter = this.getView().getNodeFilter("compiled");
-    
+    var nodeFilter = this.view.getNodeFilter("compiled");
     var matches = utils.getMatches(nodeFilter, Object.keys(changedTiddlers), true);
                                   
     for(var tRef in changedTiddlers) {
@@ -638,7 +648,7 @@ module-type: widget
       
     }
       
-    var edgeFilter = this.getView().getEdgeFilter("compiled");
+    var edgeFilter = this.view.getEdgeFilter("compiled");
     var changedEdgestores = utils.getMatches(edgeFilter, Object.keys(changedTiddlers));
     
     if(changedEdgestores.length) {
@@ -774,7 +784,7 @@ module-type: widget
       var options = this.graphOptions;
     }
     
-    options.stabilizationIterations = this.getView().getStabilizationIterations();
+    options.stabilizationIterations = this.view.getStabilizationIterations();
     
     return options;
     
@@ -808,9 +818,9 @@ module-type: widget
   
   MapWidget.prototype.handleRenameView = function() {
        
-    if(!this.getView().isLocked()) {
+    if(!this.view.isLocked()) {
 
-      var references = this.getView().getReferences();
+      var references = this.view.getReferences();
       
       var fields = {
         count : references.length.toString(),
@@ -842,23 +852,21 @@ module-type: widget
   };
   
   MapWidget.prototype.handleEditView = function() {
-    
-    var createdOn = this.getView().getCreationDate();
-    
+        
     var params = {
-      view: this.getView().getLabel(),
-      createdOn: (this.getView().getCreationDate(true) || "Not specified"),
+      view: this.view.getLabel(),
+      createdOn: this.view.getCreationDate(true),
       numberOfNodes: "" + Object.keys(this.graphData.nodesById).length,
       numberOfEdges: "" + Object.keys(this.graphData.edgesById).length,
       dialog: {
-        preselects: this.getView().getConfig()
+        preselects: this.view.getConfig()
       }
     };
     
     this.dialogManager.open("configureView", params, function(isConfirmed, outputTObj) {
       if(isConfirmed &amp;&amp; outputTObj) {
         var updates = utils.getPropertiesByPrefix(outputTObj.fields, "config.");
-        this.getView().setConfig(updates);
+        this.view.setConfig(updates);
       }
     });
     
@@ -866,16 +874,16 @@ module-type: widget
   
   MapWidget.prototype.handleDeleteView = function() {
     
-    var viewname = this.getView().getLabel();
+    var viewname = this.view.getLabel();
     
-    if(this.getView().isLocked()) {
+    if(this.view.isLocked()) {
       this.notify("Forbidden!");
       return;
     }
     
     // regex is non-greedy
 
-    var references = this.getView().getReferences();
+    var references = this.view.getReferences();
     if(references.length) {
             
       var fields = {
@@ -896,7 +904,7 @@ module-type: widget
     this.openStandardConfirmDialog(function(isConfirmed) { // TODO: this dialog needs an update
       
       if(isConfirmed) {
-        this.getView().destroy();
+        this.view.destroy();
         this.setView(this.opt.path.views + "/default");
         this.notify("view \"" + viewname + "\" deleted ");
       }
@@ -905,16 +913,32 @@ module-type: widget
     
   };
   
+  /**
+   * This handler will rerun the view's node-filter and assert if produced
+   * matches-set is the same as the one that is currently displayed in
+   * the graph. If this is not the case, a graph rebuild is initiated.
+   */
   MapWidget.prototype.handleTriggeredRefresh = function(trigger) {
-    this.logger("log", "Tiddler", trigger, "triggered a refresh");
-    this.rebuildGraph({
-      resetData: false,
-      resetOptions: false,
-      resetFocus: {
-        delay: 1000,
-        duration: 1000
-      }
-    });
+        
+    var matches = utils.getMatches(this.view.getNodeFilter("compiled"));
+    var triggerState = $tw.utils.hashString(matches.join());
+    
+    if(triggerState != this.triggerState) {
+      
+      this.logger("log", trigger, "triggered a refresh");
+    
+      this.triggerState = triggerState;
+    
+      this.rebuildGraph({
+        resetData: false,
+        resetOptions: false,
+        resetFocus: {
+          delay: 1000,
+          duration: 1000
+        }
+      });
+    }
+    
   };
     
   MapWidget.prototype.handleConfigureSystem = function() {
@@ -1014,7 +1038,7 @@ module-type: widget
       "var.nodeRef": $tw.tmap.indeces.tById[node.id],
       dialog: {
         preselects: {
-          "opt.delete": "from" + " " + (this.getView().isExplicitNode(node) ? "filter" : "system")
+          "opt.delete": "from" + " " + (this.view.isExplicitNode(node) ? "filter" : "system")
         }
       }
     };
@@ -1030,7 +1054,7 @@ module-type: widget
 
         } else {
         
-          var success = this.getView().removeNodeFromFilter(node);
+          var success = this.view.removeNodeFromFilter(node);
           
           if(!success) {
             this.notify("Couldn't remove node from filter");
@@ -1126,14 +1150,14 @@ module-type: widget
     
     $tw.rootWidget.dispatchEvent({
       type: "tmap:tm-generate-widget",
-      paramObject: { view: this.getView().getLabel() }
+      paramObject: { view: this.view.getLabel() }
     });
     
   };
   
   MapWidget.prototype.handleStorePositions = function(withNotify) {
     
-    this.adapter.storePositions(this.network.getPositions(), this.getView());
+    this.adapter.storePositions(this.network.getPositions(), this.view);
     if(withNotify) {
       this.notify("positions stored");
     }
@@ -1142,11 +1166,11 @@ module-type: widget
   
   MapWidget.prototype.handleEditFilters = function() {
 
-    var pnf = utils.getPrettyFilter(this.getView().getNodeFilter("expression"));
-    var pef = utils.getPrettyFilter(this.getView().getEdgeFilter("expression"));
+    var pnf = utils.getPrettyFilter(this.view.getNodeFilter("expression"));
+    var pef = utils.getPrettyFilter(this.view.getEdgeFilter("expression"));
 
     var param = {
-      view: this.getView().getLabel(),
+      view: this.view.getLabel(),
       dialog: {
         preselects: {
           prettyNodeFilter: pnf,
@@ -1157,8 +1181,8 @@ module-type: widget
     
     this.dialogManager.open("editFilters", param, function(isConfirmed, outputTObj) {
       if(isConfirmed) {
-        this.getView().setNodeFilter(utils.getField(outputTObj, "prettyNodeFilter", pnf));
-        this.getView().setEdgeFilter(utils.getField(outputTObj, "prettyEdgeFilter", pef));
+        this.view.setNodeFilter(utils.getField(outputTObj, "prettyNodeFilter", pnf));
+        this.view.setEdgeFilter(utils.getField(outputTObj, "prettyEdgeFilter", pef));
       }
     });
       
@@ -1176,8 +1200,8 @@ module-type: widget
     if(!this.hasNetworkStabilized) {
       this.hasNetworkStabilized = true;
       this.logger("log", "Network stabilized after " + properties.iterations + " iterations");
-      this.getView().setStabilizationIterations(properties.iterations);
-      var isFloatingMode = this.getView().isEnabled("physics_mode");
+      this.view.setStabilizationIterations(properties.iterations);
+      var isFloatingMode = this.view.isEnabled("physics_mode");
 
       this.network.storePositions();
       this.setNodesMoveable(this.graphData.nodesById, isFloatingMode);
@@ -1232,12 +1256,12 @@ module-type: widget
         
         if(utils.tiddlerExists(title)) {
           
-          if(utils.isMatch(title, this.getView().getNodeFilter("compiled"))) {
+          if(utils.isMatch(title, this.view.getNodeFilter("compiled"))) {
             this.notify("Node already exists");
           } else {
 
-            node = this.adapter.makeNode(title, node, this.getView());
-            this.getView().addNodeToView(node);
+            node = this.adapter.makeNode(title, node, this.view);
+            this.view.addNodeToView(node);
             this.rebuildGraph();
 
           }
@@ -1246,7 +1270,7 @@ module-type: widget
         
           node.label = title;
           this.adapter.insertNode(node, {
-            view: this.getView(),
+            view: this.view,
             editNodeOnCreate: false
           });
           this.preventNextContextReset = true;
@@ -1380,7 +1404,7 @@ module-type: widget
   MapWidget.prototype.handleVisDragEnd = function(properties) {
     
     if(properties.nodeIds.length) {
-      var isFloatingMode = this.getView().isEnabled("physics_mode");
+      var isFloatingMode = this.view.isEnabled("physics_mode");
       
       var node = this.graphData.nodesById[properties.nodeIds[0]];
       
@@ -1781,7 +1805,7 @@ module-type: widget
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-	on 2015-04-23T17:55:08+02:00 using the <a
+	on 2015-05-16T20:34:05+02:00 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>

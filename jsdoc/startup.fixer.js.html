@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>TiddlyMap Source: lib.callback_manager.js</title>
+	<title>TiddlyMap Source: startup.fixer.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -58,19 +58,19 @@
 	<div class="col-md-12">
 	
 		<div id="main">
-    		<h1 class="page-title">Source: lib.callback_manager.js</h1>
+    		<h1 class="page-title">Source: startup.fixer.js</h1>
 			
 
-		<h1 class="page-title">Source: lib.callback_manager.js</h1>
+		<h1 class="page-title">Source: startup.fixer.js</h1>
     
 <section>
 	<article>
 		<pre
 			class="sunlight-highlight-javascript linenums">/*\
 
-title: $:/plugins/felixhayashi/tiddlymap/callback_manager.js
+title: $:/plugins/felixhayashi/tiddlymap/fixer.js
 type: application/javascript
-module-type: library
+module-type: startup
 
 @module TiddlyMap
 @preserve
@@ -78,115 +78,118 @@ module-type: library
 \*/
 
 (/** @lends module:TiddlyMap*/function(){
-
+  
   /*jslint node: true, browser: true */
   /*global $tw: false */
-  
   "use strict";
+  
+  // Export name and synchronous status
+  exports.name = "tmap.fixer";
+  exports.after = [ "tmap.caretaker" ];
+  exports.before = [ "rootwidget" ];
+  exports.synchronous = true;
   
   /**************************** IMPORTS ****************************/
    
   var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
-
+  var Adapter = require("$:/plugins/felixhayashi/tiddlymap/adapter.js").Adapter;
+  var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/view_abstraction.js").ViewAbstraction;
+  var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/edgetype.js").EdgeType;
+  
   /***************************** CODE ******************************/
-        
-  /**
-   * @constructor
-   */
-  var CallbackManager = function() {
+
+  var moveEdges = function(path, view) {
+      
+    var matches = utils.getByPrefix(path);
+    for(var i = 0; i &lt; matches.length; i++) {
+      
+      // create edge type
+      var type = utils.getBasename(matches[i]);
+      if(type === "__noname__") { type = "tmap:unknown"; }
+      type = new EdgeType(type);
+      
+      if(!type.exists()) type.persist();
+
+      // move edges
+      var edges = $tw.wiki.getTiddlerData(matches[i]);
+      for(var j = 0; j &lt; edges.length; j++) {        
+        // prefix formerly private edges with view name as namespace
+        edges[j].type = (view ? view + ":" : "") + type.getId();
+        $tw.tmap.adapter.insertEdge(edges[j]);
+      }
     
-    this.wiki = $tw.wiki;
-    this.logger = $tw.tmap.logger;
-    this.callbacks = utils.getDataMap();
+      // finally remove the store
+      $tw.wiki.deleteTiddler(matches[i]);
+      
+    }
 
   };
-          
-  /**
-   * The callback mechanism allows to dynamically listen to tiddler
-   * changes without hardcoding a change-check for a tiddler name
-   * in the refresh function.
-   * 
-   * @param [TiddlerReference] tRef - A tiddler whose change triggers
-   *     the callback.
-   * @param {function} callback - A function that is called when the
-   *     tiddler has changed.
-   * @param {boolean} [deleteOnCall=true] - True if to delete the
-   *     callback once it has been called, false otherwise.
-   */
-  CallbackManager.prototype.add = function(tRef, callback, isDeleteOnCall) {
+
+  exports.startup = function() {
     
-    this.logger("debug", "A callback was registered for changes of \"" + tRef + "\"");
-    this.callbacks[tRef] = {
-      execute : callback,
-      isDeleteOnCall : (typeof isDeleteOnCall === "boolean" ? isDeleteOnCall : true)
-    };
+    var meta = $tw.wiki.getTiddlerData($tw.tmap.opt.ref.sysMeta, {});
+    var plugin = $tw.wiki.getTiddler($tw.tmap.opt.path.pluginRoot);
     
-  };
-  
-  /**
-   * Removes the callback from the list of tiddler callbacks.
-   * 
-   * @see CallbackManager#registerCallback
-   */
-  CallbackManager.prototype.remove = function(refOrRefList) {
+    $tw.tmap.logger("debug", "Fixer is started");
+    $tw.tmap.logger("debug", "Data-structure currently in use: ", meta.dataStructureState);
     
-    if(!refOrRefList) return;
-    
-    if(typeof refOrRefList === "string") {
-      refOrRefList = [ refOrRefList ];
-    }
-    
-    for(var i = 0; i &lt; refOrRefList.length; i++) {
-      var tRef = refOrRefList[i];
-      if(this.callbacks[tRef]) {
-        this.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
-        delete this.callbacks[tRef];
-      }
-    }
-    
-  };
-  
-  /**
-   * this method has to be implemented at the top of the refresh method.
-   * It checks for changed tiddlers that have
-   * registered callbacks. If `deleteOnCall` was specified during
-   * registration of the callback, the callback will be deleted
-   * automatically.
-   * 
-   * @see CallbackManager#registerCallback
-   */
-  CallbackManager.prototype.handleChanges = function(changedTiddlers) {
-    
-    if(this.callbacks.length == 0) {
-      this.logger("debug", "No registered callbacks exist at the moment");
-      return;
-    }
-    
-    for(var tRef in changedTiddlers) {
-            
-      if(!this.callbacks[tRef]) continue;
+    /**
+     * Upgrade datastructure to v0.7.0 from below or equal v0.6.11 
+     * 
+     * Changes:
+     * 1. Edges are stored in tiddlers instead of type based edge stores
+     * 2. No more private views
+     */   
+    var upgrade = { before: "0.6.11", after: "0.7.0" };
+    if($tw.utils.checkVersions(upgrade.before, meta.dataStructureState)) {
       
-      if(this.wiki.getTiddler(tRef)) {
-        
-        this.logger("debug", "A callback for \"" + tRef + "\" will be executed");
-        this.callbacks[tRef].execute(tRef);
-        
-        // a continue prevents deleting the callback
-        if(!this.callbacks.isDeleteOnCall) continue;
-        
+      $tw.tmap.logger("debug", "Upgrading data structure to", upgrade.after);
+      
+      // move edges that were formerly "global"
+      moveEdges("$:/plugins/felixhayashi/tiddlymap/graph/edges", null);
+      
+      // move edges that were formerly bound to view ("private")
+      var filter = $tw.tmap.opt.selector.allViews;
+      var viewRefs = utils.getMatches(filter);
+      for(var i = 0; i &lt; viewRefs.length; i++) {
+        var view = new ViewAbstraction(viewRefs[i]);
+        moveEdges(view.getRoot()+"/graph/edges", view);
       }
       
-      this.remove(tRef);
+      // update meta
+      utils.setEntry($tw.tmap.opt.ref.sysMeta, "dataStructureState", upgrade.after);
     }
     
+    /**
+     * Upgrade datastructure to v0.7.31 from v0.7.0 
+     * 
+     * Changes:
+     * 1. Changes to the live view filter and refresh trigger field
+     * 
+     */
+    var upgrade = { before: "0.7.0", after: "0.7.31" };
+    if($tw.utils.checkVersions(upgrade.before, meta.dataStructureState)) {
+      
+      $tw.tmap.logger("debug", "Upgrading data structure to", upgrade.after);
+
+      var liveView = $tw.tmap.adapter.getView("Live View");
+      // Only listen to the current tiddler of the history list
+      liveView.setNodeFilter("[field:title{$:/temp/tmap/currentTiddler}]",
+                             true);
+      
+      liveView.setConfig({
+        "refresh-trigger": null, // delete the field (renamed)
+        "refresh-triggers": $tw.utils.stringifyList([ "$:/temp/tmap/currentTiddler" ])
+      });
+      
+      // update meta
+      utils.setEntry($tw.tmap.opt.ref.sysMeta, "dataStructureState", upgrade.after);
+       
+    }
+                  
   };
 
-  // !! EXPORT !!
-  exports.CallbackManager = CallbackManager;
-  // !! EXPORT !!
-  
 })();
-
 </pre>
 	</article>
 </section>

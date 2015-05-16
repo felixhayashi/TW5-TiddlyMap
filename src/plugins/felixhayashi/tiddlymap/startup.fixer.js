@@ -66,13 +66,16 @@ module-type: startup
     $tw.tmap.logger("debug", "Data-structure currently in use: ", meta.dataStructureState);
     
     /**
-     * Upgrade from v0.6.11 to v0.7.0
+     * Upgrade datastructure to v0.7.0 from below or equal v0.6.11 
+     * 
+     * Changes:
      * 1. Edges are stored in tiddlers instead of type based edge stores
      * 2. No more private views
-     */    
-    if($tw.utils.checkVersions("0.6.11", meta.dataStructureState)) {
+     */   
+    var upgrade = { before: "0.6.11", after: "0.7.0" };
+    if($tw.utils.checkVersions(upgrade.before, meta.dataStructureState)) {
       
-      $tw.tmap.logger("debug", "Upgrading data structure from v0.6.11 to v0.7.0");
+      $tw.tmap.logger("debug", "Upgrading data structure to", upgrade.after);
       
       // move edges that were formerly "global"
       moveEdges("$:/plugins/felixhayashi/tiddlymap/graph/edges", null);
@@ -86,25 +89,35 @@ module-type: startup
       }
       
       // update meta
-      utils.setEntry($tw.tmap.opt.ref.sysMeta, "dataStructureState", "0.7.0" );
-       
+      utils.setEntry($tw.tmap.opt.ref.sysMeta, "dataStructureState", upgrade.after);
     }
     
     /**
-     * Upgrade from v0.7.0 to v0.7.23
-     * 1. Proposed: The place where positions are stored is not called map anymore.
+     * Upgrade datastructure to v0.7.31 from v0.7.0 
      * 
-     */      
-    //~ if($tw.utils.checkVersions("0.7.0", meta.dataStructureState)) {
-      //~ 
-      //~ $tw.tmap.logger("debug", "Upgrading data structure from v0.7.0 to v0.7.23");
-      //~ 
-      //~ //...
-      //~ 
-      //~ // update meta
-      //~ utils.setEntry($tw.tmap.opt.ref.sysMeta, "dataStructureState", "0.7.0" );
-       //~ 
-    //~ }
+     * Changes:
+     * 1. Changes to the live view filter and refresh trigger field
+     * 
+     */
+    var upgrade = { before: "0.7.0", after: "0.7.31" };
+    if($tw.utils.checkVersions(upgrade.before, meta.dataStructureState)) {
+      
+      $tw.tmap.logger("debug", "Upgrading data structure to", upgrade.after);
+
+      var liveView = $tw.tmap.adapter.getView("Live View");
+      // Only listen to the current tiddler of the history list
+      liveView.setNodeFilter("[field:title{$:/temp/tmap/currentTiddler}]",
+                             true);
+      
+      liveView.setConfig({
+        "refresh-trigger": null, // delete the field (renamed)
+        "refresh-triggers": $tw.utils.stringifyList([ "$:/temp/tmap/currentTiddler" ])
+      });
+      
+      // update meta
+      utils.setEntry($tw.tmap.opt.ref.sysMeta, "dataStructureState", upgrade.after);
+       
+    }
                   
   };
 

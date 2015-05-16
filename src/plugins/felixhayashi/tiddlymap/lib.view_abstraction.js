@@ -242,16 +242,26 @@ module-type: library
   };
   
   /**
+   * Returns this view's creation date.
    * 
+   * @param {boolean} [asString] True if the returned value should be
+   *     a string in any case.
+   * @return {string|object|undefined} The creation date in the specified
+   *     output format.
    */
-  ViewAbstraction.prototype.getCreationDate = function(returnAsString) {
+  ViewAbstraction.prototype.getCreationDate = function(asString) {
     
-    if(this.exists()) {   
-      var val = this.wiki.getTiddler(this.path.config).fields["created"];
-      if(returnAsString && val instanceof Date) {
-        return val.toDateString();
-      }
+    if(!this.exists()) return;
+    
+    var val = this.wiki.getTiddler(this.path.config).fields["created"];
+    if(asString) { 
+      // note: th will be translated as well!
+      return (val instanceof Date
+              ? $tw.utils.formatDateString(val, "DDth MMM YYYY")
+              : "");
     }
+    
+    return val;
     
   };
 
@@ -418,8 +428,6 @@ module-type: library
    */
   ViewAbstraction.prototype.setConfig = function() {
     
-    this.logger("log", "Updating config", this.config, "with", arguments);
-    
     if(arguments[0] == null) return; // null or undefined
     
     if(arguments.length === 1 && typeof arguments[0] === "object") {
@@ -432,20 +440,30 @@ module-type: library
       
       var prop = this.utils.getWithoutPrefix(arguments[0], "config.");
       var val = arguments[1];
-      if(val) {
-        if(prop === "edge_type_namespace") {
+      
+      if(val === undefined) {
+        return;
+      }
+      
+      if(val === null) {
+        this.logger("debug", "Removing config", prop);
+        delete this.config["config."+prop];
+      } else {
+        if(prop === "edge_type_namespace" && typeof val === "string" && val.length) {
           // if the user left out the colon, we will add it!
           val = val.replace(/([^:])$/, "$1:");
         }
-        this.config["config."+prop] = val;
       }
       
-    } else {
+      this.logger("log", "Setting config", prop, val);
+      this.config["config."+prop] = val;
+
       
+    } else { // not allowed
       return;
-      
     }
     
+    // save
     this.wiki.addTiddler(new $tw.Tiddler(
       this.wiki.getTiddler(this.path.config), this.config
     ));
@@ -488,7 +506,7 @@ module-type: library
    * 
    * @param {string} expr - A tiddlywiki filter expression.
    */
-  ViewAbstraction.prototype.setNodeFilter = function(expr) {
+  ViewAbstraction.prototype.setNodeFilter = function(expr, force) {
     
     if(!this.exists()) return;
         
@@ -499,7 +517,7 @@ module-type: library
       return;
     }
     
-    if(this.isLiveView()) {
+    if(this.isLiveView() && !force) {
       $tw.tmap.notify("It is forbidden to change the node filter of the live view!");
       return;
     }

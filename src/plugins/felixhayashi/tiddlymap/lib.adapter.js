@@ -227,6 +227,9 @@ module-type: library
     var neighScope = opts.neighbourhoodScope || view.getConfig("neighbourhood_scope");
         
     var graph = {};
+    
+    //~ graph.hash = $tw.utils.hashString(matches.join());
+    
     graph.nodes = this.selectNodesByReferences(matches, {
       view: view,
       outputType: "hashmap",

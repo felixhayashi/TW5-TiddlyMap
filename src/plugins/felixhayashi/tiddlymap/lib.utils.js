@@ -258,6 +258,8 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    * 
    * @param {TiddlyWikiFilter} filter - The filter to use.
    * @param {TiddlerCollection} [tiddlers] - A set of tiddlers used as source.
+   *     If not defined, all tiddlers and system tiddlers are selected.
+   *     Shadows are *not* included.
    * @param {Hashmap} [options] - An optional options object.
    * @param {string} [options.outputType="array"] - May either be
    *     set to "array" or "hashmap". When set to "hashmap", the result

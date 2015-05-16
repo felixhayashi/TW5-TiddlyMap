@@ -60,11 +60,20 @@ module-type: library
    * 
    * @see CallbackManager#registerCallback
    */
-  CallbackManager.prototype.remove = function(tRef) {
+  CallbackManager.prototype.remove = function(refOrRefList) {
     
-    if(this.callbacks[tRef]) {
-      this.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
-      delete this.callbacks[tRef];
+    if(!refOrRefList) return;
+    
+    if(typeof refOrRefList === "string") {
+      refOrRefList = [ refOrRefList ];
+    }
+    
+    for(var i = 0; i < refOrRefList.length; i++) {
+      var tRef = refOrRefList[i];
+      if(this.callbacks[tRef]) {
+        this.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
+        delete this.callbacks[tRef];
+      }
     }
     
   };

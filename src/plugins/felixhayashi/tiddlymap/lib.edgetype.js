@@ -254,11 +254,7 @@ module-type: library
     var tObj = this.utils.getTiddler(tiddler);
     if(tObj) {
       
-      var shadowTObj = $tw.wiki.getSubTiddler(this.opt.path.pluginRoot,
-                                              this.getPath());
-      if(!shadowTObj) {
-        shadowTObj = {};
-      }
+      var shadowTObj = $tw.wiki.getSubTiddler(this.opt.path.pluginRoot, this.getPath()) || {};
       
       var data = $tw.utils.extend({}, shadowTObj.fields, tObj.fields);
       

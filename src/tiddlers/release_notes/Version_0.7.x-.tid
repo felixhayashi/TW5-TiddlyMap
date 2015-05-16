@@ -10,10 +10,15 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.7.31
+
+* Resolves #121: Make live view work in different scenarios
+* Resolves #114: feature request: live maps work with zoomin view 
+
 ### v0.7.25
 
 * View statistics; Resolves #44
-* Export of view's graph as JSON; Resolves #68, resolves #33
+* Export of view's graph as JSON; resolves #68, resolves #33
 
 ### v0.7.24
 
@@ -86,6 +91,10 @@ Major enhancements
 
 Important Bugfixes
 ----------------------------
+
+### v0.7.31
+
+* Fixes #66: Browser crashes when it tries to generate a map with many nodes.
 
 ### v0.7.30
 

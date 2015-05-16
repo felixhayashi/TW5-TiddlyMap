@@ -7,3 +7,34 @@ type: text/css
 ul li ul li {
     margin: 0px;
 }
+
+.hzone-focus {
+
+  -webkit-animation-name: flash;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-iteration-count: 1;
+
+  -moz-animation-name: flash;
+  -moz-animation-duration: 1s;
+  -moz-animation-iteration-count: 1;
+
+  animation-name: flash;
+  animation-duration: 1s;
+  animation-iteration-count: 1;
+  
+}
+
+@-moz-keyframes flash {  
+  50% { background: #FFFFF5; }
+  100% { background: white; }
+}
+
+@-webkit-keyframes flash {  
+  50% { background: #FFFFF5; }
+  100% { background: white; }
+}
+
+@keyframes flash {  
+  50% { background: #FFFFF5; }
+  100% { background: white; }
+}

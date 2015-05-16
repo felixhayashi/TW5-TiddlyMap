@@ -1,6 +1,6 @@
 created: 20150331124622206
 id: 885f501d-575b-4c79-a7f9-790e6de2120a
-modified: 20150401212510185
+modified: 20150516161741542
 tags: Configuration
 title: Tweaking the Graph
 type: text/vnd.tiddlywiki
@@ -24,15 +24,16 @@ To change the vis options, first create a JSON tiddler (see [[DataTiddlers|http:
 Then you could add properties using nested JSON or a dot notation. For example, if you want to change the way neighbour's are colored, you would add the following to the tiddler's body (make sure you also changed the tiddler's content type to //application/json// and mind the quotation marks!):
 
 ```javascript
-"groups.neighbours.color": "pink"
+{
+  "groups.neighbours.color": "pink"
+}
 ```
 
 Alternatively
 
 ```javascript
 {
-  "groups"
-    {
+  "groups": {
       "neighbours": {
         "color": "pink"
       }

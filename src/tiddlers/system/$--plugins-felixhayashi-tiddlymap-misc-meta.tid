@@ -1,9 +1,9 @@
 created: 20150418141901338
-modified: 20150418142933532
+modified: 20150516142200074
 title: $:/plugins/felixhayashi/tiddlymap/misc/meta
 type: application/json
 
 {
     "showWelcomeMessage": false,
-    "dataStructureState": "0.7.0"
+    "dataStructureState": "0.7.31"
 }

@@ -83,16 +83,16 @@ For general information on how to set up TiddlyWiki5 with Nodejs visit [tiddlywi
             
             ...
             
-            "felixhayashi/topstoryview",
-            "felixhayashi/vis",
             "felixhayashi/tiddlymap",
-            
-            ...
+            "felixhayashi/vis",
+            "felixhayashi/hotzone",
+            "felixhayashi/topstoryview"
             
           ]
         }
-4. Restart your wiki server via the command line
-5. If you want to use the "live view", change your wiki's story view to "Top" (Configuration ➡ Appearance ➡ Story view ➡ Current view).
+4. The TW5-TopStoryView may not be needed in some cases (please see: http://bit.ly/tiddlymap/#Live View plugin dependencies)
+5. Restart your wiki server via the command line
+6. If you want to use the "live view", change your wiki's story view to "Top" (Configuration ➡ Appearance ➡ Story view ➡ Current view).
 
 #### Standalone
 

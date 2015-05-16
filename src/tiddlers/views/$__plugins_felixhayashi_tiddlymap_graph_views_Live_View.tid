@@ -1,6 +1,6 @@
 config.neighbourhood_scope: 1
 config.physics_mode: true
-config.refresh-trigger: $:/temp/focussedTiddler
+config.refresh-triggers: $:/temp/tmap/currentTiddler
 created: 20150331114808577
 isview: true
 modified: 20150406092242556

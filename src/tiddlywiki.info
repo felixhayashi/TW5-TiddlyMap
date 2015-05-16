@@ -4,6 +4,7 @@
     "tiddlywiki/markdown",
     "tiddlywiki/highlight",
     "felixhayashi/topstoryview",
+    "felixhayashi/hotzone",
     "felixhayashi/vis",
     "felixhayashi/tiddlymap",
     "danielo/contextPlugin"
@@ -13,7 +14,8 @@
     "tiddlywiki/snowwhite"
   ],
   "languages": [
-    "en-US"
+    "en-US",
+    "de-DE"
   ],
   "build": {
     "index": ["--rendertiddler","$:/core/save/all","index.html","text/plain"]

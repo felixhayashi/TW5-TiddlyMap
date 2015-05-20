@@ -47,6 +47,8 @@ subtitle: {{$:/core/images/theme-button}} View configuration -- <<view>>
     <<tmap-row title:"Neighbourhood scope" field:"config.neighbourhood_scope" type:"input-select"
                selectFilter:"[[0|Do not display a neighbourhood]] [[1|1 steps away]] [[2|2 steps away]] [[3|3 steps away]] [[4|4 steps away]] [[5|5 steps away]] [[*|No limit]]"
                descr:"Display the neighbourhood that can be reached within the given number of steps starting from the matches returned by the node filter.">>
+    <<tmap-row type:"input-checkbox" title:"Show inter-neighbour edges" field:"config.show_inter_neighbour_edges"
+               descr:"When neighbours are displayed in a map along with matches, also display their relations to other neighbours">>
   </table>
 </fieldset>
 

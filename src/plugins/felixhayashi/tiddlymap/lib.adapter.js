@@ -255,6 +255,18 @@ module-type: library
       });
       $tw.utils.extend(graph.edges, neighbours.edges);
       $tw.utils.extend(graph.nodes, neighbours.nodes);
+      
+      
+      if(view.isEnabled("show_inter_neighbour_edges")) {
+        var nodeTRefs = this.getTiddlersById(neighbours.nodes);
+        $tw.utils.extend(graph.edges, this.getAllOutgoingEdges(nodeTRefs, {
+          toFilter: utils.getArrayValuesAsHashmapKeys(nodeTRefs),
+          toFilterStyle: "whitelist",
+          typeFilter: view.getTypeWhiteList(),
+          typeFilterStyle: "whitelist"
+        }));
+      }
+      
     }
         
     $tw.tmap.stop("Assembling Graph");
@@ -355,7 +367,7 @@ module-type: library
   };
     
   /**
-   * @param {Hashmap.<Id, Tiddler>} tiddlers
+   * @param {Array<Tiddler>} tiddlers
    * @param {Hashmap<string, *>} [typeFilter] - Only edges where
    *     the type is contained in the `typeFilter` are included.
    * @return {Hashmap<Id, Edge>} An edge collection.
@@ -363,7 +375,6 @@ module-type: library
   Adapter.prototype.getAllOutgoingEdges = function(tiddlers, opts) {
 
     var edges = utils.getDataMap();
-
     for(var i = 0; i < tiddlers.length; i++) {
       $tw.utils.extend(edges, this.getEdges(tiddlers[i], opts));
     }

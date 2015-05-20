@@ -296,8 +296,6 @@ var updateLiveViewTrigger = function(changedTiddlers) {
     var tRef = utils.getField("$:/HistoryList", "current-tiddler");
   } else if(changedTiddlers["$:/temp/focussedTiddler"]) {
     var tRef = utils.getField("$:/temp/focussedTiddler", "text");
-  } else if(changedTiddlers["$:/StoryList"]) {
-    var tRef = utils.getField("$:/StoryList", "text");
   }
   
   if(tRef != null) { // not null or undefined

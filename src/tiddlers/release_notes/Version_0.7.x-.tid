@@ -10,6 +10,10 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.7.32
+
+* Added view-option to show links between neighbours as well; discussion at #107
+
 ### v0.7.31
 
 * Resolves #121: Make live view work in different scenarios
@@ -91,6 +95,10 @@ Major enhancements
 
 Important Bugfixes
 ----------------------------
+
+### v0.7.32
+
+* Fixes a bug that was mentioned in the discussion at #107
 
 ### v0.7.31
 

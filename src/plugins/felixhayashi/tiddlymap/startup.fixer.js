@@ -99,7 +99,7 @@ module-type: startup
      * 1. Changes to the live view filter and refresh trigger field
      * 
      */
-    var upgrade = { before: "0.7.0", after: "0.7.31" };
+    var upgrade = { before: "0.7.31", after: "0.7.32" };
     if($tw.utils.checkVersions(upgrade.before, meta.dataStructureState)) {
       
       $tw.tmap.logger("debug", "Upgrading data structure to", upgrade.after);

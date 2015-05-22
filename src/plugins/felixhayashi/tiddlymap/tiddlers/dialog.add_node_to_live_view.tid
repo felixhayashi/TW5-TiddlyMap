@@ -1,7 +1,0 @@
-title: $:/plugins/felixhayashi/tiddlymap/dialog/liveViewManipulation
-subtitle: {{$:/core/images/info-button}} The live view is a special view...
-
-What you should not do (unless you really want to):
-
-* Add nodes to the live view -- they will always be displayed, also if the live view's context changes.
-* Change the live view filter -- the live view needs to be triggered by the scroll-view-plugin to react to scroll changes.

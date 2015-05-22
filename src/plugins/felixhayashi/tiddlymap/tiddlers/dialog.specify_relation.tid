@@ -7,11 +7,10 @@ You are about to connect "<<fromLabel>>" with "<<toLabel>>". Please specify a ty
 
 ''Type'': <$edit-text tiddler=<<output>> field="text" type="text" tag="input" default="" />
 
-<ul class="tmap-small-list">
-
 <$set name="term" value={{!!text}}>
 <$set name="allEdgeTypes" value=<<map-macro "option" "selector.allEdgeTypesByLabel">>>
 
+<ul class="tmap-small-list">
 <$list filter=<<filter>> emptyMessage="//A type with this name does not exist yet and will be created.//">
   <li>
     <$button class="tc-btn-invisible tmap-link">
@@ -20,8 +19,8 @@ You are about to connect "<<fromLabel>>" with "<<toLabel>>". Please specify a ty
     </$button>
   </li>
 </$list>
-
-</$set>
-</$set>
-
 </ul>
+
+</$set>
+</$set>
+

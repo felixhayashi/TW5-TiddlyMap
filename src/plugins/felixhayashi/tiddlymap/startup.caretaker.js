@@ -314,10 +314,16 @@ var registerChangeListener = function(callbackManager) {
     
     $tw.tmap.start("Caretaker handling changes");
     
-    callbackManager.handleChanges(changedTiddlers);
-  
-    $tw.tmap.logger("warn", "These tiddlers changed:", changedTiddlers);
+    for(var tRef in changedTiddlers) {
+      if(changedTiddlers[tRef].deleted) {
+        $tw.tmap.logger("warn", "Removed:", tRef);
+      } else {
+        $tw.tmap.logger("warn", "Modified:", utils.getTiddler(tRef));
+      }
+    }
     
+    callbackManager.handleChanges(changedTiddlers);
+      
     // check for changed globals
     var hasChangedGlobals = utils.getMatches(filter, Object.keys(changedTiddlers)).length;
     if(hasChangedGlobals) {

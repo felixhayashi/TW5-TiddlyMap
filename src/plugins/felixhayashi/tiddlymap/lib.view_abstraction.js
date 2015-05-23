@@ -497,7 +497,6 @@ module-type: library
   };
   
   ViewAbstraction.prototype._getAddNodeFilterPart = function(node) {
-    var test = "[bla:";
     return "[field:" + this.opt.field.nodeId + "[" + node.id + "]]";
   };
 
@@ -510,7 +509,7 @@ module-type: library
     
     if(!this.exists()) return;
         
-    expr = expr.replace("\n", " ");
+    expr = expr.replace(/[\n\r]/g, " ");
     
     if(this.getNodeFilter.expression === expr) { // already up to date;
       // This check is critical to prevent recursion!
@@ -536,7 +535,7 @@ module-type: library
     
     if(!this.exists()) return;
     
-    expr = expr.replace("\n", " ");
+    expr = expr.replace(/[\n\r]/g, " ");
     
     if(this.getEdgeFilter.expression === expr) { // already up to date
       // This check is critical to prevent recursion!

@@ -96,6 +96,10 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.7.33
+
+* Fixes #124: Manually editing the view filter will destroy graph when used with node.js
+
 ### v0.7.32
 
 * Fixes a bug that was mentioned in the discussion at #107

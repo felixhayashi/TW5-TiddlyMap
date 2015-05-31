@@ -1,5 +1,5 @@
 created: 20150202231339398
-modified: 20150402083000079
+modified: 20150523204105619
 tags: 
 title: $:/plugins/felixhayashi/tiddlymap/config/sys/user
 type: application/x-tiddler-dictionary
@@ -17,4 +17,4 @@ debug: true
 notifications: true
 editNodeOnCreate: false
 singleClickMode: false
-raster: 10
+raster: 

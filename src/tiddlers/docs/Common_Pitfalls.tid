@@ -1,6 +1,6 @@
 created: 20150103171758988
 id: a7e46ff2-2010-475f-a430-d757a7659798
-modified: 20150418130434709
+modified: 20150526163200644
 tags: 
 title: Common Pitfalls
 type: text/vnd.tiddlywiki
@@ -16,7 +16,11 @@ Please do not use the following shortcut to close the widget as it may cause con
 Instead, use this version:
 
 ```html
-<$tiddlymap ...></$tiddlymap>
+<$tiddlymap></$tiddlymap>
 ```
 
 It is recommended to use the ~TiddlyMap [[widget-wizard|Embedding views within tiddlers]] for the creation of the widget code.
+
+!! Performance
+
+Generally speaking, the graph-visualization runs most smoothly in Google Chrome. However, starting from version 38.1, Firefox uses hardware acceleration, which significantly increases performance, making the graph operations as fast as in chrome.

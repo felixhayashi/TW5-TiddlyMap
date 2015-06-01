@@ -3,6 +3,7 @@
     "tiddlywiki/github-fork-ribbon",
     "tiddlywiki/markdown",
     "tiddlywiki/highlight",
+    "tiddlywiki/googleanalytics",
     "felixhayashi/topstoryview",
     "felixhayashi/hotzone",
     "felixhayashi/vis",

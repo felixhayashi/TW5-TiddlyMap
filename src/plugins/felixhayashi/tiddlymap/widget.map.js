@@ -1702,9 +1702,26 @@ module-type: widget
     
   };
   
-  // !! EXPORT !!
+  /*** TO AVOID STRANGE LIB ERROS FROM BUBBLING UP *****************/
+  
+  if($tw.boot.tasks.trapErrors) {
+    
+    var defaultHandler = window.onerror;
+    window.onerror = function(errorMsg, url, lineNumber) {
+      console.log("er123", arguments, $tw.tmap.utils.hasSubString(errorMsg, "NS_ERROR_NOT_AVAILABLE"), url);
+      if($tw.tmap.utils.hasSubString(errorMsg, "NS_ERROR_NOT_AVAILABLE")
+         && url == "$:/plugins/felixhayashi/vis/vis.js") {
+        console.error("Strange firefox related vis.js error (see https://github.com/felixhayashi/TW5-TiddlyMap/issues/125)", arguments);
+      } else if(defaultHandler) {
+        defaultHandler.apply(this, arguments);
+      }
+
+    }
+  }
+  
+  /*** Export ******************************************************/
+  
   exports.tiddlymap = MapWidget;
-  // !! EXPORT !!
   
 })();
 

@@ -1,7 +1,7 @@
 created: 20150330201101990
-description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam non blandit nisl. Nam finibus lorem et quam euismod pharetra. Vivamus eget mollis nibh. In hac habitasse platea dictumst. Nullam pellentesque faucibus ipsum vitae commodo. Sed porta imperdiet eros quis elementum. Maecenas non molestie dui, sed blandit velit.
+description: Person who is responsible for the creation
 label: developed by
-modified: 20150330201101990
+modified: 20150619153916637
 style: {"color":"#15cea3"}
 title: $:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/demo:author
 type: text/vnd.tiddlywiki

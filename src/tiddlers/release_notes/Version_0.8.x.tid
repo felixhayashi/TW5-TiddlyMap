@@ -1,0 +1,43 @@
+caption: Version 0.8.x
+created: 20150619104256657
+id: 66976ded-1d7e-4798-b7ef-a12fc5cdaeef
+modified: 20150619104746544
+released: not really
+tags: ReleaseNote
+title: Version 0.8.x
+type: text/x-markdown
+
+Major enhancements
+----------------------------
+
+### v0.8.0
+
+* Resolves #135: Added auto-focussing and hotkeys to a bunch of form elements
+* Added a loading indicator to indicate progress on bigger graphs.
+* Resolves #140: Show edge-type description as edge tooltip
+* Resolves #132: Changed the button layout and added classes to tmap buttons
+* Resolves #127: Added tooltips to all buttons
+* Node tooltips are possible again
+* Click-to-use overlay is never displayed in fullscreen mode
+* Make main editor click-to-use when in mobile mode
+* Migration to vis.js v4 :)
+
+Important Bugfixes
+----------------------------
+
+### v0.8.0
+
+* Fixes a long standing big bug that the network doesn't stabilize!!
+  It also fixes #97 and the timeout workaround is not needed anymore!
+  See issue https://github.com/almende/vis/issues/963 and
+  See https://github.com/almende/vis/issues/987#issuecomment-113226216
+* Fixes #139: Quick connect button also displays drafts in the list
+* Fixes #144: Map should not be displayed in draft mode
+* Fixes that edge styles cannot be removed
+* Fixes wrong regex escaping
+
+Incompatibilities to previous versions
+----------------------------
+
+* Vis.js changed its configuration objects, this means you might need
+  to readjust your styling

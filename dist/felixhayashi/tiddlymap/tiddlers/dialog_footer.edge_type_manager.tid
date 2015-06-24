@@ -2,13 +2,12 @@ title: $:/plugins/felixhayashi/tiddlymap/dialogFooter/edge_type_manager
 
 \define defaultTab() $:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager/overview
 
-<$button>Save
+<$button class="tmap-dialog-button tmap-save-button" tooltip="Save the current changes">Save
   <$action-sendmessage $message="tmap:tm-save-edge-type-form" output=<<output>> />
 </$button>
-<$button>Create
+<$button class="tmap-dialog-button tmap-create-button" tooltip="Create a new edge-type">Create
   <$action-sendmessage $message="tmap:tm-create-edge-type" output=<<output>> />
 </$button>
-<$button>Quit
+<$button class="tmap-dialog-button tmap-cancel-button" tooltip="Cancel the most resent changes and exit">Quit
   <$action-setfield $tiddler=<<result>> text="1" />
-  <$action-sendmessage $message="tm-close-tiddler" />
 </$button>

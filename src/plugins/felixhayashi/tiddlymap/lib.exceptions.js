@@ -15,7 +15,7 @@ module-type: library
   
   Exception.EnvironmentError = function(aspect) {
     this.name = "EnvironmentError";
-    this.message = "Critical parts (" + aspect + ") of the underlying system changed.";
+    this.message = "Critical parts of the underlying system changed: " + aspect;
   };
   
   Exception.DependencyError = function(module) {

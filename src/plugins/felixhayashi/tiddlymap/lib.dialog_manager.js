@@ -18,7 +18,6 @@ module-type: library
   
   /**************************** IMPORTS ****************************/
    
-
   var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
   var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/callback_manager.js").CallbackManager;
 
@@ -115,9 +114,9 @@ module-type: library
       templateId: templateId,
       currentTiddler: dialogTRef + "/output"
     };
-    
+        
     if(param.dialog) {
-      
+            
       if(param.dialog.preselects) {
         
         // register preselects
@@ -135,12 +134,12 @@ module-type: library
       utils.merge(dialog, param.dialog);
       
       // remove the user provided dialog object
-      delete param.dialog;
+      //delete param.dialog;
 
     }
     
-    // set the footer
-    dialog.footer = utils.getText(this.opt.path.footers + "/" + dialog.buttons),
+    // force the footer to be set to the wrapper
+    dialog.footer = utils.getText(this.opt.path.footers);
     
     // flatten dialog and param object
     dialog = utils.flatten(dialog);
@@ -148,6 +147,8 @@ module-type: library
     
     // add trigger 
     this.callbackManager.add(dialog.result, function(t) {
+
+      this.getElement("hidden-close-button").click();
 
       var triggerTObj = this.wiki.getTiddler(t);
       var isConfirmed = triggerTObj.fields.text;
@@ -180,11 +181,53 @@ module-type: library
       type: "tm-modal",
       param : dialogTiddler.fields.title,
       paramObject: dialogTiddler.fields
-    }); 
+    });
+    
+    this.addKeyBindings();
     
     return dialogTiddler;
     
   };
+  
+  DialogManager.prototype.getElement = function(name) {
+    
+    return document.getElementsByClassName("tmap-" + name)[0];
+    
+  };
+  
+  /**
+   * This method will search for form elements that have the class
+   * `tmap-trigger-field` set, which means that TiddlyMap shall
+   * perform a button press when a key combo occurs while the field
+   * has focus. To know which button to press on what key event,
+   * it looks for classes of the form: tmap-triggers-BUTTONNAME-on-KEYCOMBO.
+   */
+  DialogManager.prototype.addKeyBindings = function() {
+    
+    var keys = $tw.tmap.keycharm({
+      container: document.getElementsByClassName("tc-modal")[0]
+    });
+    
+    var re = /tmap-triggers-(.+?)-on-(.+?)(?:\s|$)/
+    var triggers = document.getElementsByClassName("tmap-trigger-field");
+    
+    for(var i = 0; i < triggers.length; i++) {
+      var classNames = triggers[i].className.split(' ');    
+      for(var j = 0; j < classNames.length; j++) {
+        var matches = classNames[j].match(re);
+        if(!matches) { // don't care
+          continue;
+        }
+        var buttonName = matches[1];
+        var key = matches[2];
+        var buttonElement = this.getElement(buttonName);
+        if(!buttonElement) continue;
+        keys.bind(key, function() { this.click(); }.bind(buttonElement));
+      }
+    }
+    
+  };
+
 
   // !! EXPORT !!
   exports.DialogManager = DialogManager;

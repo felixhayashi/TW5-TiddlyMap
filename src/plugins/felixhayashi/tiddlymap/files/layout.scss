@@ -15,6 +15,14 @@ $default-input-width: 140px;
   }
 }
 
+.tmap-graph-placeholder::before {
+  content: "TiddlyMap";
+  display: block;
+  text-align: center;
+  padding: 20px;
+  background-color: whitesmoke;
+}
+
 html { // used to increase css importance
 
   .tmap-link { // for buttons and links
@@ -146,10 +154,10 @@ html { // used to increase css importance
       .tmap-modal-editor {
       
         .tc-tiddler-frame {
-          padding: 0px !important;
-          width: auto !important;
-          margin: 28px !important;
-          border: none !important;
+          padding: 0px;
+          width: auto;
+          margin: 0px;
+          border: none;
           
           .tc-tiddler-title {
             display: none;
@@ -283,14 +291,19 @@ html { // used to increase css importance
         }
       }
     }
-
-    .tc-modal-footer, .tc-modal-header {
+    
+    .tc-modal-footer {
       padding: 8px;
       
-      p {
-        margin: 0;
+      .tmap-dialog-button {
+        font-weight: bold;
+      }
+      
+      .tmap-hidden-close-button {
+        display: none;
       }
     }
+    
   }
 
 
@@ -323,6 +336,7 @@ html { // used to increase css importance
   .tc-sidebar-scrollable {
     
     .tmap-widget {
+      position: relative;
       min-height: 350px;
             
       &.tmap-halfscreen {
@@ -344,16 +358,32 @@ html { // used to increase css importance
   }
 
   .tmap-widget {
+    position: relative;
     border: 1px dotted lightgray;
     padding: 2px;
     width: 100%;
     color: $color;
     display: block; // sometimes tw puts us into a span
     
-    &.tmap-click-to-use .network-frame:not(.vis-active) {
+    .tmap-loading-bar {
+      display: block;
+      position: absolute;
+      text-align: center;
+      font-size: 2em;
+      padding: 10px;
+      top: 50%;
+      background: rgba(245, 245, 245, 0.5);
+      z-index: 1;
+      width: 250px;
+      margin: auto;
+      left: 0px;
+      right: 0px;
+    }
+    
+    &.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) {
       cursor: pointer;
       
-      .network-navigation {
+      .vis-navigation {
         display: none;
       }
       
@@ -378,12 +408,36 @@ html { // used to increase css importance
 
     .tmap-vis-graph {
       height: calc(100% - 35px);
-
-      .network-frame {
+    
+      .vis-network {
       
-        div.network-navigation {
+        .vis-network-tooltip {
+          max-width: 250px;
+          white-space: normal;
+        }
+      
+        .vis-manipulation {
+          border-top: 1px solid #d6d9d8;
+          background: rgba(245, 245, 245, 0.7);
+        }
+      
+        .vis-navigation .vis-button {
+        
+          &.tmap-button-enabled {
+            right: 15px;
+            
+            &.tmap-fullscreen-button {
+              bottom: 90px;
+              background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />'));
+            }
+            &.tmap-halfscreen-button {
+              bottom: 130px;
+              background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/halfscreen.png}} />'));
+            }
+          }
           
           &:hover {
+            box-shadow: 0 0 3px 3px rgba(75, 75, 75, 0.3);
             
             &:before {
               background: beige;
@@ -399,29 +453,29 @@ html { // used to increase css importance
               text-align: center;
             }
             
-            &.up:before {
+            &.vis-up:before {
               left: 30px;
               content: "Scroll up";              
             }
-            &.down:before {
+            &.vis-down:before {
               left: 30px;
               content: "Scroll down";              
             }
-            &.right:before {
+            &.vis-right:before {
               left: 30px;
               content: "Scroll right";              
             }
-            &.left:before {
+            &.vis-left:before {
               left: 30px;
               content: "Scroll left";              
             }
-            &.zoomOut:before {
+            &.vis-zoomOut:before {
               content: "Zoom out";              
             }
-            &.zoomIn:before {
+            &.vis-zoomIn:before {
               content: "Zoom in";              
             }
-            &.zoomExtends:before {
+            &.vis-zoomExtends:before {
               content: "Reset focus";              
             }
             &.tmap-fullscreen-button:before {
@@ -434,24 +488,11 @@ html { // used to increase css importance
           }
           
         }
-      
-        .tmap-vis-button.tmap-button-enabled {
-          right: 15px;
-          
-          &.tmap-fullscreen-button {
-            bottom: 90px;
-            background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />'));
-          }
-          &.tmap-halfscreen-button {
-            bottom: 130px;
-            background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/halfscreen.png}} />'));
-          }
-        }
       }
     }
     
     &.tmap-no-buttons {
-      .network-navigation {
+      .vis-navigation {
         display: none;
       }
     }
@@ -469,16 +510,9 @@ html { // used to increase css importance
         
       }
     }
-
-    .network-manipulationUI.edit.editmode {
-      height: 26px;
-    }
     
-    .network-manipulationDiv {
-      border-top: #d6d9d8;
-      background: rgba(245, 245, 245, 0.7);
-      padding: 3px 0;
-      height: 35px;
+    .tmap-menu-bar {
+      width: 100%;
     }
     
     .tmap-topbar {
@@ -495,7 +529,7 @@ html { // used to increase css importance
         padding-top: 3px;
       }
       
-      .focus-button {
+      .tmap-focus-button {
         position: absolute;
         right: 10px;
         
@@ -553,7 +587,8 @@ html { // used to increase css importance
       }
       
       select {
-        width: 150px;
+        width: 30%;
+        max-width: 200px;
         word-wrap: initial;
         padding: 0px;
       }

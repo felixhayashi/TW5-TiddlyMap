@@ -318,11 +318,25 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
   };
   
   /**
+   * Polyfill until `isInteger` has become official. If the target
+   * value is an integer, return true, otherwise return false.
+   * If the value is NaN or infinite, return false.
+   * 
+   * @param {*} value - The value to be tested for being an integer.
+   * @return {boolean} True if the value is an integer, false otherwise.
+   */
+  utils.isInteger = Number.isInteger || function(value) {
+    return typeof value === "number" && 
+           isFinite(value) && 
+           Math.floor(value) === value;
+  };
+  
+  /**
    * When we do not know the string, we need to escape it
    */
   utils.escapeRegex = function(str) {
     
-    return str.replace(/[^$-*?+.()|{}[\]]/g, "\\$&");
+    return str.replace(/[-$^?.+*[\]\\(){}|]/g, "\\$&");
     
   };
   
@@ -461,6 +475,40 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
       widget.addEventListener(id, listeners[id].bind(context));
     }
   };
+  
+  /**
+   * The function allows to detect whether a widget is displayed
+   * in preview or not.
+   */
+  utils.isPreviewed = function(widget) {
+    
+    if(widget) {
+      if(widget.getVariable("tv-tiddler-preview")) {
+        return true;
+      } else { // fallback for < v5.1.9
+        var cls = "tc-tiddler-preview-preview";
+        return !!utils.getAncestorWithClass(widget.parentDomNode, cls);
+      }
+    }
+    
+    return false;
+    
+  };
+  
+  /**
+   * If an ancestor that possesses a specified class exists the the
+   * element will be returned, otherwise undefined is returned.
+   */
+  utils.getAncestorWithClass = function(el, cls) {
+
+    if(typeof el !== "object" || typeof cls !== "string") return;
+
+    while(el.parentNode) {
+      el = el.parentNode;
+      if($tw.utils.hasClass(el, cls)) { return el; }
+    }
+    
+  }
 
   /**
    * Returns a new object that contains only properties that start with
@@ -750,32 +798,43 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
 
   };
   
-  /**
-   * Rastafarianism, jaaaah
-   */
-  utils.drawRaster = function(canvas, raster, color) {
-    
-    raster = parseInt(raster) || 10;
-    var context = canvas.getContext("2d");
-    var vLines = canvas.width / raster;
-    var hLines = canvas.height / raster;
-        
-    // draw vertical lines
-    for(var x = 0; x < canvas.width; x += raster) {
-      context.moveTo(x, 0);
-      context.lineTo(x, canvas.height);
-    }
-        
-    // draw horizontal lines
-    for(var y = 0; y < canvas.height; y += raster) {
-      context.moveTo(0, y);
-      context.lineTo(canvas.width, y);
-    }
+    /**
+     * This function will draw a raster on the network canvas that will
+     * adjust to the network's current scaling factor and viewport offset.
+     * 
+     * @param {CanvasRenderingContext2D} context - The canvas's context
+     *     passed by vis.
+     * @param {number} scaleFactor - The current scale factor of the network.
+     * @param {Object} viewPosition - Object with x and y that represent the
+     *     current central focus point of the view.
+     * @param {number} rasterSize - The size of the squares that are drawn.
+     * @param {string} color - A string parsed as CSS color value.
+     */
+    utils.drawRaster = function(context, scaleFactor, viewPosition, rasterSize, color) {
+      
+      var rasterSize = parseInt(rasterSize) || 10;
+      var canvas = context.canvas;
+      var width = canvas.width / scaleFactor;
+      var height = canvas.width / scaleFactor;
+      var offsetLeft = viewPosition.x - (width / 2);
+      var offsetTop = viewPosition.y - (height / 2);
+          
+      // draw vertical lines
+      for(var x = offsetLeft; x < width; x += rasterSize) {
+        context.moveTo(x, offsetTop);
+        context.lineTo(x, height);
+      }
+          
+      // draw horizontal lines
+      for(var y = offsetTop; y < height; y += rasterSize) {
+        context.moveTo(offsetLeft, y);
+        context.lineTo(width, y);
+      }
 
-    context.strokeStyle = color || "black";
-    context.stroke();
+      context.strokeStyle = color || "#D9D9D9";
+      context.stroke();
 
-  };
+    };
   
   /**
    * Get a tiddler's text or otherwise return a default text.
@@ -982,13 +1041,10 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
    */
   utils.getTiddlersWithField = function(fieldName, value, options) {
     
-    
     if(!options || typeof options !== "object") options = {};
-    
-    var result = utils.getDataMap();
-    
-    var tiddlers = (options.tiddlers ? options.tiddlers : $tw.wiki.allTitles());
-    var limit = (options.limit ? options.limit : 0);
+        
+    var tiddlers = options.tiddlers || $tw.wiki.allTitles();
+    var limit = options.limit || 0;
     var isIncludeDrafts = (options.isIncludeDrafts === true);
     var result = utils.getDataMap();
     var keys = Object.keys(tiddlers);

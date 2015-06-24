@@ -120,14 +120,14 @@ module-type: library
     
     if(args.length === 2) {
       if(typeof args[0] === "string") {
-        if(args[0] === "style") {
-          this.setStyle(args[1]);
-        } else {
-          if(args[1] && this.utils.inArray(args[0], this.whitelist)) {
-            this.data[args[0]] = args[1];
+        if(args[1] && this.utils.inArray(args[0], this.whitelist)) {
+          if(args[0] === "style") {
+            this.setStyle(args[1]);
           } else {
-            delete this.data[args[0]];
+            this.data[args[0]] = args[1];
           }
+        } else {
+          delete this.data[args[0]];
         }
       }
     } else if(args.length === 1 && typeof args[0] === "object") {
@@ -257,7 +257,7 @@ module-type: library
       var shadowTObj = $tw.wiki.getSubTiddler(this.opt.path.pluginRoot, this.getPath()) || {};
       
       var data = $tw.utils.extend({}, shadowTObj.fields, tObj.fields);
-      
+            
       this.setData(data);
       
     }

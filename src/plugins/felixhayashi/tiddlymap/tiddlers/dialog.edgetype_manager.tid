@@ -9,7 +9,7 @@ subtitle: {{$:/core/images/tag-button}} Edge-type manager
 <div id="edge-type-manager">
   <div>
     <div class="searchbar">
-      <$edit-text tiddler="$:/temp/tmap/edgeTypeSearch" type="search" tag="input" default="" />
+      <$edit-text focus="true" tiddler="$:/temp/tmap/edgeTypeSearch" type="search" tag="input" default="" />
     </div>
     <ul>
     <$list filter=<<param.filter>> emptyMessage="//No results//">

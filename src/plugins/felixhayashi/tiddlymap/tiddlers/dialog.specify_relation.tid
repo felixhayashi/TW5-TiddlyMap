@@ -5,7 +5,9 @@ subtitle: {{$:/plugins/felixhayashi/tiddlymap/icon}} Type specification (optiona
 
 You are about to connect "<<fromLabel>>" with "<<toLabel>>". Please specify a type.
 
-''Type'': <$edit-text tiddler=<<output>> field="text" type="text" tag="input" default="" />
+''Type'': 
+<$edit-text focus="true" tiddler=<<output>> field="text" type="text" tag="input" default=""
+            class="tmap-trigger-field tmap-triggers-ok-button-on-enter" />/>
 
 <$set name="term" value={{!!text}}>
 <$set name="allEdgeTypes" value=<<map-macro "option" "selector.allEdgeTypesByLabel">>>

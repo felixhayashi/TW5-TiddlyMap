@@ -1,7 +1,8 @@
-title: $:/plugins/felixhayashi/tiddlymap/dialog/editContent
+title: $:/plugins/felixhayashi/tiddlymap/dialog/fullscreenTiddlerEditor
 subtitle: {{$:/core/images/edit-button}} <<param.ref>>
 
 <div class="tmap-modal-editor">
+  <$edit-text tiddler=<<param.ref>> field="color" tag="input" type="color"/>
   <$importvariables filter="[all[tiddlers+shadows]prefix[$:/core/macros/]]">
     <$set name="currentTiddler" value=<<param.ref>> >
       <$transclude tiddler="$:/core/ui/EditTemplate" field="text" mode="block" />

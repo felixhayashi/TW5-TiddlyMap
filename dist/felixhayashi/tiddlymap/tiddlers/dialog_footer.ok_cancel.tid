@@ -1,9 +1,7 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialogFooter/ok_cancel
 
 <$transclude tiddler="$:/plugins/felixhayashi/tiddlymap/dialogFooter/ok" mode="inline" />
-<$button>Cancel
+<$button class="tmap-dialog-button tmap-cancel-button" tooltip="Close dialog without saving">Cancel
   <!-- trigger dialog callback -->
   <$action-setfield $tiddler=<<result>> text="" />
-  <!-- close modal -->
-  <$action-sendmessage $message="tm-close-tiddler" />
 </$button>

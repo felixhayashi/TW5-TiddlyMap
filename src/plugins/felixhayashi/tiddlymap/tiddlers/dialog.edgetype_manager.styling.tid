@@ -11,5 +11,5 @@ caption: Styling
 
 <table class="tmap-config-table">
   <$macrocall $name="tmap-row" title="Styling" field="style" type="input-textarea" test="json"
-             descr="Edge-types can be styled using a JSON format and the styling properties [[defined by Vis.js|http://visjs.org/docs/network.html#Edges_configuration]]. Please [[validate your JSON|http://jsonlint.com/]] before saving." />
+             descr="Edge-types can be styled using a JSON format and the styling properties [[defined by Vis.js|http://visjs.org/docs/network/edges.html]]. Please [[validate your JSON|http://jsonlint.com/]] before saving." />
 </table>

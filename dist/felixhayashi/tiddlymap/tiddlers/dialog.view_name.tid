@@ -1,7 +1,9 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/getViewName
 subtitle: {{$:/core/images/tag-button}} Please specify a view name
 
-Name: <$edit-text tiddler=<<output>> field="text" type="text" tag="input" default=""></$edit-text> <sup>[1]</sup>
+Name:
+<$edit-text focus="true" tiddler=<<output>> field="text" type="text" tag="input" default=""
+            class="tmap-trigger-field tmap-triggers-ok-button-on-enter" /> <sup>[1]</sup>
 
 <$reveal type="nomatch" text="0" default=<<count>>>
   

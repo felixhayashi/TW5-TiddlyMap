@@ -3,5 +3,5 @@ caption: Description
 
 <table class="tmap-config-table">
   <<tmap-row title:"Description" field:"description" type:"input-textarea"
-             descr:"An optional description for this edge-type.">>
+             descr:"An optional description for this edge-type. The description will be displayed as tooltip when moving the mouse over an edge of this type.">>
 </table>

@@ -44,6 +44,7 @@ var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
 var Adapter = require("$:/plugins/felixhayashi/tiddlymap/adapter.js").Adapter;
 var DialogManager = require("$:/plugins/felixhayashi/tiddlymap/dialog_manager.js").DialogManager;
 var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/callback_manager.js").CallbackManager;
+var vis = require("$:/plugins/felixhayashi/vis/vis.js");
 
 /***************************** CODE ******************************/
 
@@ -92,6 +93,7 @@ var attachOptions = function(parent) {
   opt.ref.welcomeFlag =            "$:/plugins/felixhayashi/tiddlymap/flag/welcome";
   opt.ref.focusButton =            "$:/plugins/felixhayashi/tiddlymap/misc/focusButton";
   opt.ref.sysMeta =                "$:/plugins/felixhayashi/tiddlymap/misc/meta";
+  opt.ref.sidebarBreakpoint =      "$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint";
   
   // default configurations mixed with user config
   if(!opt.config) opt.config = utils.getDataMap();
@@ -234,7 +236,7 @@ var routineCheck = function() {
   
   for(var i = ($tw.tmap.registry.length-1); i >= 0; i--) {
     var graph = $tw.tmap.registry[i];
-    if(!document.body.contains(graph.getContainer())) { // removed
+    if(graph.isZombieWidget()) { // removed
       $tw.tmap.logger("warn", "A graph has been removed.");
       graph.destruct();
       $tw.tmap.registry.splice(i, 1);
@@ -399,6 +401,7 @@ exports.startup = function() {
   // create namespaces
   $tw.tmap = utils.getDataMap();
   $tw.tmap.utils = utils;
+  $tw.tmap.keycharm = vis.keycharm;
   
   // all graphs need to register here. @see routineWalk()
   $tw.tmap.registry = [];

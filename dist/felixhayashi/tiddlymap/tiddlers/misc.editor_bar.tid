@@ -4,7 +4,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
 
 <!-- ===== View Switcher ======================================== -->
 
-<div>
+<div class="tmap-menu-bar">
   View:
   <$reveal type="match" text="false" default=<<param.isViewBound>> >
     <$select tiddler=<<param.ref.viewHolder>> field="text" default=<<param.ref.view>> >

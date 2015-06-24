@@ -2,13 +2,15 @@ tags: $:/tags/ViewToolbar
 title: $:/plugins/felixhayashi/tiddlymap/misc/quickConnectButton
 description: Show available ~TiddlyMap actions
 
-<$reveal type="nomatch" state="$:/temp/tiddlymap/quickConnectButton" text={{!!title}}>
-  <$button set="$:/temp/tiddlymap/quickConnectButton" setTo={{!!title}} class=<<tv-config-toolbar-class>> >
+\define tiddlerSearchFilter() [!is[system]!has[draft.of]search:title{$:/temp/quickConnectSearch}sort[title]]
+
+<$reveal type="nomatch" state="$:/temp/tiddlymap/quickConnectButton" text=<<qualify>> >
+  <$button set="$:/temp/tiddlymap/quickConnectButton" setTo=<<qualify>> class=<<tv-config-toolbar-class>> >
    {{$:/plugins/felixhayashi/tiddlymap/icon}}
   </$button>
 </$reveal>
 
-<$reveal type="match" state="$:/temp/tiddlymap/quickConnectButton" text={{!!title}}>
+<$reveal type="match" state="$:/temp/tiddlymap/quickConnectButton" text=<<qualify>> >
   <$button set="$:/temp/tiddlymap/quickConnectButton" setTo="" class=<<tv-config-toolbar-class>> >
     {{$:/plugins/felixhayashi/tiddlymap/icon}}
   </$button>
@@ -32,13 +34,13 @@ description: Show available ~TiddlyMap actions
           <td>Search:</td>
           <td>
             <$edit-text tiddler="$:/temp/quickConnectSearch" type="search" tag="input" default=""></$edit-text>
-            <small><$count filter="[!is[system]search:title{$:/temp/quickConnectSearch}limit[50]sort[title]]" /> results</small>
+            <small><$count filter=<<tiddlerSearchFilter>> /> results</small>
           </td>
         </tr>
         <tr>
           <td colspan="2">
             <table class="tmap-very-small-list">
-              <$list filter="[!is[system]search:title{$:/temp/quickConnectSearch}sort[title]]" variable="item" emptyMessage="//No results//">
+              <$list filter=<<tiddlerSearchFilter>> variable="item" emptyMessage="//No results//">
               <tr>
                 <td>
                   <$button>⇦

@@ -473,12 +473,16 @@ module-type: library
   };
   
   ViewAbstraction.prototype.isExplicitNode = function(node) {
-    return this.getNodeFilter("expression")
-               .match(this.utils.escapeRegex(this._getAddNodeFilterPart(node)));
+    
+    var regex = this.utils.escapeRegex(this._getAddNodeFilterPart(node));
+    return this.getNodeFilter("expression").match(regex);
+               
   };
   
   ViewAbstraction.prototype.isLiveView = function(node) {
+    
     return (this.getLabel() === this.opt.misc.liveViewLabel);
+    
   };
   
   /**

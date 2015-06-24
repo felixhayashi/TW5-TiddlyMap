@@ -1,7 +1,11 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/getNodeTitle
 subtitle: {{$:/core/images/tag-button}} Please specify a node title
 
-''Title'': <$edit-text tiddler=<<output>> field="text" type="text" tag="input" default="" /> <sup>[1]</sup> 
+''Title'':
+<$edit-text field="text" type="text" tag="input" default="" focus="true" tiddler=<<output>>
+            class="tmap-trigger-field tmap-triggers-ok-button-on-enter" />
+            
+<sup>[1]</sup> 
 
 <ul class="tmap-small-list">
 <$set name="term" value={{!!text}}>

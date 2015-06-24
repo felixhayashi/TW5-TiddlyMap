@@ -43,11 +43,21 @@ var GlobalListener = function() {
     "tmap:tm-suppress-dialog": this.handleSuppressDialog,
     "tmap:tm-generate-widget": this.handleGenerateWidget,
     "tmap:tm-download-graph": this.handleDownloadGraph,
-    "tmap:tm-manage-edge-types": this.handleManageEdgeTypes
+    "tmap:tm-manage-edge-types": this.handleManageEdgeTypes,
+    "tmap:tm-cancel-dialog": this.handleCancelDialog,
+    "tmap:tm-confirm-dialog": this.handleConfirmDialog
   }, $tw.rootWidget, this);
   
 };
-  
+
+GlobalListener.prototype.handleCancelDialog = function(event) {
+  utils.setField(event.param, "text", "");
+};
+
+GlobalListener.prototype.handleConfirmDialog = function(event) {
+  utils.setField(event.param, "text", "1");
+};
+
 GlobalListener.prototype.handleManageEdgeTypes = function(event) {
   
   if(!event.paramObject) event.paramObject = {};
@@ -88,6 +98,10 @@ GlobalListener.prototype.handleSuppressDialog = function(event) {
 GlobalListener.prototype.handleDownloadGraph = function(event) {
 
   var graph = this.adapter.getGraph({ view: event.paramObject.view });  
+  
+  graph.nodes = utils.convert(graph.nodes, "array");
+  graph.edges = utils.convert(graph.edges, "array");
+  
   utils.setField("$:/temp/tmap/export", "text", JSON.stringify(graph, null, 2));
     
   $tw.rootWidget.dispatchEvent({

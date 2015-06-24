@@ -1,5 +1,5 @@
 title: $:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tmap:tag
 description: A tag that refers to a tiddler of the same name.
-style: { "color": "DarkSlateGray" }
+style: { "color": "DarkSlateGray", "dashes":true}
 label: tagged with
 

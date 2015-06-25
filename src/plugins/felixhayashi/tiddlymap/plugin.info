@@ -1,9 +1,9 @@
 {
   "title": "$:/plugins/felixhayashi/tiddlymap",
-  "description": "TiddlyMap - Create clickable graphs by linking your tiddlers!",
+  "description": "TiddlyMap – Map drawing and topic visualization for your wiki",
   "author": "Felix Küppers",
-  "version": "0.8.0+4661",
-  "released": "Wed, 24 Jun 2015 20:25:11 +0200",
+  "version": "0.8.0+4671",
+  "released": "Thu, 25 Jun 2015 12:33:06 +0200",
   "core-version": ">=5.1.5",
   "source": "https://github.com/felixhayashi/TW5-TiddlyMap",
   "type": "application/json",

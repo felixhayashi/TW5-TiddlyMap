@@ -364,9 +364,7 @@ MapWidget.prototype.rebuildEditorBar = function() {
 MapWidget.prototype.refresh = function(changedTiddlers) {
   
   if(this.isZombieWidget() || !this.network || utils.isPreviewed(this)) return;
-   
-  $tw.tmap.start("Map refresh");
-  
+     
   // in any case, check for callbacks triggered by tiddlers
   this.callbackManager.handleChanges(changedTiddlers);
   
@@ -405,8 +403,6 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
   
   // in any case give child widgets a chance to refresh
   this.checkOnEditorBar(changedTiddlers, isViewSwitched, viewModifications);
-  
-  $tw.tmap.stop("Map refresh");
 
 };
 
@@ -807,8 +803,9 @@ MapWidget.prototype.getGraphOptions = function() {
     physics: {
       // not nice, what if different solver??
       forceAtlas2Based: {
-        centralGravity: (this.view.isEnabled("physics_mode")
-                         && !this.view.isLiveView() ? 0.01 : 0)
+        // gravity needs to be set to very small value so graph still
+        // looks balanced when physics is off!
+        centralGravity: (this.view.isEnabled("physics_mode") ? 0.001 : 0)
       },
       stabilization: {
         iterations: this.view.getStabilizationIterations()

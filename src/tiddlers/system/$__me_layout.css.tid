@@ -1,0 +1,92 @@
+created: 20150206104625292
+modified: 20150627180417190
+tags: $:/tags/Stylesheet
+title: $:/me/layout.css
+type: text/css
+
+ul li ul li {
+    margin: 0px;
+}
+
+h2.tc-title {
+  font-size: 0.7em;
+}
+
+.hzone-focus {
+
+  -webkit-animation-name: flash;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-iteration-count: 1;
+
+  -moz-animation-name: flash;
+  -moz-animation-duration: 1s;
+  -moz-animation-iteration-count: 1;
+
+  animation-name: flash;
+  animation-duration: 1s;
+  animation-iteration-count: 1;
+  
+}
+
+@-moz-keyframes flash {  
+  50% { background: #FFFFF5; }
+  100% { background: white; }
+}
+
+@-webkit-keyframes flash {  
+  50% { background: #FFFFF5; }
+  100% { background: white; }
+}
+
+@keyframes flash {  
+  50% { background: #FFFFF5; }
+  100% { background: white; }
+}
+
+.h {
+  background: yellow;
+}
+
+h1:not(.tc-site-title) {
+  font-size: 1.2em;
+  font-weight: bold;
+  border-bottom: 1px solid #D9D9D9;
+}
+
+h2 {
+  font-size: 1em;
+  font-weight: bold;
+}
+
+h2.tc-title {
+  font-size: 0.7em;
+}
+
+button.tc-tiddlylink,
+a.tc-tiddlylink,
+a.tc-tiddlylink-external,
+a.tc-tiddlylink-external:visited  {
+  color: firebrick;
+}
+
+a.tc-tiddlylink-external {
+  text-decoration: none;
+}
+
+a.tc-tiddlylink-external:before {
+  font-family: FontAwesome;
+  padding-right: 2px;
+  content: "\f14c";
+  color: gray;
+}
+
+a.tc-tiddlylink-external:hover::before {
+  content: "\f14c"; /* \f08e */
+  color: firebrick;
+}
+
+button.tc-tag-label, span.tc-tag-label {
+  color: #FFFFFF !important;
+  background-color: #B22222 !important;
+}
+

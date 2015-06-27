@@ -1,7 +1,7 @@
 created: 20150103171758988
 id: a7e46ff2-2010-475f-a430-d757a7659798
-modified: 20150624085116535
-tags: 
+modified: 20150627145050262
+tags: Documentation
 title: Common Pitfalls
 type: text/vnd.tiddlywiki
 
@@ -28,3 +28,8 @@ Generally speaking, the graph-visualization runs most smoothly in Google Chrome.
 !! Slow movements
 
 Sometimes it happens that when moving nodes or edges in a graph, it seems to be a bit slow or stagnant when it usually runs smooth. If this happens, despite the graph being not big in size, it may help to do a click outside the canvas...
+
+!! Color values for nodes
+
+Do __not__ use css color names (like "red" or "darkcyan" etc.) for //node// coloring, this might cause problems when calculating the node's contrast color in the graph. Instead use the hexadecimal notation (e.g. "#FFFFFF" for "white").
+

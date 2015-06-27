@@ -25,6 +25,10 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.8.1
+
+* Fixes #146: Graph is not zoomed properly when switching views after adding a node 
+
 ### v0.8.0
 
 * Fixes a long standing big bug that the network doesn't stabilize!!

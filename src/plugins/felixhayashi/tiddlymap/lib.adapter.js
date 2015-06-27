@@ -588,10 +588,10 @@ module-type: library
     // use the tiddler's color field as node color
     if(tObj.fields.color) {
       node.color = tObj.fields.color
-
       node.font = node.font || {};
-      node.font.color = getContrastColour(node.color,
-                                          "#FFFFFF", "#000000", "#FFFFFF");
+      console.log("color", node.color);
+      // @see https://raw.githubusercontent.com/Jermolene/TiddlyWiki5/master/editions/tw5.com/tiddlers/macros/ContrastColourMacro.tid
+      node.font.color = getContrastColour(node.color, node.color, "#000000", "#FFFFFF");
     }
     
     // allow override

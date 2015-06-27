@@ -36,7 +36,7 @@ var MapWidget = function(parseTreeNode, options) {
   // call the parent constructor
   Widget.call(this);
   
-  // Main initialisation inherited from widget.js
+  // call initialise on prototype
   this.initialise(parseTreeNode, options);
   
   // create shortcuts and aliases
@@ -48,10 +48,10 @@ var MapWidget = function(parseTreeNode, options) {
   this.callbackManager = new CallbackManager();
   this.dialogManager = new DialogManager(this.callbackManager, this);
       
-  // https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/widgets/widget.js#L211
+  // make the html attributes available to this widget
   this.computeAttributes();
   
-  // who am I?
+  // who am I? the id is used for debugging and special cases
   this.objectId = (this.getAttribute("object-id")
                    ? this.getAttribute("object-id")
                    : utils.genUUID());
@@ -59,7 +59,7 @@ var MapWidget = function(parseTreeNode, options) {
   // register whether in editor mode or not
   this.editorMode = this.getAttribute("editor");
   
-  // register listeners
+  // register listeners that are available in editor mode
   if(this.editorMode) {
     utils.addListeners({
       "tmap:tm-create-view": this.handleCreateView,
@@ -73,6 +73,7 @@ var MapWidget = function(parseTreeNode, options) {
     }, this, this);
   }
   
+  // register listeners that are available in any case
   utils.addListeners({
     "tmap:tm-focus-node": this.handleFocusNode,
     "tmap:tm-reset-focus": this.repaintGraph
@@ -130,18 +131,23 @@ MapWidget.prototype.handleConnectionEvent = function(edge, callback) {
   
 };
 
+/**
+ * The first time a map is opened, we want to display a welcome message.
+ * Once shown, a flag is set and the message is not displayed again.
+ */
 MapWidget.prototype.checkForFreshInstall = function() {
 
   if(utils.getEntry(this.opt.ref.sysMeta, "showWelcomeMessage", true)) {
     utils.setEntry(this.opt.ref.sysMeta, "showWelcomeMessage", false);
-    this.logger("debug", "Showing welcome message");
     this.dialogManager.open("welcome", { dialog: { buttons: "ok" }});
   }
   
 };
 
 /**
- * Promts a dialog that will confront the user with making a tough choice :)
+ * A very basic dialog that will tell the user he/she has to make
+ * a choice.
+ * 
  * @param {function} [callback] - A function with the signature function(isConfirmed).
  * @param {string} [message] - An small optional message to display.
  */
@@ -151,7 +157,17 @@ MapWidget.prototype.openStandardConfirmDialog = function(callback, message) {
   this.dialogManager.open("getConfirmation", param, callback);
   
 };
-  
+
+/**
+ * An extention of the default logger mechanism. It works like
+ * `$tw.tmap.logger` but will include the object id of the widget
+ * instance.
+ * 
+ * @param {string} type - The type of the message (debug, info, warning…)
+ *     which is exactly the same as in `console[type]`.
+ * @param {...*} message - An infinite number of arguments to be printed
+ *     (just like console).
+ */
 MapWidget.prototype.logger = function(type, message /*, more stuff*/) {
   
   var args = Array.prototype.slice.call(arguments, 1);
@@ -172,9 +188,8 @@ MapWidget.prototype.render = function(parent, nextSibling) {
   // remember our place in the dom
   this.parentDomNode = parent;
   
-  
+  // when widget is only previewed we do some alternative rendering
   if(utils.isPreviewed(this)) {
-    // in this case we do some alternative rendering
     this.initAndRenderPlaceholder(parent);
     return;
   }
@@ -182,7 +197,7 @@ MapWidget.prototype.render = function(parent, nextSibling) {
   // add widget classes
   this.registerClassNames(parent);
   
-  this.sidebar = document.getElementsByClassName("tc-sidebar-scrollable")[0];
+  this.sidebar = utils.getFirstElementByClassName("tc-sidebar-scrollable");
   this.isContainedInSidebar = (this.sidebar && this.sidebar.contains(this.parentDomNode));
       
   // get view and view holder
@@ -377,7 +392,7 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
     var options = {
       resetData: true,
       resetOptions: true,
-      resetFocus: true
+      resetFocus: { delay: 0, duration: 0 }
     };
 
     if(isViewSwitched) {
@@ -446,7 +461,7 @@ MapWidget.prototype.rebuildGraph = function(options) {
   if(utils.isPreviewed(this)) return;
   
   this.logger("debug", "Rebuilding graph");
-  
+    
   options = options || {};
   
   // always reset to allow handling of stabilized-event!
@@ -472,20 +487,24 @@ MapWidget.prototype.rebuildGraph = function(options) {
   if(!utils.hasElements(this.graphData.nodesById)) {
     return;
   }
-  
+
   // see https://github.com/almende/vis/issues/987#issuecomment-113226216
   // see https://github.com/almende/vis/issues/939
   this.network.stabilize();
   
+  // resetting the focus is not the same as zooming after stabilization,
+  // the question is whether after a rebuild the focus should be immediately
+  // reset or not. Zooming after stabilization does always(!) takes place
+  // after a rebuild, in contrast, resetting the focus doesn't necessarily take place.
   if(options.resetFocus && !this.preventNextContextReset) {
-    if(typeof options.resetFocus === "object") {
-      this.fitGraph(options.resetFocus.delay, options.resetFocus.duration);
-    } else {
-      this.fitGraph(0, 0);
-    } 
-    this.doZoomAfterStabilize = true;              
-    this.preventNextContextReset = false;
+    this.fitGraph(options.resetFocus.delay, options.resetFocus.duration);
   }
+  
+
+  
+  // reset these; in any case!!
+  this.doZoomAfterStabilize = true;
+  this.preventNextContextReset = false;
   
 };
 
@@ -699,11 +718,8 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
   }
 
   this.rebuildGraph({
-    resetFocus: true
+    resetFocus: { delay: 0, duration: 0 }
   });
-  
-  // fixes #97
-  this.network.redraw();
 
 };
 
@@ -957,17 +973,14 @@ MapWidget.prototype.handleTriggeredRefresh = function(trigger) {
   
   if(triggerState != this.triggerState) {
     
-    this.logger("log", trigger, "triggered a refresh");
+    this.logger("log", trigger, "Triggered a refresh");
   
     this.triggerState = triggerState;
   
     this.rebuildGraph({
       resetData: false,
       resetOptions: false,
-      resetFocus: {
-        delay: 1000,
-        duration: 1000
-      }
+      resetFocus: { delay: 1000, duration: 1000 }
     });
   }
   
@@ -1164,7 +1177,7 @@ MapWidget.prototype.handleToggleFullscreen = function(useHalfscreen) {
       
     var pContainer = (this.isContainedInSidebar
                       ? this.sidebar
-                      : document.getElementsByClassName("tc-story-river")[0]);
+                      : utils.getFirstElementByClassName("tc-story-river"));
             
     $tw.utils.addClass(pContainer, "tmap-has-" + this.enlargedMode + "-child");        
     
@@ -1241,7 +1254,7 @@ MapWidget.prototype.handleVisStabilizedEvent = function(properties) {
 
     this.network.storePositions();
     this.setNodesMoveable(this.graphData.nodesById, isFloatingMode);
-    
+        
     if(this.doZoomAfterStabilize) {
       this.doZoomAfterStabilize = false;
       this.fitGraph(1000, 1000);
@@ -1250,6 +1263,12 @@ MapWidget.prototype.handleVisStabilizedEvent = function(properties) {
   
 };
 
+/**
+ * Zooms on a specific node in the graph
+ * 
+ * @param {Object} event - An object containing a `param` property
+ *     that holds a tiddler reference/title.
+ */
 MapWidget.prototype.handleFocusNode = function(event) {
   this.network.focus(this.adapter.getId(event.param), {
     scale: 1.5,
@@ -1258,49 +1277,55 @@ MapWidget.prototype.handleFocusNode = function(event) {
 };
 
 /**
- * A widget that is removed but still partly executed
+ * A zombie widget is a widget that is removed from the dom tree
+ * but still referenced or still partly executed -- I mean
+ * otherwise you couldn't call this function, right?
  */
 MapWidget.prototype.isZombieWidget = function() {
   return !document.body.contains(this.getContainer());
 };
 
+/**
+ * This method allows us to specify after what time and for how long
+ * the zoom-to-fit process should be executed for a graph.
+ * 
+ * @param {number} [delay=0] - How long to wait before starting to zoom.
+ * @param {number} [duration=0] - After the delay, how long should it
+ *     take for the graph to be zoomed.
+ */
 MapWidget.prototype.fitGraph = function(delay, duration) {
   
-  window.clearTimeout(this.activeZoomExtentTimeout);
+  this.logger("debug", "Fit graph", this.activeFitTimeout);
   
-  var f = function() {
+  // clear any existing fitting attempt
+  window.clearTimeout(this.activeFitTimeout);
+  
+  var fit = function() {
+        
+    // happens when widget is removed after stabilize but before fit
+    if(this.isZombieWidget()) return;
     
-    if(this.isZombieWidget()) {
-      // can happen when a widget is removed after stabilize but before fit
-      return;
-    }
+    // fixes #97
+    this.network.redraw();
     
-    this.logger("debug", "Fit graph", duration);
     this.network.fit({ // v4: formerly zoomExtent
       animation: {
-        duration: duration,
+        duration: duration || 0,
         easingFunction: "easeOutQuart"
       }
     });
-    this.activeZoomExtentTimeout = 0; // reset to a non-existent index
-  }.bind(this);
+    
+  };
   
-  if(delay) {
-    this.activeZoomExtentTimeout = window.setTimeout(f, delay);
-  } else {
-    f();
-  }
+  this.activeFitTimeout = window.setTimeout(fit.bind(this), delay || 0);
+  
 }
 
-MapWidget.prototype.handleStartStabilizionEvent = function(properties) {
-  
-    //~ this.activeZoomExtentTimeout = this.network.zoomExtent({
-      //~ duration: 2000
-    //~ });
-
-  
-};
-
+/**
+ * Spawns a dialog in which the user can specify node attributes.
+ * Once the dialog is closed, the node is inserted into the current
+ * view, unless the operation was cancelled.
+ */
 MapWidget.prototype.handleInsertNode = function(node) {
       
   this.dialogManager.open("getNodeTitle", null, function(isConfirmed, outputTObj) {
@@ -1313,11 +1338,9 @@ MapWidget.prototype.handleInsertNode = function(node) {
         if(utils.isMatch(title, this.view.getNodeFilter("compiled"))) {
           this.notify("Node already exists");
         } else {
-
           node = this.adapter.makeNode(title, node, this.view);
           this.view.addNodeToView(node);
           this.rebuildGraph();
-
         }
         
       } else {
@@ -1790,7 +1813,7 @@ MapWidget.prototype.repaintGraph = function() {
  */ 
 MapWidget.prototype.setGraphButtonEnabled = function(name, enable) {
   var className = "vis-button" + " " + "tmap-" + name;
-  var b = this.parentDomNode.getElementsByClassName(className)[0];
+  var b = utils.getFirstElementByClassName(className, this.parentDomNode);
   $tw.utils.toggleClass(b, "tmap-button-enabled", enable);
 }; 
 
@@ -1839,8 +1862,7 @@ MapWidget.prototype.setNodesMoveable = function(nodes, isMoveable) {
 MapWidget.prototype.addGraphButtons = function(buttonEvents) {
   
   // v4: formerly network-frame
-  var parent = this.parentDomNode.getElementsByClassName("vis-navigation")[0];
-  if(!parent) { throw new utils.Exception.EnvironmentError("visjs html class"); }
+  var parent = utils.getFirstElementByClassName("vis-navigation", this.parentDomNode);
   
   for(var name in buttonEvents) {
     var div = document.createElement("div");

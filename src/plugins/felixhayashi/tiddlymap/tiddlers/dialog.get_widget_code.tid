@@ -3,7 +3,7 @@ subtitle: {{$:/core/images/permalink-button}} Widget Code Generator
 
 <$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
 
-The following wizard will assist you in creating the widget code you can use (copy'n'paste) to embed this view in a tiddler. Please visit the [[online demo|http://bit.ly/tiddlymap]] for some examples on how the attributes below affect the displayed graph.
+The following wizard will assist you in creating the widget code you can use (copy'n'paste) to embed this view in a tiddler. Please visit the [[online demo|http://tiddlymap.org]] for some examples on how the attributes below affect the displayed graph.
 
 ''Widget-code''
 

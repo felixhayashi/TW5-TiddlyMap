@@ -197,8 +197,13 @@ var attachFunctions = function(parent) {
      * 
      * @see http://stackoverflow.com/questions/5538972/console-log-apply-not-working-in-ie9
      * @see http://stackoverflow.com/questions/9521921/why-does-console-log-apply-throw-an-illegal-invocation-error
+     *
+     * @param {string} type - The type of the message (debug, info, warning…)
+     *     which is exactly the same as in `console[type]`.
+     * @param {...*} message - An infinite number of arguments to be printed
+     *     (just like console).
      */
-    fn.logger = function() {
+    fn.logger = function(/* type, [messages,] messages */) {
       if(arguments.length < 2) return;
       var args = Array.prototype.slice.call(arguments);
       var arg1 = args.shift(args);

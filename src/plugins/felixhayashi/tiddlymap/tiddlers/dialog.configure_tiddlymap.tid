@@ -3,7 +3,7 @@ subtitle: {{$:/core/images/options-button}} Configuration of ~TiddlyMap
 
 <$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
 
-Please visit the [[online docs|http://bit.ly/tiddlymap#Changing%20TiddlyMap's%20default%20configuration]] for more information about the following options.
+Please visit the [[online docs|http://tiddlymap.org#Changing%20TiddlyMap's%20default%20configuration]] for more information about the following options.
 
 <fieldset>
   <legend>Field settings</legend>

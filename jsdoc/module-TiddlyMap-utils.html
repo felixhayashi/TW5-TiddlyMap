@@ -208,7 +208,7 @@ to abbreviate code and make my life easier.</p></div>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-1082">line 1082</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-1109">line 1109</a>
 			</li>
 		</ul>
 	</dd>
@@ -288,7 +288,7 @@ Dual licensed under the MIT and GPL licenses.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-1289">line 1289</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-1316">line 1316</a>
 			</li>
 		</ul>
 	</dd>
@@ -896,7 +896,7 @@ properties to Array.prototype :)</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-945">line 945</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-972">line 972</a>
 			</li>
 		</ul>
 	</dd>
@@ -1263,7 +1263,7 @@ adjust to the network's current scaling factor and viewport offset.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-813">line 813</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-840">line 840</a>
 			</li>
 		</ul>
 	</dd>
@@ -1577,7 +1577,7 @@ Code published under the BSD 3-Clause License</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-1172">line 1172</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-1199">line 1199</a>
 			</li>
 		</ul>
 	</dd>
@@ -1676,7 +1676,7 @@ https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/widgets/naviga
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-1117">line 1117</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-1144">line 1144</a>
 			</li>
 		</ul>
 	</dd>
@@ -1851,7 +1851,7 @@ element will be returned, otherwise undefined is returned.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-1020">line 1020</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-1047">line 1047</a>
 			</li>
 		</ul>
 	</dd>
@@ -2146,7 +2146,7 @@ element will be returned, otherwise undefined is returned.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-956">line 956</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-983">line 983</a>
 			</li>
 		</ul>
 	</dd>
@@ -2444,6 +2444,293 @@ string.</p>
         
             
 <dt>
+    <h4 class="name" id=".getFirstElementByClassName"><span class="type-signature">&lt;static> </span>getFirstElementByClassName<span class="signature">(cls, <span class="optional">root</span>, <span class="optional">isRequired</span>)</span><span class="type-signature"> &rarr; {DOMElement}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        <p>Works like get <code>getElementById()</code> but is based on a class name.
+It will return the first element inside an optional parent (root)
+that has a class of this name.</p>
+    </div>
+    
+
+    
+
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+		<th>Default</th>
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>cls</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>The class name to search for.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>root</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">DOMElement</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    document
+                
+                </td>
+            
+
+            <td class="description last"><p>The context to search in.</p></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>isRequired</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    true
+                
+                </td>
+            
+
+            <td class="description last"><p>If true, an exception will be
+    thrown if no element can be retrieved. This is important
+    when depending on third party modules and class names change!</p></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+	
+
+	
+
+	
+
+	
+
+    
+
+    
+
+    
+
+    
+
+	
+
+	
+
+	
+
+	
+
+	
+
+
+
+	
+	<dt class="tag-source">Source:</dt>
+	<dd class="tag-source">
+		<ul class="dummy">
+			<li>
+				<a href="lib.utils.js.html">lib.utils.js</a>,
+				 <a href="lib.utils.js.html#sunlight-1-line-772">line 772</a>
+			</li>
+		</ul>
+	</dd>
+	
+
+	
+
+	
+
+	
+</dl>
+
+    
+    
+
+    
+
+    
+
+    
+    
+    
+    <h5>Throws:</h5>
+    
+            
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <ul>
+<li>May be thrown if
+ <code>isRequired</code> is set to true.</li>
+</ul>
+        </div>
+    </dt>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">utils.Exception.EnvironmentError</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+</dl>
+
+
+        
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    <p>Either a dom element or null is returned.</p>
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">DOMElement</span>
+
+
+	</dd>
+</dl>
+
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
     <h4 class="name" id=".getFullScreenApis"><span class="type-signature">&lt;static> </span>getFullScreenApis<span class="signature">()</span><span class="type-signature"></span></h4>
     
     
@@ -2508,7 +2795,7 @@ string.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-1131">line 1131</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-1158">line 1158</a>
 			</li>
 		</ul>
 	</dd>
@@ -2645,7 +2932,7 @@ via <code>Object.keys(col)</code> in a loop.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-969">line 969</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-996">line 996</a>
 			</li>
 		</ul>
 	</dd>
@@ -3036,7 +3323,7 @@ values are used as keys.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-987">line 987</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-1014">line 1014</a>
 			</li>
 		</ul>
 	</dd>
@@ -3457,7 +3744,7 @@ the wiki are considered.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-1068">line 1068</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-1095">line 1095</a>
 			</li>
 		</ul>
 	</dd>
@@ -4723,7 +5010,7 @@ if we are dealing with an object or a reference.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-1042">line 1042</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-1069">line 1069</a>
 			</li>
 		</ul>
 	</dd>
@@ -5413,7 +5700,7 @@ Hope ECMA6 is out soon with dedicated datastructures.</a></li>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-871">line 871</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-898">line 898</a>
 			</li>
 		</ul>
 	</dd>
@@ -5574,7 +5861,7 @@ is checked.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-862">line 862</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-889">line 889</a>
 			</li>
 		</ul>
 	</dd>
@@ -5905,7 +6192,7 @@ contain distinct values.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-762">line 762</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-789">line 789</a>
 			</li>
 		</ul>
 	</dd>
@@ -6263,7 +6550,7 @@ in preview or not.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-842">line 842</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-869">line 869</a>
 			</li>
 		</ul>
 	</dd>
@@ -6600,7 +6887,7 @@ are wrapped between <code>left</code> and <code>right</code>.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-888">line 888</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-915">line 915</a>
 			</li>
 		</ul>
 	</dd>
@@ -6706,7 +6993,7 @@ are wrapped between <code>left</code> and <code>right</code>.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-935">line 935</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-962">line 962</a>
 			</li>
 		</ul>
 	</dd>
@@ -6952,7 +7239,7 @@ having a certain value. </p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-908">line 908</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-935">line 935</a>
 			</li>
 		</ul>
 	</dd>
@@ -7063,7 +7350,7 @@ https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/widgets/naviga
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-1090">line 1090</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-1117">line 1117</a>
 			</li>
 		</ul>
 	</dd>
@@ -7225,7 +7512,7 @@ at the end of the path.</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-778">line 778</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-805">line 805</a>
 			</li>
 		</ul>
 	</dd>
@@ -8389,7 +8676,7 @@ Code published under the BSD 3-Clause License</p>
 		<ul class="dummy">
 			<li>
 				<a href="lib.utils.js.html">lib.utils.js</a>,
-				 <a href="lib.utils.js.html#sunlight-1-line-1217">line 1217</a>
+				 <a href="lib.utils.js.html#sunlight-1-line-1244">line 1244</a>
 			</li>
 		</ul>
 	</dd>
@@ -8649,7 +8936,7 @@ Code published under the BSD 3-Clause License</p>
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-	on 2015-06-25T12:33:13+02:00 using the <a
+	on 2015-06-27T20:31:47+02:00 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>

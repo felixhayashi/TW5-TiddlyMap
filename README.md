@@ -9,7 +9,7 @@ TiddlyMap is a TiddlyWiki plugin that allows you to link your wiki-topics (tiddl
 
 In general you may create, visualize and describe any network-structure you have in mind.
 
-A demo with several examples and explanations can be found [here](http://bit.ly/tiddlymap).
+A demo with several examples and explanations can be found [here](http://tiddlymap.org).
 
 How it works
 ---------------------------------------------------------------------
@@ -90,7 +90,7 @@ For general information on how to set up TiddlyWiki5 with Nodejs visit [tiddlywi
             
           ]
         }
-4. The TW5-TopStoryView may not be needed in some cases (please see: http://bit.ly/tiddlymap/#Live View plugin dependencies)
+4. The TW5-TopStoryView may not be needed in some cases (please see: http://tiddlymap.org/#Live View plugin dependencies)
 5. Restart your wiki server via the command line
 6. If you want to use the "live view", change your wiki's story view to "Top" (Configuration ➡ Appearance ➡ Story view ➡ Current view).
 

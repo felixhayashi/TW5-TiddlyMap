@@ -3,9 +3,9 @@ subtitle: {{$:/core/images/info-button }} Welcome
 
 It seems that you freshly installed ~TiddlyMap.
 
-* In case you need any help, please consult the [[online docs|http://bit.ly/tiddlymap#Documentation]] first.
+* In case you need any help, please consult the [[online docs|http://tiddlymap.org#Documentation]] first.
 * You are welcome to create an [[issue|https://github.com/felixhayashi/TW5-TiddlyMap/issues]] at ~GitHub for any bug you discover.
-* Make sure to revisit the [[demo site|http://bit.ly/tiddlymap]] to see whether your version is up-to-date.
+* Make sure to revisit the [[demo site|http://tiddlymap.org]] to see whether your version is up-to-date.
 * If you like ~TiddlyMap, please give it a star at ~GitHub :)
 
 Have a great time.

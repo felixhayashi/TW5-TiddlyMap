@@ -18,4 +18,4 @@ subtitle: {{$:/core/images/edit-button}} Filter editor -- <<view>>
 ---
 
 <sup>[1]</sup> A new line is equivalent to a space symbol.<br />
-<sup>[2]</sup> It is suggested to read [[Node and edge-type filters|http://bit.ly/tiddlymap#Node%20and%20edge-type%20filters]] and [[Edge-type namespaces|http://bit.ly/tiddlymap#Node%20and%20edge-type%20filters]] before using ~Tiddlymap's filter editor. Completely new to filters? Please see [[Introduction to filter notation|http://tiddlywiki.com/#Introduction%20to%20filter%20notation]].
+<sup>[2]</sup> It is suggested to read [[Node and edge-type filters|http://tiddlymap.org#Node%20and%20edge-type%20filters]] and [[Edge-type namespaces|http://tiddlymap.org#Node%20and%20edge-type%20filters]] before using ~Tiddlymap's filter editor. Completely new to filters? Please see [[Introduction to filter notation|http://tiddlywiki.com/#Introduction%20to%20filter%20notation]].

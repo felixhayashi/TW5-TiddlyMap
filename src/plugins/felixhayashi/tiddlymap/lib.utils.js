@@ -754,9 +754,36 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     return utils.getField(tiddler, "text", defValue);
     
   };
+  
+  /**
+   * Works like get `getElementById()` but is based on a class name.
+   * It will return the first element inside an optional parent (root)
+   * that has a class of this name.
+   * 
+   * @param {string} cls - The class name to search for.
+   * @param {DOMElement} [root=document] - The context to search in.
+   * @param {boolean} [isRequired=true] - If true, an exception will be
+   *     thrown if no element can be retrieved. This is important
+   *     when depending on third party modules and class names change!
+   * @throws {utils.Exception.EnvironmentError} - May be thrown if
+   *    `isRequired` is set to true.
+   * @return {DOMElement} Either a dom element or null is returned.
+   */
+  utils.getFirstElementByClassName = function(cls, root, isRequired) {
+        
+    var el = (root || document).getElementsByClassName(cls)[0];
+    if(!el && (isRequired !== false)) {
+      var text = "Missing element with class " + cls + " inside " + root;
+      throw new utils.Exception.EnvironmentError(text);
+    }
     
+    return el;
+    
+  };
+      
   /**
    * Checks whether a tiddler is a draft or not.
+   * 
    * @param {Tiddler} tiddler - The tiddler to check on.
    */
   utils.isDraft = function(tiddler) {

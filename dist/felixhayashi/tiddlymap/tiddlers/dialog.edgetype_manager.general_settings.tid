@@ -3,7 +3,8 @@ caption: General settings
 
 <table class="tmap-config-table">
   <$macrocall $name="tmap-row" title="Identifier" field="temp.newId" type="input-text" default={{!!id}} readonly={{!!temp.idImmutable}}
-              descr="A unique identifier (e.g. &quot;foaf:name&quot;)." />
+              descr="A unique identifier (e.g. &quot;foaf:name&quot;)."
+              note="Allowed are lowercase letters, no spaces and symbols `:`, `_`, `-`, `.`" />
   <<tmap-row title:"Label" field:"label" type:"input-text"
              descr:"An optional alias used as edge-label.">>
   <<tmap-row title:"Show label" field:"show-label" type:"input-checkbox" default:"true"

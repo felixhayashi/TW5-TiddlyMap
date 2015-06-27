@@ -191,7 +191,7 @@ module-type: library
   
   DialogManager.prototype.getElement = function(name) {
     
-    return document.getElementsByClassName("tmap-" + name)[0];
+    return utils.getFirstElementByClassName("tmap-" + name);
     
   };
   
@@ -205,7 +205,7 @@ module-type: library
   DialogManager.prototype.addKeyBindings = function() {
     
     var keys = $tw.tmap.keycharm({
-      container: document.getElementsByClassName("tc-modal")[0]
+      container: utils.getFirstElementByClassName("tc-modal")
     });
     
     var re = /tmap-triggers-(.+?)-on-(.+?)(?:\s|$)/

@@ -71,15 +71,17 @@ var attachOptions = function(parent) {
   if(!opt.path) opt.path = utils.getDataMap();
   
   // persistent plugin environment
-  opt.path.pluginRoot =   "$:/plugins/felixhayashi/tiddlymap";
-  opt.path.edgeTypes =    "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes";
-  opt.path.views =        "$:/plugins/felixhayashi/tiddlymap/graph/views";
-  opt.path.options =      "$:/plugins/felixhayashi/tiddlymap/config";
+  opt.path.pluginRoot =    "$:/plugins/felixhayashi/tiddlymap";
+  opt.path.edgeTypes =     "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes";
+  opt.path.listEdgeTypes = "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-list:";
+  opt.path.fieldEdgeTypes = "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-field:";
+  opt.path.views =         "$:/plugins/felixhayashi/tiddlymap/graph/views";
+  opt.path.options =       "$:/plugins/felixhayashi/tiddlymap/config";
   // temporary environment
-  opt.path.tempRoot =     "$:/temp/felixhayashi/tiddlymap";
-  opt.path.localHolders = "$:/temp/felixhayashi/tiddlymap/holders";
-  opt.path.dialogs =      "$:/plugins/felixhayashi/tiddlymap/dialog";
-  opt.path.footers =      "$:/plugins/felixhayashi/tiddlymap/dialogFooter";
+  opt.path.tempRoot =      "$:/temp/felixhayashi/tiddlymap";
+  opt.path.localHolders =  "$:/temp/felixhayashi/tiddlymap/holders";
+  opt.path.dialogs =       "$:/plugins/felixhayashi/tiddlymap/dialog";
+  opt.path.footers =       "$:/plugins/felixhayashi/tiddlymap/dialogFooter";
   
   // static references to important tiddlers
   if(!opt.ref) opt.ref = utils.getDataMap();
@@ -124,21 +126,40 @@ var attachOptions = function(parent) {
   // some popular filters
   if(!opt.filter) opt.filter = utils.getDataMap();
   
-  opt.filter.edgeTypes = "[prefix[" + opt.path.edgeTypes + "]]";  
+  opt.filter.edgeTypes = "[prefix[" + opt.path.edgeTypes + "]]";
+  opt.filter.listEdgeTypes = "[prefix[" + opt.path.listEdgeTypes + "]]";
+  opt.filter.fieldEdgeTypes = "[prefix[" + opt.path.fieldEdgeTypes + "]]";
   opt.filter.views = "[has[" + opt.field.viewMarker + "]]";
   opt.filter.defaultEdgeFilter = opt.filter.edgeTypes
-                                 + "-[suffix[tmap:link]]"
-                                 + "-[suffix[tmap:tag]]";
+                                 + "-[suffix[tw-body:link]]"
+                                 + "-[suffix[tw-list:tags]]";
+                                 + "-[suffix[tw-list:list]]";
   
   // some popular selectors (usually used from within tiddlers via map-macro)
   if(!opt.selector) opt.selector = utils.getDataMap();
   
   var allSelector = "[all[tiddlers+shadows]!has[draft.of]]";
+
+  // al edge-types (by label)
   opt.selector.allEdgeTypes = allSelector + " +" + opt.filter.edgeTypes;
   opt.selector.allEdgeTypesByLabel = opt.selector.allEdgeTypes + " +[removeprefix[" + opt.path.edgeTypes + "/]]";
+
+  // all views (by label)
   opt.selector.allViews = allSelector + " +" + opt.filter.views;
   opt.selector.allViewsByLabel = opt.selector.allViews + "+[removeprefix[" + opt.path.views + "/]]";
+
+  // all non-draft non-system tiddlers
   opt.selector.allPotentialNodes = "[all[tiddlers]!is[system]!has[draft.of]]";
+
+  // all names of fields that contain multiple references edges
+  opt.selector.allListEdgeStores = allSelector
+                                   + " +" + opt.filter.listEdgeTypes
+                                   + " +[removeprefix[" + opt.path.listEdgeTypes + "]]";
+                                   
+  // all names of fields that store edges
+  opt.selector.allFieldEdgeStores = allSelector
+                                    + " +" + opt.filter.fieldEdgeTypes
+                                    + " +[removeprefix[" + opt.path.fieldEdgeTypes + "]]";
   
 };
 
@@ -267,9 +288,6 @@ var checkForDublicates = function(tObj, idField, id) {
         existingTiddler: dublicate,
         idField: idField,
         id: id
-      },
-      dialog: {
-        buttons: "ok_suppress"
       }
     }
 

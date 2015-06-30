@@ -1,5 +1,6 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager
 subtitle: {{$:/core/images/tag-button}} Edge-type manager
+buttons: edge_type_manager
 
 \define defaultTab() $:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager/overview
 \define settingsTab() $:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager/generalSettings
@@ -24,11 +25,8 @@ subtitle: {{$:/core/images/tag-button}} Edge-type manager
   </div>
   <div>
     <$reveal type="nomatch" text="" default={{!!id}} >
-      <$macrocall $name="tabs" 
-                  tabsList="[all[shadows]prefix[$:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager/]]"
-                  default=<<defaultTab>>
-                  state="$:/state/tabs/edgeTypeManager"
-                  />
+      <$macrocall $name="tabs" default=<<defaultTab>> state="$:/state/tabs/edgeTypeManager"
+                  tabsList="[all[shadows]prefix[$:/plugins/felixhayashi/tiddlymap/dialog/edgeTypeManager/]]" />
     </$reveal>
     <$reveal type="match" text="" default={{!!id}} >
       <div style="text-align: center;">Please select an edge-type from the list or create a new one.</div>

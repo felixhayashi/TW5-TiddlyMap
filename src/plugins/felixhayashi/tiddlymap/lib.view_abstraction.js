@@ -203,12 +203,7 @@ module-type: library
         
       } else if(tRef === this.path.edgeFilter) {
         this.edgeFilter = this.getEdgeFilter(null, true);
-        this.typeWhiteList = this.getTypeWhiteList(true);
-        // TODO: Maybe set flag to prevent allowed edge types to be updated during this refresh
-        
-      } else if(this.utils.startsWith(tRef, this.opt.path.edgeTypes)) {
-        this.typeWhiteList = this.getTypeWhiteList(true);
-        
+                
       } else {
         continue; // prevents an entry in "modified" list
       }
@@ -606,31 +601,6 @@ module-type: library
       
     return (type ? filter[type] : filter);
     
-  };
-  
-  /**
-   * 
-   */
-  ViewAbstraction.prototype.getTypeWhiteList = function(isRebuild) {
-    
-    if(!isRebuild && this.typeWhiteList) {
-      
-      return this.typeWhiteList;
-      
-    } else {
-      
-      var typeWhiteList = this.utils.getDataMap();
-      
-      var source = this.utils.getMatches(this.opt.selector.allEdgeTypes);
-      var matches = this.utils.getMatches(this.getEdgeFilter("compiled"), source);
-      for(var i = 0; i < matches.length; i++) {
-        var type = this.utils.getWithoutPrefix(matches[i], this.opt.path.edgeTypes + "/");
-        typeWhiteList[type] = new EdgeType(type);
-      }
-      
-      return typeWhiteList;
-      
-    }
   };
 
   /**

@@ -93,7 +93,7 @@ module-type: library
       return;
     }
     
-    if(!param) { param = {}; }
+    param = param || {}
     
     this.logger("debug", "Dialog param object", param);
   
@@ -104,10 +104,13 @@ module-type: library
     // create a temporary tiddler reference for the dialog
     var dialogTRef = this.opt.path.tempRoot + "/dialog-" + utils.genUUID();
     
+    // get the dialog template
+    var skeleton = utils.getTiddler(this.opt.path.dialogs + "/" + templateId);
+    
     // fields used to handle the dialog process
     var dialog = {
       title: dialogTRef,
-      buttons: "ok_cancel",
+      buttons: skeleton.fields["buttons"] || "ok_cancel",
       output: dialogTRef + "/output",
       result: dialogTRef + "/result",
       temp: dialogTRef + "/temp",
@@ -132,13 +135,12 @@ module-type: library
       
       // extend the dialog object with parameters provided by the user
       utils.merge(dialog, param.dialog);
-      
-      // remove the user provided dialog object
-      //delete param.dialog;
 
     }
     
     // force the footer to be set to the wrapper
+    // the footer wrapper will determine the footer from the
+    // buttons field/variable
     dialog.footer = utils.getText(this.opt.path.footers);
     
     // flatten dialog and param object
@@ -170,8 +172,8 @@ module-type: library
       
     }.bind(this), true);
     
-    // get the dialog template
-    var skeleton = utils.getTiddler(this.opt.path.dialogs + "/" + templateId);
+
+    // create dialog
     var dialogTiddler = new $tw.Tiddler(skeleton, param, dialog);
     this.wiki.addTiddler(dialogTiddler);
     

@@ -67,9 +67,6 @@ GlobalListener.prototype.handleManageEdgeTypes = function(event) {
       filter: this.opt.selector.allEdgeTypesByLabel
               + " +[search:title{$:/temp/tmap/edgeTypeSearch}]"
               + " +[sort[title]]"
-    },
-    dialog: {
-      buttons: "edge_type_manager"
     }
   };
   
@@ -120,7 +117,6 @@ GlobalListener.prototype.handleGenerateWidget = function(event) {
   
   var options = {
     dialog: {
-      buttons: "ok",
       preselects: { view: event.paramObject.view || "Default" }
     }
   };
@@ -191,9 +187,8 @@ GlobalListener.prototype.handleFillEdgeTypeForm = function(event) {
   var usage = this.adapter.selectEdgesByType(type);
   
   type.persist(outTRef, true);
-  
-  var isIdImmutable = (utils.startsWith(type.getId(), "tmap:") ? "true" : "");
-  utils.setField(outTRef, "temp.idImmutable", isIdImmutable);
+
+  utils.setField(outTRef, "temp.idImmutable", (type.isShipped() ? "true" : ""));
   utils.setField(outTRef, "temp.newId", type.getId());
   utils.setField(outTRef, "temp.usageCount", Object.keys(usage).length);
     

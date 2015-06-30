@@ -44,9 +44,12 @@ EdgeListWidget.prototype.execute = function() {
                       "]!has[draft.of]]";
   var filter = this.getAttribute("filter", defaultFilter);
 
-  var nhood = $tw.tmap.adapter.getNeighbours([ this.getVariable("currentTiddler") ], {
-    typeFilter: { "tmap:link": true }, typeFilterStyle: "blacklist"
-  });
+  var nhood = $tw.tmap.adapter.getNeighbours(
+                [ this.getVariable("currentTiddler") ],
+                {
+                  typeFilter: $tw.tmap.adapter.getEdgeTypeWhiteList("[!suffix[tw-body:link]]")
+                }
+              );
 
   // retrieve nodes
   this.neighbours = nhood.nodes;

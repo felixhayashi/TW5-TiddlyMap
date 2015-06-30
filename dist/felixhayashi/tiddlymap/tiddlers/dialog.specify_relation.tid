@@ -7,7 +7,7 @@ You are about to connect "<<fromLabel>>" with "<<toLabel>>". Please specify a ty
 
 ''Type'': 
 <$edit-text focus="true" tiddler=<<output>> field="text" type="text" tag="input" default=""
-            class="tmap-trigger-field tmap-triggers-ok-button-on-enter" />/>
+            class="tmap-trigger-field tmap-triggers-ok-button-on-enter" />
 
 <$set name="term" value={{!!text}}>
 <$set name="allEdgeTypes" value=<<map-macro "option" "selector.allEdgeTypesByLabel">>>

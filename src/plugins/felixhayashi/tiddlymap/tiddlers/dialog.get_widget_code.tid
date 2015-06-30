@@ -1,5 +1,6 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/getWidgetCode
 subtitle: {{$:/core/images/permalink-button}} Widget Code Generator
+buttons: ok
 
 <$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
 

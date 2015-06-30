@@ -535,9 +535,9 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
   
   utils.getWithoutPrefix = function(str, prefix) {
 
-    return (utils.startsWith(str, prefix)
-            ? str.substr(prefix.length)
-            : str);
+    return utils.startsWith(str, prefix)
+           ? str.substr(prefix.length)
+           : str;
 
   };
 
@@ -568,7 +568,6 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
   };
   
   /**
-   * 
    * 
    */
   utils.groupByProperty = function(col, prop) {
@@ -710,7 +709,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
         title: utils.getTiddlerRef(tiddler)
       };
       fields[field] = value;
-      // do not use any tObj provided since it may result in a lost update
+      // do not use any tObj provided since it may result in a lost update!
       var tObj = utils.getTiddler(tiddler, true);
       $tw.wiki.addTiddler(new $tw.Tiddler(tObj, fields));
     }
@@ -1088,21 +1087,7 @@ IN ORDER TO AVOID ACYCLIC DEPENDENCIES!
     return result;
     
   };
-  
-  /**
-   * Creates an uncompiled filter expression.
-   */
-  utils.getPrefixFilter = function(prefix, marker, isOnlyBasename) {
     
-    return "["
-           + "all[tiddlers+shadows]prefix[" + prefix + "]"
-           + "!has[draft.of]"
-           + (marker ? "has[" + marker + "]" : "")
-           + (isOnlyBasename ? "removeprefix[" + prefix + "/]" : "")
-           + "]";
-           
-  };
-  
   /**
    * Contains all TiddlyMap exceptions
    */

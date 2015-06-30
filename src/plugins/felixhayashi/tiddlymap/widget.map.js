@@ -121,6 +121,20 @@ MapWidget.prototype.handleConnectionEvent = function(edge, callback) {
       edge.type = (ns && !hasNamespace ? ns : "") + type;
       var isSuccess = this.adapter.insertEdge(edge);
       
+      var edgeTypeFilter = this.view.getEdgeFilter("compiled");
+      var typeWL = this.adapter.getEdgeTypeWhiteList(edgeTypeFilter);
+      
+      if(!typeWL[edge.type]) {
+        
+        var dialog = {
+          type: edge.type,
+          view: this.view.getLabel()
+        }
+
+        $tw.tmap.dialogManager.open("edgeNotVisible", dialog);
+        
+      }
+      
     }
     
     if(typeof callback == "function") {
@@ -139,7 +153,7 @@ MapWidget.prototype.checkForFreshInstall = function() {
 
   if(utils.getEntry(this.opt.ref.sysMeta, "showWelcomeMessage", true)) {
     utils.setEntry(this.opt.ref.sysMeta, "showWelcomeMessage", false);
-    this.dialogManager.open("welcome", { dialog: { buttons: "ok" }});
+    this.dialogManager.open("welcome");
   }
   
 };
@@ -758,14 +772,12 @@ MapWidget.prototype.isMobileMode = function() {
 
 MapWidget.prototype.getGraphOptions = function() {
   
-  this.logger("debug", "loading graph options", options);
+  this.logger("debug", "Loading graph options", options);
   
   if(!this.graphOptions) {
           
     // get a copy of the options
     var options = $tw.utils.extendDeepCopy(this.opt.config.vis);
-    
-    
     
     options.clickToUse = this.isClickToUse();
 
@@ -987,15 +999,10 @@ MapWidget.prototype.handleTriggeredRefresh = function(trigger) {
 };
   
 MapWidget.prototype.handleConfigureSystem = function() {
-      
-  var sysConfig = utils.flatten({ config: { sys: this.opt.config.sys }});  
-  var liveViewScope = this.adapter.getView("Live View").getConfig("neighbourhood_scope");
-  
+        
   var params = {
     dialog: {
-      preselects: $tw.utils.extend(
-                    sysConfig,
-                    {  liveViewScope: liveViewScope })
+      preselects: utils.flatten({ config: { sys: this.opt.config.sys }})
     }
   };
 
@@ -1023,10 +1030,9 @@ MapWidget.prototype.handleConfigureSystem = function() {
       }
       
       this.wiki.setTiddlerData(this.opt.ref.sysConf + "/user", config);
-      this.adapter.getView("Live View")
-          .setConfig("neighbourhood_scope", outputTObj.fields.liveViewScope);
-      
+            
     }
+
   });
   
 };
@@ -1164,8 +1170,7 @@ MapWidget.prototype.handleToggleFullscreen = function(useHalfscreen) {
   } else {
     
     if(!useHalfscreen && !fsapi) {
-      this.dialogManager.open("fullscreenNotSupported",
-                         { dialog: { buttons: "ok_suppress" }});
+      this.dialogManager.open("fullscreenNotSupported");
       return;
     }
 

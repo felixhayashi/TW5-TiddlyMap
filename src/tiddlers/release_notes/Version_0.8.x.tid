@@ -10,6 +10,12 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.8.2
+
+* Resolves #129: Allow users to register fields as relationship fields
+* Resolves #147: Deleting tag edges should result in the deletion of a tag (same for creating an edge
+* Notifies the user when an edge is created that is not displayed in the current view
+
 ### v0.8.0
 
 * Resolves #135: Added auto-focussing and hotkeys to a bunch of form elements

@@ -1,9 +1,11 @@
 created: 20150330124519329
 id: c10296ef-ffcf-44bd-bc82-d051dea607fb
-modified: 20150411094932275
-tags: [[Basic concepts]]
+modified: 20150630160649953
+tags: Edge-Types
 title: Edge-type namespaces
 type: text/vnd.tiddlywiki
+
+! Introduction
 
 As of v0.7.5 ~TiddlyMap acknowledges namespaces for edge-types.
 
@@ -12,15 +14,13 @@ Namespaces provide a level of direction to specific identifiers, thus making it 
 In computer programming, namespaces are typically employed for the purpose of grouping symbols and identifiers around a particular functionality.
 <<< [[Wikipedia|http://en.wikipedia.org/wiki/Namespace]]
 
-!! Usage
+! Usage
 
 When looking at an edge-type name, ~TiddlyMap regards everything that comes before a colon (:) as namespace and everything that follows the colon as actual name that is to be displayed in the graph. This notation equals the way namespaces are [[represented in XML|http://www.w3.org/TR/REC-xml-names]]. 
 
 So when creating a new edge type (e.g. by drawing a new edge and specifying a type) you can give it the name [["foaf:knows"|http://xmlns.com/foaf/spec/#term_knows]] and only "knows" is displayed in the graph. However, when clicking on the edge to open the edge manager with the type description, you can see, to which domain "knows" belongs (foaf) and how it is defined.
 
-An edge-type can be defined, even when there are no edges of that type currently present in the wiki. A type is just a class that groups edges and defines how they look and behave.
-
-!! Advantage
+! Advantage
 
 In summary, namespaces may be used in ~TiddlyMap to achieve the following.
 
@@ -29,7 +29,7 @@ In summary, namespaces may be used in ~TiddlyMap to achieve the following.
 * Quickly enable or disable a whole set of edges via the edge-filter (see [[Isolated maps vs public graph]]).
 * Name conflicts are unlikely to arise when importing tiddlers and their relationships (which are stored as tiddler fields) from other wiki's.
 
-!! Examples
+! Examples
 
 To see an example how edge-type namespaces may be used, just
 
@@ -40,6 +40,6 @@ To see an example how edge-type namespaces may be used, just
 # Also have a look at the view's the edge-type filter
 # and how the default namespace is set in the view's configuration
 
-!! Roadmap
+! Roadmap
 
 The plans are to distribute ~TiddlyMap with semantic web vocabulary bundles like e.g. the well defined [[FOAF|http://xmlns.com/foaf/spec/]] vocabulary. Using "foaf:knows" instead of homegrown relationship names like "is acquainted with" or "has seen before" will standardize wikis and make it easier to look up definitions and understand the meaning.

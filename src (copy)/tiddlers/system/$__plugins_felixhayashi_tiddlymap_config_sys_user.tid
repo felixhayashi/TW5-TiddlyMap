@@ -1,0 +1,20 @@
+created: 20150202231339398
+modified: 20150620182306444
+tags: 
+title: $:/plugins/felixhayashi/tiddlymap/config/sys/user
+type: application/x-tiddler-dictionary
+
+field.nodeId: id
+field.nodeLabel: caption
+field.nodeIcon: icon
+field.nodeInfo: description
+field.viewMarker: isview
+field.edgeTypeMarker: tmap.is-edge-type
+field.edges: tmap.edges
+suppressedDialogs.dublicateIdInfo: true
+edgeClickBehaviour: manager
+debug: true
+notifications: true
+editNodeOnCreate: false
+singleClickMode: false
+raster: 

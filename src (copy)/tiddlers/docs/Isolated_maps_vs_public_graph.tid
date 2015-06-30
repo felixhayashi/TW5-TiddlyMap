@@ -1,0 +1,26 @@
+created: 20150201132115819
+id: 04f1dd6d-79a9-4d6e-91be-b8322dd0d0be
+modified: 20150401212634973
+tags: Recipe
+title: Isolated maps vs public graph
+type: text/vnd.tiddlywiki
+
+~TiddlyMap serves to use cases:
+
+!! Use case 1 -- Global topic linking
+
+''Purpose:'' Turning your wiki into a network of information
+
+~TiddlyMap can be used to express the overall structure of your information contained in your wiki. On a top level, you want to show how each tiddler is related to all the other tiddlers in your wiki. With ~TiddlyMap, you may globally link your pieces of information in your wiki, thus creating a big holistic network of linked tiddlers. 
+
+Global linking is the default operating mode of ~TiddlyMap.
+
+!! Use case 2 -- Independent mindmaps
+
+''Purpose:'' To create (almost) isolated concept or mind maps
+
+When creating concept or mind maps, you may want only a narrow set of edge-types to be displayed in the current view.
+
+In this case it is best to prefix all edge types that you create with a certain namespace (domain). For example "family:mother of", "family:brother of" (Open the "Family tree" demo view for an example setup). Then change the edge filter to only include edges with that namespace. You can set the default prefix for edges created inside a certain view via the view configuration menu.
+
+See also: [[Dealing with interferences between graphs]].

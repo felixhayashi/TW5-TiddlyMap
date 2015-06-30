@@ -1,0 +1,22 @@
+created: 20150408145146498
+id: 50e0b623-ddaf-4c19-a659-422c18b26a7d
+modified: 20150408192618202
+tags: [[Basic concepts]]
+title: Working in fullscreen and halfscreen mode
+type: text/vnd.tiddlywiki
+
+! {{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} Fullscreen mode 
+
+Need some room for your brainstorming? Then open the editor and switch to fullscreen by clicking on the fullscreen button that is displayed in the graph.
+
+~TiddlyMap will now consume all the possible space.
+
+Moreover, you are able to edit, rename and preview your tiddlers without leaving the fullscreen. Just click on a node and ~TiddlyWiki's default tiddler editor will be displayed.
+
+! {{$:/plugins/felixhayashi/tiddlymap/media/halfscreen.png}} Halfscreen mode 
+
+Alternatively you can configure ~TiddlyMap to switch into "halfscreen mode". The halfscreen mode is __only available for the sidebar editor__.
+
+When in halfscreen mode, the sidebar editor will enlarge vertically and consume all space available in the sidebar. This means the sidebar will be completely hidden and only the editor is displayed. 
+
+The great advantage of the halfscreen mode is that you are always able to see the story river.

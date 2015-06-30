@@ -1,0 +1,10 @@
+created: 20141217202218989
+id: D0B54F1D-8D7A-4C2E-9490-D3DF8866A6EC
+modified: 20150111032403092
+tags: component
+title: Vis.js
+type: text/vnd.tiddlywiki
+
+For graph visualization and manipulation, TiddlyMap draws upon the popular open-source [[vis.js|http://visjs.org/]] library. It is actively developed by [[Almende B.V|http://almende.com]] under the lead of Alex de Mulder (@AlexDM0) and Jos de Jong (@josdejong).
+
+//The library is designed to be easy to use, handle large amounts of dynamic data, and enable manipulation of the data// -- [[visjs.org|http://visjs.org/]]

@@ -1,0 +1,39 @@
+created: 20150630133803178
+id: 79fa55bc-416e-494a-ac67-785532129910
+modified: 20150630160746569
+tags: Edge-Types
+title: Magic Edge-Type Namespaces
+type: text/vnd.tiddlywiki
+
+Some edge-type namespaces are reserved for special purposes. Knowing about these "magic" types can help you to combine TiddlyMap with other cool TiddlyWiki plugins as these types enable you to create relations that are saved directly into user defined tw-fields.
+
+! tw-list
+
+If you create an edge-type (e.g. using the [[Edge-type manager]]) and use the `tw-list` namespace as identifier prefix, the edges will __not__ be stored in the common json-based [[tiddlymap  format|Storage of Edges]]. Instead each outgoing connection to a tiddler is stored by inserting the title the edge is pointing to into a list.
+
+Say you want create a connection between tiddler "Dawna Dozal"  and tiddler "Toney Thacker" and you name the connection `tw-list:friends`. Then a field named "friends" will be created in tiddler "Dawna Dozal" and "Toney Thacker" will be added to this field. Since the title contains spaces, tiddlwiki's double square bracket notation is used to save the title to the list that now looks like this: 
+
+```
+friends: [[Toney Thacker]]`
+```
+
+If you create another connection between "Dawna Dozal" and two tiddler titled "Jack" and "Cathy" using the edge-type identier `tw-list:friends`, then "Jack" and "Cathy" will be added to the list, which now looks like this:
+
+```
+friends: [[Toney Thacker]] Jack Cathey`.
+```
+<i class="fa fa-exclamation-circle" /> You probably know that TiddlyWiki stores titles in the `tags` field in the format described above. This means that you can also use TiddlyMap to create and delete tags by connecting tiddlers using the edge-type `tw-list:tags` when drawing an edge!
+
+<i class="fa fa-exclamation-triangle" /> You should be aware of the fact that this method does not use ids and changing tiddler titles will break the specified connection!
+
+! tw-field
+
+Similar to the magic type described above, you can use the `tw-field` namespace to save a drawn edge into a field. E.g. creating an edge between the tiddlers "Betsy" and "Dave" with the type `tw-field:husband` will create a field "husband" inside the "Betsy" tiddler and save "Dave" as value.
+
+<i class="fa fa-exclamation-triangle" /> You should be aware of the fact that this method does not use ids and changing tiddler titles will break the specified connection! Moreover, you cannot store multiple edges using this technique. If you want to store multiple edges, use the `tw-list` namespace.
+
+! tw-body
+
+This edge-type will is used to auto-generate and display links that are contained inside the tiddler text.
+
+<i class="fa fa-exclamation-triangle" /> You should not use this type for drawing edges.

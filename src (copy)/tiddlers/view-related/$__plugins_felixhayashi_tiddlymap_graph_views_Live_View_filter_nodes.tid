@@ -1,0 +1,5 @@
+created: 20150516142205284
+filter: [field:title{$:/temp/tmap/currentTiddler}]
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/Live View/filter/nodes
+type: text/vnd.tiddlywiki
+

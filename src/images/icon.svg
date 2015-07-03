@@ -7,173 +7,74 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="22"
-   height="22"
-   id="svg2"
    version="1.1"
-   inkscape:version="0.48.4 r9939"
-   sodipodi:docname="icon_plain.svg"
-   class="tc-image-button">
+   width="22pt"
+   height="22pt"
+   viewBox="0 0 128 128"
+   id="svg2">
   <defs
      id="defs4">
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="Arrow1Lend"
+       style="overflow:visible">
+      <path
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         id="path3850"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="Arrow1Lstart"
+       style="overflow:visible">
+      <path
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         transform="matrix(0.8,0,0,0.8,10,0)"
+         id="path3847"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" />
+    </marker>
     <inkscape:path-effect
        effect="skeletal"
-       id="path-effect4329"
-       is_visible="true"
-       pattern="m -8.2188626,1023.9138 0,10 9.9999971,-5 z"
-       copytype="single_stretched"
-       prop_scale="1"
-       scale_y_rel="false"
-       spacing="0"
-       normal_offset="0"
-       tang_offset="0"
-       prop_units="false"
-       vertical_pattern="false"
-       fuse_tolerance="0" />
+       id="path-effect4329" />
     <inkscape:path-effect
        effect="skeletal"
-       id="path-effect4321"
-       is_visible="true"
-       pattern="M 0,5 C 0,2.24 2.24,0 5,0 7.76,0 10,2.24 10,5 10,7.76 7.76,10 5,10 2.24,10 0,7.76 0,5 z"
-       copytype="single_stretched"
-       prop_scale="1"
-       scale_y_rel="false"
-       spacing="0"
-       normal_offset="0"
-       tang_offset="0"
-       prop_units="false"
-       vertical_pattern="false"
-       fuse_tolerance="0" />
+       id="path-effect4321" />
     <inkscape:path-effect
        effect="skeletal"
-       id="path-effect4315"
-       is_visible="true"
-       pattern="m 4,1035.0497 10,5 0,-10 z"
-       copytype="single_stretched"
-       prop_scale="1"
-       scale_y_rel="false"
-       spacing="0"
-       normal_offset="0"
-       tang_offset="0"
-       prop_units="false"
-       vertical_pattern="false"
-       fuse_tolerance="0" />
+       id="path-effect4315" />
     <inkscape:path-effect
        effect="skeletal"
-       id="path-effect4307"
-       is_visible="true"
-       pattern="M 0,5 10,10 10,0 z"
-       copytype="single_stretched"
-       prop_scale="1"
-       scale_y_rel="false"
-       spacing="0"
-       normal_offset="0"
-       tang_offset="0"
-       prop_units="false"
-       vertical_pattern="false"
-       fuse_tolerance="0" />
+       id="path-effect4307" />
     <inkscape:path-effect
        effect="skeletal"
-       id="path-effect4299"
-       is_visible="true"
-       pattern="m -13.965358,1006.0858 9.9999991,5 0,-10 z"
-       copytype="single_stretched"
-       prop_scale="1"
-       scale_y_rel="false"
-       spacing="0"
-       normal_offset="0"
-       tang_offset="0"
-       prop_units="false"
-       vertical_pattern="false"
-       fuse_tolerance="0" />
+       id="path-effect4299" />
     <inkscape:path-effect
        effect="skeletal"
-       id="path-effect4293"
-       is_visible="true"
-       pattern="M 0,5 10,10 10,0 z"
-       copytype="single_stretched"
-       prop_scale="1"
-       scale_y_rel="false"
-       spacing="0"
-       normal_offset="0"
-       tang_offset="0"
-       prop_units="false"
-       vertical_pattern="false"
-       fuse_tolerance="0" />
-    <inkscape:perspective
-       sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 13.75 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="27.5 : 13.75 : 1"
-       inkscape:persp3d-origin="13.75 : 9.1666667 : 1"
-       id="perspective4215" />
+       id="path-effect4293" />
   </defs>
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="11.313709"
-     inkscape:cx="13.047442"
-     inkscape:cy="-7.1321454"
-     inkscape:document-units="px"
-     inkscape:current-layer="layer1"
-     showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1030"
-     inkscape:window-x="1920"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
-     units="px"
-     inkscape:showpageshadow="false"
-     showguides="true"
-     inkscape:guide-bbox="true"
-     showborder="true">
-    <inkscape:grid
-       type="xygrid"
-       id="grid4295"
-       empspacing="5"
-       visible="true"
-       enabled="true"
-       snapvisiblegridlinesonly="true" />
-    <sodipodi:guide
-       orientation="1,0"
-       position="3.5797281,14.363106"
-       id="guide4331" />
-  </sodipodi:namedview>
   <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(0,-1030.3622)">
+     transform="translate(0,-1024.5289)"
+     id="layer1">
     <path
-       sodipodi:type="arc"
-       style="fill-opacity:1;fill-rule:nonzero"
-       id="path4139-1-14"
-       sodipodi:cx="14.142136"
-       sodipodi:cy="4.5821643"
-       sodipodi:rx="3.7249374"
-       sodipodi:ry="3.7249374"
        d="m 17.867073,4.5821643 a 3.7249374,3.7249374 0 1 1 -7.449875,0 3.7249374,3.7249374 0 1 1 7.449875,0 z"
-       transform="matrix(-0.92067214,0,0,0.9067667,31.288377,1044.4963)" />
+       transform="matrix(-6.3328802,0,0,6.2775831,193.9581,1100.3667)"
+       id="path4139-1-14"
+       style="fill-opacity:1;fill-rule:nonzero" />
     <path
-       style="fill-rule:nonzero"
-       d="m 17.000007,1033.6163 -8.8942822,4.5708 8.2745462,5.1624 z"
-       id="path4327"
-       inkscape:path-effect="#path-effect4329"
-       inkscape:original-d="m 12.552866,1035.9017 3.827405,7.4478"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
-    <path
-       style="fill-opacity:1"
-       d="m 16.759655,1039.6227 c -1.848511,-10.8084 -23.2472087,-9.4234 -27.641002,-7.1916 l 7.0480408,1.1159 c 0,0 12.9317346,-4.5838 17.4326372,7.7395 z"
+       d="M 77.450496,1064.5069 C 58.849552,1025.9634 15.704158,1023.3858 2.8821873e-7,1034.558 L 0.02388589,1035.2674 C 24.502636,1022.2072 44.810725,1042.1507 60.163934,1074.112 z"
        id="path4337"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="ccccc" />
+       style="fill-opacity:1;stroke-width:0.58181816;stroke-miterlimit:4;stroke-dasharray:none;marker-start:none;marker-end:none" />
+    <path
+       d="m 12.878637,11.280739 4.75937,-2.7478243 4.759371,-2.7478236 0,5.4956479 0,5.495648 -4.759371,-2.747824 z"
+       transform="matrix(4.6545455,0,0,4.6545455,-13.580429,1027.7638)"
+       id="path3004"
+       style="fill-opacity:1;fill-rule:nonzero" />
   </g>
   <metadata
      id="metadata3772">
@@ -181,6 +82,9 @@
       <cc:Work
          rdf:about="">
         <dc:title></dc:title>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
       </cc:Work>
     </rdf:RDF>
   </metadata>

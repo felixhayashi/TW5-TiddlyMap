@@ -1,9 +1,0 @@
-config.neighbourhood_scope: 1
-config.physics_mode: true
-config.refresh-triggers: $:/temp/tmap/currentTiddler
-created: 20150331114808577
-isview: true
-modified: 20150630160147709
-title: $:/plugins/felixhayashi/tiddlymap/graph/views/Live View
-type: text/vnd.tiddlywiki
-

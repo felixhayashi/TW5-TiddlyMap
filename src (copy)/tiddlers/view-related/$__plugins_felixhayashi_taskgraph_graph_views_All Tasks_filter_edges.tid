@@ -1,7 +1,0 @@
-created: 20141220185948402
-filter: [prefix[$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes]] -[suffix[tmap:link]] -[suffix[tmap:tag]]
-id: A2930721-CC99-4A96-99F8-67B65C0EE1E4
-modified: 20141220191854201
-title: $:/plugins/felixhayashi/tiddlymap/graph/views/All Tasks/filter/edges
-type: text/vnd.tiddlywiki
-

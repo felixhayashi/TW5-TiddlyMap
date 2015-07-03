@@ -1,11 +1,11 @@
 created: 20150531200637949
-modified: 20150627175959190
+modified: 20150703112644731
 tags: $:/core/wiki/rawmarkup
 title: $:/me/meta
 type: text/vnd.tiddlywiki
 
 <meta name="google-site-verification" content="2IQZc8DCJYVKmZWbOa2RlbEJGIJ1BK1ewGSv8Azwu1s" />
-<meta name="description" content="An interactive concept and mind map plugin for the personal note-taking software TiddlyWiki based on the Vis.js library. It's free and open-source!" />
+<meta name="description" content="An interactive concept- and mind-mapping plugin for the personal note-taking software TiddlyWiki based on the Vis.js library. It's free and open-source!" />
     
 <!--
 

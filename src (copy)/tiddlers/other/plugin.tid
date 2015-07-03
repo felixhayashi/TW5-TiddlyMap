@@ -1,8 +1,0 @@
-created: 20141217162650920
-id: 2B168E35-853F-4F5A-8EC9-EF46D062D752
-modified: 20141217163116835
-tags: 
-title: plugin
-type: text/vnd.tiddlywiki
-
-<$transclude tiddler="$:/plugins/felixhayashi/tiddlymap" field={{!!title}} />

@@ -1,8 +1,0 @@
-created: 20150207202437883
-id: 6cb4ad7c-0cb6-492e-8801-49ae9208f468
-modified: 20150401212139254
-tags: [[Basic concepts]]
-title: Navigation
-type: text/vnd.tiddlywiki
-
-~TiddlyMap adds a whole new concept of navigation. You can navigate to topics be using the __doubleclick__ on the displayed nodes. You may also enable the single click option (see [[Changing TiddlyMap's default configuration]]).

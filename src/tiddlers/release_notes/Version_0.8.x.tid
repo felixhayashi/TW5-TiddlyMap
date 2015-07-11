@@ -31,6 +31,11 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.8.3
+
+* Fixed bug that deletion of tags from toolbar button wasn't possible
+* Toolbar button contained a space character
+
 ### v0.8.1
 
 * Fixes #146: Graph is not zoomed properly when switching views after adding a node 

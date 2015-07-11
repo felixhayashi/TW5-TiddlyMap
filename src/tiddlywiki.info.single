@@ -19,7 +19,7 @@
     "de-DE"
   ],
   "build": {
-    "index": ["--rendertiddler","$:/core/save/all","index.html","text/plain"]
+    "index": ["--rendertiddler","$:/core/save/all","demo.html","text/plain"]
   },
   "config": {
     "retain-original-tiddler-path": true

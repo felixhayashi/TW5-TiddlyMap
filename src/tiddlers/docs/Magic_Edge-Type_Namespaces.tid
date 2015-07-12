@@ -1,6 +1,6 @@
 created: 20150630133803178
 id: 79fa55bc-416e-494a-ac67-785532129910
-modified: 20150630160746569
+modified: 20150711205015015
 tags: Edge-Types
 title: Magic Edge-Type Namespaces
 type: text/vnd.tiddlywiki
@@ -24,13 +24,20 @@ friends: [[Toney Thacker]] Jack Cathey`.
 ```
 <i class="fa fa-exclamation-circle" /> You probably know that TiddlyWiki stores titles in the `tags` field in the format described above. This means that you can also use TiddlyMap to create and delete tags by connecting tiddlers using the edge-type `tw-list:tags` when drawing an edge!
 
-<i class="fa fa-exclamation-triangle" /> You should be aware of the fact that this method does not use ids and changing tiddler titles will break the specified connection!
+<i class="fa fa-exclamation-triangle" /> There are some drawbacks with this technique:
+
+* This method does not use ids and changing tiddler titles will break the specified connection!
+* When using this namespace, only use tiddlywiki [[allowed field-name charactes|http://tiddlywiki.com/#TiddlerFields]] for field names.
 
 ! tw-field
 
 Similar to the magic type described above, you can use the `tw-field` namespace to save a drawn edge into a field. E.g. creating an edge between the tiddlers "Betsy" and "Dave" with the type `tw-field:husband` will create a field "husband" inside the "Betsy" tiddler and save "Dave" as value.
 
-<i class="fa fa-exclamation-triangle" /> You should be aware of the fact that this method does not use ids and changing tiddler titles will break the specified connection! Moreover, you cannot store multiple edges using this technique. If you want to store multiple edges, use the `tw-list` namespace.
+<i class="fa fa-exclamation-triangle" /> There are some drawbacks with this technique:
+
+* This method does not use ids and changing tiddler titles will break the specified connection! 
+* You cannot store multiple edges using this technique. If you want to store multiple edges, use the `tw-list` namespace.
+* When using this namespace, only use tiddlywiki [[allowed field-name charactes|http://tiddlywiki.com/#TiddlerFields]] for field names.
 
 ! tw-body
 

@@ -1,9 +1,9 @@
-caption: Version 0.7.x
+caption: v0.7.x
 created: 20150327192440821
 id: 5a7dd179-4aa9-4441-badd-0614253852b8
-modified: 20150331151607871
+modified: 20150712181334115
 released: not really
-tags: ReleaseNote
+tags: ReleaseNote [[Structural Awareness]] [[Map Constructs]] Configurability Usability [[Public API]] Storage
 title: Version 0.7.x
 type: text/x-markdown
 
@@ -85,7 +85,7 @@ Major enhancements
 * Cloning of tiddlers is now supported
 * Internal Links may be displayed in the map; #58; #14
 * Editor bar with less menus
-* The Edge Manager; resolves #48, #77, #4
+* The Edge-type Manager; resolves #48, #77, #4
 * When node is selected, "edit node" button is displayed in manipulation bar.
 * Datastructure-updater that transformes obsolete datastructures; #70
 * Improved datastructure; resolves #64

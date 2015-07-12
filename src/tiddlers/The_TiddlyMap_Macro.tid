@@ -1,0 +1,35 @@
+created: 20141217202038499
+id: 5E82CA80-199F-4EBA-BC59-77C672978697
+modified: 20150712144041567
+tags: component [[Public API]]
+title: The TiddlyMap Macro
+tmap.edges: {"6BB4F5FD-C031-4722-839D-6D3D5CB70A2C":{"to":"A9995A40-BAA5-4F26-9909-28C73FE097A1","type":"demo:uses"}}
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+{{Public API!!warning}}
+
+The TiddlyMap macro allows us to access system information from within tiddlers as well as to execute some util functions.
+
+! Getting a unique id
+
+Calling `<<tmap "uuid">>` will produce a unique id, such as the one below:
+
+<pre><<tmap "uuid">></pre>
+
+! Accessing TiddlyMap options
+
+All options of the TiddlyMap options-object (`$tw.tmap.opt`) are also accessible from within tiddlers via `<<tmap "options" "...">>`.
+
+!! Example 1
+
+`<<tmap "option" "selector.allViews">>` will produce
+
+<pre><<tmap "option" "selector.allViews">></pre>
+
+!! Example 2
+
+Or `<<tmap "option" "path.pluginRoot">>` will produce
+
+<pre><<tmap "option" "path.pluginRoot">></pre>

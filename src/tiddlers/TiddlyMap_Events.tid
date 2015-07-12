@@ -1,0 +1,86 @@
+created: 20150712131413486
+id: edcfb5b1-130b-472c-943d-5108d005d426
+modified: 20150712144035591
+tags: [[Public API]]
+title: TiddlyMap Events
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+{{Public API!!warning}}
+
+Tiddlymap events messages are prefixed with `tmap:` and described below:
+
+! tmap:tm-create-edge
+
+Creates an edge.
+
+<i class="fa fa-exclamation-triangle" />  If you use [[Magic Edge-Type Namespaces]], you don't need to supply an id, otherwise, make sure you supply a unique id unless you want to override an existing edge. Unique ids may be generated with [[The TiddlyMap Macro]] If you don't supply an id, a unique id will be generated in the course of the edge creation.
+
+!! Example
+
+```
+<$button>Create Edge
+<$action-sendmessage $message="tmap:tm-create-edge"
+                     id="a truly unique id"
+                     from=<<currentTiddler>>
+                     to="Hello World"
+                     label="foo:bar"
+                     view="My test view" />
+</$button>
+```
+
+! tmap:tm-remove-edge
+
+Removes an edge from the system.
+
+!! Example
+
+You do not need to suppy an `id` when removing edges with [[Magic Edge-Type Namespaces]].
+
+```
+<$button>Remove Edge
+<$action-sendmessage $message="tmap:tm-remove-edge"
+                     id=<<edge.id>>
+                     from=<<edge.from>>
+                     to=<<edge.to>>
+                     type=<<edge.type>> />
+</$button>
+```
+
+! tmap:tm-generate-widget
+
+Opens the TiddlyMap widget generator (see: [[Embedding views within tiddlers]]).
+
+```
+<$button>Gab widget code
+<$action-sendmessage $message="tmap:tm-generate-widget" />
+</$button>
+```
+
+! tmap:tm-manage-edge-types
+
+Open the [[Edge-type manager]].
+
+!! Example
+
+```
+<$button>Open Edge-Type Manager
+<$action-sendmessage $message="tmap:tm-manage-edge-types"
+                     type="tmap:unknown" />
+</$button>
+```
+
+! tmap:tm-download-graph
+
+Show download dialog.
+
+!! Example
+
+```
+<$button>Show download dialog
+<$action-sendmessage $message="tmap:tm-download-graph"
+                     view="default" />
+</$button>
+```
+

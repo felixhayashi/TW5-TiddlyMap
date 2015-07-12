@@ -1,9 +1,26 @@
 created: 20150119191256190
 id: 847d7896-9174-48f9-9509-6c89c1498335
-list: Installation [[Basic concepts]] Interface Configuration Examples Insight
-modified: 20150418131224238
+list: Installation [[Common Pitfalls]] [[Basic concepts]] Interface Configuration [[Public API]] Examples Insight
+modified: 20150712180329987
 title: Documentation
 tmap.edges: {}
 type: text/vnd.tiddlywiki
+
+\define toc-body(rootTag,tag,sort:"",itemClassFilter)
+<ol class="tc-toc">
+<$list filter="""[all[shadows+tiddlers]tag[$tag$]!has[draft.of]$sort$]-[tag[ReleaseNote]]""">
+<$set name="toc-item-class" filter="""$itemClassFilter$""" value="toc-item-selected" emptyValue="toc-item">
+<li class=<<toc-item-class>>>
+<$list filter="[all[current]toc-link[no]]" emptyMessage="<$link><$view field='caption'><$view field='title'/></$view></$link>">
+<<toc-caption>>
+</$list>
+<$list filter="""[all[current]] -[[$rootTag$]]""">
+<$macrocall $name="toc-body" rootTag="""$rootTag$""" tag=<<currentTiddler>> sort="""$sort$""" itemClassFilter="""$itemClassFilter$"""/>
+</$list>
+</li>
+</$set>
+</$list>
+</ol>
+\end
 
 <<toc "Documentation" >>

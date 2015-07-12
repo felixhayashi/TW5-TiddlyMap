@@ -1,5 +1,5 @@
 created: 20150206104625292
-modified: 20150630144541379
+modified: 20150712130147453
 tags: $:/tags/Stylesheet
 title: $:/me/layout.css
 type: text/css
@@ -69,6 +69,7 @@ h2.tc-title {
 button.tc-tiddlylink,
 a.tc-tiddlylink,
 a.tc-tiddlylink-external,
+a.tc-tiddlylink-external:hover,
 a.tc-tiddlylink-external:visited  {
   color: firebrick;
 }

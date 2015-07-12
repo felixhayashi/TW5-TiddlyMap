@@ -1,8 +1,9 @@
+caption: v0.3.0
 created: 20141217194318537
 id: DDEBD365-03CF-4040-B542-63B2341D8340
-modified: 20141225154614154
+modified: 20150712153037656
 released: 20141109
-tags: ReleaseNote
+tags: ReleaseNote Usability Integration
 title: Version 0.3.0
 tmap.edges: {"9203D5BA-290F-43FF-9EE9-CF143E6372BF":{"to":"EB8DBFAF-E1B1-4E91-A784-4CC2B34D9D40","type":"then"}}
 type: text/vnd.tiddlywiki

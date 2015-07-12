@@ -1,0 +1,16 @@
+created: 20150711214200462
+id: b2d8981d-c58d-416f-9542-c8540cb6e00c
+modified: 20150712151425311
+order.challenges: 4
+tags: Challenges
+title: Structural Awareness
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+In case of TiddlyMap, this describes the extent to which TiddlyMap is able to make sense of the existing wiki structure (i.e. explicit and implicit relations between the tiddlers). 
+
+Examples for progress in the realm of structural awareness:
+
+* In version v0.7.10 TiddlyMap was programmed to understand that tags are a form of relationship and to potentially display them in a graph.
+* In v0.8.2, TiddlyMap allows the user to register his/her own relationship fields with the help of [[Magic Edge-Type Namespaces]].

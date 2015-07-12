@@ -1,5 +1,5 @@
 /*\
-title: $:/plugins/felixhayashi/tiddlymap/map-macro.js
+title: $:/plugins/felixhayashi/tiddlymap/tmap.js
 type: application/javascript
 module-type: macro
 
@@ -18,13 +18,7 @@ util functions.
   /*global $tw: false */
   "use strict";
 
-  var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
-
-  /*
-  Information about this macro
-  */
-
-  exports.name = "map-macro";
+  exports.name = "tmap";
 
   // unfortunately tw forces us to specify params in advance so I will
   // reserve some argument slots here.. lets say five.
@@ -41,6 +35,8 @@ util functions.
   };
 
   exports.run = function() {
+    
+    var utils = $tw.tmap.utils;
        
     switch(arguments[0]) {
       
@@ -65,8 +61,11 @@ util functions.
         var result = str.split(arguments[1])[arguments[2]];
         
         return (result != null ? result : str);
-        
-      
+
+      case "uuid":
+
+        return utils.genUUID();
+
       case "option":
       
         var prop = $tw.tmap.opt;

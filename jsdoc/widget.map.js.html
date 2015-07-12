@@ -34,7 +34,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="module-TiddlyMap-Adapter.html">TiddlyMap~Adapter</a></li><li><a href="module-TiddlyMap-CallbackManager.html">TiddlyMap~CallbackManager</a></li><li><a href="module-TiddlyMap-DialogManager.html">TiddlyMap~DialogManager</a></li><li><a href="module-TiddlyMap-EdgeType.html">TiddlyMap~EdgeType</a></li><li><a href="module-TiddlyMap-MapWidget.html">TiddlyMap~MapWidget</a></li><li><a href="module-TiddlyMap-ViewAbstraction.html">TiddlyMap~ViewAbstraction</a></li>
+					<li><a href="module-TiddlyMap-Adapter.html">TiddlyMap~Adapter</a></li><li><a href="module-TiddlyMap-CallbackManager.html">TiddlyMap~CallbackManager</a></li><li><a href="module-TiddlyMap-DialogManager.html">TiddlyMap~DialogManager</a></li><li><a href="module-TiddlyMap-EdgeListItemWidget.html">TiddlyMap~EdgeListItemWidget</a></li><li><a href="module-TiddlyMap-EdgeListWidget.html">TiddlyMap~EdgeListWidget</a></li><li><a href="module-TiddlyMap-EdgeType.html">TiddlyMap~EdgeType</a></li><li><a href="module-TiddlyMap-MapWidget.html">TiddlyMap~MapWidget</a></li><li><a href="module-TiddlyMap-ViewAbstraction.html">TiddlyMap~ViewAbstraction</a></li>
 				</ul>
 			</li>
 			
@@ -839,62 +839,52 @@ MapWidget.prototype.isMobileMode = function() {
 };
 
 MapWidget.prototype.getGraphOptions = function() {
+            
+  // get a copy of the options
+  var options = this.view.getVisConfig();
   
-  this.logger("debug", "Loading graph options", options);
-  
-  if(!this.graphOptions) {
-          
-    // get a copy of the options
-    var options = $tw.utils.extendDeepCopy(this.opt.config.vis);
-    
-    options.clickToUse = this.isClickToUse();
+  options.clickToUse = this.isClickToUse();
 
+  // v4
+  options.manipulation = {
+    enabled: (this.editorMode ? true : false),
     // v4
-    options.manipulation = {
-      enabled: (this.editorMode ? true : false),
-      // v4
-      initiallyActive: true,
-      controlNodeStyle: {
-        // all node options are valid.
-      }
-      
-    };
+    initiallyActive: true,
+    controlNodeStyle: {
+      // all node options are valid.
+    }
     
-    // v4: ATTENTION this needs work as it was formerly only delete() for node AND edges!
-    options.manipulation.deleteNode = function(data, callback) {
-      this.handleRemoveElement(data);
-      this.resetVisManipulationBar(callback);
-    }.bind(this);
-    
-    // same as deleteNode
-    options.manipulation.deleteEdge = options.manipulation.deleteNode;
-    
-    // v4: formerly onConnect
-    options.manipulation.addEdge = function(data, callback) {
-      this.handleConnectionEvent(data);
-      this.resetVisManipulationBar(callback);
-    }.bind(this);
-    // v4: formerly onAdd
-    options.manipulation.addNode = function(data, callback) {
-      this.handleInsertNode(data);
-      this.resetVisManipulationBar(callback);
-    }.bind(this);
-    // v4: formerly onEditEdge
-    options.manipulation.editEdge = function(data, callback) {
-      var changedData = this.handleReconnectEdge(data);
-      this.resetVisManipulationBar(callback);
-    }.bind(this);
-    // v4: formerly onEdit; doesn't work; upstream bug
-    //~ options.manipulation.editNode = function(node, callback) {
-      //~ this.openTiddlerWithId(node.id);
-    //~ }.bind(this);
-    
-  } else {
-    var options = this.graphOptions;
-  }
+  };
   
-  // all options below are recalculated on every function call
+  // v4: ATTENTION this needs work as it was formerly only delete() for node AND edges!
+  options.manipulation.deleteNode = function(data, callback) {
+    this.handleRemoveElement(data);
+    this.resetVisManipulationBar(callback);
+  }.bind(this);
   
+  // same as deleteNode
+  options.manipulation.deleteEdge = options.manipulation.deleteNode;
+  
+  // v4: formerly onConnect
+  options.manipulation.addEdge = function(data, callback) {
+    this.handleConnectionEvent(data);
+    this.resetVisManipulationBar(callback);
+  }.bind(this);
+  // v4: formerly onAdd
+  options.manipulation.addNode = function(data, callback) {
+    this.handleInsertNode(data);
+    this.resetVisManipulationBar(callback);
+  }.bind(this);
+  // v4: formerly onEditEdge
+  options.manipulation.editEdge = function(data, callback) {
+    var changedData = this.handleReconnectEdge(data);
+    this.resetVisManipulationBar(callback);
+  }.bind(this);
+  // v4: formerly onEdit; doesn't work; upstream bug
+  //~ options.manipulation.editNode = function(node, callback) {
+    //~ this.openTiddlerWithId(node.id);
+  //~ }.bind(this);
+    
   utils.merge(options, {
     physics: {
       // not nice, what if different solver??
@@ -908,6 +898,8 @@ MapWidget.prototype.getGraphOptions = function() {
       }
     }
   });
+  
+  this.logger("debug", "Loaded graph options", options);
     
   return options;
   
@@ -2001,7 +1993,7 @@ exports.tiddlymap = MapWidget;
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-	on 2015-07-03T17:55:49+02:00 using the <a
+	on 2015-07-12T20:25:12+02:00 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>
@@ -2071,6 +2063,23 @@ $( function () {
 
 
 <!--Google Analytics-->
+
+<script>
+	(function ( i, s, o, g, r, a, m ) {
+		i['GoogleAnalyticsObject'] = r;
+		i[r] = i[r] || function () {
+			(i[r].q = i[r].q || []).push( arguments )
+		}, i[r].l = 1 * new Date();
+		a = s.createElement( o ),
+			m = s.getElementsByTagName( o )[0];
+		a.async = 1;
+		a.src = g;
+		m.parentNode.insertBefore( a, m )
+	})( window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga' );
+
+	ga( 'create', 'UA-63628573-1', 'tiddlymap.org' );
+	ga( 'send', 'pageview' );
+</script>
 
 
 </body>

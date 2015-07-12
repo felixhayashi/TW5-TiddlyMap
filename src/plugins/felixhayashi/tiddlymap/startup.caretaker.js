@@ -135,7 +135,7 @@ var attachOptions = function(parent) {
                                  + "-[suffix[tw-list:tags]]";
                                  + "-[suffix[tw-list:list]]";
   
-  // some popular selectors (usually used from within tiddlers via map-macro)
+  // some popular selectors (usually used from within tiddlers via tmap)
   if(!opt.selector) opt.selector = utils.getDataMap();
   
   var allSelector = "[all[tiddlers+shadows]!has[draft.of]]";
@@ -206,7 +206,7 @@ var attachFunctions = function(parent) {
   
   var nirvana = function() { /* /dev/null */ }; 
 
-  if($tw.tmap.opt.config.sys.debug === "true" && console) {
+  if(utils.isTrue($tw.tmap.opt.config.sys.debug, false) && console) {
   
     /**
      * A logging mechanism that uses the first argument as type and
@@ -272,8 +272,13 @@ var routineCheck = function() {
 };
 
 
-var checkForDublicates = function(tObj, idField, id) {
+var checkForDublicates = function(tObj) {
 
+  var idField = $tw.tmap.opt.field.nodeId;
+  var id = tObj.fields[idField];
+  
+  if(!id) return;
+  
   var opt = $tw.tmap.opt;
   var dublicates = utils.getTiddlersWithField(idField, id, { limit: 2 });
   delete dublicates[tObj.fields.title];
@@ -295,7 +300,12 @@ var checkForDublicates = function(tObj, idField, id) {
 
   }
   
-  return dublicate;
+  if(dublicate) {
+    // remove any defined edges
+    utils.setField(tObj, $tw.tmap.opt.field.edges, undefined);
+    // override id
+    $tw.tmap.adapter.assignId(tObj, true);
+  }  
   
 };
 
@@ -329,59 +339,61 @@ var updateLiveViewTrigger = function(changedTiddlers) {
       
 };
 
-var registerChangeListener = function(callbackManager) {
-    
-  var filter = $tw.wiki.compileFilter(
-    "[prefix[" + $tw.tmap.opt.path.options + "]!has[draft.of]]"
-  );
+var refreshGlobals = function(changedTiddlers) {
   
+  var filter = "[prefix[" + $tw.tmap.opt.path.options + "]!has[draft.of]]";
+  if(utils.getMatches(filter, Object.keys(changedTiddlers)).length) {
+    rebuildGlobals();
+  }
+  
+};
+
+/**
+ * Only for debugging
+ */
+var printChanges = function(changedTiddlers) {
+
+  if(utils.isTrue($tw.tmap.opt.config.sys.debug, false)) {
+    for(var tRef in changedTiddlers) {
+      if(changedTiddlers[tRef].deleted) {
+        $tw.tmap.logger("warn", "Tiddler deleted:", tRef);
+      } else {
+        $tw.tmap.logger("warn", "Tiddle modified:", utils.getTiddler(tRef));
+      }
+    }
+  }
+
+};
+
+var registerChangeListener = function(callbackManager) {
+
   $tw.wiki.addEventListener("change", function(changedTiddlers) {
     
     $tw.tmap.start("Caretaker handling changes");
     
-    for(var tRef in changedTiddlers) {
-      if(changedTiddlers[tRef].deleted) {
-        $tw.tmap.logger("warn", "Removed:", tRef);
-      } else {
-        $tw.tmap.logger("warn", "Modified:", utils.getTiddler(tRef));
-      }
-    }
+    // debugging
+    printChanges(changedTiddlers);
     
+    // check on callbacks
     callbackManager.handleChanges(changedTiddlers);
-      
+    
     // check for changed globals
-    var hasChangedGlobals = utils.getMatches(filter, Object.keys(changedTiddlers)).length;
-    if(hasChangedGlobals) {
-      rebuildGlobals();
-    }
+    refreshGlobals(changedTiddlers);
     
     for(var tRef in changedTiddlers) {
-      
       if(utils.isSystemOrDraft(tRef)) continue;
       
       var tObj = utils.getTiddler(tRef);
       
-      if(tObj) {
-        var idField = $tw.tmap.opt.field.nodeId;
-        var id = tObj.fields[idField];
+      if(tObj) { // created or modified
         
-        if(id) {
-          var hasDublicates = checkForDublicates(tObj, idField, id);
-        
-          if(hasDublicates) {
-            // remove any defined edges
-            utils.setField(tObj, $tw.tmap.opt.field.edges, undefined);
-            // override id
-            $tw.tmap.adapter.assignId(tObj, true);
-          }
-          
-        }
+        checkForDublicates(tObj);
         
         // call assignId IN ANY CASE to make sure the index stays intact
         // also after a renaming operation
         $tw.tmap.adapter.assignId(tObj);
-        
-      } else { // deleted or renamed
+                
+      } else { // deleted
         
         // remove node; any edges pointing in/out; update indeces
         // CAREFUL about recursion!
@@ -391,6 +403,7 @@ var registerChangeListener = function(callbackManager) {
       }
     }
     
+    // finally update live view
     updateLiveViewTrigger(changedTiddlers);
     
     $tw.tmap.stop("Caretaker handling changes");

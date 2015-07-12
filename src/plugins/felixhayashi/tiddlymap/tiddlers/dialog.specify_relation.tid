@@ -10,7 +10,7 @@ You are about to connect "<<fromLabel>>" with "<<toLabel>>". Please specify a ty
             class="tmap-trigger-field tmap-triggers-ok-button-on-enter" />
 
 <$set name="term" value={{!!text}}>
-<$set name="allEdgeTypes" value=<<map-macro "option" "selector.allEdgeTypesByLabel">>>
+<$set name="allEdgeTypes" value=<<tmap "option" "selector.allEdgeTypesByLabel">>>
 
 <ul class="tmap-small-list">
 <$list filter=<<filter>> emptyMessage="//A type with this name does not exist yet and will be created.//">

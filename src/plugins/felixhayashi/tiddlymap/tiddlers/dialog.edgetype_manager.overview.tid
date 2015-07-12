@@ -9,9 +9,9 @@ caption: Overview
                    [[Modified on|modified]]
                    [[Edges of this type|temp.usageCount]] ">
       <tr>
-        <th align="left"><<map-macro "splitAndSelect" "|" "0">></th>
+        <th align="left"><<tmap "splitAndSelect" "|" "0">></th>
         <td>
-          <$transclude tiddler=<<self>> field=<<map-macro "splitAndSelect" "|" "1">> />
+          <$transclude tiddler=<<self>> field=<<tmap "splitAndSelect" "|" "1">> />
         </td>
       </tr>
     </$list>

@@ -9,24 +9,32 @@ module-type: widget
 
 \*/
 
-// <$edges>{{!!title}}</$edges>
 (/** @lends module:TiddlyMap*/function(){
 
 /*jslint node: true, browser: true */
 /*global $tw: false */
 "use strict";
 
+// import classes
 var Widget = require("$:/core/modules/widgets/widget.js").widget;
-var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
 var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/edgetype.js").EdgeType;
 
+/**
+ * @constructor
+ */
 var EdgeListWidget = function(parseTreeNode,options) {
   
+  // call the parent constructor  
   Widget.call(this, parseTreeNode, options);
+  
+  // import services
+  this.utils = $tw.tmap.utils;
     
 };
 
+// !! EXTENSION !!
 EdgeListWidget.prototype = Object.create(Widget.prototype);
+// !! EXTENSION !!
 
 EdgeListWidget.prototype.render = function(parent,nextSibling) {
   
@@ -39,60 +47,46 @@ EdgeListWidget.prototype.render = function(parent,nextSibling) {
 
 EdgeListWidget.prototype.execute = function() {
   
-  var defaultFilter = "[field:title[" +
-                      this.getVariable("currentTiddler") +
-                      "]!has[draft.of]]";
-  var filter = this.getAttribute("filter", defaultFilter);
+  var nodes = [ this.getVariable("currentTiddler") ];
+  var options = {
+    typeWL: $tw.tmap.adapter.getEdgeTypeWhiteList("[!suffix[tw-body:link]]")
+  };
 
-  var nhood = $tw.tmap.adapter.getNeighbours(
-                [ this.getVariable("currentTiddler") ],
-                {
-                  typeFilter: $tw.tmap.adapter.getEdgeTypeWhiteList("[!suffix[tw-body:link]]")
-                }
-              );
+  var neighbourhood = $tw.tmap.adapter.getNeighbours(nodes, options);
 
-  // retrieve nodes
-  this.neighbours = nhood.nodes;
-
-  // retrieve edges
-  this.edges = nhood.edges;
+  // retrieve nodes and edges
+  var neighbours = neighbourhood.nodes;
+  var edges = neighbourhood.edges;
   
   var entries = [];
-  for(var id in this.edges) {
-    var item = this.makeItemTemplate(this.edges[id]);
-    if(item) {
-      entries.push(item);
-    }
+  for(var id in edges) {
+    var edge = edges[id];
+    var direction = (neighbours[edge.to] ? "To" : "From");
+    var neighbour = neighbours[edge[direction.toLowerCase()]];
+    
+    if(!neighbour) continue; // obsolete edge from old times;
+    
+    // make item template
+    entries.push({
+      type: "tmap-edgelistitem",
+      edge: edge,
+      neighbour: neighbour,
+      direction: direction,
+      // the children of this widget (=what is wrapped inside the
+      // widget-element's body) is used as template for the list items
+      children: this.parseTreeNode.children
+    });
   }
 
   this.makeChildWidgets(entries);
   
 };
 
-EdgeListWidget.prototype.makeItemTemplate = function(edge) {
-  
-  var text = "";
-  var linkedNodeRole = (this.neighbours[edge.to] ? "To" : "From");
-  var linkedNode = this.neighbours[edge[linkedNodeRole.toLowerCase()]];
-
-  if(!linkedNode) return; // obsolete edge from old times;
-  
-  return {
-    type: "tmap-edgelistitem",
-    edge: edge,
-    link: linkedNode,
-    linkRole: linkedNodeRole,
-    children: this.parseTreeNode.children
-  };
-  
-};
-
 EdgeListWidget.prototype.refresh = function(changedTiddlers) {
 
   for(var tRef in changedTiddlers) {
-    if(!utils.isSystemOrDraft(tRef)) {
+    if(!this.utils.isSystemOrDraft(tRef)) {
     
-      //~ var isCurrentTiddler = (tRef === this.getVariable("currentTiddler"));
       this.refreshSelf();
       return true;
     
@@ -108,26 +102,38 @@ EdgeListWidget.prototype.refresh = function(changedTiddlers) {
 exports["tmap-connections"] = EdgeListWidget;
 // !! EXPORT !!
 
-var EdgeListItemWidget = function(parseTreeNode,options) {
+/**
+ * @constructor
+ */
+var EdgeListItemWidget = function(parseTreeNode, options) {
+  
   Widget.call(this, parseTreeNode, options);
+  
+  // import services
+  this.utils = $tw.tmap.utils;
+  
 };
 
+// !! EXTENSION !!
 EdgeListItemWidget.prototype = Object.create(Widget.prototype);
+// !! EXTENSION !!
 
 EdgeListItemWidget.prototype.execute = function() {
   
   var item = this.parseTreeNode;
-  var tRef = $tw.tmap.indeces.tById[item.link.id];
+  var tRef = $tw.tmap.indeces.tById[item.neighbour.id];
   
-  var type = new EdgeType(item.edge.type);
-  
+  // make edge properties available as variables
+  var edge = this.utils.flatten(item.edge);
+  for(var p in edge) {
+    if(typeof edge[p] === "string") {
+      this.setVariable("edge." + p, edge[p]);
+    }
+  }
+    
   this.setVariable("currentTiddler", tRef);
-  this.setVariable("edge.from", item.edge.from);
-  this.setVariable("edge.id", item.edge.id);
-  this.setVariable("edge.label", type.getLabel());
-  this.setVariable("edge.type", type.getId());
   this.setVariable("neighbour", tRef);
-  this.setVariable("role", item.linkRole);
+  this.setVariable("direction", item.direction);
   
   // Construct the child widgets
   this.makeChildWidgets();
@@ -135,7 +141,9 @@ EdgeListItemWidget.prototype.execute = function() {
 };
 
 EdgeListItemWidget.prototype.refresh = function(changedTiddlers) {
+  
   return this.refreshChildren(changedTiddlers);
+  
 };
 
 // !! EXPORT !!

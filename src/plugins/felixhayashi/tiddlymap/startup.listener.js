@@ -125,7 +125,9 @@ GlobalListener.prototype.handleGenerateWidget = function(event) {
 };
 
 GlobalListener.prototype.handleRemoveEdge = function(event) {
+  
   this.adapter.deleteEdge(event.paramObject);
+  
 };
 
 GlobalListener.prototype.handleCreateEdge = function(event) {
@@ -133,7 +135,8 @@ GlobalListener.prototype.handleCreateEdge = function(event) {
   var edge = {
     from: this.adapter.makeNode(event.paramObject.from).id,
     to: this.adapter.makeNode(event.paramObject.to).id,
-    type: event.paramObject.label
+    type: event.paramObject.label,
+    id: event.paramObject.id
   }
   
   this.adapter.insertEdge(edge);

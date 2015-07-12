@@ -34,7 +34,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="module-TiddlyMap-Adapter.html">TiddlyMap~Adapter</a></li><li><a href="module-TiddlyMap-CallbackManager.html">TiddlyMap~CallbackManager</a></li><li><a href="module-TiddlyMap-DialogManager.html">TiddlyMap~DialogManager</a></li><li><a href="module-TiddlyMap-EdgeType.html">TiddlyMap~EdgeType</a></li><li><a href="module-TiddlyMap-MapWidget.html">TiddlyMap~MapWidget</a></li><li><a href="module-TiddlyMap-ViewAbstraction.html">TiddlyMap~ViewAbstraction</a></li>
+					<li><a href="module-TiddlyMap-Adapter.html">TiddlyMap~Adapter</a></li><li><a href="module-TiddlyMap-CallbackManager.html">TiddlyMap~CallbackManager</a></li><li><a href="module-TiddlyMap-DialogManager.html">TiddlyMap~DialogManager</a></li><li><a href="module-TiddlyMap-EdgeListItemWidget.html">TiddlyMap~EdgeListItemWidget</a></li><li><a href="module-TiddlyMap-EdgeListWidget.html">TiddlyMap~EdgeListWidget</a></li><li><a href="module-TiddlyMap-EdgeType.html">TiddlyMap~EdgeType</a></li><li><a href="module-TiddlyMap-MapWidget.html">TiddlyMap~MapWidget</a></li><li><a href="module-TiddlyMap-ViewAbstraction.html">TiddlyMap~ViewAbstraction</a></li>
 				</ul>
 			</li>
 			
@@ -203,7 +203,7 @@ var attachOptions = function(parent) {
                                  + "-[suffix[tw-list:tags]]";
                                  + "-[suffix[tw-list:list]]";
   
-  // some popular selectors (usually used from within tiddlers via map-macro)
+  // some popular selectors (usually used from within tiddlers via tmap)
   if(!opt.selector) opt.selector = utils.getDataMap();
   
   var allSelector = "[all[tiddlers+shadows]!has[draft.of]]";
@@ -274,7 +274,7 @@ var attachFunctions = function(parent) {
   
   var nirvana = function() { /* /dev/null */ }; 
 
-  if($tw.tmap.opt.config.sys.debug === "true" &amp;&amp; console) {
+  if(utils.isTrue($tw.tmap.opt.config.sys.debug, false) &amp;&amp; console) {
   
     /**
      * A logging mechanism that uses the first argument as type and
@@ -340,8 +340,13 @@ var routineCheck = function() {
 };
 
 
-var checkForDublicates = function(tObj, idField, id) {
+var checkForDublicates = function(tObj) {
 
+  var idField = $tw.tmap.opt.field.nodeId;
+  var id = tObj.fields[idField];
+  
+  if(!id) return;
+  
   var opt = $tw.tmap.opt;
   var dublicates = utils.getTiddlersWithField(idField, id, { limit: 2 });
   delete dublicates[tObj.fields.title];
@@ -363,7 +368,12 @@ var checkForDublicates = function(tObj, idField, id) {
 
   }
   
-  return dublicate;
+  if(dublicate) {
+    // remove any defined edges
+    utils.setField(tObj, $tw.tmap.opt.field.edges, undefined);
+    // override id
+    $tw.tmap.adapter.assignId(tObj, true);
+  }  
   
 };
 
@@ -397,59 +407,61 @@ var updateLiveViewTrigger = function(changedTiddlers) {
       
 };
 
-var registerChangeListener = function(callbackManager) {
-    
-  var filter = $tw.wiki.compileFilter(
-    "[prefix[" + $tw.tmap.opt.path.options + "]!has[draft.of]]"
-  );
+var refreshGlobals = function(changedTiddlers) {
   
+  var filter = "[prefix[" + $tw.tmap.opt.path.options + "]!has[draft.of]]";
+  if(utils.getMatches(filter, Object.keys(changedTiddlers)).length) {
+    rebuildGlobals();
+  }
+  
+};
+
+/**
+ * Only for debugging
+ */
+var printChanges = function(changedTiddlers) {
+
+  if(utils.isTrue($tw.tmap.opt.config.sys.debug, false)) {
+    for(var tRef in changedTiddlers) {
+      if(changedTiddlers[tRef].deleted) {
+        $tw.tmap.logger("warn", "Tiddler deleted:", tRef);
+      } else {
+        $tw.tmap.logger("warn", "Tiddle modified:", utils.getTiddler(tRef));
+      }
+    }
+  }
+
+};
+
+var registerChangeListener = function(callbackManager) {
+
   $tw.wiki.addEventListener("change", function(changedTiddlers) {
     
     $tw.tmap.start("Caretaker handling changes");
     
-    for(var tRef in changedTiddlers) {
-      if(changedTiddlers[tRef].deleted) {
-        $tw.tmap.logger("warn", "Removed:", tRef);
-      } else {
-        $tw.tmap.logger("warn", "Modified:", utils.getTiddler(tRef));
-      }
-    }
+    // debugging
+    printChanges(changedTiddlers);
     
+    // check on callbacks
     callbackManager.handleChanges(changedTiddlers);
-      
+    
     // check for changed globals
-    var hasChangedGlobals = utils.getMatches(filter, Object.keys(changedTiddlers)).length;
-    if(hasChangedGlobals) {
-      rebuildGlobals();
-    }
+    refreshGlobals(changedTiddlers);
     
     for(var tRef in changedTiddlers) {
-      
       if(utils.isSystemOrDraft(tRef)) continue;
       
       var tObj = utils.getTiddler(tRef);
       
-      if(tObj) {
-        var idField = $tw.tmap.opt.field.nodeId;
-        var id = tObj.fields[idField];
+      if(tObj) { // created or modified
         
-        if(id) {
-          var hasDublicates = checkForDublicates(tObj, idField, id);
-        
-          if(hasDublicates) {
-            // remove any defined edges
-            utils.setField(tObj, $tw.tmap.opt.field.edges, undefined);
-            // override id
-            $tw.tmap.adapter.assignId(tObj, true);
-          }
-          
-        }
+        checkForDublicates(tObj);
         
         // call assignId IN ANY CASE to make sure the index stays intact
         // also after a renaming operation
         $tw.tmap.adapter.assignId(tObj);
-        
-      } else { // deleted or renamed
+                
+      } else { // deleted
         
         // remove node; any edges pointing in/out; update indeces
         // CAREFUL about recursion!
@@ -459,6 +471,7 @@ var registerChangeListener = function(callbackManager) {
       }
     }
     
+    // finally update live view
     updateLiveViewTrigger(changedTiddlers);
     
     $tw.tmap.stop("Caretaker handling changes");
@@ -552,7 +565,7 @@ exports.startup = function() {
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-	on 2015-07-03T17:55:49+02:00 using the <a
+	on 2015-07-12T20:25:12+02:00 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>
@@ -622,6 +635,23 @@ $( function () {
 
 
 <!--Google Analytics-->
+
+<script>
+	(function ( i, s, o, g, r, a, m ) {
+		i['GoogleAnalyticsObject'] = r;
+		i[r] = i[r] || function () {
+			(i[r].q = i[r].q || []).push( arguments )
+		}, i[r].l = 1 * new Date();
+		a = s.createElement( o ),
+			m = s.getElementsByTagName( o )[0];
+		a.async = 1;
+		a.src = g;
+		m.parentNode.insertBefore( a, m )
+	})( window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga' );
+
+	ga( 'create', 'UA-63628573-1', 'tiddlymap.org' );
+	ga( 'send', 'pageview' );
+</script>
 
 
 </body>

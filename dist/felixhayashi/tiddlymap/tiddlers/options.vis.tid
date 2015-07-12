@@ -6,6 +6,9 @@ type: application/json
   "autoResize": false,
   "height": "100%",
   "width": "100%",
+  "configure": {
+    "enabled": false
+  },
   "interaction": {
     "dragNodes":true,
     "dragView": true,

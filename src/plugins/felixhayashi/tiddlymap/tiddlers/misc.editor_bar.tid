@@ -8,9 +8,9 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
   View:
   <$reveal type="match" text="false" default=<<param.isViewBound>> >
     <$select tiddler=<<param.ref.viewHolder>> field="text" default=<<param.ref.view>> >
-       <$list filter=<<map-macro "option" "selector.allViews">> >
+       <$list filter=<<tmap "option" "selector.allViews">> >
          <option value={{!!title}}>
-           <$view tiddler=<<map-macro "basename">> field="title" />
+           <$view tiddler=<<tmap "basename">> field="title" />
           </option>
        </$list>
     </$select>
@@ -53,9 +53,9 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
                    [[4|4 step distance]]
                    [[5|5 step distance]]">
       <$button class="tc-btn-invisible">
-        <<map-macro "splitAndSelect" "|" "1">>
+        <<tmap "splitAndSelect" "|" "1">>
         <$action-setfield $tiddler=<<param.ref.view>>
-                          config.neighbourhood_scope=<<map-macro "splitAndSelect" "|" "0">> />
+                          config.neighbourhood_scope=<<tmap "splitAndSelect" "|" "0">> />
       </$button>
     </$list>
     <hr />

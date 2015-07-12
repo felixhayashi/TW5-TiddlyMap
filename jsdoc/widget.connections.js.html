@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>TiddlyMap Source: lib.callback_manager.js</title>
+	<title>TiddlyMap Source: widget.connections.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -58,19 +58,19 @@
 	<div class="col-md-12">
 	
 		<div id="main">
-    		<h1 class="page-title">Source: lib.callback_manager.js</h1>
+    		<h1 class="page-title">Source: widget.connections.js</h1>
 			
 
-		<h1 class="page-title">Source: lib.callback_manager.js</h1>
+		<h1 class="page-title">Source: widget.connections.js</h1>
     
 <section>
 	<article>
 		<pre
 			class="sunlight-highlight-javascript linenums">/*\
 
-title: $:/plugins/felixhayashi/tiddlymap/callback_manager.js
+title: $:/plugins/felixhayashi/tiddlymap/widget/connections.js
 type: application/javascript
-module-type: library
+module-type: widget
 
 @module TiddlyMap
 @preserve
@@ -79,115 +79,146 @@ module-type: library
 
 (/** @lends module:TiddlyMap*/function(){
 
-  /*jslint node: true, browser: true */
-  /*global $tw: false */
-  
-  "use strict";
-  
-  /**************************** IMPORTS ****************************/
-   
-  var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
+/*jslint node: true, browser: true */
+/*global $tw: false */
+"use strict";
 
-  /***************************** CODE ******************************/
-        
-  /**
-   * @constructor
-   */
-  var CallbackManager = function() {
-    
-    this.wiki = $tw.wiki;
-    this.logger = $tw.tmap.logger;
-    this.callbacks = utils.getDataMap();
+// import classes
+var Widget = require("$:/core/modules/widgets/widget.js").widget;
+var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/edgetype.js").EdgeType;
 
-  };
-          
-  /**
-   * The callback mechanism allows to dynamically listen to tiddler
-   * changes without hardcoding a change-check for a tiddler name
-   * in the refresh function.
-   * 
-   * @param [TiddlerReference] tRef - A tiddler whose change triggers
-   *     the callback.
-   * @param {function} callback - A function that is called when the
-   *     tiddler has changed.
-   * @param {boolean} [deleteOnCall=true] - True if to delete the
-   *     callback once it has been called, false otherwise.
-   */
-  CallbackManager.prototype.add = function(tRef, callback, isDeleteOnCall) {
-    
-    this.logger("debug", "A callback was registered for changes of \"" + tRef + "\"");
-    this.callbacks[tRef] = {
-      execute : callback,
-      isDeleteOnCall : (typeof isDeleteOnCall === "boolean" ? isDeleteOnCall : true)
-    };
-    
-  };
+/**
+ * @constructor
+ */
+var EdgeListWidget = function(parseTreeNode,options) {
   
-  /**
-   * Removes the callback from the list of tiddler callbacks.
-   * 
-   * @see CallbackManager#registerCallback
-   */
-  CallbackManager.prototype.remove = function(refOrRefList) {
-    
-    if(!refOrRefList) return;
-    
-    if(typeof refOrRefList === "string") {
-      refOrRefList = [ refOrRefList ];
-    }
-    
-    for(var i = 0; i &lt; refOrRefList.length; i++) {
-      var tRef = refOrRefList[i];
-      if(this.callbacks[tRef]) {
-        this.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
-        delete this.callbacks[tRef];
-      }
-    }
-    
-  };
+  // call the parent constructor  
+  Widget.call(this, parseTreeNode, options);
   
-  /**
-   * this method has to be implemented at the top of the refresh method.
-   * It checks for changed tiddlers that have
-   * registered callbacks. If `deleteOnCall` was specified during
-   * registration of the callback, the callback will be deleted
-   * automatically.
-   * 
-   * @see CallbackManager#registerCallback
-   */
-  CallbackManager.prototype.handleChanges = function(changedTiddlers) {
+  // import services
+  this.utils = $tw.tmap.utils;
     
-    if(this.callbacks.length == 0) {
-      this.logger("debug", "No registered callbacks exist at the moment");
-      return;
-    }
-    
-    for(var tRef in changedTiddlers) {
-            
-      if(!this.callbacks[tRef]) continue;
-      
-      if(this.wiki.getTiddler(tRef)) {
-        
-        this.logger("debug", "A callback for \"" + tRef + "\" will be executed");
-        this.callbacks[tRef].execute(tRef);
-        
-        // a continue prevents deleting the callback
-        if(!this.callbacks.isDeleteOnCall) continue;
-        
-      }
-      
-      this.remove(tRef);
-    }
-    
+};
+
+// !! EXTENSION !!
+EdgeListWidget.prototype = Object.create(Widget.prototype);
+// !! EXTENSION !!
+
+EdgeListWidget.prototype.render = function(parent,nextSibling) {
+  
+  this.parentDomNode = parent;
+  this.computeAttributes();
+  this.execute();
+  this.renderChildren(parent,nextSibling);
+  
+};
+
+EdgeListWidget.prototype.execute = function() {
+  
+  var nodes = [ this.getVariable("currentTiddler") ];
+  var options = {
+    typeWL: $tw.tmap.adapter.getEdgeTypeWhiteList("[!suffix[tw-body:link]]")
   };
 
-  // !! EXPORT !!
-  exports.CallbackManager = CallbackManager;
-  // !! EXPORT !!
-  
-})();
+  var neighbourhood = $tw.tmap.adapter.getNeighbours(nodes, options);
 
-</pre>
+  // retrieve nodes and edges
+  var neighbours = neighbourhood.nodes;
+  var edges = neighbourhood.edges;
+  
+  var entries = [];
+  for(var id in edges) {
+    var edge = edges[id];
+    var direction = (neighbours[edge.to] ? "To" : "From");
+    var neighbour = neighbours[edge[direction.toLowerCase()]];
+    
+    if(!neighbour) continue; // obsolete edge from old times;
+    
+    // make item template
+    entries.push({
+      type: "tmap-edgelistitem",
+      edge: edge,
+      neighbour: neighbour,
+      direction: direction,
+      // the children of this widget (=what is wrapped inside the
+      // widget-element's body) is used as template for the list items
+      children: this.parseTreeNode.children
+    });
+  }
+
+  this.makeChildWidgets(entries);
+  
+};
+
+EdgeListWidget.prototype.refresh = function(changedTiddlers) {
+
+  for(var tRef in changedTiddlers) {
+    if(!this.utils.isSystemOrDraft(tRef)) {
+    
+      this.refreshSelf();
+      return true;
+    
+    } 
+  }
+    
+  // let children decide for themselves
+  return this.refreshChildren(changedTiddlers);
+
+};
+
+// !! EXPORT !!
+exports["tmap-connections"] = EdgeListWidget;
+// !! EXPORT !!
+
+/**
+ * @constructor
+ */
+var EdgeListItemWidget = function(parseTreeNode, options) {
+  
+  Widget.call(this, parseTreeNode, options);
+  
+  // import services
+  this.utils = $tw.tmap.utils;
+  
+};
+
+// !! EXTENSION !!
+EdgeListItemWidget.prototype = Object.create(Widget.prototype);
+// !! EXTENSION !!
+
+EdgeListItemWidget.prototype.execute = function() {
+  
+  var item = this.parseTreeNode;
+  var tRef = $tw.tmap.indeces.tById[item.neighbour.id];
+  
+  // make edge properties available as variables
+  var edge = this.utils.flatten(item.edge);
+  for(var p in edge) {
+    if(typeof edge[p] === "string") {
+      this.setVariable("edge." + p, edge[p]);
+    }
+  }
+    
+  this.setVariable("currentTiddler", tRef);
+  this.setVariable("neighbour", tRef);
+  this.setVariable("direction", item.direction);
+  
+  // Construct the child widgets
+  this.makeChildWidgets();
+  
+};
+
+EdgeListItemWidget.prototype.refresh = function(changedTiddlers) {
+  
+  return this.refreshChildren(changedTiddlers);
+  
+};
+
+// !! EXPORT !!
+exports["tmap-edgelistitem"] = EdgeListItemWidget;
+// !! EXPORT !!
+
+})();</pre>
 	</article>
 </section>
 

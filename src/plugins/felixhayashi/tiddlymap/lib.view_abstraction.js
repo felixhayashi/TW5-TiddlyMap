@@ -51,9 +51,10 @@ module-type: library
       return; // skip initialization
     }
     
-    this.path.map = this.path.config + "/map";
+    this.path.map =        this.path.config + "/map";
     this.path.nodeFilter = this.path.config + "/filter/nodes";
     this.path.edgeFilter = this.path.config + "/filter/edges";
+    this.path.visConfig =  this.path.config + "/vis";
     
     // If a view component was deliberately changed by the owner
     // of the ViewAbstraction instance this hashmap is used to
@@ -382,6 +383,17 @@ module-type: library
    */
   ViewAbstraction.prototype.getStabilizationIterations = function() {
     return (this.stabIterations ? this.stabIterations : 1000);
+  };
+  
+  /**
+   * 
+   */
+  ViewAbstraction.prototype.getVisConfig = function() {
+    
+    var config = this.utils.parseFieldData(this.path.visConfig, "text", {});
+    return this.utils.merge($tw.utils.extendDeepCopy(this.opt.config.vis),
+                            config);
+    
   };
   
   ViewAbstraction.prototype.setStabilizationIterations = function(i) {

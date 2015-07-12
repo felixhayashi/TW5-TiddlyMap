@@ -771,62 +771,52 @@ MapWidget.prototype.isMobileMode = function() {
 };
 
 MapWidget.prototype.getGraphOptions = function() {
+            
+  // get a copy of the options
+  var options = this.view.getVisConfig();
   
-  this.logger("debug", "Loading graph options", options);
-  
-  if(!this.graphOptions) {
-          
-    // get a copy of the options
-    var options = $tw.utils.extendDeepCopy(this.opt.config.vis);
-    
-    options.clickToUse = this.isClickToUse();
+  options.clickToUse = this.isClickToUse();
 
+  // v4
+  options.manipulation = {
+    enabled: (this.editorMode ? true : false),
     // v4
-    options.manipulation = {
-      enabled: (this.editorMode ? true : false),
-      // v4
-      initiallyActive: true,
-      controlNodeStyle: {
-        // all node options are valid.
-      }
-      
-    };
+    initiallyActive: true,
+    controlNodeStyle: {
+      // all node options are valid.
+    }
     
-    // v4: ATTENTION this needs work as it was formerly only delete() for node AND edges!
-    options.manipulation.deleteNode = function(data, callback) {
-      this.handleRemoveElement(data);
-      this.resetVisManipulationBar(callback);
-    }.bind(this);
-    
-    // same as deleteNode
-    options.manipulation.deleteEdge = options.manipulation.deleteNode;
-    
-    // v4: formerly onConnect
-    options.manipulation.addEdge = function(data, callback) {
-      this.handleConnectionEvent(data);
-      this.resetVisManipulationBar(callback);
-    }.bind(this);
-    // v4: formerly onAdd
-    options.manipulation.addNode = function(data, callback) {
-      this.handleInsertNode(data);
-      this.resetVisManipulationBar(callback);
-    }.bind(this);
-    // v4: formerly onEditEdge
-    options.manipulation.editEdge = function(data, callback) {
-      var changedData = this.handleReconnectEdge(data);
-      this.resetVisManipulationBar(callback);
-    }.bind(this);
-    // v4: formerly onEdit; doesn't work; upstream bug
-    //~ options.manipulation.editNode = function(node, callback) {
-      //~ this.openTiddlerWithId(node.id);
-    //~ }.bind(this);
-    
-  } else {
-    var options = this.graphOptions;
-  }
+  };
   
-  // all options below are recalculated on every function call
+  // v4: ATTENTION this needs work as it was formerly only delete() for node AND edges!
+  options.manipulation.deleteNode = function(data, callback) {
+    this.handleRemoveElement(data);
+    this.resetVisManipulationBar(callback);
+  }.bind(this);
   
+  // same as deleteNode
+  options.manipulation.deleteEdge = options.manipulation.deleteNode;
+  
+  // v4: formerly onConnect
+  options.manipulation.addEdge = function(data, callback) {
+    this.handleConnectionEvent(data);
+    this.resetVisManipulationBar(callback);
+  }.bind(this);
+  // v4: formerly onAdd
+  options.manipulation.addNode = function(data, callback) {
+    this.handleInsertNode(data);
+    this.resetVisManipulationBar(callback);
+  }.bind(this);
+  // v4: formerly onEditEdge
+  options.manipulation.editEdge = function(data, callback) {
+    var changedData = this.handleReconnectEdge(data);
+    this.resetVisManipulationBar(callback);
+  }.bind(this);
+  // v4: formerly onEdit; doesn't work; upstream bug
+  //~ options.manipulation.editNode = function(node, callback) {
+    //~ this.openTiddlerWithId(node.id);
+  //~ }.bind(this);
+    
   utils.merge(options, {
     physics: {
       // not nice, what if different solver??
@@ -840,6 +830,8 @@ MapWidget.prototype.getGraphOptions = function() {
       }
     }
   });
+  
+  this.logger("debug", "Loaded graph options", options);
     
   return options;
   

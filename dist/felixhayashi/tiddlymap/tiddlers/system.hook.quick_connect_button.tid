@@ -3,102 +3,103 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/quickConnectButton
 description: {{$:/language/Buttons/TiddlyMap/Hint}}
 caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/TiddlyMap/Caption}}
 
-\define tiddlerSearchFilter() [!is[system]!has[draft.of]search:title{$:/temp/quickConnectSearch}sort[title]]
+\define tiddlerSearchFilter()
+  [!is[system]!has[draft.of]search:title{$:/temp/quickConnectSearch}sort[title]]
+\end
 
-<$reveal type="nomatch" state="$:/temp/tiddlymap/quickConnectButton" text=<<qualify>>>
-  <$button set="$:/temp/tiddlymap/quickConnectButton"
-           setTo=<<qualify>>
-           tooltip={{$:/language/Buttons/TiddlyMap/Hint}}
-           aria-label={{$:/language/Buttons/TiddlyMap/Caption}}
-           class=<<tv-config-toolbar-class>>>
-    <$list filter="[<tv-config-toolbar-icons>prefix[yes]]">{{$:/plugins/felixhayashi/tiddlymap/icon}}</$list>
-    <$list filter="[<tv-config-toolbar-text>prefix[yes]]">
-      <span class="tc-btn-text"><$text text={{$:/language/Buttons/TiddlyMap/Caption}}/></span>
-    </$list>
-  </$button>
-</$reveal>
+\define showButton(state)
+<$button set="$:/temp/tiddlymap/quickConnectButton"
+         setTo="$state$" tooltip={{$:/language/Buttons/TiddlyMap/Hint}} 
+         aria-label={{$:/language/Buttons/TiddlyMap/Caption}}
+         class=<<tv-config-toolbar-class>>>
+<$list filter="[<tv-config-toolbar-icons>prefix[yes]]">
+{{$:/plugins/felixhayashi/tiddlymap/icon}}
+</$list>
+<$list filter="[<tv-config-toolbar-text>prefix[yes]]">
+<span class="tc-btn-text"><$text text={{$:/language/Buttons/TiddlyMap/Caption}}/></span>
+</$list>
+</$button>
+\end
 
-<$reveal type="match" state="$:/temp/tiddlymap/quickConnectButton" text=<<qualify>> >
-  <$button set="$:/temp/tiddlymap/quickConnectButton"
-           setTo=""
-           tooltip={{$:/language/Buttons/TiddlyMap/Hint}}
-           aria-label={{$:/language/Buttons/TiddlyMap/Caption}}
-           class=<<tv-config-toolbar-class>>>
-    <$list filter="[<tv-config-toolbar-icons>prefix[yes]]">{{$:/plugins/felixhayashi/tiddlymap/icon}}</$list>
-    <$list filter="[<tv-config-toolbar-text>prefix[yes]]">
-      <span class="tc-btn-text"><$text text={{$:/language/Buttons/TiddlyMap/Caption}}/></span>
-    </$list>
-  </$button>
-  <div class="tmap-quick-connect tc-reveal tc-popup">
-    <div class="tc-drop-down">
-      <div>{{$:/core/images/close-others-button}} ''Create connection'' <sup>[1]</sup></div>
-      <table>
-        <tr>
-          <td>Type:</td>
-          <td>
-            <$edit-text tiddler="$:/temp/quickConnectSearch/type" field="text" type="text" tag="input" default="" />
-            <$select tiddler="$:/temp/quickConnectSearch/type" default="">
-              <option></option>
-              <$list filter=<<map-macro "option" "selector.allEdgeTypesByLabel">>  >
-                <option>{{!!title}}</option>
-              </$list>
-            </$select>
-          </td>
-        </tr>
-        <tr>
-          <td>Search:</td>
-          <td>
-            <$edit-text tiddler="$:/temp/quickConnectSearch" type="search" tag="input" default=""></$edit-text>
-            <small><$count filter=<<tiddlerSearchFilter>> /> results</small>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <table class="tmap-very-small-list">
-              <$list filter=<<tiddlerSearchFilter>> variable="item" emptyMessage="//No results//">
-              <tr>
-                <td>
-                  <$button>⇦
-                    <$action-sendmessage $message="tmap:tm-create-edge"
-                                         from=<<item>>
-                                         to=<<currentTiddler>>
-                                         label={{$:/temp/quickConnectSearch/type}}
-                                         view={{$:/temp/quickConnectSearch/view}} />
-                  </$button>
-                </td>
-                <td>
-                  <$button>⇨
-                    <$action-sendmessage $message="tmap:tm-create-edge"
-                                         from=<<currentTiddler>>
-                                         to=<<item>>
-                                         label={{$:/temp/quickConnectSearch/type}}
-                                         view={{$:/temp/quickConnectSearch/view}} />
-                  </$button>
-                </td>
-                <td><$view tiddler=<<item>> field="title" /></td>
-              </tr>
-              </$list>
-            </table>
-          </td>
-        </tr>
-      </table>
-      <hr />
-      <div>''Existing Connections''</div>
-      <p>  
-        <$tmap-connections>
-          <div>
-            <$button class="tc-btn-invisible">
-              <$action-sendmessage $message="tmap:tm-remove-edge" id=<<edge.id>> from=<<edge.from>> />
-              {{$:/core/images/close-button}}
-            </$button>
-            <<role>>
-            <$link to=<<neighbour>>>
-              <$view tiddler=<<map-macro "basename">> field="title" />
-            </$link>
-            (<<edge.label>>)
-          </div>
-        </$tmap-connections>
-      </p>      
-    </div>
+\define hidePopup()
+<$macrocall $name="showButton" state=<<qualify>> />
+\end
+
+\define showPopup()
+<$macrocall $name="showButton" state="" />
+<div class="tmap-quick-connect tc-reveal tc-popup">
+  <div class="tc-drop-down">
+    <div>{{$:/core/images/close-others-button}} ''Create connection'' <sup>[1]</sup></div>
+    <table>
+      <tr>
+        <td>Type:</td>
+        <td>
+          <$edit-text tiddler="$:/temp/quickConnectSearch/type" field="text" type="text" tag="input" default="" />
+          <$select tiddler="$:/temp/quickConnectSearch/type" default="">
+            <option></option>
+            <$list filter=<<tmap "option" "selector.allEdgeTypesByLabel">>  >
+              <option>{{!!title}}</option>
+            </$list>
+          </$select>
+        </td>
+      </tr>
+      <tr>
+        <td>Search:</td>
+        <td>
+          <$edit-text tiddler="$:/temp/quickConnectSearch" type="search" tag="input" default=""></$edit-text>
+          <small><$count filter=<<tiddlerSearchFilter>> /> results</small>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <table class="tmap-very-small-list">
+            <$list filter=<<tiddlerSearchFilter>> variable="item" emptyMessage="//No results//">
+            <tr>
+              <td>
+                <$button>⇦
+                  <$action-sendmessage $message="tmap:tm-create-edge"
+                                       from=<<item>>
+                                       to=<<currentTiddler>>
+                                       label={{$:/temp/quickConnectSearch/type}}
+                                       view={{$:/temp/quickConnectSearch/view}} />
+                </$button>
+              </td>
+              <td>
+                <$button>⇨
+                  <$action-sendmessage $message="tmap:tm-create-edge"
+                                       from=<<currentTiddler>>
+                                       to=<<item>>
+                                       label={{$:/temp/quickConnectSearch/type}}
+                                       view={{$:/temp/quickConnectSearch/view}} />
+                </$button>
+              </td>
+              <td><$view tiddler=<<item>> field="title" /></td>
+            </tr>
+            </$list>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <hr />
+    <div>''Existing Connections''</div>
+    <p>
+      <$tmap-connections>
+        <div>
+          <$button class="tc-btn-invisible">{{$:/core/images/close-button}}
+            <$action-sendmessage $message="tmap:tm-remove-edge" id=<<edge.id>> from=<<edge.from>> to=<<edge.to>> type=<<edge.type>> />
+          </$button>
+          <<direction>>
+          <$link to=<<neighbour>>>
+            <$view field="title" />
+          </$link>
+          (<<edge.label>>)
+        </div>
+      </$tmap-connections>
+    </p>      
   </div>
-</$reveal>
+</div>
+\end
+
+<$list filter="[{$:/temp/tiddlymap/quickConnectButton}prefix<qualify>first[]]"
+       variable="item" emptyMessage=<<hidePopup>>><<showPopup>>
+</$list>

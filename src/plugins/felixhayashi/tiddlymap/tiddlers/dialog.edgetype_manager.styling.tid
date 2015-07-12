@@ -4,7 +4,7 @@ caption: Styling
 \define flashTypeClass() tmap-flash-message tmap-$(flashType)$
 
 <$set name="trigger" value={{!!style}}>
-<$set name="flashType" value=<<map-macro "testJSON" "style">>>
+<$set name="flashType" value=<<tmap "testJSON" "style">>>
 <div class=<<flashTypeClass>>>The JSON you entered is: <<flashType>></div>
 </$set>
 </$set>

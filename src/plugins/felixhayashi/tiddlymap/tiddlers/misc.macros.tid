@@ -25,8 +25,8 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
 \define input-select(field, index, selectFilter, default)
   <$select tiddler=<<output>> field="$field$" index="$index$" default="$default$">
     <$list filter="$selectFilter$">
-      <option value=<<map-macro "splitAndSelect" "|" "0">> >
-        <<map-macro "splitAndSelect" "|" "1">>
+      <option value=<<tmap "splitAndSelect" "|" "0">> >
+        <<tmap "splitAndSelect" "|" "1">>
       </option>
     </$list>
   </$select>

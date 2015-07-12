@@ -50,6 +50,7 @@ module-type: library
                        "modified", "created", "show-label" ];
               
     this.id = this.utils.getWithoutPrefix(type, this.opt.path.edgeTypes + "/");
+
     this.loadDataFromType(this.id);
 
   };
@@ -91,6 +92,13 @@ module-type: library
   EdgeType.prototype.getLabel = function() {
   
     return this.data.label || this.getId(true);
+  
+  };
+  
+  EdgeType.prototype.getNamespace = function() {
+  
+    var match = this.id.match("^(.*):");
+    return (match ? match[1] : "");
   
   };
   

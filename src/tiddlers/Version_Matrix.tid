@@ -1,6 +1,6 @@
 created: 20150711205433243
 id: dd0a0883-5ea0-49a9-8f6a-6d510d77b225
-modified: 20150712173138595
+modified: 20150712183637132
 tags: 
 title: Version Matrix
 type: text/vnd.tiddlywiki
@@ -42,4 +42,4 @@ table.matrix tr th { border: none; background: none; }
 </$list>
 </table>
 
-The above matrix gives an overview about which versions affect which critical TiddlyMap aspects. For a more detailed impression have a look at the individual release notes.
+The above matrix gives a quick overview about which versions affect which critical TiddlyMap aspects. For a more detailed impression have a look at the individual release notes.

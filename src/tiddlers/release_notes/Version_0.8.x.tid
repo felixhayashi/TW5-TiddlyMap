@@ -36,6 +36,11 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.8.4
+
+* Fixed a bug that was introducced with v0.8.3 where noname edges
+  could not be created anymore.
+
 ### v0.8.3
 
 * Fixed bug that deletion of tags from toolbar button wasn't possible

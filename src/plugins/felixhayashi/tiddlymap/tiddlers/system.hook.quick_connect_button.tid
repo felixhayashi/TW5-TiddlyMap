@@ -92,7 +92,7 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
           <$link to=<<neighbour>>>
             <$view field="title" />
           </$link>
-          (<<edge.label>>)
+          (<<edge.type>>)
         </div>
       </$tmap-connections>
     </p>      

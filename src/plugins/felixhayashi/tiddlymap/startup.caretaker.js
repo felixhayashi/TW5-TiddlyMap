@@ -358,7 +358,7 @@ var printChanges = function(changedTiddlers) {
       if(changedTiddlers[tRef].deleted) {
         $tw.tmap.logger("warn", "Tiddler deleted:", tRef);
       } else {
-        $tw.tmap.logger("warn", "Tiddle modified:", utils.getTiddler(tRef));
+        $tw.tmap.logger("warn", "Tiddler modified:", utils.getTiddler(tRef));
       }
     }
   }

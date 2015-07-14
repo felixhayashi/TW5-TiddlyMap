@@ -118,16 +118,22 @@ MapWidget.prototype.handleConnectionEvent = function(edge, callback) {
       // get the default name space of the view
       var ns = this.view.getConfig("edge_type_namespace");
       
-      edge.type = (ns && !hasNamespace ? ns : "") + type;
+      // maybe add namespace to type and instanciate as EdgeType
+      type = new EdgeType((ns && !hasNamespace ? ns : "") + type);
+      
+      if(!type.exists()) type.persist();
+      
+      // add type to edge
+      edge.type = type.getId();
       var isSuccess = this.adapter.insertEdge(edge);
       
       var edgeTypeFilter = this.view.getEdgeFilter("compiled");
       var typeWL = this.adapter.getEdgeTypeWhiteList(edgeTypeFilter);
       
-      if(!typeWL[edge.type]) {
+      if(!typeWL[type.getId()]) {
         
         var dialog = {
-          type: edge.type,
+          type: type.getId(),
           view: this.view.getLabel()
         }
 

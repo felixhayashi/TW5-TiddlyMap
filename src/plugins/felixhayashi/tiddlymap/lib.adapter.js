@@ -91,6 +91,8 @@ module-type: library
    * It prepares the process arcoding to the action type and delegates
    * the task to more specific functions.
    * 
+   * The edge type is optional!!
+   * 
    * @private
    * @return {Edge} The processed edge.
    */
@@ -98,7 +100,7 @@ module-type: library
     
     this.logger("debug", "Edge", action, edge);
 
-    if(typeof edge !== "object" || !action || !edge.from || !edge.type) return;
+    if(typeof edge !== "object" || !action || !edge.from) return;
     if(action === "insert" && !edge.to) return;
     
     // get from-node and corresponding tiddler
@@ -1011,12 +1013,24 @@ module-type: library
    */
   Adapter.prototype.createView = function(label) {
       
-      if(typeof label !== "string" || label === "") {
-        label = "My view";
-      }
-      var tRef = this.wiki.generateNewTitle(this.opt.path.views + "/" + label);
-          
-      return new ViewAbstraction(tRef, true);
+    if(typeof label !== "string" || label === "") {
+      label = "My view";
+    }
+    var tRef = this.wiki.generateNewTitle(this.opt.path.views + "/" + label);
+        
+    return new ViewAbstraction(tRef, true);
+
+  };
+  
+  /**
+   * Create a new edge type.
+   * 
+   * @param {string} [id="tmap:unknown"] - An optional id.
+   * @return {EdgeType} The newly created edge type.
+   */
+  Adapter.prototype.createEdgeType = function(id) {
+                
+    return new EdgeType(id);
 
   };
     

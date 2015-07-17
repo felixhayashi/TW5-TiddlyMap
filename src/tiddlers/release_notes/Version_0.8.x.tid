@@ -36,6 +36,10 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.8.5
+
+* Fixes #153: Automatic zoom out after adding new node
+
 ### v0.8.4
 
 * Fixed a bug that was introducced with v0.8.3 where noname edges

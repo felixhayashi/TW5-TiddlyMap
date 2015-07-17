@@ -141,6 +141,8 @@ MapWidget.prototype.handleConnectionEvent = function(edge, callback) {
         
       }
       
+      this.preventFitAfterRebuild = true;
+      
     }
     
     if(typeof callback == "function") {
@@ -223,6 +225,14 @@ MapWidget.prototype.render = function(parent, nextSibling) {
   // get view and view holder
   this.viewHolderRef = this.getViewHolderRef();
   this.view = this.getView();
+                  
+  // flag that determines whether to zoom after stabilization finished;
+  // always set to false after the next stabilization
+  this.doFitAfterStabilize = true;
+  
+  // flag that determines whether to zoom after rebuilding the graph;
+  // always set to false after the next rebuild
+  this.preventFitAfterRebuild = false;
                   
   // *first* inject the bar
   this.initAndRenderEditorBar(parent);
@@ -414,7 +424,7 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
       resetOptions: true,
       resetFocus: { delay: 0, duration: 0 }
     };
-
+    
     if(isViewSwitched) {
       this.logger("warn", "View switched");
       this.view = this.getView(true);
@@ -422,6 +432,9 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
       this.logger("warn", "View modified", viewModifications);
       // not necessary to reset data
       options.resetData = false;
+      if(this.preventFitAfterRebuild) {
+        options.resetFocus = false;
+      }
     }
     
     this.rebuildGraph(options);
@@ -476,6 +489,30 @@ MapWidget.prototype.checkOnRefreshTriggers = function() {
   
 };
 
+/**
+ * Calling this method will cause the graph to be rebuild, which means
+ * the graph data is refreshed. A rebuild of the graph will always
+ * cause the network to stabilize again.
+ * 
+ * @param {Hashmap} [options] - An optional options object.
+ * @param {boolean} [options.refreshData=false] - If this is set to
+ *     true, all datasets will be cleared before new data is added.
+ *     This guarantees a fresh start. This option should only be
+ *     used when the topic of the graph changes (= view switched).
+ * @param {boolean} [options.refreshOptions=false] - If this is set
+ *     to true, the vis options will also be reloaded. This option
+ *     should only be used if the options have actually changed, which
+ *     is always the case when a view is switched or sometimes when
+ *     a view is modified.
+ * @param {Hashmap} [options.resetFocus=null] - If not false or null,
+ *     this object requires two properties to be set: `delay` (the
+ *     time to wait before starting the fit), `duration` (the length
+ *     of the fit animation). If the global flag `preventFitAfterRebuild`
+ *     is set to true at the time `rebuildGraph` is called with the
+ *     `resetFocus` option specified, then it overrules this option
+ *     and the fit will not take place. After the rebuild,
+ *     `preventFitAfterRebuild` is said to false again.
+ */
 MapWidget.prototype.rebuildGraph = function(options) {
   
   if(utils.isPreviewed(this)) return;
@@ -502,6 +539,11 @@ MapWidget.prototype.rebuildGraph = function(options) {
     this.network.setOptions(this.graphOptions);
   }
   
+  if(!options.resetFocus) {
+    // option or data resets always overrule any flags!
+    this.doFitAfterStabilize = false;
+  }
+  
   this.rebuildGraphData(true);
   
   if(!utils.hasElements(this.graphData.nodesById)) {
@@ -516,15 +558,16 @@ MapWidget.prototype.rebuildGraph = function(options) {
   // the question is whether after a rebuild the focus should be immediately
   // reset or not. Zooming after stabilization does always(!) takes place
   // after a rebuild, in contrast, resetting the focus doesn't necessarily take place.
-  if(options.resetFocus && !this.preventNextContextReset) {
+  if(options.resetFocus && !this.preventFitAfterRebuild) {
+    
+    // a not-prevented focus reset will always also cause a fit after stabilize
+    this.doFitAfterStabilize = true;
     this.fitGraph(options.resetFocus.delay, options.resetFocus.duration);
+        
   }
   
-
-  
-  // reset these; in any case!!
-  this.doZoomAfterStabilize = true;
-  this.preventNextContextReset = false;
+  // in any case, reset to default
+  this.preventFitAfterRebuild = false;
   
 };
 
@@ -625,33 +668,39 @@ MapWidget.prototype.checkOnEditorBar = function(changedTiddlers, isViewSwitched,
  * 2. A node that once matched the node filter has been removed
  * 3. An edge that matches the edge filter has been added or removed.
  * 
+ * @param {Hashmap<TiddlerReference, *>} changedTiddlers - A list of
+ *     tiddler changes.
  */
 MapWidget.prototype.checkOnGraph = function(changedTiddlers) {
    
+  // check for changed or removed nodes and edges
+  
   var nodeFilter = this.view.getNodeFilter("compiled");
   var matches = utils.getMatches(nodeFilter, Object.keys(changedTiddlers), true);
-                                
   for(var tRef in changedTiddlers) {
     
     if(utils.isSystemOrDraft(tRef)) continue;
     
     var isMatch = matches[tRef];
     var wasMatch = this.graphData.nodesById[this.adapter.getId(tRef)];
-          
+    
     if(isMatch || wasMatch) {
-      // either (1) a match changed or (2) a former match is not included anymore
-      this.rebuildGraph();
+      // either (1) a match changed or (2) a former match is not included anymore;
+      // a match change also includes changed edges as edges are stored in the nodes!
+      this.rebuildGraph({resetFocus: { delay: 0, duration: 0 }});
       return;
     }
     
   }
-    
+  
+  // check for changed edge-types
+  
   var edgeFilter = this.view.getEdgeFilter("compiled");
   var changedEdgeTypes = utils.getMatches(edgeFilter, Object.keys(changedTiddlers));
   
   if(changedEdgeTypes.length) {
     this.logger("info", "Changed edge-types", changedEdgeTypes);
-    this.rebuildGraph();
+    this.rebuildGraph({resetFocus: { delay: 0, duration: 0 }});
     return;
   }
 
@@ -721,11 +770,9 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
   this.network.on('dragStart', this.handleVisDragStart.bind(this));
   this.network.on("dragEnd", this.handleVisDragEnd.bind(this));
   this.network.on("select", this.handleVisSelect.bind(this));
-  this.network.on("viewChanged", this.handleVisViewportChanged.bind(this));
   this.network.on("beforeDrawing", this.handleVisBeforeDrawing.bind(this));
   this.network.on("stabilizationProgress", this.handleVisLoading.bind(this));
   this.network.on("stabilizationIterationsDone", this.handleVisLoadingDone.bind(this));
-  
   
   this.addGraphButtons({
     "fullscreen-button": function() { this.handleToggleFullscreen(false); }
@@ -737,9 +784,7 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
     });
   }
 
-  this.rebuildGraph({
-    resetFocus: { delay: 0, duration: 0 }
-  });
+  this.rebuildGraph({ resetFocus: { delay: 0, duration: 0 }});
 
 };
 
@@ -1035,7 +1080,13 @@ MapWidget.prototype.handleConfigureSystem = function() {
   
 };
 
-
+/**
+ * Handler that guides the user through the process of creating edges
+ * 
+ * This action represents a direct graph manipulation by the user,
+ * which means it will prevent a graph fitting (viewport adjusting)
+ * in the course of the next rebuild.
+ */
 MapWidget.prototype.handleReconnectEdge = function(updates) {
   
   // get current edge data
@@ -1046,6 +1097,9 @@ MapWidget.prototype.handleReconnectEdge = function(updates) {
   
   // update from and to properties
   var newEdge = $tw.utils.extend(oldEdge, updates);
+  
+  // prevent focus reset
+  this.preventFitAfterRebuild = true;
       
   // insert updated edge into store
   return this.adapter.insertEdge(newEdge);
@@ -1054,6 +1108,7 @@ MapWidget.prototype.handleReconnectEdge = function(updates) {
 
 /**
  * Called by vis when the user tries to delete a node or an edge.
+ * The action is delegated to subhandlers.
  * 
  * @param {Object} elements - An object containing the elements to be removed.
  * @param {Array<Id>} elements.nodes - Removed edges.
@@ -1061,7 +1116,7 @@ MapWidget.prototype.handleReconnectEdge = function(updates) {
  */
 MapWidget.prototype.handleRemoveElement = function(elements) {
   
-  if(elements.edges.length && !elements.nodes.length) { // only deleting edges
+  if(elements.edges.length && !elements.nodes.length) {
     this.handleRemoveEdges(elements.edges);
   }
                       
@@ -1072,14 +1127,26 @@ MapWidget.prototype.handleRemoveElement = function(elements) {
   this.resetVisManipulationBar();
   
 };
-  
+
 MapWidget.prototype.handleRemoveEdges = function(edges) {
   
   this.adapter.deleteEdges(this.graphData.edges.get(edges));
   this.notify("edge" + (edges.length > 1 ? "s" : "") + " removed");
   
+  this.preventFitAfterRebuild = true;
+  
 };
 
+
+/**
+ * Handler that guides the user through the process of deleting a node
+ * from the graph. The nodes may be removed from the filter (if possible)
+ * or from the system.
+ * 
+ * This action represents a direct graph manipulation by the user,
+ * which means it will prevent a graph fitting (viewport adjusting)
+ * in the course of the next rebuild.
+ */
 MapWidget.prototype.handleRemoveNode = function(node) {
 
   var params = {
@@ -1111,6 +1178,8 @@ MapWidget.prototype.handleRemoveNode = function(node) {
         }
         
       }
+      
+      this.preventFitAfterRebuild = true;
       
       this.notify("Node removed " + outputTObj.fields["opt.delete"]);
       
@@ -1258,8 +1327,8 @@ MapWidget.prototype.handleVisStabilizedEvent = function(properties) {
     this.network.storePositions();
     this.setNodesMoveable(this.graphData.nodesById, isFloatingMode);
         
-    if(this.doZoomAfterStabilize) {
-      this.doZoomAfterStabilize = false;
+    if(this.doFitAfterStabilize) {
+      this.doFitAfterStabilize = false;
       this.fitGraph(1000, 1000);
     }
   }
@@ -1339,11 +1408,13 @@ MapWidget.prototype.handleInsertNode = function(node) {
       if(utils.tiddlerExists(title)) {
         
         if(utils.isMatch(title, this.view.getNodeFilter("compiled"))) {
+          
           this.notify("Node already exists");
+          return;
+          
         } else {
           node = this.adapter.makeNode(title, node, this.view);
           this.view.addNodeToView(node);
-          this.rebuildGraph();
         }
         
       } else {
@@ -1353,14 +1424,16 @@ MapWidget.prototype.handleInsertNode = function(node) {
           view: this.view,
           editNodeOnCreate: false
         });
-        this.preventNextContextReset = true;
       
       }
+      
+      this.preventFitAfterRebuild = true;
+      
     }
   });
   
 };
-  
+
 /**
  * This handler is registered at and called by the vis network event
  * system.
@@ -1520,10 +1593,6 @@ MapWidget.prototype.handleVisDragEnd = function(properties) {
 
 MapWidget.prototype.handleVisSelect = function(properties) {
   //
-};
-
-MapWidget.prototype.handleVisViewportChanged = function(properties) {
-  this.doZoomAfterStabilize = false;
 };
 
 MapWidget.prototype.handleVisBeforeDrawing = function(context2d) {

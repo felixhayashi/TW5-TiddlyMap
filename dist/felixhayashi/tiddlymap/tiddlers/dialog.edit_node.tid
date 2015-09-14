@@ -1,0 +1,35 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/editNode
+subtitle: {{$:/core/images/edit-button}} Editing style of node "<<tiddler>>"
+
+\define tab(name) $(template)$/$name$
+
+\define maybeShowTidColorWarning()
+  <$list filter="[<tidColor>regexp[.+]]">
+  <div class="tmap-flash-message tmap-warning">
+    {{$:/core/images/info-button}} You have set the tiddler's color
+    field to "<<tidColor>>". This value will be completely ignored
+    when you change node's color properties in the vis editor below.
+  </div>
+  </$list>
+  <$list filter="[<tidIcon>regexp[.+]]">
+  <div class="tmap-flash-message tmap-warning">
+    {{$:/core/images/info-button}} The tiddler is displayed as icon in the graph. Do __not__ change the shape property unless
+    you want the icon to be ignored.
+  </div>
+  </$list>
+\end
+
+<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]] [[$:/core/macros/tabs]]">
+
+A node's individual style may be defined on two levels. Click on the tabs for further details. All options are documented at [[vis.js.org|http://visjs.org/docs/network/nodes]].
+
+<<templateTRef>>
+
+<$macrocall
+  $name="tabs"
+  default=<<tab "default">>
+  state="$:/state/tabs/elementTypeManager"
+  tabsList="[all[shadows]prefix<template>] -[<template>]"
+/>
+
+</$importvariables>

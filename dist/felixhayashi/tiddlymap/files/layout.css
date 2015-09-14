@@ -1,10 +1,38 @@
+/**** TiddlyWiki ***************************************************/
+/**
+ * Do not allow blurred background for dialogs
+ * see: https://github.com/Jermolene/TiddlyWiki5/issues/1893
+ */
+.tc-page-container-wrapper.tc-modal-displayed {
+  -webkit-filter: inherit;
+  -moz-filter: inherit;
+  filter: inherit; }
+
+/**** Flash messages ***********************************************/
 .tmap-flash-message {
   border: 1px solid lightgray;
-  padding: 5px; }
-  .tmap-flash-message.tmap-valid {
+  padding: 5px;
+  margin: 6px 0; }
+  .tmap-flash-message svg {
+    vertical-align: text-top;
+    width: 1em;
+    height: 1em; }
+  .tmap-flash-message.tmap-valid, .tmap-flash-message.tmap-info {
     background: #D1EED4; }
-  .tmap-flash-message.tmap-malformed {
+  .tmap-flash-message.tmap-neutral, .tmap-flash-message.tmap-warning {
+    background: #FFF6D1; }
+  .tmap-flash-message.tmap-malformed, .tmap-flash-message.tmap-invalid, .tmap-flash-message.tmap-danger {
     background: #EED5D1; }
+
+/*******************************************************************/
+.tmap-list-separator {
+  display: block;
+  background-color: #efefef;
+  margin: 10px 0 5px 0;
+  cursor: default;
+  border-bottom: 1px dotted gray;
+  font-weight: bold;
+  font-size: 0.8em; }
 
 .tmap-graph-placeholder::before {
   content: "TiddlyMap";
@@ -12,6 +40,12 @@
   text-align: center;
   padding: 20px;
   background-color: whitesmoke; }
+
+.tmap-unicode-icon {
+  width: 1em;
+  display: inline-block;
+  text-align: center;
+  color: black; }
 
 html {
   /*
@@ -31,6 +65,8 @@ html {
     display: block; }
   html .tmap-very-small-list {
     max-height: 70px; }
+  html .tc-tiddler-controls button.tmap-active-button svg {
+    fill: #888888; }
   html .tmap-quick-connect {
     font-size: 0.7em; }
     html .tmap-quick-connect .tc-drop-down {
@@ -40,11 +76,13 @@ html {
       line-height: 1em;
       position: absolute;
       z-index: 1000;
-      right: 50px; }
+      right: 50px;
+      background: linear-gradient(45deg, #f5f5f5 0%, #ffffff 50%, #f5f5f5 100%); }
       html .tmap-quick-connect .tc-drop-down select {
         width: 80px;
         word-wrap: initial; }
       html .tmap-quick-connect .tc-drop-down table {
+        width: 100%;
         border: none;
         margin-bottom: 0px; }
         html .tmap-quick-connect .tc-drop-down table td {
@@ -69,6 +107,8 @@ html {
           background: transparent;
           color: #5778d8;
           text-decoration: underline; }
+      html .tmap-quick-connect .tc-drop-down span.tmap-hide-links {
+        float: right; }
       html .tmap-quick-connect .tc-drop-down button {
         display: inline-block;
         padding: 0px 3px;
@@ -82,6 +122,10 @@ html {
           fill: #ffffff; }
   html .tc-modal-wrapper {
     z-index: 1010; }
+    html .tc-modal-wrapper .tc-modal {
+      boder: 1px solid #999999;
+      left: calc(50% - 400px);
+      width: 802px; }
     html .tc-modal-wrapper .tc-modal-header svg {
       vertical-align: sub; }
     html .tc-modal-wrapper .tc-modal-header h3 {
@@ -89,7 +133,9 @@ html {
     html .tc-modal-wrapper .tc-modal-body {
       min-height: 250px;
       max-height: 70vh;
-      overflow: auto; }
+      overflow: auto;
+      left: calc(50% - 400px);
+      width: 800px; }
       html .tc-modal-wrapper .tc-modal-body > div > p:first-child {
         margin-top: 0px; }
       html .tc-modal-wrapper .tc-modal-body > div > p:last-child {
@@ -103,24 +149,27 @@ html {
         border: none; }
         html .tc-modal-wrapper .tc-modal-body .tmap-modal-editor .tc-tiddler-frame .tc-tiddler-title {
           display: none; }
-      html .tc-modal-wrapper .tc-modal-body #edge-type-manager .tc-tab-buttons {
+      html .tc-modal-wrapper .tc-modal-body #element-type-manager .tc-tab-buttons {
         padding-top: 0px; }
-      html .tc-modal-wrapper .tc-modal-body #edge-type-manager > div:first-child {
+      html .tc-modal-wrapper .tc-modal-body #element-type-manager > div:first-child {
         height: 100%;
         float: left;
         width: 20%;
         position: fixed; }
-        html .tc-modal-wrapper .tc-modal-body #edge-type-manager > div:first-child .searchbar input {
+        html .tc-modal-wrapper .tc-modal-body #element-type-manager > div:first-child .searchbar input {
           width: 100%; }
-        html .tc-modal-wrapper .tc-modal-body #edge-type-manager > div:first-child ul {
+        html .tc-modal-wrapper .tc-modal-body #element-type-manager > div:first-child ul {
           height: calc(100% - 135px);
           overflow: auto;
           margin: 5px 0 0 0;
           padding-left: 0px;
-          list-style: none; }
-          html .tc-modal-wrapper .tc-modal-body #edge-type-manager > div:first-child ul li {
+          list-style: none;
+          background: linear-gradient(45deg, #f5f5f5 0%, #ffffff 50%, #f5f5f5 100%); }
+          html .tc-modal-wrapper .tc-modal-body #element-type-manager > div:first-child ul li {
             white-space: nowrap; }
-      html .tc-modal-wrapper .tc-modal-body #edge-type-manager > div:last-child {
+            html .tc-modal-wrapper .tc-modal-body #element-type-manager > div:first-child ul li input.tmap-ranking {
+              width: 25px; }
+      html .tc-modal-wrapper .tc-modal-body #element-type-manager > div:last-child {
         height: 100%;
         width: calc(80% - 20px);
         margin-left: 22%; }
@@ -134,9 +183,10 @@ html {
         html .tc-modal-wrapper .tc-modal-body table td, html .tc-modal-wrapper .tc-modal-body table th {
           border: 1px solid lightgray; }
         html .tc-modal-wrapper .tc-modal-body table.tmap-key-value-table th {
-          width: 30%; }
+          width: 30%;
+          background-color: #F0F0F0; }
         html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr:nth-child(odd) {
-          background-color: #E8E8E8; }
+          background-color: #F0F0F0; }
         html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr:nth-child(even) {
           background-color: #FFFFFF; }
         html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr:hover {
@@ -148,13 +198,15 @@ html {
           html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td:first-child {
             width: 15%; }
           html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td:last-child {
-            width: 35%; }
-          html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td input, html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td textarea, html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td select {
+            width: 40%; }
+          html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td input:not([type=radio]), html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td textarea, html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td select {
             width: 100%;
             /* prevents bad looking select boxes and wrapping in textareas */
             word-wrap: normal; }
+          html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td div.tmap-button-wrapper {
+            text-align: center; }
         html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr .tmap-note {
-          margin: 10px 10px 10px 0; }
+          margin-top: 0.5em; }
         html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr .tmap-description {
           font-style: italic; }
         html .tc-modal-wrapper .tc-modal-body table ul {
@@ -193,6 +245,8 @@ html {
       margin: 0;
       background: #ececec;
       z-index: 1000; }
+      html .tc-sidebar-scrollable .tmap-widget.tmap-halfscreen .tmap-fullscreen-button {
+        display: none; }
   html .tmap-widget {
     position: relative;
     border: 1px dotted lightgray;
@@ -200,19 +254,8 @@ html {
     width: 100%;
     color: #666666;
     display: block; }
-    html .tmap-widget .tmap-loading-bar {
-      display: block;
-      position: absolute;
-      text-align: center;
-      font-size: 2em;
-      padding: 10px;
-      top: 50%;
-      background: rgba(245, 245, 245, 0.5);
-      z-index: 1;
-      width: 250px;
-      margin: auto;
-      left: 0px;
-      right: 0px; }
+    html .tmap-widget.tmap-fullscreen .vis-network .tmap-halfscreen-button {
+      display: none; }
     html .tmap-widget.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) {
       cursor: pointer; }
       html .tmap-widget.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) .vis-navigation {
@@ -233,6 +276,19 @@ html {
         z-index: 2000;
         padding: 5px;
         pointer-events: none; }
+    html .tmap-widget .tmap-loading-bar {
+      display: block;
+      position: absolute;
+      text-align: center;
+      font-size: 2em;
+      padding: 10px;
+      top: 50%;
+      background: rgba(245, 245, 245, 0.5);
+      z-index: 1;
+      width: 250px;
+      margin: auto;
+      left: 0px;
+      right: 0px; }
     html .tmap-widget .tmap-vis-graph {
       height: calc(100% - 35px); }
       html .tmap-widget .tmap-vis-graph .vis-network .vis-network-tooltip {
@@ -280,11 +336,11 @@ html {
         html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-zoomIn:before {
           content: "Zoom in"; }
         html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-zoomExtends:before {
-          content: "Reset focus"; }
+          content: "Fit whole graph"; }
         html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.tmap-fullscreen-button:before {
-          content: "Fullscreen"; }
+          content: "Toggle Fullscreen"; }
         html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.tmap-halfscreen-button:before {
-          content: "Halfscreen"; }
+          content: "Toggle Halfscreen"; }
     html .tmap-widget.tmap-no-buttons .vis-navigation {
       display: none; }
     html .tmap-widget.tmap-advanced-editor {
@@ -364,6 +420,43 @@ html {
         padding: inherit;
         box-shadow: none; }
 
+/**** Config Widget ************************************************/
+.tmap-config-widget {
+  background: #F0F0F0;
+  padding: 5px;
+  margin: 5px 0;
+  box-sizing: border-box;
+  display: block; }
+  .tmap-config-widget .vis-network {
+    display: none; }
+  .tmap-config-widget .vis-configuration-wrapper {
+    width: 350px; }
+    .tmap-config-widget .vis-configuration-wrapper .vis-config-rangeinput {
+      height: inherit;
+      margin-left: 4px; }
+    .tmap-config-widget .vis-configuration-wrapper .vis-config-item {
+      width: 100%;
+      height: inherit;
+      background: none !important; }
+      .tmap-config-widget .vis-configuration-wrapper .vis-config-item .vis-config-range {
+        width: 150px; }
+        .tmap-config-widget .vis-configuration-wrapper .vis-config-item .vis-config-range::-moz-range-track {
+          width: 150px !important; }
+      .tmap-config-widget .vis-configuration-wrapper .vis-config-item .vis-config-label {
+        width: 120px; }
+  .tmap-config-widget .vis-color-picker {
+    width: 310px;
+    left: 20px !important;
+    top: 20px !important;
+    margin-top: 0px;
+    margin-left: 0px;
+    height: 444px; }
+  .tmap-config-widget::after {
+    clear: both;
+    content: "";
+    display: block; }
+
+/**** Fullscreen ***************************************************/
 html:fullscreen body {
   overflow: hidden; }
 html:fullscreen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
@@ -459,3 +552,14 @@ html:-ms-fullscreen .tmap-has-fullscreen-child {
     z-index: 999 !important;
     border: none !important;
     margin: 0 !important; }
+
+/**** Media queries ************************************************/
+@media (max-width: {{$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint}}) {
+  .tc-sidebar-scrollable .tmap-desktop-editor {
+    display: none; }
+ }
+
+@media (min-width: {{$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint}}) {
+  .tc-sidebar-scrollable .tmap-mobile-editor {
+    display: none; }
+ }

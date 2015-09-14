@@ -1,6 +1,6 @@
 /*\
 
-title: $:/plugins/felixhayashi/tiddlymap/startup/listener.js
+title: $:/plugins/felixhayashi/tiddlymap/js/startup/listener
 type: application/javascript
 module-type: startup
 
@@ -15,15 +15,12 @@ module-type: startup
 /*global $tw: false */
 "use strict";
 
-// Export name and synchronous status
-exports.name = "tmap.listener";
-exports.platforms = [ "browser" ];
-exports.after = [ "rootwidget", "tmap.caretaker" ];
-exports.before = [ "story" ];
-exports.synchronous = true;
+/**************************** IMPORTS ****************************/
 
-var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
-var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/edgetype.js").EdgeType;
+var NodeType = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;
+var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
+
+/***************************** CODE ******************************/
 
 var GlobalListener = function() {
     
@@ -32,18 +29,21 @@ var GlobalListener = function() {
   this.wiki = $tw.wiki;
   this.logger = $tw.tmap.logger;
   this.opt = $tw.tmap.opt;
+  this.utils = $tw.tmap.utils;
+  this.dialogManager = $tw.tmap.dialogManager;
     
   // add handlers to the root widget to make them available from everywhere
-  utils.addListeners({ 
+  this.utils.addListeners({ 
     "tmap:tm-remove-edge": this.handleRemoveEdge,
-    "tmap:tm-fill-edge-type-form": this.handleFillEdgeTypeForm,
-    "tmap:tm-save-edge-type-form": this.handleSaveEdgeTypeForm,
-    "tmap:tm-create-edge-type": this.handleCreateEdgeType,
+    "tmap:tm-load-type-form": this.handleLoadTypeForm,
+    "tmap:tm-save-type-form": this.handleSaveTypeForm,
+    "tmap:tm-create-type": this.handleCreateType,
     "tmap:tm-create-edge": this.handleCreateEdge,
     "tmap:tm-suppress-dialog": this.handleSuppressDialog,
     "tmap:tm-generate-widget": this.handleGenerateWidget,
     "tmap:tm-download-graph": this.handleDownloadGraph,
-    "tmap:tm-manage-edge-types": this.handleManageEdgeTypes,
+    "tmap:tm-manage-edge-types": this.handleOpenTypeManager,
+    "tmap:tm-manage-node-types": this.handleOpenTypeManager,
     "tmap:tm-cancel-dialog": this.handleCancelDialog,
     "tmap:tm-confirm-dialog": this.handleConfirmDialog
   }, $tw.rootWidget, this);
@@ -51,43 +51,21 @@ var GlobalListener = function() {
 };
 
 GlobalListener.prototype.handleCancelDialog = function(event) {
-  utils.setField(event.param, "text", "");
+  this.utils.setField(event.param, "text", "");
 };
 
 GlobalListener.prototype.handleConfirmDialog = function(event) {
-  utils.setField(event.param, "text", "1");
+  this.utils.setField(event.param, "text", "1");
 };
-
-GlobalListener.prototype.handleManageEdgeTypes = function(event) {
-  
-  if(!event.paramObject) event.paramObject = {};
-  
-  var params = {
-    param: {
-      filter: this.opt.selector.allEdgeTypesByLabel
-              + " +[search:title{$:/temp/tmap/edgeTypeSearch}]"
-              + " +[sort[title]]"
-    }
-  };
-  
-  var dialogTObj = $tw.tmap.dialogManager.open("edgeTypeManager", params);
-  
-  var type = event.paramObject.type;
-  if(type) {
-    this.handleFillEdgeTypeForm({
-      paramObject: {
-        id: type,
-        output: dialogTObj.fields["output"]
-      }
-    });
-  }
-  
-};  
   
 GlobalListener.prototype.handleSuppressDialog = function(event) {
 
-  if(utils.isTrue(event.paramObject.suppress, false)) {
-    utils.setEntry(this.opt.ref.sysUserConf, "suppressedDialogs." + event.paramObject.dialog, true);
+  if(this.utils.isTrue(event.paramObject.suppress, false)) {
+    this.utils.setEntry(
+        this.opt.ref.sysUserConf,
+        "suppressedDialogs." + event.paramObject.dialog,
+        true
+    );
   }
   
 };
@@ -96,14 +74,16 @@ GlobalListener.prototype.handleDownloadGraph = function(event) {
 
   var graph = this.adapter.getGraph({ view: event.paramObject.view });  
   
-  graph.nodes = utils.convert(graph.nodes, "array");
-  graph.edges = utils.convert(graph.edges, "array");
+  graph.nodes = this.utils.convert(graph.nodes, "array");
+  graph.edges = this.utils.convert(graph.edges, "array");
   
-  utils.setField("$:/temp/tmap/export", "text", JSON.stringify(graph, null, 2));
+  var tRef = "$:/temp/tmap/export";
+
+  this.utils.setField(tRef, "text", JSON.stringify(graph, null, 2));
     
   $tw.rootWidget.dispatchEvent({
     type: "tm-download-file",
-    param: "$:/temp/tmap/export",
+    param: tRef,
     paramObject: {
       filename: event.paramObject.view + ".json"
     }
@@ -120,7 +100,7 @@ GlobalListener.prototype.handleGenerateWidget = function(event) {
       preselects: { view: event.paramObject.view || "Default" }
     }
   };
-  $tw.tmap.dialogManager.open("getWidgetCode", options);
+  this.dialogManager.open("getWidgetCode", options);
   
 };
 
@@ -131,7 +111,7 @@ GlobalListener.prototype.handleRemoveEdge = function(event) {
 };
 
 GlobalListener.prototype.handleCreateEdge = function(event) {
-    
+
   var edge = {
     from: this.adapter.makeNode(event.paramObject.from).id,
     to: this.adapter.makeNode(event.paramObject.to).id,
@@ -144,82 +124,176 @@ GlobalListener.prototype.handleCreateEdge = function(event) {
    
 };
 
-GlobalListener.prototype.handleSaveEdgeTypeForm = function(event) {
+GlobalListener.prototype.handleOpenTypeManager = function(event) {
+    
+  if(!event.paramObject) event.paramObject = {};
   
-  var tObj = utils.getTiddler(event.paramObject.output);
-  var type = new EdgeType(tObj.fields.id);
+  // either "manage-edge-types" or "manage-node-types"
+  var mode = event.type.match(/tmap:tm-(.*)/)[1];
   
-  if(utils.isTrue(tObj.fields["temp.deleteType"], false)) {
-    
-    this.logger("debug", "Deleting type", type);
-    this.adapter._processEdgesWithType(type, { action: "delete" });
-    this.wiki.addTiddler(new $tw.Tiddler({title: event.paramObject.output}));
-    $tw.tmap.notify("Deleted type");
-    
-  } else { 
-    
-    type.loadDataFromTiddler(tObj);
-    type.persist();
+  if(mode === "manage-edge-types") {
+    var topic = "Edge-Type Manager";
+    var allTypesSelector = this.opt.selector.allEdgeTypesByLabel;
+  } else {
+    var topic = "Node-Type Manager";
+    var allTypesSelector = this.opt.selector.allNodeTypesByLabel;
+  }
+                          
+  var opts = {
+    mode: mode,
+    topic: topic,
+    filter: allTypesSelector
+            + " +[search:title{$:/temp/tmap/elementTypeSearch}]"
+            + " +[sort[title]]"
+  };
+  
+  var dialogTObj = this.dialogManager.open("elementTypeManager", opts);
+  
+  if(event.paramObject.type) {
+    this.handleLoadTypeForm({
+      paramObject: {
+        mode: mode,
+        id: event.paramObject.type,
+        output: dialogTObj.fields["output"]
+      }
+    });
+  }
+  
+};
 
-    if(!tObj.fields["temp.newId"]) { // no new id set
+GlobalListener.prototype.handleLoadTypeForm = function(event) {
+  
+  var outTRef = event.paramObject.output;
+    
+  var type = (event.paramObject.mode === "manage-edge-types"
+              ? new EdgeType(event.paramObject.id)
+              : new NodeType(event.paramObject.id));
+  
+  // inject all the type data as fields into the dialog output
+  type.persist(outTRef, true);
+  
+  // fields that need preprocessing
+  
+  if(event.paramObject.mode === "manage-edge-types") {
+    var usage = this.adapter.selectEdgesByType(type);
+    var count = Object.keys(usage).length;
+    this.utils.setField(outTRef, "temp.usageCount", count);
+  }
+  
+  $tw.wiki.addTiddler(new $tw.Tiddler(
+    this.utils.getTiddler(outTRef),
+    {
+      "temp.idImmutable": (type.isShipped() ? "true" : ""),
+      "temp.newId": type.getId(),
+      "vis-inherited": JSON.stringify(this.opt.config.vis)
+    }
+  ));
+
+  // reset the tabs to default
+  this.utils.deleteByPrefix("$:/state/tabs/elementTypeManager");
+  
+};
+
+GlobalListener.prototype.handleSaveTypeForm = function(event) {
+  
+  var tObj = this.utils.getTiddler(event.paramObject.output);  
+  if(!tObj) return;
+  
+  var mode = event.paramObject.mode;
+  var type = (mode === "manage-edge-types"
+              ? new EdgeType(tObj.fields.id)
+              : new NodeType(tObj.fields.id));
+  
+  if(this.utils.isTrue(tObj.fields["temp.deleteType"], false)) {
+    this.deleteType(mode, type, tObj);
+  } else {
+    this.saveType(mode, type, tObj);
+  }
+  
+};
+
+GlobalListener.prototype.deleteType = function(mode, type, dialogOutput) {
+  
+  this.logger("debug", "Deleting type", type);
       
-      // set id back to original state
-      utils.setField(tObj, "temp.newId", tObj.fields["id"]);
-      
-    } else if(tObj.fields["temp.newId"] !== tObj.fields["id"]) { //renamed
-      
+  if(mode === "manage-edge-types") {
+    this.adapter._processEdgesWithType(type, { action: "delete" });
+  } else {
+    this.adapter.removeNodeType(type);
+  }
+  
+  this.wiki.addTiddler(new $tw.Tiddler({
+    title: this.utils.getTiddlerRef(dialogOutput)
+  }));
+  
+  $tw.tmap.notify("Deleted type");
+  
+};
+
+GlobalListener.prototype.saveType = function(mode, type, dialogOutput) {
+  
+  var tObj = this.utils.getTiddler(dialogOutput);
+  
+  // save
+  type.loadDataFromTiddler(tObj);
+  type.persist();
+  
+  if(!tObj.fields["temp.newId"]) { // no new id set
+    
+    // set id back to original state
+    this.utils.setField(tObj, "temp.newId", tObj.fields["id"]);
+    
+  } else if(tObj.fields["temp.newId"] !== tObj.fields["id"]) { //renamed
+    
+    if(mode === "manage-edge-types") {
       this.adapter._processEdgesWithType(type, {
         action: "rename",
         newName: tObj.fields["temp.newId"]
       });
-      
-      utils.setField(tObj, "id", tObj.fields["temp.newId"]);
-
     }
-    
-    $tw.tmap.notify("Saved type data");
-    
+    this.utils.setField(tObj, "id", tObj.fields["temp.newId"]);
   }
-
-};
-
-GlobalListener.prototype.handleFillEdgeTypeForm = function(event) {
   
-  var type = new EdgeType(event.paramObject.id);
-  var outTRef = event.paramObject.output;
-  var usage = this.adapter.selectEdgesByType(type);
-  
-  type.persist(outTRef, true);
-
-  utils.setField(outTRef, "temp.idImmutable", (type.isShipped() ? "true" : ""));
-  utils.setField(outTRef, "temp.newId", type.getId());
-  utils.setField(outTRef, "temp.usageCount", Object.keys(usage).length);
-    
-  // reset the tabs to default
-  utils.deleteByPrefix("$:/state/tabs/edgeTypeManager");
+  $tw.tmap.notify("Saved type data");
   
 };
 
-// TODO refactor to adapter!
-GlobalListener.prototype.handleCreateEdgeType = function(event) {
+GlobalListener.prototype.handleCreateType = function(event) {
   
-  var name = this.wiki.generateNewTitle(this.opt.path.edgeTypes + "/New Type");
-  var type = new EdgeType(utils.getBasename(name));
-  
-  type.persist();
-    
-  this.handleFillEdgeTypeForm({
+  var id = event.paramObject.id;
+  var type = (event.paramObject.mode === "manage-edge-types" ? "edge" : "node");
+
+  this.handleLoadTypeForm({
     paramObject: {
-      id: type.getId(),
+      id: this.adapter.createType(type, id).getId(),
+      mode: event.paramObject.mode,
       output: event.paramObject.output
     }
   });
   
 };
 
+/**
+ * Helper
+ */
+GlobalListener.prototype.getTypeFromEvent = function(event) {
+    
+  return (event.paramObject.mode === "manage-edge-types"
+          ? new EdgeType(event.paramObject.id)
+          : new NodeType(event.paramObject.id));
+          
+};
+
+/**************************** EXPORTS ****************************/
+
+exports.name = "tmap.listener";
+exports.platforms = [ "browser" ];
+exports.after = [ "rootwidget", "tmap.caretaker" ];
+exports.before = [ "story" ];
+exports.synchronous = true;
 exports.startup = function() {
   // will register its lister functions to the root widget
   new GlobalListener();
-}
+};
 
 })();

@@ -7,12 +7,9 @@ type: application/json
     "nodeLabel": "caption",
     "nodeIcon": "icon",
     "nodeInfo": "description",
-    "viewMarker": "isview",
-    "edgeTypeMarker": "tmap.is-edge-type",
-    "edges": "tmap.edges"
+    "viewMarker": "isview"
   },
-  "suppressedDialogs": {
-  },
+  "suppressedDialogs": {},
   "edgeClickBehaviour": "manager",
   "debug": "false",
   "notifications": "true",

@@ -9,8 +9,16 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
   </$reveal>
 \end
 
+\define input-button(field, index, default, default, label:"Proceed")
+  <div class="tmap-button-wrapper">
+  <$button>$label$
+    <$action-setfield $tiddler=<<output>> $field="$field$" index="$index$" $value="$default$" />
+  </$button>
+  </div>
+\end
+
 \define input-textarea(field, index, default, default)
-  <$edit-text tiddler=<<output>> field="$field$" index="$index$" type="text" tag="textarea" default="$default$" />
+  <$edit-text tiddler=<<output>> field="$field$" index="$index$" autoHeight="no" type="text" tag="textarea" default="$default$" />
 \end
 
 \define input-checkbox(field, index, readonly, default)
@@ -22,31 +30,48 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
   </$reveal>
 \end
 
-\define input-select(field, index, selectFilter, default)
+\define input-select(field, index, selectFilter, default, nochoice)
   <$select tiddler=<<output>> field="$field$" index="$index$" default="$default$">
+    <$set name="nochoice" value="$nochoice$">
+      <$list filter="[<nochoice>regexp[.+]]">
+        <option value=""><b><<nochoice>></b></option>
+      </$list>
+    </$set>
     <$list filter="$selectFilter$">
       <option value=<<tmap "splitAndSelect" "|" "0">> >
-        <<tmap "splitAndSelect" "|" "1">>
+        <$view tiddler=<<tmap "splitAndSelect" "|" "1">> field="title" />   
       </option>
-    </$list>
+    </$list> 
   </$select>
 \end
 
-\define input-radio(field, index, default)
-  <$radio tiddler=<<output>> field="$field$" index="$index$" value="$value$" />
+\define input-radio(field, index, selectFilter, default)
+  <$list filter="$selectFilter$">
+    <$radio tiddler=<<output>> field="$field$" index="$index$" value=<<tmap "splitAndSelect" "|" "0">>>
+      <<tmap "splitAndSelect" "|" "1">>
+    </$radio><br />
+  </$list>
 \end
 
-\define tmap-row(title, field, index, type, descr, note, default, readonly, selectFilter)
+\define tmap-row(title, field, index, type, descr, note, label, default, readonly, reset, selectFilter, nochoice)
   <tr>
     <td class="tmap-title">$title$:</td>
     <td>
-      <<$type$
-        field:"$field$"
-        index:"$index$"
-        values:"$values$"
-        readonly:"$readonly$"
-        default:"$default$"
-        selectFilter:"$selectFilter$">>
+      <div>
+        <<$type$
+          field:"$field$"
+          index:"$index$"
+          readonly:"$readonly$"
+          default:"$default$"
+          label:"$label$"
+          selectFilter:"$selectFilter$"
+          nochoice:"$nochoice$" >>
+        <$reveal type="match" text="true" default="$reset$">
+          <$button>reset
+            <$action-setfield $tiddler=<<output>> $field="$field$" $index="$index$" $value="$default$" />
+          </$button>
+        </$reveal>
+      </div>
     </td>
     <td>
       <span class="tmap-description">$descr$</span>

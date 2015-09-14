@@ -1,26 +1,69 @@
 $filterbar-height: 35px;
 $default-input-width: 140px;
 
+/**** TiddlyWiki ***************************************************/
+
+/**
+ * Do not allow blurred background for dialogs
+ * see: https://github.com/Jermolene/TiddlyWiki5/issues/1893
+ */
+.tc-page-container-wrapper.tc-modal-displayed {
+  -webkit-filter: inherit;
+  -moz-filter: inherit;
+  filter: inherit;
+}
+
+/**** Flash messages ***********************************************/
+
 .tmap-flash-message {
   
   border: 1px solid lightgray;
   padding: 5px;
+  margin: 6px 0;
+  
+  svg {
+    vertical-align: text-top;
+    width: 1em;
+    height: 1em;
+  }
 
-  &.tmap-valid {
+  &.tmap-valid, &.tmap-info {
     background: #D1EED4;
   }
   
-  &.tmap-malformed {
+  &.tmap-neutral, &.tmap-warning {
+    background: #FFF6D1;
+  }
+  
+  &.tmap-malformed, &.tmap-invalid, &.tmap-danger {
     background: #EED5D1;
   }
 }
 
+/*******************************************************************/
+
+.tmap-list-separator {
+  display: block;
+  background-color: rgb(239, 239, 239);
+  margin: 10px 0 5px 0;
+  cursor: default;
+  border-bottom: 1px dotted gray;
+  font-weight: bold;
+  font-size: 0.8em,
+}
 .tmap-graph-placeholder::before {
   content: "TiddlyMap";
   display: block;
   text-align: center;
   padding: 20px;
   background-color: whitesmoke;
+}
+
+.tmap-unicode-icon {
+  width: 1em;
+  display: inline-block;
+  text-align: center;
+  color: black;
 }
 
 html { // used to increase css importance
@@ -45,7 +88,16 @@ html { // used to increase css importance
     @extend .tmap-small-list;
     max-height: 70px;
   }
-
+  
+  .tc-tiddler-controls {
+  
+    button.tmap-active-button {
+      svg {
+        fill: #888888;
+      }
+    }
+  }
+  
   .tmap-quick-connect {
     font-size: 0.7em;
   
@@ -57,6 +109,7 @@ html { // used to increase css importance
       position: absolute;
       z-index: 1000;
       right: 50px;
+      background: linear-gradient(45deg, rgba(245,245,245,1) 0%,rgba(255,255,255,1) 50%,rgba(245,245,245,1) 100%);
       
       select {
         width: 80px;
@@ -64,6 +117,7 @@ html { // used to increase css importance
       }
       
       table {
+        width: 100%;
         border: none;
         margin-bottom: 0px;
         
@@ -100,6 +154,10 @@ html { // used to increase css importance
         }
       }
       
+      span.tmap-hide-links {
+        float: right;
+      }
+      
       button {
         display: inline-block;
         padding: 0px 3px;
@@ -121,6 +179,12 @@ html { // used to increase css importance
   .tc-modal-wrapper {
     z-index: 1010; // fix this in core?
 
+    .tc-modal {
+      boder: 1px solid #999999;
+      left: calc(50% - 400px);
+      width: 802px;
+    }
+    
     .tc-modal-header {
           
       svg {
@@ -137,7 +201,9 @@ html { // used to increase css importance
       min-height: 250px;
       max-height: 70vh;
       overflow: auto;
-      
+      left: calc(50% - 400px);
+      width: 800px;
+
       > div {
         >p:first-child {
           margin-top: 0px;
@@ -167,7 +233,7 @@ html { // used to increase css importance
       }
       
       
-      #edge-type-manager {
+      #element-type-manager {
       
         .tc-tab-buttons {
           padding-top: 0px;
@@ -191,10 +257,14 @@ html { // used to increase css importance
             margin: 5px 0 0 0;
             padding-left: 0px;
             list-style: none;
-            
+            background: linear-gradient(45deg, rgba(245,245,245,1) 0%,rgba(255,255,255,1) 50%,rgba(245,245,245,1) 100%);
             
             li {
               white-space: nowrap;
+
+              input.tmap-ranking {
+                width: 25px;
+              }
             }
           }
 
@@ -232,6 +302,7 @@ html { // used to increase css importance
         &.tmap-key-value-table {
           th {
             width: 30%;
+            background-color: #F0F0F0;
           }
         }
               
@@ -240,7 +311,7 @@ html { // used to increase css importance
           tr {
           
             &:nth-child(odd) {
-              background-color: #E8E8E8;
+              background-color: #F0F0F0;
             }
             &:nth-child(even) {
               background-color: #FFFFFF;
@@ -259,18 +330,23 @@ html { // used to increase css importance
               }
               
               &:last-child {
-                width: 35%;
+                width: 40%;
               }
               
-              input, textarea, select {
+              input:not([type=radio]), textarea, select {
                 width: 100%;
                 /* prevents bad looking select boxes and wrapping in textareas */
                 word-wrap: normal;
               }
+              
+              div.tmap-button-wrapper {
+                text-align: center;
+              }
+
             }
 
             .tmap-note {
-              margin: 10px 10px 10px 0;
+              margin-top: 0.5em;
             }
             
             .tmap-description {
@@ -353,6 +429,10 @@ html { // used to increase css importance
         margin: 0;
         background: #ececec;
         z-index: 1000;
+        
+        .tmap-fullscreen-button {
+          display: none;
+        }
       }
     }
   }
@@ -364,20 +444,11 @@ html { // used to increase css importance
     width: 100%;
     color: $color;
     display: block; // sometimes tw puts us into a span
-    
-    .tmap-loading-bar {
-      display: block;
-      position: absolute;
-      text-align: center;
-      font-size: 2em;
-      padding: 10px;
-      top: 50%;
-      background: rgba(245, 245, 245, 0.5);
-      z-index: 1;
-      width: 250px;
-      margin: auto;
-      left: 0px;
-      right: 0px;
+        
+    &.tmap-fullscreen {
+     .vis-network .tmap-halfscreen-button {
+        display: none;
+      }
     }
     
     &.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) {
@@ -404,6 +475,21 @@ html { // used to increase css importance
         padding: 5px;
         pointer-events: none;
       }
+    }
+    
+    .tmap-loading-bar {
+      display: block;
+      position: absolute;
+      text-align: center;
+      font-size: 2em;
+      padding: 10px;
+      top: 50%;
+      background: rgba(245, 245, 245, 0.5);
+      z-index: 1;
+      width: 250px;
+      margin: auto;
+      left: 0px;
+      right: 0px;
     }
 
     .tmap-vis-graph {
@@ -476,13 +562,13 @@ html { // used to increase css importance
               content: "Zoom in";              
             }
             &.vis-zoomExtends:before {
-              content: "Reset focus";              
+              content: "Fit whole graph";              
             }
             &.tmap-fullscreen-button:before {
-              content: "Fullscreen";              
+              content: "Toggle Fullscreen";              
             }
             &.tmap-halfscreen-button:before {
-              content: "Halfscreen";              
+              content: "Toggle Halfscreen";              
             }
             
           }
@@ -625,6 +711,66 @@ html { // used to increase css importance
   }
 }
 
+/**** Config Widget ************************************************/
+
+.tmap-config-widget {
+  background: #F0F0F0;
+  padding: 5px;
+  margin: 5px 0;
+  box-sizing: border-box;
+  display: block; // sometimes tw puts us into a span
+
+  .vis-network {
+    display: none;
+  }
+
+  .vis-configuration-wrapper {
+    width: 350px;
+  
+    .vis-config-rangeinput {
+      height: inherit;
+      margin-left: 4px;
+    }
+  
+    .vis-config-item {
+      width: 100%;
+      height: inherit;
+      background: none !important;
+      
+      .vis-config-range {
+        width: 150px;
+        
+        &::-moz-range-track {
+          width: 150px !important;
+        }
+        
+      }
+      
+      .vis-config-label {
+        width: 120px;
+      }
+    }
+    
+  }
+  
+  .vis-color-picker {
+    width: 310px;
+    left: 20px !important;
+    top: 20px !important;
+    margin-top: 0px;
+    margin-left: 0px;
+    height: 444px;
+  }
+
+  &::after {
+    clear: both;
+    content: "";
+    display: block;
+  }
+}
+
+/**** Fullscreen ***************************************************/
+
 @mixin fullscreen() {
 
   body { // hide scrollbar
@@ -666,3 +812,22 @@ html:fullscreen { @include fullscreen(); }
 html:-moz-full-screen { @include fullscreen(); }
 html:-webkit-full-screen { @include fullscreen(); }
 html:-ms-fullscreen { @include fullscreen(); }
+
+
+/**** Media queries ************************************************/
+
+@media (max-width: unquote("{{$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint}}")) {
+  .tc-sidebar-scrollable {
+    .tmap-desktop-editor {
+      display: none;
+    }
+  }
+}
+
+@media (min-width: unquote("{{$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint}}")) {
+  .tc-sidebar-scrollable {
+    .tmap-mobile-editor {
+      display: none;
+    }
+  }
+}

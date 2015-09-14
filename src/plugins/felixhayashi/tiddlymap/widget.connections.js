@@ -1,6 +1,6 @@
 /*\
 
-title: $:/plugins/felixhayashi/tiddlymap/widget/connections.js
+title: $:/plugins/felixhayashi/tiddlymap/js/widget/connections
 type: application/javascript
 module-type: widget
 
@@ -17,7 +17,7 @@ module-type: widget
 
 // import classes
 var Widget = require("$:/core/modules/widgets/widget.js").widget;
-var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/edgetype.js").EdgeType;
+var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
 
 /**
  * @constructor
@@ -48,8 +48,9 @@ EdgeListWidget.prototype.render = function(parent,nextSibling) {
 EdgeListWidget.prototype.execute = function() {
   
   var nodes = [ this.getVariable("currentTiddler") ];
+  var filter = this.getAttribute("filter", "");
   var options = {
-    typeWL: $tw.tmap.adapter.getEdgeTypeWhiteList("[!suffix[tw-body:link]]")
+    typeWL: $tw.tmap.adapter.getEdgeTypeWhiteList(filter)
   };
 
   var neighbourhood = $tw.tmap.adapter.getNeighbours(nodes, options);
@@ -77,19 +78,43 @@ EdgeListWidget.prototype.execute = function() {
       children: this.parseTreeNode.children
     });
   }
+  
+  if(!entries.length) {
+    this.wasEmpty = true;
+    entries = this.getEmptyMessage();
+  } else if(this.wasEmpty) {
+    // we need to remove the empty message
+    this.removeChildDomNodes();
+  }
 
   this.makeChildWidgets(entries);
   
 };
 
+EdgeListWidget.prototype.getEmptyMessage = function() {
+  
+  var parser = this.wiki.parseText(
+                  "text/vnd.tiddlywiki",
+                  this.getAttribute("emptyMessage", ""),
+                  {parseAsInline: true});
+    
+  return parser ? parser.tree : [];
+  
+};
+
 EdgeListWidget.prototype.refresh = function(changedTiddlers) {
+  
+  var changedAttributes = this.computeAttributes();
+
+  if(changedAttributes.filter || changedAttributes.emptyMessage) {
+    this.refreshSelf();
+    return true;
+  }
 
   for(var tRef in changedTiddlers) {
     if(!this.utils.isSystemOrDraft(tRef)) {
-    
       this.refreshSelf();
       return true;
-    
     } 
   }
     

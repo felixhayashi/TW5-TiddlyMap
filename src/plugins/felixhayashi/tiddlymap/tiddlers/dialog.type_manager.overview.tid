@@ -1,0 +1,32 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/elementTypeManager/overview
+caption: Overview
+
+\define edge-type-attributes()
+  [[Created on|created]] [[Modified on|modified]] [[Instances|temp.usageCount]]
+\end
+
+\define node-type-attributes()
+  [[Created on|created]] [[Modified on|modified]]
+\end
+
+! {{!!id}}
+
+<table class="tmap-key-value-table">
+  <$set name="attributes"
+        filter="[<mode>prefix[manage-edge-types]]"
+        value=<<edge-type-attributes>>
+        emptyValue=<<node-type-attributes>>>
+  <$set name="self" value=<<currentTiddler>>>
+    <$list filter=<<attributes>>>
+      <tr>
+        <th align="left"><<tmap "splitAndSelect" "|" "0">></th>
+        <td>
+          <$transclude tiddler=<<self>> field=<<tmap "splitAndSelect" "|" "1">> />
+        </td>
+      </tr>
+    </$list>
+  </$set>
+  </$set>
+</table>
+
+{{!!description}}

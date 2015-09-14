@@ -34,7 +34,18 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="module-TiddlyMap-Adapter.html">TiddlyMap~Adapter</a></li><li><a href="module-TiddlyMap-CallbackManager.html">TiddlyMap~CallbackManager</a></li><li><a href="module-TiddlyMap-DialogManager.html">TiddlyMap~DialogManager</a></li><li><a href="module-TiddlyMap-EdgeListItemWidget.html">TiddlyMap~EdgeListItemWidget</a></li><li><a href="module-TiddlyMap-EdgeListWidget.html">TiddlyMap~EdgeListWidget</a></li><li><a href="module-TiddlyMap-EdgeType.html">TiddlyMap~EdgeType</a></li><li><a href="module-TiddlyMap-MapWidget.html">TiddlyMap~MapWidget</a></li><li><a href="module-TiddlyMap-ViewAbstraction.html">TiddlyMap~ViewAbstraction</a></li>
+					<li><a href="bli%2520bla%2520blub%250A%250A%2560%2560%2560%250Atmap-config%250A%2520%2520%2520%2520inherited=_FIELDNAME%2520FIELDNAME%2520%25E2%2580%25A6_%250A%2520%2520%2520%2520extension=_FIELDNAME_%250A%2520%2520%2520%2520changes=_FIELDNAME_%2520(default_%2520same%2520field%2520as%2520extension)%250A%2520%2520%2520%2520override=_true_false_%2520(default_%2520false)%250A%2520%2520%2520%2520mode=_manage-__%250A%2520%2520%2520%2520refresh-trigger=_tRef_%250A%250A%2560%2560%2560.html">bli bla blub
+
+```
+tmap-config
+    inherited="FIELDNAME FIELDNAME …"
+    extension="FIELDNAME"
+    changes="FIELDNAME" (default: same field as extension)
+    override="true|false" (default: false)
+    mode="manage-*"
+    refresh-trigger="tRef"
+
+```</a></li><li><a href="module-TiddlyMap-Adapter.html">TiddlyMap~Adapter</a></li><li><a href="module-TiddlyMap-CallbackManager.html">TiddlyMap~CallbackManager</a></li><li><a href="module-TiddlyMap-DialogManager.html">TiddlyMap~DialogManager</a></li><li><a href="module-TiddlyMap-EdgeListItemWidget.html">TiddlyMap~EdgeListItemWidget</a></li><li><a href="module-TiddlyMap-EdgeListWidget.html">TiddlyMap~EdgeListWidget</a></li><li><a href="module-TiddlyMap-EdgeType.html">TiddlyMap~EdgeType</a></li><li><a href="module-TiddlyMap-MapWidget.html">TiddlyMap~MapWidget</a></li><li><a href="module-TiddlyMap-ViewAbstraction.html">TiddlyMap~ViewAbstraction</a></li>
 				</ul>
 			</li>
 			
@@ -68,7 +79,7 @@
 		<pre
 			class="sunlight-highlight-javascript linenums">/*\
 
-title: $:/plugins/felixhayashi/tiddlymap/callback_manager.js
+title: $:/plugins/felixhayashi/tiddlymap/js/CallbackManager
 type: application/javascript
 module-type: library
 
@@ -79,111 +90,110 @@ module-type: library
 
 (/** @lends module:TiddlyMap*/function(){
 
-  /*jslint node: true, browser: true */
-  /*global $tw: false */
-  
-  "use strict";
-  
-  /**************************** IMPORTS ****************************/
-   
-  var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
+/*jslint node: true, browser: true */
+/*global $tw: false */
 
-  /***************************** CODE ******************************/
+"use strict";
+
+/**************************** IMPORTS ****************************/
+ 
+var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+
+/***************************** CODE ******************************/
+      
+/**
+ * @constructor
+ */
+var CallbackManager = function() {
+  
+  this.logger = $tw.tmap.logger;
+  this.callbacks = utils.getDataMap();
+
+};
         
-  /**
-   * @constructor
-   */
-  var CallbackManager = function() {
-    
-    this.wiki = $tw.wiki;
-    this.logger = $tw.tmap.logger;
-    this.callbacks = utils.getDataMap();
-
+/**
+ * The callback mechanism allows to dynamically listen to tiddler
+ * changes without hardcoding a change-check for a tiddler name
+ * in the refresh function.
+ * 
+ * @param [TiddlerReference] tRef - A tiddler whose change triggers
+ *     the callback.
+ * @param {function} callback - A function that is called when the
+ *     tiddler has changed.
+ * @param {boolean} [deleteOnCall=true] - True if to delete the
+ *     callback once it has been called, false otherwise.
+ */
+CallbackManager.prototype.add = function(tRef, callback, isDeleteOnCall) {
+  
+  this.logger("debug", "A callback was registered for changes of \"" + tRef + "\"");
+  this.callbacks[tRef] = {
+    execute : callback,
+    isDeleteOnCall : (typeof isDeleteOnCall === "boolean" ? isDeleteOnCall : true)
   };
+  
+};
+
+/**
+ * Removes the callback from the list of tiddler callbacks.
+ * 
+ * @see CallbackManager#registerCallback
+ */
+CallbackManager.prototype.remove = function(refOrRefList) {
+  
+  if(!refOrRefList) return;
+  
+  if(typeof refOrRefList === "string") {
+    refOrRefList = [ refOrRefList ];
+  }
+  
+  for(var i = refOrRefList.length; i--;) {
+    var tRef = refOrRefList[i];
+    if(this.callbacks[tRef]) {
+      this.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
+      delete this.callbacks[tRef];
+    }
+  }
+  
+};
+
+/**
+ * this method has to be implemented at the top of the refresh method.
+ * It checks for changed tiddlers that have
+ * registered callbacks. If `deleteOnCall` was specified during
+ * registration of the callback, the callback will be deleted
+ * automatically.
+ * 
+ * @see CallbackManager#registerCallback
+ */
+CallbackManager.prototype.handleChanges = function(changedTiddlers) {
+  
+  if(this.callbacks.length == 0) {
+    this.logger("debug", "No registered callbacks exist at the moment");
+    return;
+  }
+  
+  for(var tRef in changedTiddlers) {
           
-  /**
-   * The callback mechanism allows to dynamically listen to tiddler
-   * changes without hardcoding a change-check for a tiddler name
-   * in the refresh function.
-   * 
-   * @param [TiddlerReference] tRef - A tiddler whose change triggers
-   *     the callback.
-   * @param {function} callback - A function that is called when the
-   *     tiddler has changed.
-   * @param {boolean} [deleteOnCall=true] - True if to delete the
-   *     callback once it has been called, false otherwise.
-   */
-  CallbackManager.prototype.add = function(tRef, callback, isDeleteOnCall) {
+    if(!this.callbacks[tRef]) continue;
     
-    this.logger("debug", "A callback was registered for changes of \"" + tRef + "\"");
-    this.callbacks[tRef] = {
-      execute : callback,
-      isDeleteOnCall : (typeof isDeleteOnCall === "boolean" ? isDeleteOnCall : true)
-    };
-    
-  };
-  
-  /**
-   * Removes the callback from the list of tiddler callbacks.
-   * 
-   * @see CallbackManager#registerCallback
-   */
-  CallbackManager.prototype.remove = function(refOrRefList) {
-    
-    if(!refOrRefList) return;
-    
-    if(typeof refOrRefList === "string") {
-      refOrRefList = [ refOrRefList ];
-    }
-    
-    for(var i = 0; i &lt; refOrRefList.length; i++) {
-      var tRef = refOrRefList[i];
-      if(this.callbacks[tRef]) {
-        this.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
-        delete this.callbacks[tRef];
-      }
-    }
-    
-  };
-  
-  /**
-   * this method has to be implemented at the top of the refresh method.
-   * It checks for changed tiddlers that have
-   * registered callbacks. If `deleteOnCall` was specified during
-   * registration of the callback, the callback will be deleted
-   * automatically.
-   * 
-   * @see CallbackManager#registerCallback
-   */
-  CallbackManager.prototype.handleChanges = function(changedTiddlers) {
-    
-    if(this.callbacks.length == 0) {
-      this.logger("debug", "No registered callbacks exist at the moment");
-      return;
-    }
-    
-    for(var tRef in changedTiddlers) {
-            
-      if(!this.callbacks[tRef]) continue;
+    if($tw.wiki.getTiddler(tRef)) {
       
-      if(this.wiki.getTiddler(tRef)) {
-        
-        this.logger("debug", "A callback for \"" + tRef + "\" will be executed");
-        this.callbacks[tRef].execute(tRef);
-        
-        // a continue prevents deleting the callback
-        if(!this.callbacks.isDeleteOnCall) continue;
-        
-      }
+      this.logger("debug", "A callback for \"" + tRef + "\" will be executed");
+      this.callbacks[tRef].execute(tRef);
       
-      this.remove(tRef);
+      // a continue prevents deleting the callback
+      if(!this.callbacks.isDeleteOnCall) continue;
+      
     }
     
-  };
+    this.remove(tRef);
+  }
+  
+};
 
-  // !! EXPORT !!
-  exports.CallbackManager = CallbackManager;
-  // !! EXPORT !!
+// !! EXPORT !!
+exports.CallbackManager = CallbackManager;
+// !! EXPORT !!
   
 })();
 
@@ -216,7 +226,7 @@ module-type: library
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-	on 2015-07-17T17:52:38+02:00 using the <a
+	on 2015-09-14T18:31:14+02:00 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>

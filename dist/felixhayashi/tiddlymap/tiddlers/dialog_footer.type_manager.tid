@@ -1,0 +1,31 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialogFooter/element_type_manager
+
+<!--
+<$tiddler tiddler=<<temp>>>
+<$edit-text field="creation-name" type="text" tag="input" />
+<$button
+    class="tmap-dialog-button tmap-create-button"
+    tooltip="Create a new type">Create
+  <$action-sendmessage
+      $message="tmap:tm-create-type"
+      mode=<<mode>> id={{!!creation-name}}
+      output=<<output>>
+  />
+  <$action-setfield creation-name=""
+  />
+</$button>
+</$tiddler>
+-->
+<$button
+    class="tmap-dialog-button tmap-save-button"
+    tooltip="Save the current changes">Save
+  <$action-sendmessage
+      $message="tmap:tm-save-type-form"
+      mode=<<mode>>
+      output=<<output>> />
+</$button>
+<$button
+    class="tmap-dialog-button tmap-cancel-button"
+    tooltip="Cancel the most resent changes and exit">Quit
+  <$action-setfield $tiddler=<<result>> text="1" />
+</$button>

@@ -1,0 +1,59 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/elementTypeManager/styling
+caption: Styling
+
+\define vis-refresh-trigger() $(temp)$/vis-refresh
+
+\define url()
+  <$set
+      filter="[<mode>prefix[manage-edge-types]]"
+      name="module"
+      value="edges"
+      emptyValue="nodes">
+    [[vis.js.org|http://visjs.org/docs/network/$(module)$]]
+  </$set>
+\end
+
+\define manage-node-types()
+
+<fieldset><legend>Icon Settings</legend>
+  <table class="tmap-config-table">
+    <<tmap-row type:"input-text"
+        title:"TW-icon"
+        field:"tw-icon"
+        descr:"A tiddlywiki image reference.
+               For example '$:/core/icon' for Movotun Jack.">>
+    <<tmap-row type:"input-text"
+        title:"FA-icon"
+        field:"fa-icon"
+        descr:"A Font Awesome icon code.
+               For example 'f206' for the bicycle symbol.">>
+  </table>
+</fieldset>
+\end
+
+<div class="tmap-flash-message tmap-info">
+   {{$:/core/images/info-button}}
+   All visjs options below are documented at <<url>>.
+</div>
+<$macrocall $name=<<mode>> />
+<fieldset><legend>Visjs styles</legend>
+<table class="tmap-config-table">
+  <tr>
+    <td>Reset:</td>
+    <td>
+      <div class="tmap-button-wrapper">
+        <$button>Reset style
+          <$action-setfield style="" />
+          <$action-setfield $tiddler=<<vis-refresh-trigger>> text="" />
+        </$button>
+     </div>
+   </td>
+   <td> Press the reset button to clear the style for this type.</td>
+  </tr>
+</table>
+<$tmap-config
+    mode=<<mode>>
+    inherited="vis-inherited"
+    extension="style"
+    refresh-trigger=<<vis-refresh-trigger>> />
+</fieldset>

@@ -1,6 +1,6 @@
 /*\
 
-title: $:/plugins/felixhayashi/tiddlymap/caretaker.js
+title: $:/plugins/felixhayashi/tiddlymap/js/caretaker
 type: application/javascript
 module-type: startup
 
@@ -16,13 +16,6 @@ module-type: startup
  * This module is responsible for registering a global namespace under $tw
  * and loading (and refreshing) the configuration.
  * 
- * Since changes in configuration tiddlers are instantly acknowledged,
- * the user does not need to refresh its browser.
- * 
- * Like a caretaker in real life, nobody can communicate with him. He does
- * all his work in the background without being ever seen. What I want to
- * say here is: do not require the caretaker!
- * 
  * @lends module:TiddlyMap
  */ 
 function(){
@@ -31,23 +24,19 @@ function(){
 /*global $tw: false */
 "use strict";
 
-// Export name and synchronous status
-exports.name = "tmap.caretaker";
-exports.platforms = [ "browser" ];
-exports.after = [ "startup" ];
-exports.before = [ "rootwidget" ];
-exports.synchronous = true;
+/*** Imports *******************************************************/
 
-/**************************** IMPORTS ****************************/
- 
-var utils = require("$:/plugins/felixhayashi/tiddlymap/utils.js").utils;
-var Adapter = require("$:/plugins/felixhayashi/tiddlymap/adapter.js").Adapter;
-var DialogManager = require("$:/plugins/felixhayashi/tiddlymap/dialog_manager.js").DialogManager;
-var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/callback_manager.js").CallbackManager;
-var vis = require("$:/plugins/felixhayashi/vis/vis.js");
+var visConfig =       require("$:/plugins/felixhayashi/tiddlymap/js/config/vis").config;
+var utils =           require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var Adapter =         require("$:/plugins/felixhayashi/tiddlymap/js/Adapter").Adapter;
+var DialogManager =   require("$:/plugins/felixhayashi/tiddlymap/js/DialogManager").DialogManager;
+var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager").CallbackManager;
+var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction").ViewAbstraction;
+var EdgeType =        require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
+var NodeType =        require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;
+var vis =             require("$:/plugins/felixhayashi/vis/vis.js");
 
-/***************************** CODE ******************************/
-
+/*** Code **********************************************************/
 
 /**
  * This function will append the global options to the tree. In case
@@ -67,30 +56,29 @@ var attachOptions = function(parent) {
                     
   var opt = parent;
   
+  // persistent plugin environment
   // **ATTENTION: NO TRAILING SLASHES IN PATHS EVER**
   if(!opt.path) opt.path = utils.getDataMap();
   
-  // persistent plugin environment
-  opt.path.pluginRoot =    "$:/plugins/felixhayashi/tiddlymap";
-  opt.path.edgeTypes =     "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes";
-  opt.path.listEdgeTypes = "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-list:";
+  opt.path.pluginRoot =     "$:/plugins/felixhayashi/tiddlymap";
+  opt.path.edgeTypes =      "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes";
+  opt.path.nodeTypes =      "$:/plugins/felixhayashi/tiddlymap/graph/nodeTypes";
+  opt.path.listEdgeTypes =  "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-list:";
   opt.path.fieldEdgeTypes = "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-field:";
-  opt.path.views =         "$:/plugins/felixhayashi/tiddlymap/graph/views";
-  opt.path.options =       "$:/plugins/felixhayashi/tiddlymap/config";
-  // temporary environment
-  opt.path.tempRoot =      "$:/temp/felixhayashi/tiddlymap";
-  opt.path.localHolders =  "$:/temp/felixhayashi/tiddlymap/holders";
-  opt.path.dialogs =       "$:/plugins/felixhayashi/tiddlymap/dialog";
-  opt.path.footers =       "$:/plugins/felixhayashi/tiddlymap/dialogFooter";
+  opt.path.views =          "$:/plugins/felixhayashi/tiddlymap/graph/views";
+  opt.path.options =        "$:/plugins/felixhayashi/tiddlymap/config";
+  opt.path.dialogs =        "$:/plugins/felixhayashi/tiddlymap/dialog";
+  opt.path.footers =        "$:/plugins/felixhayashi/tiddlymap/dialogFooter";
+  opt.path.tempRoot =       "$:/temp/tmap";
+  opt.path.localHolders =   "$:/temp/tmap/holders";
   
   // static references to important tiddlers
   if(!opt.ref) opt.ref = utils.getDataMap();
   
-  opt.ref.defaultGraphViewHolder = "$:/plugins/felixhayashi/tiddlymap/misc/defaultViewHolder";
+  opt.ref.defaultViewHolder =      "$:/plugins/felixhayashi/tiddlymap/misc/defaultViewHolder";
   opt.ref.graphBar =               "$:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar";
   opt.ref.sysConf =                "$:/plugins/felixhayashi/tiddlymap/config/sys";
   opt.ref.sysUserConf =            "$:/plugins/felixhayashi/tiddlymap/config/sys/user";
-  opt.ref.visConf =                "$:/plugins/felixhayashi/tiddlymap/config/vis";
   opt.ref.visUserConf =            "$:/plugins/felixhayashi/tiddlymap/config/vis/user";
   opt.ref.welcomeFlag =            "$:/plugins/felixhayashi/tiddlymap/flag/welcome";
   opt.ref.focusButton =            "$:/plugins/felixhayashi/tiddlymap/misc/focusButton";
@@ -105,9 +93,9 @@ var attachOptions = function(parent) {
     utils.unflatten($tw.wiki.getTiddlerData(opt.ref.sysUserConf, {}))
   );
   
+  // do not merge into visConfig directly; this needs to stay "pure"
   opt.config.vis = utils.merge(
-    $tw.wiki.getTiddlerData(opt.ref.visConf, {}),
-    utils.unflatten($tw.wiki.getTiddlerData(opt.ref.visUserConf, {}))
+    {}, visConfig, $tw.wiki.getTiddlerData(opt.ref.visUserConf, {})
   );
 
   // a shortcut for fields property
@@ -122,14 +110,16 @@ var attachOptions = function(parent) {
   opt.misc.cssPrefix = "tmap-";
   opt.misc.sysEdgeTypeNS = "tmap";
   opt.misc.liveViewLabel = "Live View";
+  opt.misc.defaultViewLabel = "Default";
 
   // some popular filters
   if(!opt.filter) opt.filter = utils.getDataMap();
   
+  opt.filter.nodeTypes = "[prefix[" + opt.path.nodeTypes + "]]";
   opt.filter.edgeTypes = "[prefix[" + opt.path.edgeTypes + "]]";
   opt.filter.listEdgeTypes = "[prefix[" + opt.path.listEdgeTypes + "]]";
   opt.filter.fieldEdgeTypes = "[prefix[" + opt.path.fieldEdgeTypes + "]]";
-  opt.filter.views = "[has[" + opt.field.viewMarker + "]]";
+  opt.filter.views = "[" + opt.field.viewMarker + "[true]]";
   opt.filter.defaultEdgeFilter = opt.filter.edgeTypes
                                  + "-[suffix[tw-body:link]]"
                                  + "-[suffix[tw-list:tags]]";
@@ -140,13 +130,26 @@ var attachOptions = function(parent) {
   
   var allSelector = "[all[tiddlers+shadows]!has[draft.of]]";
 
-  // al edge-types (by label)
+  // all edge-types (by label)
   opt.selector.allEdgeTypes = allSelector + " +" + opt.filter.edgeTypes;
-  opt.selector.allEdgeTypesByLabel = opt.selector.allEdgeTypes + " +[removeprefix[" + opt.path.edgeTypes + "/]]";
+  opt.selector.allEdgeTypesByLabel = opt.selector.allEdgeTypes
+                                     + " +[removeprefix["
+                                     + opt.path.edgeTypes
+                                     + "/]]";
+
+  // all node-types (by label)
+  opt.selector.allNodeTypes = allSelector + " +" + opt.filter.nodeTypes;
+  opt.selector.allNodeTypesByLabel = opt.selector.allNodeTypes
+                                     + " +[removeprefix["
+                                     + opt.path.nodeTypes
+                                     + "/]]";
 
   // all views (by label)
   opt.selector.allViews = allSelector + " +" + opt.filter.views;
-  opt.selector.allViewsByLabel = opt.selector.allViews + "+[removeprefix[" + opt.path.views + "/]]";
+  opt.selector.allViewsByLabel = opt.selector.allViews
+                                 + "+[removeprefix["
+                                 + opt.path.views
+                                 + "/]]";
 
   // all non-draft non-system tiddlers
   opt.selector.allPotentialNodes = "[all[tiddlers]!is[system]!has[draft.of]]";
@@ -163,47 +166,117 @@ var attachOptions = function(parent) {
   
 };
 
+/**
+ * This function will cache/index some tiddler properties as javascript
+ * objects for faster access.
+ */
 var attachIndeces = function(parent) {
   
   $tw.tmap.start("Attaching Indeces");
   
-  if(!parent.indeces) {
-    parent.indeces = {
-      tById: utils.getDataMap(),
-      idByT: utils.getDataMap()
-    };
-  }
-  
+  parent.indeces = parent.indeces || {};
   var allTiddlers = $tw.wiki.allTitles();
-  for(var i = 0; i < allTiddlers.length; i++) {
-    var tRef = allTiddlers[i];
-    var tObj = $tw.wiki.getTiddler(tRef);
-    if(!utils.isSystemOrDraft(tObj)) {
-      var id = tObj.fields[$tw.tmap.opt.field.nodeId];
-      if(!id) {
-        id = utils.genUUID();
-        utils.setField(tObj, $tw.tmap.opt.field.nodeId, id);
-      }
-      
-      parent.indeces.tById[id] = tRef;
-      parent.indeces.idByT[tRef] = id;
-    }
-  }
+  
+  // tiddler vs. ids
+  updateTiddlerVsIdIndeces(parent.indeces, allTiddlers);
+  
+  // update node type indeces
+  updateNodeTypesIndeces(parent.indeces, allTiddlers);
   
   $tw.tmap.stop("Attaching Indeces");
   
 };
 
 /**
+ * TiddlyMap uses ids to reference tiddlers. This function creates
+ * a table that maps ids to tRefs and vice versa.
+ * 
+ * Two indeces are added to the indeces chain:
+ * 1. tById – tiddler references by id
+ * 2. idByT – ids by tiddler references
+ * 
+ * @param {Object} [parent] - The global indeces object indeces.
+ *     If not stated, $tw.tmap.indeces is used.
+ * @param {Array<TiddlerReference>} [allTiddlers] - The tiddlers to
+ *     use as basis for this index. If not stated, all tiddlers in
+ *     the wiki are used.
+ */
+var updateTiddlerVsIdIndeces = function(parent, allTiddlers) {
+  
+  parent = parent || $tw.tmap.indeces;
+  allTiddlers = allTiddlers || $tw.wiki.allTitles();
+
+  var nodeId = $tw.tmap.opt.field.nodeId;
+  var tById = parent.tById = {}; // tiddlerById
+  var idByT = parent.idByT = {}; // idByTiddler
+  for(var i = allTiddlers.length; i--;) {
+    var tRef = allTiddlers[i];
+    var tObj = $tw.wiki.getTiddler(tRef);
+    if(utils.isSystemOrDraft(tObj)) continue;
+    
+    var id = tObj.fields[nodeId];
+    if(!id) {
+      id = utils.genUUID();
+      utils.setField(tObj, nodeId, id);
+    }
+    
+    tById[id] = tRef; // tiddlerById
+    idByT[tRef] = id; // idByTiddler
+  }
+  
+};
+
+/**
+ * For faster access to node-type styles, we store all node-type
+ * objects as indeces in a table.
+ * 
+ * Four indeces are added to the indeces chain:
+ * 1. glNTy – all global node types
+ * 2. loNTy – all local node types
+ * 3. glLoNTy – first global, then local node types
+ * 4. loGlNTy – first local, then global node types
+ * 
+ * @param {Object} [parent] - The global indeces object indeces.
+ *     If not stated, $tw.tmap.indeces is used.
+ * @param {Array<TiddlerReference>} [allTiddlers] - The tiddlers to
+ *     use as basis for this index. If not stated, all tiddlers in
+ *     the wiki are used.
+ */
+var updateNodeTypesIndeces = function(parent, allTiddlers) {
+
+  parent = parent || $tw.tmap.indeces;
+  allTiddlers = allTiddlers || $tw.wiki.allTitles();
+
+  var typePath = $tw.tmap.opt.path.nodeTypes;
+      
+  var glNTy = parent.glNTy = [];
+  var loNTy = parent.loNTy = [];
+  for(var i = allTiddlers.length; i--;) {
+    if(utils.startsWith(allTiddlers[i], typePath)) {
+      var type = new NodeType(allTiddlers[i]);
+      (type.data.view ? loNTy : glNTy).push(type);
+    }
+  }
+  
+  parent.glLoNTy = glNTy.concat(loNTy);
+  parent.loGlNTy = loNTy.concat(glNTy);
+
+};
+
+/**
  * This function attaches all the top level functions to the
  * tiddlymap namespace.
+ * 
+ * This will add the
+ * 1. global logger method,
+ * 2. the notify method
+ * 3. the stopwatch methods `start` and `stop`.
  * 
  * @param {Hashmap} parent - The parent object to attach the options to.
  */
 var attachFunctions = function(parent) {
   
   var fn = parent;
-  
   var nirvana = function() { /* /dev/null */ }; 
 
   if(utils.isTrue($tw.tmap.opt.config.sys.debug, false) && console) {
@@ -242,13 +315,13 @@ var attachFunctions = function(parent) {
     
   } else {
     
-    fn.logger = nirvana
-    fn.start = nirvana;
-    fn.stop = nirvana;
+    fn.logger = fn.start = fn.stop = nirvana;
     
   }
 
-  fn.notify = ($tw.tmap.opt.config.sys.notifications === "true" ? utils.notify : nirvana);
+  fn.notify = (utils.isTrue($tw.tmap.opt.config.sys.notifications)
+               ? utils.notify
+               : nirvana);
   
 };
 
@@ -260,7 +333,7 @@ var attachFunctions = function(parent) {
  */
 var routineCheck = function() {
   
-  for(var i = ($tw.tmap.registry.length-1); i >= 0; i--) {
+  for(var i = $tw.tmap.registry.length; i--;) {
     var graph = $tw.tmap.registry[i];
     if(graph.isZombieWidget()) { // removed
       $tw.tmap.logger("warn", "A graph has been removed.");
@@ -270,7 +343,6 @@ var routineCheck = function() {
   }
   
 };
-
 
 var checkForDublicates = function(tObj) {
 
@@ -302,7 +374,7 @@ var checkForDublicates = function(tObj) {
   
   if(dublicate) {
     // remove any defined edges
-    utils.setField(tObj, $tw.tmap.opt.field.edges, undefined);
+    utils.setField(tObj, "tmap.edges", undefined);
     // override id
     $tw.tmap.adapter.assignId(tObj, true);
   }  
@@ -339,15 +411,6 @@ var updateLiveViewTrigger = function(changedTiddlers) {
       
 };
 
-var refreshGlobals = function(changedTiddlers) {
-  
-  var filter = "[prefix[" + $tw.tmap.opt.path.options + "]!has[draft.of]]";
-  if(utils.getMatches(filter, Object.keys(changedTiddlers)).length) {
-    rebuildGlobals();
-  }
-  
-};
-
 /**
  * Only for debugging
  */
@@ -358,7 +421,8 @@ var printChanges = function(changedTiddlers) {
       if(changedTiddlers[tRef].deleted) {
         $tw.tmap.logger("warn", "Tiddler deleted:", tRef);
       } else {
-        $tw.tmap.logger("warn", "Tiddler modified:", utils.getTiddler(tRef));
+        $tw.tmap.logger("warn", "Tiddler modified:", tRef,
+                        utils.getTiddler(tRef));
       }
     }
   }
@@ -366,22 +430,48 @@ var printChanges = function(changedTiddlers) {
 };
 
 var registerChangeListener = function(callbackManager) {
+  
+  var nodeTypePath = $tw.tmap.opt.path.nodeTypes;
+  var optionsPath = $tw.tmap.opt.path.options;
+  var nodeId = $tw.tmap.opt.field.nodeId;
+  var loopCount = 0;
 
   $tw.wiki.addEventListener("change", function(changedTiddlers) {
     
     $tw.tmap.start("Caretaker handling changes");
+    
+    $tw.tmap.logger("warn", "=== Refresh " + (loopCount++) + " ===");
     
     // debugging
     printChanges(changedTiddlers);
     
     // check on callbacks
     callbackManager.handleChanges(changedTiddlers);
-    
-    // check for changed globals
-    refreshGlobals(changedTiddlers);
-    
+        
+    var hasUpdatedNodeTypes = false;
+    var hasUpdatedOptions = false;
     for(var tRef in changedTiddlers) {
-      if(utils.isSystemOrDraft(tRef)) continue;
+      
+      // check for relevant system tiddler changes
+      
+      if(utils.isSystemOrDraft(tRef)) {
+        
+        // check for node types
+        if(utils.startsWith(tRef, nodeTypePath) && !hasUpdatedNodeTypes) {
+          updateNodeTypesIndeces();
+          hasUpdatedNodeTypes = true;
+        }
+        
+        // check on global options
+        if(utils.startsWith(tRef, optionsPath) && !hasUpdatedOptions) {
+          rebuildGlobals();
+          hasUpdatedOptions = true;
+        }
+        
+        continue; 
+      }
+      
+      // check for non-system tiddler changes
       
       var tObj = utils.getTiddler(tRef);
       
@@ -389,16 +479,35 @@ var registerChangeListener = function(callbackManager) {
         
         checkForDublicates(tObj);
         
-        // call assignId IN ANY CASE to make sure the index stays intact
-        // also after a renaming operation
+        // call assignId IN ANY CASE to make sure the index
+        // stays intact, also after a renaming operation
         $tw.tmap.adapter.assignId(tObj);
                 
-      } else { // deleted
+      } else { // deleted or renamed
         
-        // remove node; any edges pointing in/out; update indeces
-        // CAREFUL about recursion!
-        // WROOONG WE CANNOT DO ANYTHING HERE BECAUSE WE DON'T KNOW WHETHER RENAMED OR DELETED
-        //$tw.tmap.adapter.deleteNode($tw.tmap.indeces.idByT[tRef]);
+        var id = $tw.tmap.indeces.idByT[tRef];
+        if(!id) {
+          $tw.tmap.logger("warn", "Ignoring Tiddler", tRef,
+                                  "without id; Assuming draft");
+          continue;
+        }
+        
+        var tWithId = utils.getTiddlerWithField(nodeId, id);
+        
+        if(tWithId) { // only renamed
+        
+          $tw.tmap.logger("warn", "Tiddler", tRef,
+                                  "renamed into", tWithId);
+        
+        } else {
+          
+          $tw.tmap.logger("warn", "Tiddler", tRef, "removed");
+        
+          // remove node; any edges pointing in/out; update indeces
+          // CAREFUL about recursion!
+          $tw.tmap.adapter.deleteNode(id);
+          
+        }
         
       }
     }
@@ -410,6 +519,16 @@ var registerChangeListener = function(callbackManager) {
     
   });
   
+};
+
+var setDefaults = function() {
+  
+  var defaultView = $tw.tmap.opt.config.sys.defaultView;
+  if(defaultView) {
+    utils.setField($tw.tmap.opt.ref.defaultViewHolder,
+                   "text", defaultView);
+  }
+                 
 };
 
 var createMetaFile = function() {
@@ -432,22 +551,40 @@ var createMetaFile = function() {
   
 };
 
+/*** Exports *******************************************************/
+
+// Export name and synchronous status
+exports.name = "tmap.caretaker";
+exports.platforms = [ "browser" ];
+exports.after = [ "startup" ];
+exports.before = [ "rootwidget" ];
+exports.synchronous = true;
+
 exports.startup = function() {
   
   // create namespaces
   $tw.tmap = utils.getDataMap();
   $tw.tmap.utils = utils;
   $tw.tmap.keycharm = vis.keycharm;
+  $tw.tmap.obj = {
+    NodeType: NodeType,
+    EdgeType: EdgeType,
+    ViewAbstraction: ViewAbstraction
+  };
+  
   
   // all graphs need to register here. @see routineWalk()
   $tw.tmap.registry = [];
-  window.setInterval(routineCheck, 1000);
+  window.setInterval(routineCheck, 5000);
   
   // build and integrate global options   
   rebuildGlobals($tw.tmap);
   
   // create indeces
   attachIndeces($tw.tmap);
+  
+  // set defaults
+  setDefaults();
       
   // attach the adapter object to the tiddlymap namespace
   $tw.tmap.adapter = new Adapter();
@@ -458,8 +595,8 @@ exports.startup = function() {
   // create global callback and dialog managers 
   $tw.tmap.callbackManager = new CallbackManager();
   $tw.tmap.dialogManager = new DialogManager($tw.tmap.callbackManager);
-      
-  // finally register change listener with the callback manager
+        
+  // AT THE VERY END: register change listener with the callback manager
   registerChangeListener($tw.tmap.callbackManager);
   
   // issue notification

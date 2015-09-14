@@ -6,10 +6,16 @@ subtitle: {{$:/core/images/edit-button}} Filter editor -- <<view>>
 <fieldset>
   <legend>Filters <sup>[1]</sup></legend>
   <table class="tmap-config-table">
-    <<tmap-row title:"Node filter" field:"prettyNodeFilter" type:"input-textarea"
-               descr:"Show tiddlers in the graph that match this filter. Drafts and system tiddlers are automatically excluded.">>
-    <<tmap-row title:"Edge filter" field:"prettyEdgeFilter" type:"input-textarea"
-               descr:"Show edges that match this filter" >>
+    <<tmap-row type:"input-textarea"
+        title:"Node filter"
+        field:"prettyNodeFilter"
+        descr:"Show tiddlers in the graph that match this filter.
+               Drafts and system tiddlers are automatically
+               excluded.">>
+    <<tmap-row type:"input-textarea"
+        title:"Edge filter"
+        field:"prettyEdgeFilter" 
+        descr:"Show edges that match this filter">>
   </table>   
 </fieldset>
 

@@ -3,18 +3,20 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/quickConnectButton
 description: {{$:/language/Buttons/TiddlyMap/Hint}}
 caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/TiddlyMap/Caption}}
 
+\define buttonClass() $(tv-config-toolbar-class)$ $(additional-classes)$
+
+\define defConFiltr() [!suffix[tw-body:link]]
+
 \define tiddlerSearchFilter()
-  [!is[system]!has[draft.of]search:title{$:/temp/quickConnectSearch}sort[title]]
+[!is[system]!has[draft.of]search:title{$:/temp/quickConnectSearch}sort[title]]
 \end
 
 \define showButton(state)
 <$button set="$:/temp/tiddlymap/quickConnectButton"
          setTo="$state$" tooltip={{$:/language/Buttons/TiddlyMap/Hint}} 
          aria-label={{$:/language/Buttons/TiddlyMap/Caption}}
-         class=<<tv-config-toolbar-class>>>
-<$list filter="[<tv-config-toolbar-icons>prefix[yes]]">
-{{$:/plugins/felixhayashi/tiddlymap/icon}}
-</$list>
+         class=<<buttonClass>>>
+<$list filter="[<tv-config-toolbar-icons>prefix[yes]]">{{$:/plugins/felixhayashi/tiddlymap/icon}}</$list>
 <$list filter="[<tv-config-toolbar-text>prefix[yes]]">
 <span class="tc-btn-text"><$text text={{$:/language/Buttons/TiddlyMap/Caption}}/></span>
 </$list>
@@ -26,10 +28,10 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 \end
 
 \define showPopup()
-<$macrocall $name="showButton" state="" />
+<$set name="additional-classes" value="tmap-active-button"><$macrocall $name="showButton" state="" /></$set>
 <div class="tmap-quick-connect tc-reveal tc-popup">
   <div class="tc-drop-down">
-    <div>{{$:/core/images/close-others-button}} ''Create connection'' <sup>[1]</sup></div>
+    <div>{{$:/core/images/new-button}} ''Create connection''</div>
     <table>
       <tr>
         <td>Type:</td>
@@ -46,7 +48,7 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
       <tr>
         <td>Search:</td>
         <td>
-          <$edit-text tiddler="$:/temp/quickConnectSearch" type="search" tag="input" default=""></$edit-text>
+          <$edit-text tiddler="$:/temp/quickConnectSearch" type="text" tag="input" default=""></$edit-text>
           <small><$count filter=<<tiddlerSearchFilter>> /> results</small>
         </td>
       </tr>
@@ -81,9 +83,15 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
       </tr>
     </table>
     <hr />
-    <div>''Existing Connections''</div>
+    <div>''Existing Connections''
+      <span class="tmap-hide-links">
+        <$checkbox tiddler="$:/temp/tmap/qc" field="filter" checked=<<defConFiltr>> unchecked="" default="">
+          hide links
+        </$checkbox>
+      </span>
+    </div>
     <p>
-      <$tmap-connections>
+      <$tmap-connections filter={{$:/temp/tmap/qc!!filter}} emptyMessage="–">
         <div>
           <$button class="tc-btn-invisible">{{$:/core/images/close-button}}
             <$action-sendmessage $message="tmap:tm-remove-edge" id=<<edge.id>> from=<<edge.from>> to=<<edge.to>> type=<<edge.type>> />
@@ -100,6 +108,4 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 </div>
 \end
 
-<$list filter="[{$:/temp/tiddlymap/quickConnectButton}prefix<qualify>first[]]"
-       variable="item" emptyMessage=<<hidePopup>>><<showPopup>>
-</$list>
+<$list filter="[{$:/temp/tiddlymap/quickConnectButton}prefix<qualify>]" variable="item" emptyMessage=<<hidePopup>>><<showPopup>></$list>

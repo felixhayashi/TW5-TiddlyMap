@@ -1,5 +1,6 @@
 title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
 
+\rules except wikilink
 \define showEdgeField() show-$(curEdgeId)$
 
 <!-- ===== View Switcher ======================================== -->
@@ -7,12 +8,15 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
 <div class="tmap-menu-bar">
   View:
   <$reveal type="match" text="false" default=<<param.isViewBound>> >
-    <$select tiddler=<<param.ref.viewHolder>> field="text" default=<<param.ref.view>> >
-       <$list filter=<<tmap "option" "selector.allViews">> >
-         <option value={{!!title}}>
-           <$view tiddler=<<tmap "basename">> field="title" />
-          </option>
-       </$list>
+    <$select
+        tiddler=<<param.ref.viewHolder>>
+        field="text"
+        default=<<param.ref.view>> >
+      <$list filter=<<tmap "option" "selector.allViewsByLabel">> >
+        <option value={{!!title}}>
+          <$view tiddler={{!!title}} field="title" />
+        </option>
+      </$list>
     </$select>
   </$reveal>
   <$reveal type="match" text="true" default=<<param.isViewBound>> >
@@ -23,19 +27,43 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
   
   <$reveal type="popup" position="below" state=<<qualify "$:/temp/menu">> >
     <div class="tc-drop-down">
-      <a href="http://tiddlymap.org#Documentation" target="_blank">{{$:/core/images/info-button}} Open online help</a>
-      <hr />
-      <$button class="tc-btn-invisible" message="tmap:tm-create-view">{{$:/core/images/new-button}} Create empty view</$button>
-      <$button class="tc-btn-invisible" message="tmap:tm-rename-view">{{$:/core/images/tag-button}} Rename view</$button>
-      <$button class="tc-btn-invisible" message="tmap:tm-delete-view">{{$:/core/images/delete-button}} Delete view</$button>
-      <$button class="tc-btn-invisible" message="tmap:tm-store-position">{{$:/core/images/globe}} Save positions</$button>
-      <$button class="tc-btn-invisible" message="tmap:tm-generate-widget">{{$:/core/images/permalink-button}} Grab widget code</$button>
-      <hr />
-      <$button class="tc-btn-invisible" message="tmap:tm-edit-view">{{$:/core/images/theme-button}} Configure view</$button>
-      <$button class="tc-btn-invisible" message="tmap:tm-edit-filters">{{$:/core/images/edit-button}} Edit filters</$button>
-      <hr />
-      <$button class="tc-btn-invisible" message="tmap:tm-configure-system">{{$:/core/images/options-button}} Global configurations</$button>
-      <$button class="tc-btn-invisible" message="tmap:tm-manage-edge-types">{{$:/core/images/tag-button}} Manage edge-types</$button>
+      <a href="http://tiddlymap.org#Documentation" target="_blank">
+        {{$:/core/images/info-button}} Open online help
+      </a>
+      <$button class="tc-btn-invisible" message="tmap:tm-create-view">
+        {{$:/core/images/new-button}} Create empty view
+      </$button>
+      <$button class="tc-btn-invisible" message="tmap:tm-generate-widget">
+        {{$:/core/images/permalink-button}} Grab widget code
+      </$button>
+      <div class="tmap-list-separator">Global configurations:</div>
+      <$button class="tc-btn-invisible" message="tmap:tm-configure-system">
+        {{$:/core/images/options-button}} Configure TiddlyMap
+      </$button>
+      <$button class="tc-btn-invisible" message="tmap:tm-manage-edge-types">
+        <span class="tmap-unicode-icon">◭</span> Manage edge-types
+      </$button>
+      <$button class="tc-btn-invisible" message="tmap:tm-manage-node-types">
+        <span class="tmap-unicode-icon">▢</span> Manage node-types
+      </$button>
+      <div class="tmap-view-actions">
+        <div class="tmap-list-separator">Actions for this view:</div>
+        <$button class="tc-btn-invisible" message="tmap:tm-edit-view">
+          {{$:/core/images/options-button}} Configure view
+        </$button>
+        <$button class="tc-btn-invisible" message="tmap:tm-edit-filters">
+          {{$:/core/images/edit-button}} Edit filters
+        </$button>
+        <$button class="tc-btn-invisible" message="tmap:tm-store-position">
+          {{$:/core/images/globe}} Save positions
+        </$button>
+        <$button class="tc-btn-invisible" message="tmap:tm-rename-view">
+          {{$:/core/images/tag-button}} Rename view
+        </$button>
+        <$button class="tc-btn-invisible" message="tmap:tm-delete-view">
+          {{$:/core/images/delete-button}} Delete view
+        </$button>
+      </div>
     </div>
   </$reveal>
   
@@ -44,7 +72,9 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
   <$reveal type="popup" position="below" state=<<qualify "$:/temp/radar">> >
     <div class="tc-drop-down">
     <$button class="tc-btn-invisible">Hide neighbourhood
-      <$action-setfield $tiddler=<<param.ref.view>> config.neighbourhood_scope="0" />
+      <$action-setfield
+          $tiddler=<<param.ref.view>>
+          config.neighbourhood_scope="0" />
     </$button>
     <hr />
     <$list filter="[[1|1 step distance]]
@@ -54,13 +84,16 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
                    [[5|5 step distance]]">
       <$button class="tc-btn-invisible">
         <<tmap "splitAndSelect" "|" "1">>
-        <$action-setfield $tiddler=<<param.ref.view>>
-                          config.neighbourhood_scope=<<tmap "splitAndSelect" "|" "0">> />
+        <$action-setfield
+            $tiddler=<<param.ref.view>>
+            config.neighbourhood_scope=<<tmap "splitAndSelect" "|" "0">> />
       </$button>
     </$list>
     <hr />
     <$button class="tc-btn-invisible">No limit
-      <$action-setfield $tiddler=<<param.ref.view>> config.neighbourhood_scope="100" />
+      <$action-setfield
+          $tiddler=<<param.ref.view>>
+          config.neighbourhood_scope="100" />
     </$button>
     </div>
   </$reveal>

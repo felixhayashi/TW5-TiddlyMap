@@ -1,0 +1,32 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/editNode/default
+caption: Global node style
+
+\define vis-refresh-trigger() $(temp)$/vis-refresh
+
+<div class="tmap-flash-message tmap-info">
+  {{$:/core/images/info-button}} A node's ''global style''
+  (also referred to as //global individual style//) defines its
+  individual appearance in all views.
+</div>
+<<maybeShowTidColorWarning>>
+<table class="tmap-config-table">
+  <tr>
+    <td>Reset:</td>
+    <td>
+      <div class="tmap-button-wrapper">
+        <$button>Reset this style
+          <$action-setfield global-node-style="" />
+          <$action-setfield $tiddler=<<vis-refresh-trigger>> text="" />
+        </$button>
+     </div>
+   </td>
+   <td>Press the reset button to clear the node's global style</td>
+  </tr>
+</table>
+<$tmap-config
+    mode="manage-node-types"
+    inherited="[[inherited-global-default-style]]
+               [[inherited-local-default-style]]
+               [[inherited-group-styles]]"
+    extension="global-node-style"
+    refresh-trigger=<<vis-refresh-trigger>> />

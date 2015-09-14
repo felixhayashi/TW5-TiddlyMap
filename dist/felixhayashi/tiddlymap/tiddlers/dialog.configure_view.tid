@@ -1,7 +1,14 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/configureView
-subtitle: {{$:/core/images/theme-button}} View configuration -- <<view>>
+subtitle: {{$:/core/images/options-button}} View configuration -- <<view>>
+
+\define vis-refresh-trigger() $(temp)$/vis-refresh
 
 <$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
+
+<div class="tmap-flash-message tmap-info">
+   {{$:/core/images/info-button}}
+   All configurations __only__ affect this view.
+</div>
 
 <fieldset><legend>Statistics</legend>
   <table class="tmap-key-value-table">
@@ -22,34 +29,89 @@ subtitle: {{$:/core/images/theme-button}} View configuration -- <<view>>
 
 <fieldset><legend>Export</legend>
   <$button>Download graph (JSON format)
-    <$action-sendmessage $message="tmap:tm-download-graph" view=<<view>> />
+    <$action-sendmessage
+        $message="tmap:tm-download-graph"
+        view=<<view>> />
   </$button>
 </fieldset>
 
 
 <fieldset><legend>Layout</legend>
   <table class="tmap-config-table">
-    <<tmap-row title:"Floating nodes" field:"config.physics_mode" type:"input-checkbox"
-               descr:"Set this to true if you want your nodes to freely swirl around.">>
+    <<tmap-row type:"input-checkbox"
+        title:"Floating nodes"
+        field:"config.physics_mode" 
+        descr:"Set this to true if you want your nodes to freely
+               swirl around.">>
   </table>
 </fieldset>
 
 <fieldset><legend>Other</legend>
   <table class="tmap-config-table">
-    <<tmap-row title:"Edge-type namespace" field:"config.edge_type_namespace" type:"input-text"
-               descr:"A namespace (like 'foaf' in 'foaf:knows') that will be automatically added to all edge-types you create in this view."
-               note:"All namespaces are automatically stripped when the edge label is displayed in the graph">>
+    <<tmap-row type:"input-text"
+        title:"Edge-type namespace"
+        field:"config.edge_type_namespace" 
+        descr:"A namespace (like 'foaf' in 'foaf:knows') that will be
+               automatically added to all edge-types you create in
+               this view."
+        note:"All namespaces are automatically stripped when the
+              edge label is displayed in the graph">>
   </table>
 </fieldset>
 
 <fieldset><legend>Neighbourhood</legend>
   <table class="tmap-config-table">
-    <<tmap-row title:"Neighbourhood scope" field:"config.neighbourhood_scope" type:"input-select"
-               selectFilter:"[[0|Do not display a neighbourhood]] [[1|1 steps away]] [[2|2 steps away]] [[3|3 steps away]] [[4|4 steps away]] [[5|5 steps away]] [[*|No limit]]"
-               descr:"Display the neighbourhood that can be reached within the given number of steps starting from the matches returned by the node filter.">>
-    <<tmap-row type:"input-checkbox" title:"Show inter-neighbour edges" field:"config.show_inter_neighbour_edges"
-               descr:"When neighbours are displayed in a map along with matches, also display their relations to other neighbours">>
+    <<tmap-row type:"input-select"
+        title:"Neighbourhood scope"
+        field:"config.neighbourhood_scope" 
+        selectFilter:"[[0|Do not display a neighbourhood]]
+                      [[1|1 steps away]]
+                      [[2|2 steps away]]
+                      [[3|3 steps away]]
+                      [[4|4 steps away]]
+                      [[5|5 steps away]]
+                      [[*|No limit]]"
+        descr:"Display the neighbourhood that can be reached
+               within the given number of steps starting from the
+               matches returned by the node filter.">>
+    <<tmap-row type:"input-checkbox"
+        title:"Show inter-neighbour edges"
+        field:"config.show_inter_neighbour_edges"
+        descr:"When neighbours are displayed in a map along with
+               matches, also display their relations to other
+               neighbours">>
   </table>
+</fieldset>
+
+<fieldset><legend>Vis configurations</legend>
+  <div class="tmap-flash-message tmap-info">
+     {{$:/core/images/info-button}}
+     The local vis configurations will affect all
+     elements (nodes and edges) of this view, unless they are
+     overridden on a lower level. All options below are documented at
+     [[vis.js.org|http://visjs.org/docs/network]].
+  </div>
+  <table class="tmap-config-table">
+    <tr>
+      <td>Reset config:</td>
+      <td>
+        <div class="tmap-button-wrapper">
+          <$button>Reset vis configuration
+            <$action-setfield config.vis="" />
+            <$action-setfield $tiddler=<<vis-refresh-trigger>> text="" />
+          </$button>
+       </div>
+     </td>
+     <td>
+       Press the reset button to clear this view's vis configurations.
+     </td>
+    </tr>
+  </table>
+  <$tmap-config
+      mode="manage-config"
+      inherited="vis-inherited"
+      extension="config.vis"
+      refresh-trigger=<<vis-refresh-trigger>> />
 </fieldset>
 
 </$importvariables>

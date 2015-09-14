@@ -1,0 +1,52 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/editNode/local
+caption: Local node style
+
+\define vis-refresh-trigger() $(temp)$/vis-refresh
+
+\define defaultContent()
+  <div class="tmap-flash-message tmap-info">
+    {{$:/core/images/info-button}} The ''local node style'' 
+    (also referred to as //local individual style// or
+    //view-specific node style//) overrides the
+    //global individual style// and only affects the node's
+    appearance in the current view ("<<view>>").
+  </div>
+  <<maybeShowTidColorWarning>>
+  <table class="tmap-config-table">
+    <tr>
+      <td>Reset:</td>
+      <td>
+        <div class="tmap-button-wrapper">
+          <$button>Reset this style
+            <$action-setfield local-node-style="" />
+            <$action-setfield $tiddler=<<vis-refresh-trigger>> text="" />
+          </$button>
+       </div>
+     </td>
+     <td>Press the reset button to clear the node's local style</td>
+    </tr>
+  </table>
+  <$tmap-config
+      mode="manage-node-types"
+      inherited="[[inherited-global-default-style]]
+                 [[inherited-local-default-style]]
+                 [[inherited-group-styles]]
+                 [[global-node-style]]"
+      extension="local-node-style"
+      refresh-trigger=<<vis-refresh-trigger>> />
+      
+\end
+
+\define liveViewContent()
+  <div class="tmap-flash-message tmap-invalid">
+    {{$:/core/images/info-button}} The live view only shows global
+    styles and does not allow the creation of any view specific
+    style.
+  </div>
+\end
+
+<$list
+    filter="[<view>regexp[^Live View$]]"
+    emptyMessage=<<defaultContent>>>
+  <<liveViewContent>>
+</$list>

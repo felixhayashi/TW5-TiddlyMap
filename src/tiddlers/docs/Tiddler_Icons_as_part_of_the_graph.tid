@@ -1,22 +1,16 @@
 created: 20150112140815454
-icon: $:/core/images/star-filled
-id: 4fe33f8e-2a84-45dd-ab5c-4bfcf205e44e
-modified: 20150418131134311
+modified: 20150910223144138
 rank: 2
 tags: Examples
 title: Tiddler Icons as part of the graph
+tmap.id: 4fe33f8e-2a84-45dd-ab5c-4bfcf205e44e
 type: text/vnd.tiddlywiki
 
-In TiddlyWiki you can assign icons to your tiddlers by referencing a *local* image in the tiddler's icon field. This icon appears next to the tiddler's title (just like the star you see next to this tiddler's title).
+In TiddlyWiki you can assign icons to your tiddlers by referencing a //locally stored// image in the tiddler's icon field. This icon appears next to the tiddler's title. These icons are also displayed in graphs.
 
-Icons are also displayed in graphs. For example this view shows all tiddlers that have an icon field.
+<i class="fa fa-exclamation-circle" /> As of v0.9 it is possible to use the font awesome plugin and paste the icon code into a tiddler field tmap.fa-icon: `f072` for e.g. adding the plane icon.
+
+For example this view shows some tiddlers that have an icon field set.
 
 <$tiddlymap view="Tiddlers with Icons" height="250px"></$tiddlymap>
-
-Node filter:
-
-```
-[has[icon]]
-```
-
 

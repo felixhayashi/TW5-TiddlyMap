@@ -1,9 +1,9 @@
 created: 20150712180730202
-id: cf067397-bbf0-4806-93f0-17c2bea58e72
 modified: 20150712181215435
 order.challenges: 8
 tags: Challenges
 title: Storage
+tmap.id: cf067397-bbf0-4806-93f0-17c2bea58e72
 type: text/vnd.tiddlywiki
 
 Where and how to store information? Which data structure to employ for storage and retrival of [[construct|Map Constructs]] instances? This includes for example the [[Storage of Edges]].

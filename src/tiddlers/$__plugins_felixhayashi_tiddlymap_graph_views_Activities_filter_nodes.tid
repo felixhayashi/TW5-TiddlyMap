@@ -1,0 +1,5 @@
+created: 20150824131003553
+filter:  [field:tmap.id[afd75e95-e45a-4dea-848a-e16ca735bc57]] [field:tmap.id[38d37e10-3c8b-487c-9757-1061d2bbbd07]] [field:tmap.id[35b99ac8-aa07-4834-b508-6e9435f573cb]] [field:tmap.id[a1485262-99fe-4b1e-a246-cc70fbb1859a]] [field:tmap.id[6c9256c8-f45d-4276-8d57-83c9a2969d59]] [field:tmap.id[8b26d3b9-ddf5-43d9-9fa6-8d9ffcd6d3fc]] [field:tmap.id[11b9f558-6809-4d91-a7d1-60707c548b2e]] [field:tmap.id[50abb186-4360-43f9-b9e0-92b0a4dad8f9]]
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/Activities/filter/nodes
+type: text/vnd.tiddlywiki
+

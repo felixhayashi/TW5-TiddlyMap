@@ -1,9 +1,11 @@
 created: 20141217160951054
 creator: @felixhayashi
-id: B0528516-51F2-477C-94F3-F1195C0718C6
-modified: 20150627181633718
+icon: Hayashi Kanji.png
+modified: 20150904101847217
 modifier: @felixhayashi
 title: @felixhayashi
+tmap.edges: {"08852b7d-2df6-43ee-9539-435b0207bfa1":{"to":"0c36fc82-ef76-4272-bc5c-581660ada789","type":"would like to give"}}
+tmap.id: B0528516-51F2-477C-94F3-F1195C0718C6
 type: text/vnd.tiddlywiki
 
 """

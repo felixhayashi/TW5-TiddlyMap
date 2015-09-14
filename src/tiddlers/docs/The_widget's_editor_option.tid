@@ -1,10 +1,10 @@
 created: 20141220185422497
-id: 8FA9A14C-D58E-4257-ADDC-D01E834DD18C
 modified: 20150418131123816
 rank: 6
 tags: Examples
 title: The widget's editor option
 tmap.edges: {"34944601-27b4-4ae8-a053-713c8d6aebce":{"to":"9d97c1e8-9458-44f9-97c5-82253da987c0","type":"belongs to"},"da8ac3b4-0bc3-4420-9440-321b4847804e":{"to":"1e3565b4-f11f-4191-9d24-c4a54faed0d5","type":"demo:suggestion"}}
+tmap.id: 8FA9A14C-D58E-4257-ADDC-D01E834DD18C
 type: text/vnd.tiddlywiki
 
 In rare cases, you want your graphs displayed in your tiddlers to possess an editor bar for direct manipulation (this is usually done in the main editor).

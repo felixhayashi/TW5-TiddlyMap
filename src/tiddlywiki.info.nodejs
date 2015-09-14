@@ -9,6 +9,7 @@
     "felixhayashi/hotzone",
     "felixhayashi/vis",
     "felixhayashi/tiddlymap",
+    "spangenhelm/enhancedsearch",
     "danielo/contextPlugin"
   ],
   "themes": [

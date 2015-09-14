@@ -1,8 +1,8 @@
 created: 20150408145146498
-id: 50e0b623-ddaf-4c19-a659-422c18b26a7d
 modified: 20150408192618202
 tags: [[Basic concepts]]
 title: Working in fullscreen and halfscreen mode
+tmap.id: 50e0b623-ddaf-4c19-a659-422c18b26a7d
 type: text/vnd.tiddlywiki
 
 ! {{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} Fullscreen mode 

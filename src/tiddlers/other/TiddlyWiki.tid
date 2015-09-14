@@ -1,7 +1,8 @@
 created: 20141217202637180
-id: 746FEF43-FCAD-4229-8601-50ACE50AE49B
-modified: 20141217202651790
+icon: $:/core/icon
+modified: 20150910211501289
 title: TiddlyWiki
+tmap.id: 746FEF43-FCAD-4229-8601-50ACE50AE49B
 type: text/vnd.tiddlywiki
 
 //"~TiddlyWiki has bought unprecedented freedom to people to keep their precious information under their own control"//

@@ -1,11 +1,11 @@
 created: 20141219205505686
 description: haloohaloo cdjckdckd ffvf
-id: 69427454-433F-4409-86A8-68BC54A7285F
-modified: 20150620173240343
+modified: 20150823122459479
 rank: 1
 tags: Examples
 title: TaskManagementExample 2.0
 tmap.edges: {"250837f6-dec6-4dd1-8128-a0c6e0c3f7b4":{"to":"9d97c1e8-9458-44f9-97c5-82253da987c0","type":"belongs to"}}
+tmap.id: 69427454-433F-4409-86A8-68BC54A7285F
 type: text/vnd.tiddlywiki
 
 You probably already know that TiddlyWiki is a great tool to organize yourself and your tasks. A classical example for quick and easy task management is shown here [[TaskManagementExample|http://tiddlywiki.com/#TaskManagementExample]]. With ~TiddlyMap, however, you can now specify the relations of your tasks and graphically represent everything as a graph by simply linking your tiddlers!
@@ -17,6 +17,7 @@ In this example, the tiddlers from the TiddlyWiki example are incorporated into 
 ```
 [tag[Task]]
 ```
-ich ind ich kenne diesen menschen nicht heute bin ich aber no
+
+Despite the color, some task are displayed in a different form. This is because they match a certain node type and inherit its style. Open TiddlyMap's node-type manager and search for the type "important".
 
 Note that each tiddler's ''color field'' is used to infer the default node color.

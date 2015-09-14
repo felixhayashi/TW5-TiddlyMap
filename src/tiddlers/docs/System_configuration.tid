@@ -1,8 +1,8 @@
 created: 20150202224852034
-id: 4f43e8ec-73d8-4d5d-baea-dcbbaafd9779
 modified: 20150401212456718
 tags: Configuration
 title: System configuration
+tmap.id: 4f43e8ec-73d8-4d5d-baea-dcbbaafd9779
 type: text/vnd.tiddlywiki
 
 Some aspects of ~TiddlyMap are configurable. To change the global configurations, open the view menu and click on //Global configurations//.

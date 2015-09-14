@@ -1,10 +1,11 @@
 color: #c79df1
 created: 20130825143000000
-id: 7BEF6C80-B285-48B3-9736-F0845E612A4F
-modified: 20150401213047170
+modified: 20150911181816411
 tags: Task
 title: Compose ballad
 tmap.edges: {"6A5795CA-2B17-4133-AB83-E63563935A7B":{"to":"E255F767-A447-46D7-865C-494C782FC034","type":"maybe also"},"91DD50F4-BA3A-43CD-A27C-5FE3C8C676A3":{"to":"F37FE14F-DBCB-40A5-8055-F4020FFB37BB","type":"then"}}
+tmap.fa-icon: f02d
+tmap.id: 7BEF6C80-B285-48B3-9736-F0845E612A4F
 type: text/vnd.tiddlywiki
 
 //This is a sample task for the TaskManagementExample//

@@ -1,0 +1,8 @@
+created: 20150823102849864
+description: An example node type…
+modified: 20150824125339027
+scope: [tag[Task]tag[important]]
+style: {"shadow":{"size":16},"shape":"star","font":{"size":14}}
+title: $:/plugins/felixhayashi/tiddlymap/graph/nodeTypes/demo:important
+type: text/vnd.tiddlywiki
+

@@ -1,0 +1,36 @@
+caption: v0.9.x
+created: 20150726142912155
+modified: 20150901173329867
+released: not really
+tags: ReleaseNote [[Map Constructs]] Usability Configurability Storage
+title: Version 0.9.x
+tmap.id: 16976ded-1d7e-4798-b7ef-a12fc5cdaeef
+type: text/x-markdown
+
+Major enhancements
+----------------------------
+
+### v0.9.0
+
+* Resolves #162: Allow Font Awesome icons to be used with TiddlyMap
+* Resolves #151: Making the vis.js configurator available in tiddlymap
+* Resolves #152: Node-types and node-type manager
+* Adding individual node styling possibilities
+* Enhanced the tiddler-toolbar popup
+* Allows to set the default map which is displayed at startup
+
+Important Bugfixes
+----------------------------
+
+### v0.9.0
+
+* Fixes #157: Unexpected behaviour from sidebar map resize button
+* Fixes that a user could enter an empty view name during rename
+* Fixes #154: Using icons might cause false font color
+* Fixes error when pressing the save button in type manager when no
+  type is loaded
+
+Incompatibilities to previous versions
+----------------------------
+
+* Positioning the live view nodes and saving the positions is not possible anymore :( I had to remove this feature again since it clashed with different view operations.

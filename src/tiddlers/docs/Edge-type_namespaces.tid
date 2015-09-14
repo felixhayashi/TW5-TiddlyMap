@@ -1,8 +1,8 @@
 created: 20150330124519329
-id: c10296ef-ffcf-44bd-bc82-d051dea607fb
 modified: 20150630160649953
 tags: Edge-Types
 title: Edge-type namespaces
+tmap.id: c10296ef-ffcf-44bd-bc82-d051dea607fb
 type: text/vnd.tiddlywiki
 
 ! Introduction
@@ -32,10 +32,12 @@ In summary, namespaces may be used in ~TiddlyMap to achieve the following.
 ! Examples
 
 To see an example how edge-type namespaces may be used, just
-
+<<tmap "option" "ref.defaultViewHolder">>
 # <$button>Open the Family tree view
-  <$action-setfield $tiddler=<<map-macro "option" "ref.defaultGraphViewHolder">> text="Family Tree" />
-</$button>
+    <$action-setfield
+        $tiddler=<<map-macro "option" "ref.defaultViewHolder">>
+        text="Family Tree" />
+  </$button>
 # and click on an edge to view its type in the edge-type manager
 # Also have a look at the view's the edge-type filter
 # and how the default namespace is set in the view's configuration

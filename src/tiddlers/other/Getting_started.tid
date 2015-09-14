@@ -1,13 +1,18 @@
 created: 20141217161104178
 creator: @felixhayashi
-id: 63EA2EE9-F821-44F7-A706-E1F973F7C6E0
-modified: 20150627174439925
+modified: 20150914162059007
 modifier: @felixhayashi
 title: Getting started
 tmap.edges: {"30af4ba7-306f-4e68-9e32-d0342d64a717":{"to":"6159DA1A-73F2-451D-B55F-8744480BA7AC","type":"demo:suggestion"}}
+tmap.id: 63EA2EE9-F821-44F7-A706-E1F973F7C6E0
+tmap.open-view: Overview
 type: text/vnd.tiddlywiki
 
 \rules except wikilink
+
+<div class="tmap-flash-message tmap-info">
+   <i class="fa fa-exclamation-circle"></i> v0.9 just got released. Be safe and backup your wiki before installing it!
+</div>
 
 |!Current TiddlyMap version |{{ version || plugin }} |
 |!Version's build date |{{ released || plugin }} |
@@ -15,6 +20,6 @@ type: text/vnd.tiddlywiki
 
 Hi, this is a demo site of TiddlyMap.
 
-See the [[version history|Version History]] for a list of existing features and [[overview|The Big Picture]] to understand what TiddlyMap can do for you. To dive into the basic concepts and building blocks of TiddlyMap check out the [[docs|Documentation]]. Use the double-click on the nodes to [[navigate|Navigation]] to the corresponding content. The visualization runs most smoothly in [[Chrome|http://www.google.com/chrome/]]. Many [[thanks|Special thanks]] to everybody who made this project possible.
+See the [[version history|Version History]] for a list of existing features and check out the [[docs|Documentation]] to understand what TiddlyMap can do for you. Use the double-click on the nodes to [[navigate|Navigation]] to the corresponding content. The visualization runs most smoothly in [[Chrome|http://www.google.com/chrome/]]. TiddlyMap is designed to be used on large desktop screens. Here is an impression how it should look like: [[Screenshot|https://upload.wikimedia.org/wikipedia/commons/1/13/TiddlyMap_Demo_Site_-_0.7.24.png]].
 
-TiddlyMap is currently in its late beta-phase. If you want to use it in your wiki, check out the [[installation instructions|Installation]].
+TiddlyMap is currently in its late beta-phase. If you want to use it in your wiki, check out the [[installation instructions|Installation]]. Many [[thanks|Special Thanks]] to everybody who made this project possible.

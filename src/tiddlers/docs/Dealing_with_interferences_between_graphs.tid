@@ -1,8 +1,8 @@
 created: 20150119180138081
-id: a6cd2976-7837-4eb0-b43e-e6163a823121
 modified: 20150401212618582
 tags: Recipe
 title: Dealing with interferences between graphs
+tmap.id: a6cd2976-7837-4eb0-b43e-e6163a823121
 type: text/vnd.tiddlywiki
 
 Tiddlers (including their relationships) may be shared by different graphs and thus a tiddler-update may affect multiple graphs at once - same goes for adding relations - if the filters (views) are not disjunct. 

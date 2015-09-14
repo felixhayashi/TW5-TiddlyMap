@@ -1,8 +1,8 @@
 created: 20150630133803178
-id: 79fa55bc-416e-494a-ac67-785532129910
 modified: 20150711205015015
 tags: Edge-Types
 title: Magic Edge-Type Namespaces
+tmap.id: 79fa55bc-416e-494a-ac67-785532129910
 type: text/vnd.tiddlywiki
 
 Some edge-type namespaces are reserved for special purposes. Knowing about these "magic" types can help you to combine TiddlyMap with other cool TiddlyWiki plugins as these types enable you to create relations that are saved directly into user defined tw-fields.

@@ -1,10 +1,10 @@
 created: 20150202231339398
-modified: 20150620182306444
+modified: 20150910220323615
 tags: 
 title: $:/plugins/felixhayashi/tiddlymap/config/sys/user
 type: application/x-tiddler-dictionary
 
-field.nodeId: id
+field.nodeId: tmap.id
 field.nodeLabel: caption
 field.nodeIcon: icon
 field.nodeInfo: description
@@ -18,3 +18,4 @@ notifications: true
 editNodeOnCreate: false
 singleClickMode: false
 raster: 
+defaultView: Overview

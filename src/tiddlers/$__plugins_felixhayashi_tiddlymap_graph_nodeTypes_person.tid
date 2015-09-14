@@ -1,0 +1,8 @@
+created: 20150824131102871
+fa-icon: f007
+modified: 20150911180512499
+scope: [tag[Person]] [tag[Author]]
+style: {"color":{"background":"rgba(55,70,175,1)","border":"rgba(183,148,134,1)"}}
+title: $:/plugins/felixhayashi/tiddlymap/graph/nodeTypes/person
+type: text/vnd.tiddlywiki
+

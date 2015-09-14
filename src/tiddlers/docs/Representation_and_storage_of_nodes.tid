@@ -1,8 +1,8 @@
 created: 20150125155603745
-id: a4c3882d-0dd7-4e3c-818a-5065e8d09da0
 modified: 20150401212803529
 tags: Insight
 title: Representation and storage of nodes
+tmap.id: a4c3882d-0dd7-4e3c-818a-5065e8d09da0
 type: text/vnd.tiddlywiki
 
 Each node in a graph corresponds to a tiddler. Therefore, creating a new node in the map editor will necessarily result in the creation of a new tiddler and clicking on a node, will open that tiddler.

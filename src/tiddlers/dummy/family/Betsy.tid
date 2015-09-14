@@ -1,8 +1,8 @@
 created: 20150102011439979
-id: 38d37e10-3c8b-487c-9757-1061d2bbbd07
 modified: 20150102011523543
-tags: family
+tags: Person
 title: Betsy
-tmap.edges: {"4ae8de41-ef1a-400a-b51b-05662ce24597":{"to":"e017a09b-4526-4b4d-b097-f70e56f20ab4","type":"family:mother of"},"70f6e36a-ce9a-47b4-97e1-14b2df17d204":{"to":"8d2a0469-bb6a-4e40-ab1f-3d5edc620415","type":"family:mother of"},"c32a86ce-ab9a-49b6-a202-e93a37265fda":{"to":"b11149a2-9050-4632-b095-d9d233319b91","type":"family:mother of"}}
+tmap.edges: {"4ae8de41-ef1a-400a-b51b-05662ce24597":{"to":"e017a09b-4526-4b4d-b097-f70e56f20ab4","type":"family:mother of"},"70f6e36a-ce9a-47b4-97e1-14b2df17d204":{"to":"8d2a0469-bb6a-4e40-ab1f-3d5edc620415","type":"family:mother of"},"c32a86ce-ab9a-49b6-a202-e93a37265fda":{"to":"b11149a2-9050-4632-b095-d9d233319b91","type":"family:mother of"},"d25ba030-e3e2-4ff6-95d1-7c27d71aa7be":{"to":"50abb186-4360-43f9-b9e0-92b0a4dad8f9","type":"reads"}}
+tmap.id: 38d37e10-3c8b-487c-9757-1061d2bbbd07
 type: text/vnd.tiddlywiki
 

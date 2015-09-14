@@ -1,9 +1,9 @@
 created: 20141218163905294
-id: A94544D7-9A04-40D6-9274-AD56617C04BE
-modified: 20150630172044770
+modified: 20150829210604439
 tags: Documentation
 title: Installation
 tmap.edges: {}
+tmap.id: A94544D7-9A04-40D6-9274-AD56617C04BE
 type: text/vnd.tiddlywiki
 
 !! Disclaimer
@@ -24,7 +24,7 @@ By using this plugin you agree to the product's [[License Terms|$:/plugins/felix
 #: This plugin is necessary when you want to use the live view.
 #; [[TW5-TopStoryView|$:/plugins/felixhayashi/topstoryview]]
 #: Unless you are using the zoomin or stacked story view, install this plugin to achieve a better live view experience.
-#: <i class="fa fa-exclamation-triangle" />  You need to explicitly enable the top story view after installation.
+#: <i class="fa fa-exclamation-triangle" /> You need to explicitly enable the top story view after installation.
 #: Configuration ➡ Appearance ➡ Story view ➡ Current view ➡ top
 # Save your ~TiddlyWiki
 # Refresh the window

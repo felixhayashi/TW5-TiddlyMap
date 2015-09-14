@@ -1,9 +1,9 @@
 created: 20150113192543022
-id: 30e39689-af74-4182-99b2-33e1331d9f0f
 modified: 20150418131102390
 rank: 5
 tags: Examples
 title: Making use of the caption field
+tmap.id: 30e39689-af74-4182-99b2-33e1331d9f0f
 type: text/vnd.tiddlywiki
 
 To avoid having your valuable graph space covered by large titles, you can set caption fields in your tiddlers, which are used by ~TiddlyMap as node labels instead of the titles.

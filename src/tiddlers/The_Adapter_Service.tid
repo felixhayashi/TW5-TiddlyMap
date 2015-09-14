@@ -1,9 +1,9 @@
 created: 20141217201950735
-id: 04CCC27E-A88B-4CE2-93C8-914D8D65BD46
 modified: 20150712144011846
 tags: component [[Public API]]
 title: The Adapter Service
 tmap.edges: {"30A5C817-4F32-430E-A71A-7D71CDC765C3":{"to":"A9995A40-BAA5-4F26-9909-28C73FE097A1","type":"demo:uses"},"25830E82-AECB-4FBF-8267-25D46372FAC3":{"to":"46F1FDF7-0517-44B8-8593-30DDA1DAE459","type":"demo:uses"}}
+tmap.id: 04CCC27E-A88B-4CE2-93C8-914D8D65BD46
 type: text/vnd.tiddlywiki
 
 {{Public API!!warning}}

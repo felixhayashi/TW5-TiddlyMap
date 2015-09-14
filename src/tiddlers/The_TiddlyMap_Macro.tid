@@ -1,9 +1,9 @@
 created: 20141217202038499
-id: 5E82CA80-199F-4EBA-BC59-77C672978697
 modified: 20150712144041567
 tags: component [[Public API]]
 title: The TiddlyMap Macro
 tmap.edges: {"6BB4F5FD-C031-4722-839D-6D3D5CB70A2C":{"to":"A9995A40-BAA5-4F26-9909-28C73FE097A1","type":"demo:uses"}}
+tmap.id: 5E82CA80-199F-4EBA-BC59-77C672978697
 type: text/vnd.tiddlywiki
 
 \rules except wikilink

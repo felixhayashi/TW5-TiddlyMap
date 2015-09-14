@@ -1,8 +1,8 @@
 created: 20150119181237867
-id: e7ebfd9b-7ecd-4547-852f-6f2832f78421
 modified: 20150712150712304
 tags: [[Basic concepts]]
 title: Graph views
+tmap.id: e7ebfd9b-7ecd-4547-852f-6f2832f78421
 type: text/vnd.tiddlywiki
 
 Views determine which nodes and edges are selected in order to draw the graph. In its core, views are tw-filters. You can modify a view by selecting it in the sidebar map editor.

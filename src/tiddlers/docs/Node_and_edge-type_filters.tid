@@ -1,8 +1,8 @@
 created: 20150408193831749
-id: 336511aa-c981-4a5d-8f32-0bde79c7a578
 modified: 20150408200537971
 tags: [[View configuration]]
 title: Node and edge-type filters
+tmap.id: 336511aa-c981-4a5d-8f32-0bde79c7a578
 type: text/vnd.tiddlywiki
 
 Node and edge-type filters determine what is displayed in a graph. Both actually are tiddlywiki-filters. The filters can be set for each view by opening the [[view's configuration|View configuration]].
@@ -21,7 +21,7 @@ Just like you would usually filter a set of tiddlers, you can use a node filter 
 
 All edge-types are internally stored below the path
 
-<pre><<map-macro "option" "path.edgeTypes">></pre>
+<pre><<tmap "option" "path.edgeTypes">></pre>
 
 For example information about the "tmap:link" edge-type is stored in a tiddler with the title
 

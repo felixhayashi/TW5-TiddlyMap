@@ -23,7 +23,10 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
     <b><<param.viewLabel>></b>
   </$reveal>
 
-  <$button popup=<<qualify "$:/temp/menu">>>{{$:/core/images/menu-button}}</$button>
+  <$button
+      popup=<<qualify "$:/temp/menu">>
+      tooltip="Open the Menu">{{$:/core/images/menu-button}}
+  </$button>
   
   <$reveal type="popup" position="below" state=<<qualify "$:/temp/menu">> >
     <div class="tc-drop-down">
@@ -67,9 +70,18 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
     </div>
   </$reveal>
   
-  <$button class="tmap-radar-button" popup=<<qualify "$:/temp/radar">>>☀</$button>  
+  <$reveal
+      type="match"
+      text="true"
+      default=<<tmap "option" "config.sys.editorMenuBar.showNeighScopeButton">>>
+    <$button
+        class="tmap-neigh-scope-button"
+        tooltip="Show or hide the neighbourhood"
+        popup=<<qualify "$:/temp/neighScope">>>☀
+    </$button>
+  </$reveal>
   
-  <$reveal type="popup" position="below" state=<<qualify "$:/temp/radar">> >
+  <$reveal type="popup" position="below" state=<<qualify "$:/temp/neighScope">> >
     <div class="tc-drop-down">
     <$button class="tc-btn-invisible">Hide neighbourhood
       <$action-setfield
@@ -98,4 +110,37 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
     </div>
   </$reveal>
   
+  <$reveal
+      type="match"
+      text="true"
+      default=<<tmap "option"
+                     "config.sys.editorMenuBar.showScreenshotButton">>>
+    <$button
+        tooltip="Open the map-export menu"
+        popup=<<qualify "$:/temp/mapExport">>>
+      {{$:/core/images/download-button}}
+    </$button>
+  </$reveal>
+  
+  <$reveal
+      type="popup"
+      position="below"
+      state=<<qualify "$:/temp/mapExport">>>
+    <div class="tc-drop-down">
+    <$button
+        class="tc-btn-invisible">
+        {{$:/core/images/permalink-button}} Save as JSON file
+      <$action-sendmessage
+          $message="tmap:tm-download-graph"
+          view=<<param.viewLabel>> />
+    </$button>
+    <$button
+        class="tc-btn-invisible"
+        tooltip="Download graph as png image">
+        {{$:/core/images/palette}} Save as png image
+      <$action-sendmessage $message="tmap:tm-download-canvas" />
+    </$button>
+    </div>
+  </$reveal>
+    
 </div>

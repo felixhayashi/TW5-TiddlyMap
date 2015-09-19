@@ -68,6 +68,14 @@ exports.run = function() {
       
       return (result != null ? result : str);
 
+    case "concat":
+      
+      var str = "";
+      for(var i = 1, l = arguments.length; i < l; i++) {
+        str += arguments[i];
+      }
+      return str;
+      
     case "uuid":
 
       return utils.genUUID();

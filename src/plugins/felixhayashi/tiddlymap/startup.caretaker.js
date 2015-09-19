@@ -27,6 +27,7 @@ function(){
 /*** Imports *******************************************************/
 
 var visConfig =       require("$:/plugins/felixhayashi/tiddlymap/js/config/vis").config;
+var sysConfig =       require("$:/plugins/felixhayashi/tiddlymap/js/config/sys").config;
 var utils =           require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
 var Adapter =         require("$:/plugins/felixhayashi/tiddlymap/js/Adapter").Adapter;
 var DialogManager =   require("$:/plugins/felixhayashi/tiddlymap/js/DialogManager").DialogManager;
@@ -77,7 +78,6 @@ var attachOptions = function(parent) {
   
   opt.ref.defaultViewHolder =      "$:/plugins/felixhayashi/tiddlymap/misc/defaultViewHolder";
   opt.ref.graphBar =               "$:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar";
-  opt.ref.sysConf =                "$:/plugins/felixhayashi/tiddlymap/config/sys";
   opt.ref.sysUserConf =            "$:/plugins/felixhayashi/tiddlymap/config/sys/user";
   opt.ref.visUserConf =            "$:/plugins/felixhayashi/tiddlymap/config/vis/user";
   opt.ref.welcomeFlag =            "$:/plugins/felixhayashi/tiddlymap/flag/welcome";
@@ -88,14 +88,16 @@ var attachOptions = function(parent) {
   // default configurations mixed with user config
   if(!opt.config) opt.config = utils.getDataMap();
 
+  // Never modify the imported config objects; instead, merge them
+  // into a new object  
+
   opt.config.sys = utils.merge(
-    $tw.wiki.getTiddlerData(opt.ref.sysConf, {}),
-    utils.unflatten($tw.wiki.getTiddlerData(opt.ref.sysUserConf, {}))
+    {}, sysConfig,
+    utils.unflatten($tw.wiki.getTiddlerData(opt.ref.sysUserConf))
   );
   
-  // do not merge into visConfig directly; this needs to stay "pure"
   opt.config.vis = utils.merge(
-    {}, visConfig, $tw.wiki.getTiddlerData(opt.ref.visUserConf, {})
+    {}, visConfig, $tw.wiki.getTiddlerData(opt.ref.visUserConf)
   );
 
   // a shortcut for fields property
@@ -107,8 +109,6 @@ var attachOptions = function(parent) {
   
   // if no edge label is specified, this is used as label
   opt.misc.unknownEdgeLabel = "tmap:undefined";
-  opt.misc.cssPrefix = "tmap-";
-  opt.misc.sysEdgeTypeNS = "tmap";
   opt.misc.liveViewLabel = "Live View";
   opt.misc.defaultViewLabel = "Default";
 

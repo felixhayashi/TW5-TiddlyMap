@@ -1,6 +1,8 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/getEdgeType
 subtitle: {{$:/plugins/felixhayashi/tiddlymap/icon}} Type specification (optional)
 
+\rules except wikilink
+
 \define filter() $(allEdgeTypes)$ +[search:title[$(term)$]]
 
 You are about to connect "<<fromLabel>>" with "<<toLabel>>". Please specify a type.
@@ -13,7 +15,9 @@ You are about to connect "<<fromLabel>>" with "<<toLabel>>". Please specify a ty
 <$set name="allEdgeTypes" value=<<tmap "option" "selector.allEdgeTypesByLabel">>>
 
 <ul class="tmap-small-list">
-<$list filter=<<filter>> emptyMessage="//A type with this name does not exist yet and will be created.//">
+<$list filter=<<filter>>
+    emptyMessage="//A type with this name does not exist yet
+                  and will be created.//">
   <li>
     <$button class="tc-btn-invisible tmap-link">
       <$view field="title" />

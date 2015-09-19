@@ -2,7 +2,9 @@ title: $:/plugins/felixhayashi/tiddlymap/dialog/edgeNotVisible
 subtitle: {{$:/core/images/info-button}} Edge will not be visible in view "<<view>>"
 buttons: ok_suppress
 
-~TiddlyMap just noticed that you created an edge of type <<type>> that will not be visible in this view.
+\rules except wikilink
+
+TiddlyMap just noticed that you created an edge of type <<type>> that will not be visible in this view.
 
 The reason is that the view's edge filter prevents edges of type "<<type>>" from being displayed. To change this, open the view's menu and change the edge-filter configuration.
 

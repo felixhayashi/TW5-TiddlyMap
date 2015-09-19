@@ -23,7 +23,13 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
 
 \define input-checkbox(field, index, readonly, default)
   <$reveal type="match" text="" default="$readonly$">
-    <$checkbox tiddler=<<output>> field="$field$" index="$index$" checked="true" unchecked="false" default="$default$" />
+    <$checkbox
+        tiddler=<<output>>
+        field="$field$"
+        index="$index$"
+        checked="true"
+        unchecked="false"
+        default="$default$" />
   </$reveal>
   <$reveal type="nomatch" text="" default="$readonly$">
     <input type="checkbox" value="$default$" readonly="true" disabled="true" />

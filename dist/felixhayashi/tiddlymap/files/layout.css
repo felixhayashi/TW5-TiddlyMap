@@ -35,7 +35,7 @@
   font-size: 0.8em; }
 
 .tmap-graph-placeholder::before {
-  content: "TiddlyMap";
+  content: "Map";
   display: block;
   text-align: center;
   padding: 20px;
@@ -347,7 +347,7 @@ html {
       background: #F2F2F2; }
       html .tmap-widget.tmap-advanced-editor .tmap-topbar {
         background: #d6d9d8; }
-        html .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-radar-button {
+        html .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-neigh-scope-button {
           font-size: 1.5em;
           vertical-align: middle; }
     html .tmap-widget .tmap-menu-bar {

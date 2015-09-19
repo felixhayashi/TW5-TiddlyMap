@@ -1,6 +1,8 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/elementTypeManager/overview
 caption: Overview
 
+\rules except wikilink
+
 \define edge-type-attributes()
   [[Created on|created]] [[Modified on|modified]] [[Instances|temp.usageCount]]
 \end

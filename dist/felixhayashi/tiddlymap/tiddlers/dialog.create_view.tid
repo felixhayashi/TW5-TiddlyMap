@@ -1,6 +1,8 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/createView
 subtitle: {{$:/core/images/new-button}} Creating a new view
 
+\rules except wikilink
+
 Please specify a view name.
 
 Name:

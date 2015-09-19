@@ -475,7 +475,7 @@ ViewAbstraction.prototype.setConfig = function() {
 
 ViewAbstraction.prototype.isExplicitNode = function(node) {
   
-  var regex = utils.escapeRegex(this._getAddNodeFilterPart(node));
+  var regex = $tw.utils.escapeRegExp(this._getAddNodeFilterPart(node));
   return this.getNodeFilter("expression").match(regex);
              
 };

@@ -97,7 +97,9 @@ GlobalListener.prototype.handleGenerateWidget = function(event) {
   
   var options = {
     dialog: {
-      preselects: { view: event.paramObject.view || "Default" }
+      preselects: {
+        view: (event.paramObject.view || this.opt.misc.defaultViewLabel)
+      }
     }
   };
   this.dialogManager.open("getWidgetCode", options);

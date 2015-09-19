@@ -1,6 +1,8 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/fullscreenTiddlerEditor
 subtitle: {{$:/core/images/edit-button}} <<param.ref>>
 
+\rules except wikilink
+
 <div class="tmap-modal-editor">
   <$edit-text tiddler=<<param.ref>> field="color" tag="input" type="color"/>
   <$importvariables filter="[all[tiddlers+shadows]prefix[$:/core/macros/]]">

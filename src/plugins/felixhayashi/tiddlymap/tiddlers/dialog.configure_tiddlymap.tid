@@ -1,5 +1,5 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/configureTiddlyMap
-subtitle: {{$:/core/images/options-button}} Configuration of ~TiddlyMap
+subtitle: {{$:/core/images/options-button}} Configuration of TiddlyMap
 
 \rules except wikilink
 
@@ -9,7 +9,8 @@ subtitle: {{$:/core/images/options-button}} Configuration of ~TiddlyMap
 
 <div class="tmap-flash-message tmap-info">
    {{$:/core/images/info-button}}
-   Please visit the [[online docs|http://tiddlymap.org#Changing%20TiddlyMap's%20default%20configuration]] for more information about the following options.
+   Please visit the [[online docs|http://tiddlymap.org#Changing%20TiddlyMap's%20default%20configuration]]
+   for more information about the following options.
 </div>
 
 <fieldset>
@@ -84,7 +85,20 @@ subtitle: {{$:/core/images/options-button}} Configuration of ~TiddlyMap
   </table>
 </fieldset>
 
-<fieldset><legend>Global Vis Configurations</legend>
+<fieldset><legend>Editor menu bar</legend>
+  <table class="tmap-config-table">
+    <<tmap-row type:"input-checkbox"
+        title:"Show Neighbour&shy;hood button"
+        field:"config.sys.editorMenuBar.showNeighScopeButton" 
+        descr:"Show or hide the neighbourhood scope button from the menu.">>
+    <<tmap-row type:"input-checkbox"
+        title:"Show Screen&shy;shot button"
+        field:"config.sys.editorMenuBar.showScreenshotButton" 
+        descr:"Show or hide the screenshot button.">>
+  </table>   
+</fieldset>
+
+<fieldset><legend>Global Visjs configurations</legend>
   <div class="tmap-flash-message tmap-info">
      {{$:/core/images/info-button}}
      The global vis configurations will affect all views and their

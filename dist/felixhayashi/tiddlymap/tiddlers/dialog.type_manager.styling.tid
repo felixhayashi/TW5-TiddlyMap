@@ -1,6 +1,8 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/elementTypeManager/styling
 caption: Styling
 
+\rules except wikilink
+
 \define vis-refresh-trigger() $(temp)$/vis-refresh
 
 \define url()

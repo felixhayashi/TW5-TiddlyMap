@@ -74,7 +74,11 @@ utils.deleteTiddlers = function(tiddlers) {
 
 // TODO: function "delete tiddlers below path
 
-utils.moveFieldValues = function(oldName, newName, isRemoveOldField, isIncludeSystemTiddlers, tiddlers) {
+utils.moveFieldValues = function(oldName,
+                                 newName,
+                                 isRemoveOldField,
+                                 isIncludeSystemTiddlers,
+                                 tiddlers) {
         
   var allTiddlers = tiddlers || $tw.wiki.allTitles();
   for(var i = allTiddlers.length; i--;) {
@@ -96,28 +100,6 @@ utils.moveFieldValues = function(oldName, newName, isRemoveOldField, isIncludeSy
   }
   
 };
-
-/**
- * Creates an array of ids based on a given set of tiddlers.
- * 
- * @param {TiddlerCollection} tiddlers - A collection of tiddlers from
- *     which to retrieve the ids.
- * @param {string} idFieldName - The field that identifies the tiddler
- * @return {array.<Id>} - An array of ids.
- */
-//~ utils.getTiddlerIds = function(tiddlers, idFieldName) {
-  //~ 
-  //~ var ids = [];
-  //~ var keys = Object.keys(tiddlers);
-  //~ for(var i = keys.length; i--;) {
-    //~ if(utils.tiddlerExists(tiddlers[keys[i]])) {
-      //~ var id = utils.getTiddler(tiddlers[keys[i]]).fields[idFieldName];
-      //~ ids.push(id);
-    //~ }
-  //~ }
-  //~ return ids;
-  //~ 
-//~ };
 
 /**
  * @param {Tiddler} tiddler
@@ -291,9 +273,9 @@ utils.getDataMap = function() {
  * the wiki are considered.
  * 
  * @param {TiddlyWikiFilter} filter - The filter to use.
- * @param {TiddlerCollection} [tiddlers] - A set of tiddlers used as source.
- *     If not defined, all tiddlers and system tiddlers are selected.
- *     Shadows are *not* included.
+ * @param {TiddlerCollection} [tiddlers] - A set of tiddlers used as
+ *     source. If not defined, all tiddlers and system tiddlers are
+ *     selected. Shadows are *not* included.
  * @param {Hashmap} [options] - An optional options object.
  * @param {string} [options.outputType="array"] - May either be
  *     set to "array" or "hashmap". When set to "hashmap", the result
@@ -306,10 +288,11 @@ utils.getMatches = function(filter, tiddlers, asHashmap) {
   // use wiki as default source
   var source = undefined;
   
-  if(tiddlers !== null && typeof tiddlers === "object") {
+  // if a source is provided, create an iterator
+  if(tiddlers != null && typeof tiddlers === "object") {
     var keys = Object.keys(tiddlers);
     source = function(iterator) {
-      for(var i = 0; i < keys.length; i++) {
+      for(var i = keys.length; i--;) {
         var tObj = utils.getTiddler(tiddlers[keys[i]]);
         if(tObj) {
           iterator(tObj, tObj.fields.title);
@@ -326,7 +309,7 @@ utils.getMatches = function(filter, tiddlers, asHashmap) {
   
   if(asHashmap) {
     var lookupTable = utils.getDataMap();
-    for(var i = 0; i < tRefs.length; i++) {
+    for(var i = tRefs.length; i--;) {
       lookupTable[tRefs[i]] = $tw.wiki.getTiddler(tRefs[i]);
     }
     return lookupTable;
@@ -366,7 +349,8 @@ utils.isInteger = Number.isInteger || function(value) {
 };
 
 /**
- * When we do not know the string, we need to escape it
+ * When we do not know the string, we need to escape it.
+ * @deprecated use tw's escapeRegExp instead
  */
 utils.escapeRegex = function(str) {
   
@@ -584,7 +568,9 @@ utils.getWithoutPrefix = function(str, prefix) {
 utils.hasPropWithPrefix = function(obj, prefix) {
   
   for(var p in obj) {
-    if(utils.startsWith(p, prefix)) return true;
+    if(utils.startsWith(p, prefix)) {
+      return true;
+    }
   }
   return false;
   
@@ -594,6 +580,7 @@ utils.hasPropWithPrefix = function(obj, prefix) {
 
 /**
  * Helper to increase the code semantics.
+ * 
  * @param {string} str - The string to work with.
  * @param {string} prefix - The sequence to test.
  * @result {boolean} True if `str` starts with `prefix`, false otherwise.
@@ -652,9 +639,9 @@ utils.groupByProperty = function(col, prop) {
  */
 utils.findAndRemoveClassNames = function(classNames) {
   
-  for(var i = 0; i < classNames.length; i++) {
+  for(var i = classNames.length; i--;) {
     var elements = document.getElementsByClassName(classNames[i]);
-    for(var j = 0; j < elements.length; j++) {
+    for(var j = elements.length; j--;) {
       $tw.utils.removeClass(elements[j], classNames[i]);
     }
   }
@@ -878,9 +865,12 @@ utils.merge = function(dest /*[,src], src*/) {
     return dest;
   };
   
-  // start the merging
-  for(var i = 1; i < arguments.length; i++) {
-    dest = _merge(dest, arguments[i]);
+  // start the merging; i = 1 since first argument is the destination
+  for(var i = 1, l = arguments.length; i < l; i++) {
+    var src = arguments[i];
+    if(src != null && typeof src === "object") {
+      dest = _merge(dest, src);
+    }
   }
   
   return dest;
@@ -1032,7 +1022,7 @@ utils.keysOfItemsWithProperty = function(col, key, val, limit) {
   var keys = Object.keys(col);
   var result = [];
   var limit = (typeof limit === "number" ? limit : keys.length);
-  for(var i = 0; i < keys.length; i++) {
+  for(var i = 0, l = keys.length; i < l; i++) {
     var index = keys[i];
     if(typeof col[index] === "object" && col[index][key]) {
       if(!val || col[index][key] === val) {
@@ -1111,14 +1101,15 @@ utils.getLookupTable = function(col, lookupKey) {
   var lookupTable = utils.getDataMap();
   
   var keys = Object.keys(col);
-  for(var i = 0; i < keys.length; i++) {
+  for(var i = 0, l = keys.length; i < l; i++) {
     
     var key = keys[i];
     
     // value to be used as the lookup table's index
     var ltIndex = (lookupKey ? col[key][lookupKey] : col[key]);
     
-    if((typeof ltIndex === "string" && ltIndex != "") || typeof ltIndex === "number") {
+    if((typeof ltIndex === "string" && ltIndex != "")
+       || typeof ltIndex === "number") {
       if(!lookupTable[ltIndex]) { // doesn't exist yet!
         lookupTable[ltIndex] = col[key];
         continue;

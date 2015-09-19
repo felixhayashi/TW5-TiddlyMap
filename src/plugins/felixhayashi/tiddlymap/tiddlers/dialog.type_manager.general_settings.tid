@@ -1,6 +1,8 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/elementTypeManager/generalSettings
 caption: General
 
+\rules except wikilink
+
 \define manage-edge-types()
   <<tmap-row type:"input-text"
       title:"Label"

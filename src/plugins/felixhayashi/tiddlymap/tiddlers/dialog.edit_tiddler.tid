@@ -1,0 +1,14 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/fullscreenTiddlerEditor
+subtitle: {{$:/core/images/edit-button}} <<draftTRef>>
+
+\rules except wikilink
+
+\define defaultTab() $:/plugins/felixhayashi/tiddlymap/dialog/fullscreenTiddlerEditor/original
+
+<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]
+                          [[$:/core/macros/tabs]]">
+<$macrocall $name="tabs"
+    default=<<defaultTab>>
+    state="$:/state/tabs/elementTypeManager"
+    tabsList="[all[shadows]prefix[$:/plugins/felixhayashi/tiddlymap/dialog/fullscreenTiddlerEditor/]]" />
+</$importvariables>

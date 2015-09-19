@@ -31,6 +31,9 @@ var vis =             require("$:/plugins/felixhayashi/vis/vis.js");
 /*** Code **********************************************************/
       
 /**
+ * The map widget is responsible for drawing the actual network
+ * diagrams.
+ * 
  * @constructor
  */
 var MapWidget = function(parseTreeNode, options) {
@@ -46,6 +49,8 @@ var MapWidget = function(parseTreeNode, options) {
   this.opt = $tw.tmap.opt;
   this.notify = $tw.tmap.notify;
   this.fsapi = utils.getFullScreenApis();
+  this.getAttr = this.getAttribute;
+  this.isDebug = utils.isTrue(this.opt.config.sys.debug, false);
   
   // instanciate managers
   this.callbackManager = new CallbackManager();
@@ -53,17 +58,11 @@ var MapWidget = function(parseTreeNode, options) {
       
   // make the html attributes available to this widget
   this.computeAttributes();
+  this.editorMode = this.getAttr("editor");
+  this.clickToUse = utils.isTrue(this.getAttr("click-to-use"), true);
   
   // who am I? the id is used for debugging and special cases
-  this.objectId = (this.getAttribute("object-id")
-                   ? this.getAttribute("object-id")
-                   : utils.genUUID());
-                       
-  // register whether in editor mode or not
-  this.editorMode = this.getAttribute("editor");
-  
-  // click to use?
-  this.clickToUse = utils.isTrue(this.getAttribute("click-to-use"), true);
+  this.objectId = this.getAttr("object-id") || utils.genUUID();
     
   // register listeners that are available in editor mode
   if(this.editorMode) {
@@ -75,7 +74,8 @@ var MapWidget = function(parseTreeNode, options) {
       "tmap:tm-configure-system": this.handleConfigureSystem,
       "tmap:tm-store-position": this.handleStorePositions,
       "tmap:tm-edit-filters": this.handleEditFilters,
-      "tmap:tm-generate-widget": this.handleGenerateWidget
+      "tmap:tm-generate-widget": this.handleGenerateWidget,
+      "tmap:tm-download-canvas": this.handleDownloadCanvas
     }, this, this);
   }
   
@@ -92,13 +92,11 @@ MapWidget.prototype = Object.create(Widget.prototype);
 // !! EXTENSION !!
   
 /**
- * This handler will open a dialog in which the user specifies an
- * edgetype to use to create an edge between to nodes.
+ * This handler will open a dialog that allows the user to create a
+ * new relationship between two edges. This includes, that the user
+ * gets a chance to specify the edgetype of the connection.
  * 
- * Before any result is displayed to the user on the graph, the
- * relationship needs to be persisted in the store for the according
- * edgetype. If that operation was successful, each graph will instantly
- * be aware of the change as it listens to tiddler changes.
+ * Once the user confirmed the dialog, the edge is persisted.
  * 
  * @param {Edge} edge - A javascript object that contains at least
  *    the properties "from", "to" and "label"
@@ -107,26 +105,28 @@ MapWidget.prototype = Object.create(Widget.prototype);
  */
 MapWidget.prototype.handleConnectionEvent = function(edge, callback) {
 
-  var vars = {
+  var param = {
     fromLabel: this.adapter.selectNodeById(edge.from).label,
     toLabel: this.adapter.selectNodeById(edge.to).label
   };
   
-  this.dialogManager.open("getEdgeType", vars, function(isConfirmed, outputTObj) {
+  var name = "getEdgeType";
+  this.dialogManager.open(name, param, function(isConfirmed, outTObj) {
   
     if(isConfirmed) {
       
-      var type = utils.getText(outputTObj);
+      var type = utils.getText(outTObj);
+      
+      // get the default namespace of the view
+      var ns = this.view.getConfig("edge_type_namespace");
       
       // check whether type string comes with a namespace
       var hasNamespace = utils.hasSubString(type, ":");
-      
-      // get the default name space of the view
-      var ns = this.view.getConfig("edge_type_namespace");
-      
+            
       // maybe add namespace to type and instanciate as EdgeType
       type = new EdgeType((ns && !hasNamespace ? ns : "") + type);
       
+      // persist the type if it doesn't exist
       if(!type.exists()) type.persist();
       
       // add type to edge
@@ -151,7 +151,7 @@ MapWidget.prototype.handleConnectionEvent = function(edge, callback) {
       
     }
     
-    if(typeof callback == "function") {
+    if(typeof callback === "function") {
       callback(isConfirmed);
     }
       
@@ -165,8 +165,9 @@ MapWidget.prototype.handleConnectionEvent = function(edge, callback) {
  */
 MapWidget.prototype.checkForFreshInstall = function() {
 
-  if(utils.getEntry(this.opt.ref.sysMeta, "showWelcomeMessage", true)) {
-    utils.setEntry(this.opt.ref.sysMeta, "showWelcomeMessage", false);
+  var sysMeta = this.opt.ref.sysMeta;
+  if(utils.getEntry(sysMeta, "showWelcomeMessage", true)) {
+    utils.setEntry(sysMeta, "showWelcomeMessage", false);
     this.dialogManager.open("welcome");
   }
   
@@ -176,7 +177,8 @@ MapWidget.prototype.checkForFreshInstall = function() {
  * A very basic dialog that will tell the user he/she has to make
  * a choice.
  * 
- * @param {function} [callback] - A function with the signature function(isConfirmed).
+ * @param {function} [callback] - A function with the signature
+ *     function(isConfirmed).
  * @param {string} [message] - An small optional message to display.
  */
 MapWidget.prototype.openStandardConfirmDialog = function(callback, message) {
@@ -198,16 +200,19 @@ MapWidget.prototype.openStandardConfirmDialog = function(callback, message) {
  */
 MapWidget.prototype.logger = function(type, message /*, more stuff*/) {
   
-  var args = Array.prototype.slice.call(arguments, 1);
-  args.unshift("@" + this.objectId.toUpperCase());
-  args.unshift(type);
-  $tw.tmap.logger.apply(this, args);
+  if(this.isDebug) {
+  
+    var args = Array.prototype.slice.call(arguments, 1);
+    args.unshift("@" + this.objectId.toUpperCase());
+    args.unshift(type);
+    $tw.tmap.logger.apply(this, args);
+    
+  }
   
 };
 
 /**
  * Method to render this widget into the DOM.
- * Attention: BE CAREFUL WITH THE ORDER OF FUNCTION CALLS IN THIS FUNCTION.
  * 
  * @override
  */
@@ -216,17 +221,39 @@ MapWidget.prototype.render = function(parent, nextSibling) {
   // remember our place in the dom
   this.parentDomNode = parent;
   
-  // when widget is only previewed we do some alternative rendering
   if(utils.isPreviewed(this)) {
-    this.initAndRenderPlaceholder(parent);
-    return;
+    this.renderPreview(parent);
+  } else {
+    this.renderFullWidget(parent);
   }
       
+};
+
+/**
+ * When the widget is only previewed we do some alternative rendering.
+ */
+MapWidget.prototype.renderPreview = function(parent) {
+      
+  $tw.utils.addClass(parent, "tmap-graph-placeholder");
+  
+};
+
+/**
+ * The standard way of rendering.
+ * Attention: BE CAREFUL WITH THE ORDER OF FUNCTION CALLS IN THIS FUNCTION.
+ */
+MapWidget.prototype.renderFullWidget = function(parent) {
+  
   // add widget classes
   this.registerClassNames(parent);
   
+  // add a loading bar
+  this.addLoadingBar(parent);
+  
+  // register 
   this.sidebar = utils.getFirstElementByClassName("tc-sidebar-scrollable");
-  this.isContainedInSidebar = (this.sidebar && this.sidebar.contains(this.parentDomNode));
+  this.isContainedInSidebar = (this.sidebar
+                               && this.sidebar.contains(this.parentDomNode));
       
   // get view and view holder
   this.viewHolderRef = this.getViewHolderRef();
@@ -244,18 +271,17 @@ MapWidget.prototype.render = function(parent, nextSibling) {
   this.initAndRenderEditorBar(parent);
   
   // *second* initialise graph variables and render the graph
-  if(!utils.isPreviewed(this)) {
-    this.initAndRenderGraph(parent);
-  }
-  
+  this.initAndRenderGraph(parent);
+
   // register this graph at the caretaker's graph registry
   $tw.tmap.registry.push(this);
   
   // if any refresh-triggers exist, register them
   this.reloadRefreshTriggers();
   
+  // maybe display a welcome message
   this.checkForFreshInstall();
-
+  
 };
 
 /**
@@ -264,26 +290,32 @@ MapWidget.prototype.render = function(parent, nextSibling) {
  */  
 MapWidget.prototype.registerClassNames = function(parent) {
   
-  if(!$tw.utils.hasClass(parent, "tmap-widget")) {
-    
-    var classes = [ "tmap-widget" ];
-    if(this.clickToUse) {
-      classes.push("tmap-click-to-use");
-    }
-    if(this.getAttribute("editor") === "advanced") {
-      classes.push("tmap-advanced-editor");
-    }
-    if(!utils.isTrue(this.getAttribute("show-buttons"), true)) {
-      classes.push("tmap-no-buttons");
-    }
-    if(this.getAttribute("class")) {
-      classes.push(this.getAttribute("class"));
-    }
-    
-    $tw.utils.addClass(parent, classes.join(" "));
-        
+  var addClass = $tw.utils.addClass;
+  
+  // add main class
+  addClass(parent, "tmap-widget");
+  
+  // maybe add some of these classes as well…
+  if(this.clickToUse) {
+    addClass(parent, "tmap-click-to-use");
+  }
+  if(this.getAttr("editor") === "advanced") {
+    addClass(parent, "tmap-advanced-editor");
+  }
+  if(!utils.isTrue(this.getAttr("show-buttons"), true)) {
+    addClass(parent, "tmap-no-buttons");
+  }
+  if(this.getAttr("class")) {
+    addClass(parent, this.getAttr("class"));
   }
   
+};
+
+/**
+ * Adds a loading bar div below the parent.
+ */
+MapWidget.prototype.addLoadingBar = function(parent) {
+                
   this.graphLoadingBarDomNode = document.createElement("div");
   $tw.utils.addClass(this.graphLoadingBarDomNode, "tmap-loading-bar");
   parent.appendChild(this.graphLoadingBarDomNode);
@@ -312,12 +344,6 @@ MapWidget.prototype.initAndRenderEditorBar = function(parent) {
   
 };
 
-MapWidget.prototype.initAndRenderPlaceholder = function(parent) {
-      
-    $tw.utils.addClass(parent, "tmap-graph-placeholder");
-  
-};
-
 /**
  * Creates this widget's child-widgets.
  * 
@@ -339,7 +365,9 @@ MapWidget.prototype.rebuildEditorBar = function() {
       },
       allEdgesFilter: this.opt.selector.allEdgeTypes,
       searchOutput: "$:/temp/tmap/bar/search",
-      nodeFilter: "[list[$:/temp/tmap/nodes/" + this.view.getLabel() + "]"
+      nodeFilter: "[list[$:/temp/tmap/nodes/"
+                  + this.view.getLabel()
+                  + "]"
                   + "search:title{$:/temp/tmap/bar/search}]"
     }
   });
@@ -395,7 +423,7 @@ MapWidget.prototype.rebuildEditorBar = function() {
  * 
  * The changes are analyzed by several functions.
  * 
- * 1. checking for callbacks: some processes decided at runtime to 
+ * 1. checking for callbacks: some processes decide at runtime to 
  * listen to changes of single tiddlers (for example dialogs waiting
  * for results). So at first it is checked if a callback is triggered.
  * 
@@ -416,7 +444,6 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
   
   if(this.isZombieWidget() || !this.network || utils.isPreviewed(this)) return;
      
-  // in any case, check for callbacks triggered by tiddlers
   this.callbackManager.handleChanges(changedTiddlers);
   
   if(utils.hasPropWithPrefix(changedTiddlers, this.opt.path.options)) {
@@ -490,7 +517,7 @@ MapWidget.prototype.reloadRefreshTriggers = function() {
   this.callbackManager.remove(this.refreshTriggers);
       
   // load new trigger list either from attribute or view config
-  var str = this.getAttribute("refresh-triggers")
+  var str = this.getAttr("refresh-triggers")
             || this.view.getConfig("refresh-triggers");
   this.refreshTriggers = $tw.utils.parseStringArray(str) || [];
   
@@ -647,7 +674,11 @@ MapWidget.prototype.rebuildGraphData = function(isRebuild) {
   this.graphData.nodesById = nodes;
   this.graphData.edgesById = edges;
   
-  utils.setField("$:/temp/tmap/nodes/" + this.view.getLabel(), "list", this.adapter.getTiddlersById(nodes));
+  // TODO: that's a performance killer. this should be loaded when
+  // the search is actually used!
+  utils.setField("$:/temp/tmap/nodes/" + this.view.getLabel(),
+                 "list",
+                 this.adapter.getTiddlersById(nodes));
   
   $tw.tmap.stop("Reloading Network");
   
@@ -805,7 +836,7 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
 
   // in contrast to the graph height, which is assigned to the vis
   // graph wrapper, the graph width is assigned to the parent
-  parent.style["width"] = this.getAttribute("width", "100%");
+  parent.style["width"] = this.getAttr("width", "100%");
     
   // always save reference to a bound function that is used as listener
   // see http://stackoverflow.com/a/22870717
@@ -846,15 +877,23 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
   this.addKeyBindings();
 
   // register events
-  this.network.on("click", this.handleVisSingleClickEvent.bind(this));
-  this.network.on("doubleClick", this.handleVisDoubleClickEvent.bind(this));
-  this.network.on("stabilized", this.handleVisStabilizedEvent.bind(this));
-  this.network.on('dragStart', this.handleVisDragStart.bind(this));
-  this.network.on("dragEnd", this.handleVisDragEnd.bind(this));
-  this.network.on("select", this.handleVisSelect.bind(this));
-  this.network.on("beforeDrawing", this.handleVisBeforeDrawing.bind(this));
-  this.network.on("stabilizationProgress", this.handleVisLoading.bind(this));
-  this.network.on("stabilizationIterationsDone", this.handleVisLoadingDone.bind(this));
+  var handlers = {
+    "click": this.handleVisSingleClickEvent,
+    "doubleClick": this.handleVisDoubleClickEvent,
+    "stabilized": this.handleVisStabilizedEvent,
+    'dragStart': this.handleVisDragStart,
+    "dragEnd": this.handleVisDragEnd,
+    "select": this.handleVisRightClick,
+    "oncontext": this.handleVisSelect,
+    "beforeDrawing": this.handleVisBeforeDrawing,
+    "showPopup": this.handleVisShowPopup,
+    "stabilizationProgress": this.handleVisLoading,
+    "stabilizationIterationsDone": this.handleVisLoadingDone
+  };
+  
+  for(var event in handlers) {
+    this.network.on(event, handlers[event].bind(this));
+  }
   
   this.addGraphButtons({
     "fullscreen-button": function() { this.handleToggleFullscreen(false); }
@@ -965,11 +1004,11 @@ MapWidget.prototype.resetVisManipulationBar = function(visCallback) {
  */
 MapWidget.prototype.handleCreateView = function() {
   
-  this.dialogManager.open("createView", null, function(isConfirmed, outputTObj) {
+  this.dialogManager.open("createView", null, function(isConfirmed, outTObj) {
   
     if(isConfirmed) {
       
-      var label = utils.getText(outputTObj);
+      var label = utils.getText(outTObj);
       var view = new ViewAbstraction(label);
       
       if(view.isLocked()) {
@@ -996,11 +1035,11 @@ MapWidget.prototype.handleRenameView = function() {
       filter : utils.joinAndWrap(references, "[[", "]]")
     };
 
-    this.dialogManager.open("getViewName", fields, function(isConfirmed, outputTObj) {
+    this.dialogManager.open("getViewName", fields, function(isConfirmed, outTObj) {
     
       if(isConfirmed) {
         
-        var label = utils.getText(outputTObj);
+        var label = utils.getText(outTObj);
         var view = new ViewAbstraction(label);
         
         if(!label || view.isLocked()) {
@@ -1034,11 +1073,11 @@ MapWidget.prototype.handleEditView = function() {
   
   params.dialog.preselects["vis-inherited"] = JSON.stringify(this.opt.config.vis);
   
-  this.dialogManager.open("configureView", params, function(isConfirmed, outputTObj) {
+  this.dialogManager.open("configureView", params, function(isConfirmed, outTObj) {
     
     if(!isConfirmed) return;
       
-    var config = utils.getPropertiesByPrefix(outputTObj.fields, "config.");
+    var config = utils.getPropertiesByPrefix(outTObj.fields, "config.");
     this.view.setConfig(config);
     if(config["config.physics_mode"]) {
       // otherwise nodes would cludge together…
@@ -1046,6 +1085,21 @@ MapWidget.prototype.handleEditView = function() {
     }
           
   });
+  
+};
+
+/**
+ * Triggers a download dialog where the user can store the canvas
+ * as png on his/her harddrive.
+ */
+MapWidget.prototype.handleDownloadCanvas = function() {
+  
+  var canvas = this.parentDomNode.getElementsByTagName("canvas")[0];
+  var dataURL = canvas.toDataURL('image/png');
+  var a = document.createElement("a");
+  a.download = "Map snapshot – " + this.view.getLabel() + ".png";
+  a.href = dataURL;
+  a.click();
   
 };
 
@@ -1110,7 +1164,7 @@ MapWidget.prototype.handleTriggeredRefresh = function(trigger) {
   
 MapWidget.prototype.handleConfigureSystem = function() {
 
-  var params = {
+  var args = {
     dialog: {
       preselects: {
         "vis-inherited": JSON.stringify(visDefConf),
@@ -1120,15 +1174,19 @@ MapWidget.prototype.handleConfigureSystem = function() {
     }
   };
 
-  this.dialogManager.open("configureTiddlyMap", params, function(isConfirmed, outputTObj) {
+  var name = "configureTiddlyMap";
+  this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
     
-    if(isConfirmed && outputTObj) {
+    if(isConfirmed && outTObj) {
       
-      var config = utils.getPropertiesByPrefix(outputTObj.fields, "config.sys.", true);
+      var config = utils.getPropertiesByPrefix(outTObj.fields,
+                                               "config.sys.",
+                                               true);
+
       this.wiki.setTiddlerData(this.opt.ref.sysUserConf, config);
       
       // tw doesn't translate the json to an object so this is already a string
-      utils.setField(this.opt.ref.visUserConf, "text", outputTObj.fields["config.vis"]);
+      utils.setField(this.opt.ref.visUserConf, "text", outTObj.fields["config.vis"]);
             
     }
 
@@ -1217,11 +1275,11 @@ MapWidget.prototype.handleRemoveNode = function(node) {
     }
   };
 
-  this.dialogManager.open("deleteNodeDialog", params, function(isConfirmed, outputTObj) {
+  this.dialogManager.open("deleteNodeDialog", params, function(isConfirmed, outTObj) {
     
     if(isConfirmed) {
       
-      if(outputTObj.fields["opt.delete"] === "from system") {
+      if(outTObj.fields["opt.delete"] === "from system") {
 
         // will also delete edges
         this.adapter.deleteNode(node);
@@ -1239,7 +1297,7 @@ MapWidget.prototype.handleRemoveNode = function(node) {
       
       this.preventFitAfterRebuild = true;
       
-      this.notify("Node removed " + outputTObj.fields["opt.delete"]);
+      this.notify("Node removed " + outTObj.fields["opt.delete"]);
       
     }
     
@@ -1363,10 +1421,10 @@ MapWidget.prototype.handleEditFilters = function() {
     }
   };
   
-  this.dialogManager.open("editFilters", param, function(isConfirmed, outputTObj) {
+  this.dialogManager.open("editFilters", param, function(isConfirmed, outTObj) {
     if(isConfirmed) {
-      this.view.setNodeFilter(utils.getField(outputTObj, "prettyNodeFilter", pnf));
-      this.view.setEdgeFilter(utils.getField(outputTObj, "prettyEdgeFilter", pef));
+      this.view.setNodeFilter(utils.getField(outTObj, "prettyNodeFilter", pnf));
+      this.view.setEdgeFilter(utils.getField(outTObj, "prettyEdgeFilter", pef));
     }
   });
     
@@ -1461,10 +1519,10 @@ MapWidget.prototype.fitGraph = function(delay, duration) {
  */
 MapWidget.prototype.handleInsertNode = function(node) {
       
-  this.dialogManager.open("getNodeTitle", null, function(isConfirmed, outputTObj) {
+  this.dialogManager.open("getNodeTitle", null, function(isConfirmed, outTObj) {
     if(isConfirmed) {
       
-      var title = utils.getText(outputTObj);
+      var title = utils.getText(outTObj);
       
       if(utils.tiddlerExists(title)) {
         
@@ -1629,12 +1687,12 @@ MapWidget.prototype.handleResizeEvent = function(event) {
   
   if(this.isZombieWidget()) return;
   
-  var height = this.getAttribute("height");
+  var height = this.getAttr("height");
   
   if(!height && this.isContainedInSidebar) {
   
     var canvasOffset = this.parentDomNode.getBoundingClientRect().top;
-    var distanceBottom = parseInt(this.getAttribute("bottom-spacing", 25));
+    var distanceBottom = parseInt(this.getAttr("bottom-spacing", 25));
     var calculatedHeight = window.innerHeight - canvasOffset;
     height = (calculatedHeight - distanceBottom) + "px";
   
@@ -1666,6 +1724,27 @@ MapWidget.prototype.handleClickEvent = function(event) {
     this.visNetworkDomNode.focus();
   }
 
+};
+
+/**
+ * Fired by vis when the user click on the canvas with the right
+ * mouse button. 
+ */
+MapWidget.prototype.handleVisRightClick = function(properties) {
+  
+  //~ var id = this.network.getNodeAt(properties.pointer.DOM);
+  //~ if(id) {
+    //~ alert("right" + id);
+  //~ }
+  
+};
+
+/**
+ * Fired by vis when the user click on the canvas with the right
+ * mouse button. 
+ */
+MapWidget.prototype.handleVisShowPopup = function(id) {
+  
 };
 
 /**
@@ -1766,33 +1845,39 @@ MapWidget.prototype.openTiddlerWithId = function(id) {
   
   if(this.enlargedMode === "fullscreen") {
     
-    this.dispatchEvent({
-      type: "tm-edit-tiddler", tiddlerTitle: tRef
-    });
-    
     var draftTRef = this.wiki.findDraft(tRef);
-    
-    if(!draftTRef) return;
-    
-    var params = {
-      param: { ref: draftTRef }
+    var wasInDraftAlready = !!draftTRef;
+        
+    if(!wasInDraftAlready) {
+      
+      var type = "tm-edit-tiddler";
+      this.dispatchEvent({ type: type, tiddlerTitle: tRef });
+      draftTRef = this.wiki.findDraft(tRef);
+      
+    }
+        
+    var args = {
+      draftTRef: draftTRef
     };
 
-    this.dialogManager.open("fullscreenTiddlerEditor", params,  function(isConfirmed, outputTObj) {
+    var name = "fullscreenTiddlerEditor";
+    this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
     
       if(isConfirmed) {
         
-        this.dispatchEvent({
-          type: "tm-save-tiddler", tiddlerTitle: draftTRef
-        }); 
+        var type = "tm-save-tiddler";
+        this.dispatchEvent({ type: type, tiddlerTitle: draftTRef }); 
         
-      } else {
+      } else if(!wasInDraftAlready) {
         
-        this.dispatchEvent({
-          type: "tm-cancel-tiddler", tiddlerTitle: draftTRef
-        });
+        var type = "tm-cancel-tiddler";
+        this.dispatchEvent({ type: type, tiddlerTitle: draftTRef }); 
         
       }
+      
+      // in any case, remove the original tiddler from the river
+      var type = "tm-close-tiddler";
+      this.dispatchEvent({ type: type, tiddlerTitle: tRef }); 
       
     });
     
@@ -1827,7 +1912,7 @@ MapWidget.prototype.getViewHolderRef = function() {
   this.logger("info", "Retrieving or generating the view holder reference");
   
   // if given, try to retrieve the viewHolderRef by specified attribute
-  var viewName = this.getAttribute("view");
+  var viewName = this.getAttr("view");
   if(viewName) {
     
     this.logger("log", "User wants to bind view \"" + viewName + "\" to graph");
@@ -1875,7 +1960,7 @@ MapWidget.prototype.setView = function(view, viewHolderRef) {
   
   if(view) {
     
-    viewLabel = new ViewAbstraction(view).getLabel();
+    var viewLabel = new ViewAbstraction(view).getLabel();
     viewHolderRef = viewHolderRef || this.viewHolderRef;
     this.logger("info", "Inserting view '"
                         + viewLabel

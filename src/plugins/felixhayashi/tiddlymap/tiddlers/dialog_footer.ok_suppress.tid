@@ -1,5 +1,7 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialogFooter/ok_suppress
 
+\rules except wikilink
+
 <$set name="currentTiddler" value=<<title>> >
 
 <$checkbox field="suppress" checked="1" unchecked="0" default="0"> Do not show this dialog again</$checkbox>

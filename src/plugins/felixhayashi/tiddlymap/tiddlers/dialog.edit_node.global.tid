@@ -1,6 +1,8 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/editNode/default
 caption: Global node style
 
+\rules except wikilink
+
 \define vis-refresh-trigger() $(temp)$/vis-refresh
 
 <div class="tmap-flash-message tmap-info">

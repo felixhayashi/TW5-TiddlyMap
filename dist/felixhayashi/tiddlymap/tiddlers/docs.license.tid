@@ -2,18 +2,20 @@ title: $:/plugins/felixhayashi/tiddlymap/license
 subtitle: License
 caption: License
 
-!! ~TiddlyMap
+\rules except wikilink
+
+!! TiddlyMap
 
 Copyright (c) 2014, Felix Küppers
 All rights reserved.
 
-~TiddlyMap is licensed under the [[BSD 2-Clause License|http://opensource.org/licenses/BSD-2-Clause]]. For the exact license terms, please visit [[https://github.com/felixhayashi/TW5-TiddlyMap/blob/master/LICENSE]]. 
+TiddlyMap is licensed under the [[BSD 2-Clause License|http://opensource.org/licenses/BSD-2-Clause]]. For the exact license terms, please visit [[https://github.com/felixhayashi/TW5-TiddlyMap/blob/master/LICENSE]]. 
 
-!! ~TiddlyWiki
+!! TiddlyWiki
 
 Created by Jeremy Ruston, (jeremy [at] jermolene [dot] com)
 
-Copyright © Jeremy Ruston 2004-2007 Copyright © ~UnaMesa Association 2007-2014
+Copyright © Jeremy Ruston 2004-2007 Copyright © UnaMesa Association 2007-2014
 
 Published under the following [licenses](https://github.com/Jermolene/TiddlyWiki5/tree/master/licenses):
 

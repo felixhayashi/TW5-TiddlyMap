@@ -2,6 +2,8 @@ title: $:/plugins/felixhayashi/tiddlymap/dialog/elementTypeManager
 subtitle: {{$:/core/images/tag-button}} <<topic>>
 buttons: element_type_manager
 
+\rules except wikilink
+
 \define defaultTab() $:/plugins/felixhayashi/tiddlymap/dialog/elementTypeManager/overview
 \define settingsTab() $:/plugins/felixhayashi/tiddlymap/dialog/elementTypeManager/generalSettings
 

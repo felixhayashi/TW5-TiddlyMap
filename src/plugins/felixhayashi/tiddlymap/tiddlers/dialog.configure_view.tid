@@ -1,6 +1,8 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/configureView
 subtitle: {{$:/core/images/options-button}} View configuration -- <<view>>
 
+\rules except wikilink
+
 \define vis-refresh-trigger() $(temp)$/vis-refresh
 
 <$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
@@ -26,15 +28,6 @@ subtitle: {{$:/core/images/options-button}} View configuration -- <<view>>
     </tr>
   </table>
 </fieldset>
-
-<fieldset><legend>Export</legend>
-  <$button>Download graph (JSON format)
-    <$action-sendmessage
-        $message="tmap:tm-download-graph"
-        view=<<view>> />
-  </$button>
-</fieldset>
-
 
 <fieldset><legend>Layout</legend>
   <table class="tmap-config-table">

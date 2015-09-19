@@ -1,6 +1,8 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/elementTypeManager/description
 caption: Description
 
+\rules except wikilink
+
 \define manage-edge-types()
   <<tmap-row type:"input-textarea"
       title:"Description"

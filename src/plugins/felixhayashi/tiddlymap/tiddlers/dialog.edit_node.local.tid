@@ -1,6 +1,8 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/editNode/local
 caption: Local node style
 
+\rules except wikilink
+
 \define vis-refresh-trigger() $(temp)$/vis-refresh
 
 \define defaultContent()

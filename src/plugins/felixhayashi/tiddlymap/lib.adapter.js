@@ -47,6 +47,7 @@ var Adapter = function() {
   // create shortcuts to services
   this.opt = $tw.tmap.opt;
   this.logger = $tw.tmap.logger;
+  this.indeces = $tw.tmap.indeces;
   this.visShapesWithTextInside = utils.getLookupTable([
       "ellipse", "circle", "database", "box", "text"
   ]);
@@ -112,7 +113,7 @@ Adapter.prototype._processEdge = function(edge, action) {
   if(action === "insert" && !edge.to) return;
   
   // get from-node and corresponding tiddler
-  var fromTRef = $tw.tmap.indeces.tById[edge.from];
+  var fromTRef = this.indeces.tById[edge.from];
   if(!fromTRef || !utils.tiddlerExists(fromTRef)) return;
 
   var type = new EdgeType(edge.type);
@@ -205,7 +206,7 @@ Adapter.prototype._processListEdge = function(tiddler, edge, type, action) {
   list = (list || []).slice()
   
   // transform
-  var toTRef = $tw.tmap.indeces.tById[edge.to];
+  var toTRef = this.indeces.tById[edge.to];
       
   if(action === "insert") {
     list.push(toTRef);
@@ -239,7 +240,7 @@ Adapter.prototype._processListEdge = function(tiddler, edge, type, action) {
  */
 Adapter.prototype._processFieldEdge = function(tiddler, edge, type, action) {
 
-  var toTRef = $tw.tmap.indeces.tById[edge.to];
+  var toTRef = this.indeces.tById[edge.to];
   if(toTRef == null) return; // null or undefined
   
   var val = (action === "insert" ? toTRef : "");
@@ -350,7 +351,7 @@ Adapter.prototype.getNeighbours = function(tiddlers, opts) {
       
       // 2) add nodes for these edges
       for(var id in outgoing) {
-        var toTRef = $tw.tmap.indeces.tById[outgoing[id].to];
+        var toTRef = this.indeces.tById[outgoing[id].to];
         if(!lookupTable[toTRef] && !neighNodes[outgoing[id].to]) {
           // not included in original set and not already discovered
           var node = this.makeNode(toTRef, protoNode);
@@ -362,10 +363,10 @@ Adapter.prototype.getNeighbours = function(tiddlers, opts) {
       }
       
       // 3) get all edges from outside that point towards the set
-      var incoming = adjList[$tw.tmap.indeces.idByT[tiddlers[i]]];
+      var incoming = adjList[this.indeces.idByT[tiddlers[i]]];
       if(incoming) {
         for(var j = 0; j < incoming.length; j++) {
-          var fromTRef = $tw.tmap.indeces.tById[incoming[j].from];
+          var fromTRef = this.indeces.tById[incoming[j].from];
           if(lookupTable[fromTRef]) continue; // included in original set
           if(!neighNodes[incoming[j].from]) {              
             var node = this.makeNode(fromTRef, protoNode);
@@ -595,7 +596,7 @@ Adapter.prototype._getTmapEdges = function(tiddler, toWL, typeWL) {
   
   for(var conId in connections) {
     var con = connections[conId];
-    var toTRef = $tw.tmap.indeces.tById[con.to];
+    var toTRef = this.indeces.tById[con.to];
     if(toTRef && (!toWL || toWL[toTRef]) && (!typeWL || typeWL[con.type])) {
       var edge = this.makeEdge(this.getId(tiddler), con.to, con.type, conId);
       if(edge) {
@@ -822,7 +823,7 @@ Adapter.prototype.makeEdge = function(from, to, type, id) {
   
   edge.label = (utils.isTrue(type.getData("show-label"), true)
                 ? type.getLabel()
-                : undefined); // needs to be set/unset explicitly 
+                : null); // needs to be set/unset explicitly 
 
   edge = $tw.utils.extend(edge, type.getData("style"));
   
@@ -871,7 +872,7 @@ Adapter.prototype.getInheritedNodeStyles = function(nodes, view) {
   var protoByTRef = {};
   // we decrement and therefore use the loGlNTy index which
   // first contains local and at the end global node-types.
-  var loGlNTy = $tw.tmap.indeces.loGlNTy;
+  var loGlNTy = this.indeces.loGlNTy;
   
   for(var i = loGlNTy.length; i--;) {
   
@@ -938,8 +939,13 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
   var viewNodeData = (view.exists() ? view.getNodeData() : {});
   var isFixedNode = !view.isEnabled("physics_mode");
   
+  // shortcuts (for performance and readability)
+  var nodeInfoField = this.opt.field.nodeInfo;
+  var nodeIconField = this.opt.field.nodeIcon;
+  var tById = this.indeces.tById;
+  
   for(var id in nodes) {
-    var tRef = $tw.tmap.indeces.tById[id];
+    var tRef = tById[id];
     var tObj = $tw.wiki.getTiddler(tRef);
     var fields = tObj.fields;
     var node = nodes[id];
@@ -978,7 +984,7 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
     // and global node style as been merged as it uses the color property
     this._addNodeIcon(node,
                       fields["tmap.fa-icon"],
-                      fields[this.opt.field.nodeIcon]);
+                      fields[nodeIconField]);
     
     // == local node styles ==
     
@@ -1017,15 +1023,14 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
     // == independent information ==
   
     // tooltip
-    var info = fields[this.opt.field.nodeInfo];
-    if(info && this.opt.field.nodeInfo !== "text") {
+    if(fields[nodeInfoField]) {
       node.title = $tw.wiki.renderText("text/html",
                                        "text/vnd-tiddlywiki",
-                                       info);
+                                       fields[nodeInfoField]);
     } else if(node.label !== tRef) {
       node.title = tRef;
     }
-         
+             
   }
   
 };
@@ -1048,7 +1053,7 @@ Adapter.prototype.deleteNode = function(node) {
   if(!node) return;
   
   var id = (typeof node === "object" ? node.id : node);
-  var tRef = $tw.tmap.indeces.tById[id];
+  var tRef = this.indeces.tById[id];
   
   // delete tiddler and remove it from the river; this will
   // automatically remove the global node style and the outgoing edges
@@ -1082,12 +1087,13 @@ Adapter.prototype.deleteNode = function(node) {
   // It does not do harm to leave indeces as is since we do not
   // iterate over them(!) and when a tiddler has the same title or
   // id as a deleted tiddler, which is highly unlikely, then it will
-  // simply override the index, which is totally fine.
+  // simply override the index, which is totally fine. The indeces
+  // are refreshed on every boot anyway so it is not a big deal.
   // 
   // THEREFORE:
   //
-  // DO NOT DO delete $tw.tmap.indeces.tById[id];
-  // DO NOT DO delete $tw.tmap.indeces.idByT[tRef];
+  // DO NOT DO delete this.indeces.tById[id];
+  // DO NOT DO delete this.indeces.idByT[tRef];
   
 };
 
@@ -1184,8 +1190,8 @@ Adapter.prototype.assignId = function(tiddler, isForce) {
   
   // blindly update the index IN ANY CASE because tiddler may have
   // an id but it is not indexed yet (e.g. because of renaming operation)
-  $tw.tmap.indeces.tById[id] = tObj.fields.title;
-  $tw.tmap.indeces.idByT[tObj.fields.title] = id;
+  this.indeces.tById[id] = tObj.fields.title;
+  this.indeces.idByT[tObj.fields.title] = id;
   
   return id;
   
@@ -1261,7 +1267,7 @@ Adapter.prototype.getTiddlersById = function(nodeIds) {
   }
   
   var result = [];
-  var tById = $tw.tmap.indeces.tById;
+  var tById = this.indeces.tById;
   for(var id in nodeIds) {
     if(tById[id]) result.push(tById[id]);
   }
@@ -1271,7 +1277,7 @@ Adapter.prototype.getTiddlersById = function(nodeIds) {
 };
 
 Adapter.prototype.getId = function(tiddler) {
-  return $tw.tmap.indeces.idByT[utils.getTiddlerRef(tiddler)];
+  return this.indeces.idByT[utils.getTiddlerRef(tiddler)];
   //return utils.getField(tiddler, this.opt.field.nodeId);
 };
 

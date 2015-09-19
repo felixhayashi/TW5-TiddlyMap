@@ -1,6 +1,8 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/editNode
 subtitle: {{$:/core/images/edit-button}} Editing style of node "<<tiddler>>"
 
+\rules except wikilink
+
 \define tab(name) $(template)$/$name$
 
 \define maybeShowTidColorWarning()

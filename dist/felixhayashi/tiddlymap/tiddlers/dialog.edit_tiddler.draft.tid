@@ -1,0 +1,13 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/fullscreenTiddlerEditor/draft
+caption: Draft
+
+\rules except wikilink
+
+<div class="tmap-modal-editor">
+  <$edit-text tiddler=<<draftTRef>> field="color" tag="input" type="color"/>
+  <$importvariables filter="[all[tiddlers+shadows]prefix[$:/core/macros/]]">
+    <$set name="currentTiddler" value=<<draftTRef>> >
+      <$transclude tiddler="$:/core/ui/EditTemplate" field="text" mode="block" />
+    </$set>
+  </$importvariables>
+</div>

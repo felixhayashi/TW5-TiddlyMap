@@ -52,7 +52,7 @@ $default-input-width: 140px;
   font-size: 0.8em,
 }
 .tmap-graph-placeholder::before {
-  content: "TiddlyMap";
+  content: "Map";
   display: block;
   text-align: center;
   padding: 20px;
@@ -589,7 +589,7 @@ html { // used to increase css importance
       .tmap-topbar {
         background: #d6d9d8;
         
-        .tmap-radar-button {
+        .tmap-neigh-scope-button {
           font-size: 1.5em;
           vertical-align: middle;
         }

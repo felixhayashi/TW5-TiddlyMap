@@ -1,0 +1,11 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/fullscreenTiddlerEditor/original
+caption: Preview
+
+\rules except wikilink
+
+<$transclude tiddler=<<draftTRef>> mode="block" />
+
+<!--
+<$set name="currentTiddler" value=<<draftTRef>> >
+  <$transclude tiddler="$:/core/ui/ViewTemplate" field="text" mode="block" />
+</$set>-->

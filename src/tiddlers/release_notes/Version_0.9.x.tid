@@ -10,6 +10,12 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.9.1
+
+* Added fullscreen preview and draft tabs when opening a node
+* Added download graph button
+* Added option to hide editor-menu buttons
+
 ### v0.9.0
 
 * Resolves #162: Allow Font Awesome icons to be used with TiddlyMap
@@ -22,9 +28,13 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.9.1
+
+* Fixes #165: Unexpected behaviour from sidebar map resize button
+
 ### v0.9.0
 
-* Fixes #157: Unexpected behaviour from sidebar map resize button
+* Fixes #157: Renaming a view creates an error
 * Fixes that a user could enter an empty view name during rename
 * Fixes #154: Using icons might cause false font color
 * Fixes error when pressing the save button in type manager when no

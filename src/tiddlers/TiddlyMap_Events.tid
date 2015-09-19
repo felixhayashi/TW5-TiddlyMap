@@ -80,7 +80,7 @@ Show download dialog.
 ```
 <$button>Show download dialog
 <$action-sendmessage $message="tmap:tm-download-graph"
-                     view="default" />
+                     view="Default" />
 </$button>
 ```
 

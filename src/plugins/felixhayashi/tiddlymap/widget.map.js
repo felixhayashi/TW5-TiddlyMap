@@ -1099,7 +1099,11 @@ MapWidget.prototype.handleDownloadCanvas = function() {
   var a = document.createElement("a");
   a.download = "Map snapshot – " + this.view.getLabel() + ".png";
   a.href = dataURL;
-  a.click();
+
+  // we cannot simply call click() on <a>; chrome is cool with it but
+  // firefox requires us to create a mouse event…
+  var event = new MouseEvent('click');
+  a.dispatchEvent(event);
   
 };
 

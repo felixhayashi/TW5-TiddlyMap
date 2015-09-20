@@ -1,11 +1,11 @@
 Contributing to TiddlyMap
 =========================
 
-TiddlyMap is an open source project and as such warmly welcomes contributions from the community to improve the software or anything else related to the project (e.g. docs). However, to accept contributions, the TiddlyMap project needs contributors to sign a so called *contributor license agreement* (CLA).
+TiddlyMap is an open source project and as such warmly welcomes contributions from the community to improve the software or anything else related to the project. This includes ideas, code, documentation, graphics etc.
 
-The purpose of this legal agreement is to clearly define the terms under which intellectual property has been contributed to the TiddlyMap project and thereby allow us, to defend the project should there be a legal dispute regarding the software at some future time. By signing the agreement, contributors assert that they own the copyright of their contribution and that they agree to license it to the TiddlyMap project and its original creator.
+If you want to contribute to TiddlyMap's success, please create a GitHub issue first, so it is possible to discuss the contribution beforehand!
 
-This agreement is for your protection as well as the protection of TiddlyMap and its licensees. It does not change your rights to use your contributions for any other purpose.
+Contributors of code and other artifacts (e.g. images) need to sign a so called *contributor license agreement* (CLA). By signing the agreement, you as the contributor assert that you own the copyright of your contribution and that you agree to license it to the TiddlyMap project and its original creator (me). This agreement is necessary for the legal protection of the TiddlyMap project and its users (licensees) against copyright infringements. It does not change your rights to use your contributions for any other purpose.
 
 Signing the CLA
 ---------------
@@ -22,4 +22,4 @@ Remarks
 
 **When not owning the copyright in the entire work of authorship**
 
-In this case, please clearly state so, since otherwise we assume that you are the legal copyright holder of the contributed work! Please provide links and additional information that clarify under which license the rest of the code is distributed.
+In this case, please clearly state so in advance. Otherwise it is assumed that you are the legal copyright holder of the contributed work! Please provide links and additional information that clarify under which license the rest of the code is distributed.

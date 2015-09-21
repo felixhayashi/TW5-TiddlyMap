@@ -21,7 +21,6 @@ module-type: library
 
 exports.config = { 
   field: {
-    nodeId: "tmap.id",
     nodeLabel: "caption",
     nodeIcon: "icon",
     nodeInfo: "description",

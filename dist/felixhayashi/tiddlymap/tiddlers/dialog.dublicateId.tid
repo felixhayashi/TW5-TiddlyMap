@@ -4,7 +4,7 @@ buttons: ok_suppress
 
 \rules except wikilink
 
-TiddlyMap requires the value of the id field ("<<param.idField>>") to be
+TiddlyMap requires the value of the id field ("tmap.id") to be
 unique in order to correctly identify nodes and tiddlers.
 
 The tiddler "<<param.changedTiddler>>" had the same id as the

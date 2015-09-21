@@ -8,4 +8,245 @@ module-type: library
 @preserve
 
 \*/
-(function(){"use strict";var t=require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;var i=function(i,e,s){if(typeof i!=="string"){throw"Cannot create type"}this.opt=$tw.tmap.opt;this.logger=$tw.tmap.logger;this.type=i;this.allowedFields=["description","style","modified","created"].concat(s||[]);this.root=e;this.data=t.getDataMap();this.id=t.getWithoutPrefix(i,this.root+"/");this.loadDataFromType(this.id)};i.prototype.getPath=function(){return this.root+"/"+this.id};i.prototype.exists=function(){return t.tiddlerExists(this.getPath())};i.prototype.getId=function(){return this.id};i.prototype.getData=function(i){if(i){var e=this["get"+t.ucFirst(i)];return typeof e==="function"?e.call(this):this.data[i]}return this.data};i.prototype.setData=function(){var i=arguments;if(i.length===2){if(typeof i[0]==="string"){if(i[1]&&t.inArray(i[0],this.allowedFields)){var e=this["set"+t.ucFirst(i[0])];if(typeof e==="function"){e.call(this,i[1])}else{this.data[i[0]]=i[1]}}else{delete this.data[i[0]]}}}else if(i.length===1&&typeof i[0]==="object"){for(var s in i[0]){this.setData(s,i[0][s])}}return this};i.prototype.setStyle=function(i,e){if(typeof i==="string"){i=t.parseJSON(i)}if(typeof i==="object"){if(e){t.merge(this.data.style,i)}else{this.data.style=i}}return this};i.prototype.persist=function(i,e){if(!i){i=this.getPath()}if(typeof i==="string"){var s={title:i};if(!t.startsWith(i,this.root)){s.id=this.id}else{$tw.utils.extend(s,$tw.wiki.getModificationFields());if(!this.exists()){$tw.utils.extend(s,$tw.wiki.getCreationFields())}}var o=e?$tw.config.preferences.jsonSpaces:null;this.data.style=JSON.stringify(this.data.style,null,o);$tw.wiki.addTiddler(new $tw.Tiddler(this.data,s))}};i.prototype.loadDataFromType=function(e){if(e instanceof i){this.setData(e.getData())}else{if(e instanceof $tw.Tiddler){e=e.fields.title}if(typeof e==="string"){if(!t.startsWith(e,this.root)){e=this.root+"/"+e}this.loadDataFromTiddler($tw.wiki.getTiddler(e),false)}}};i.prototype.isShipped=function(){return $tw.wiki.getSubTiddler(this.opt.path.pluginRoot,this.getPath())};i.prototype.loadDataFromTiddler=function(i){var e=t.getTiddler(i);if(e){var s=$tw.wiki.getSubTiddler(this.opt.path.pluginRoot,this.getPath())||{};var o=$tw.utils.extend({},s.fields,e.fields);this.setData(o)}};exports.ElementType=i})();
+
+(/** @lends module:TiddlyMap*/function() {
+
+/*jslint node: true, browser: true */
+/*global $tw: false */
+
+"use strict";
+
+/**************************** IMPORTS ****************************/
+
+var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+  
+/***************************** CODE ******************************/
+
+var ElementType = function(type, root, fields) {
+
+  if(typeof type !== "string") {
+    throw "Cannot create type"; 
+  }
+
+  // create shortcuts to services
+  this.opt = $tw.tmap.opt;
+  this.logger = $tw.tmap.logger;
+  
+  this.type = type;
+  this.allowedFields = [
+    "description", "style", "modified", "created"
+  ].concat(fields || []);
+  this.root = root;
+  this.data = utils.getDataMap();
+  this.id = utils.getWithoutPrefix(type, this.root + "/");
+  this.loadDataFromType(this.id);
+
+};
+
+/**
+ * @return {string}
+ */
+ElementType.prototype.getPath = function() {
+
+  return (this.root + "/" + this.id);
+
+};
+
+/**
+ * Method to determine whether or not this type exists. A type
+ * exists if a tiddler with the type's id can be found below
+ * the type's root path.
+ * 
+ * @return {boolean} True if the type exists, false otherwise.
+ */
+ElementType.prototype.exists = function() {
+
+  return utils.tiddlerExists(this.getPath());
+
+};
+    
+ElementType.prototype.getId = function() {
+  
+  return this.id;
+
+};
+
+ElementType.prototype.getData = function(prop) {
+  
+  if(prop) {
+    var getter = this["get" + utils.ucFirst(prop)];
+    return (typeof getter === "function"
+            ? getter.call(this)
+            : this.data[prop]);
+  }
+
+  return this.data;  
+  
+};
+
+/**
+ * If two arguments are provided, a key-value schema is assumed,
+ * otherwise, the whole data object is replaced.
+ */
+ElementType.prototype.setData = function() {
+  
+  var args = arguments;
+  
+  if(args.length === 2) {
+    if(typeof args[0] === "string") {
+      if(args[1] && utils.inArray(args[0], this.allowedFields)) {
+        var setter = this["set" + utils.ucFirst(args[0])];
+        if(typeof setter === "function") {
+          setter.call(this, args[1]);
+        } else {
+          this.data[args[0]] = args[1];
+        }
+      } else {
+        delete this.data[args[0]];
+      }
+    }
+  } else if(args.length === 1 && typeof args[0] === "object") {
+    for(var p in args[0]) {
+      this.setData(p, args[0][p]);
+    }
+  }
+  
+  return this;
+ 
+};
+
+ElementType.prototype.setStyle = function(style, isMerge) {
+
+  // preprocessing: try to turn string into json
+  if(typeof style === "string") {
+    style = utils.parseJSON(style);
+  }
+  
+  // merge or override
+  if(typeof style === "object") {
+    if(isMerge) {
+      utils.merge(this.data.style, style);
+    } else {
+      this.data.style = style;
+    }
+  }
+  
+  return this;
+    
+};
+  
+/**
+ * Store the type object as tiddler in the wiki. If the `title`
+ * property is not provided, the default type path prefix 
+ * will be used with the type id appended. The style data is
+ * written as JSON into the text field.
+ * 
+ * @param {string} [tRef] - If `tRef` is provided, the type
+ *     data will be written into this tiddler and the id property
+ *     is added as extra field value. Do not use this option if you
+ *     want the system to recognize the type. This is only for
+ *     dumping purposes.
+ * @param {boolean} [isPrettifyJSON] - True, if any json data should
+ *     be stored in a prettified way, false otherwise.
+ */
+ElementType.prototype.persist = function(tRef, isPrettifyJSON) {
+
+  if(!tRef) { tRef = this.getPath(); }
+  
+  if(typeof tRef === "string") {
+  
+    var fields = {
+      title: tRef,
+    };
+    
+    if(!utils.startsWith(tRef, this.root)) {
+      fields.id = this.id;
+    } else {
+      $tw.utils.extend(fields, $tw.wiki.getModificationFields());
+      if(!this.exists()) {
+        $tw.utils.extend(fields, $tw.wiki.getCreationFields());
+      }
+    }
+    
+
+    var spaces = (isPrettifyJSON ? $tw.config.preferences.jsonSpaces : null);
+    this.data.style = JSON.stringify(this.data.style, null, spaces);
+
+    
+    $tw.wiki.addTiddler(new $tw.Tiddler(this.data, fields));
+    
+  }
+  
+};
+
+/**
+ * Clone all data from the type provided (except the id).
+ * 
+ * @param {*} type - The type containing the data.
+ *     The `type` parameter may be a string denoting the
+ *     type's id, a path (tiddler title), a `$tw.Tiddler` object
+ *     or an `ElementType` object.
+ */
+ElementType.prototype.loadDataFromType = function(type) {
+
+  if(type instanceof ElementType) {
+    
+    this.setData(type.getData());
+    
+  } else {
+    
+    if(type instanceof $tw.Tiddler) {
+      // get only title; we need to check if the prefix is correct 
+      type = type.fields.title;
+    }
+  
+    if(typeof type === "string") {
+      
+      if(!utils.startsWith(type, this.root)) {
+        type = this.root + "/" + type;
+      }
+      
+      this.loadDataFromTiddler($tw.wiki.getTiddler(type), false);
+    }
+  }
+  
+};
+
+ElementType.prototype.isShipped = function() {
+  
+  return $tw.wiki.getSubTiddler(this.opt.path.pluginRoot, this.getPath());
+  
+};
+
+/**
+ * Retrieve all data from the tiddler provided. If a shadow tiddler
+ * with the same id exists, its data is merged during the load process.
+ * 
+ * @param {*} edgeType - The edge-type containing the data.
+ *     The  `edgeType` parameter may be a string denoting the
+ *     type's id, a path (tiddler title), a `$tw.Tiddler` object
+ *     or an `ElementType` object.
+ * @param {boolean} [isAllowOverideId=false] - If the provided tiddler has
+ *     an id field set, setting `isAllowOverideId` to `true` will cause
+ *     the currently held id to be overridden.
+ */
+ElementType.prototype.loadDataFromTiddler = function(tiddler) {
+  
+  var tObj = utils.getTiddler(tiddler);
+  if(tObj) {
+    
+    var shadowTObj = $tw.wiki.getSubTiddler(this.opt.path.pluginRoot, this.getPath()) || {};
+    
+    var data = $tw.utils.extend({}, shadowTObj.fields, tObj.fields);
+          
+    this.setData(data);
+    
+  }
+    
+};
+
+// !! EXPORT !!
+exports.ElementType = ElementType;
+// !! EXPORT !!#
+  
+})();

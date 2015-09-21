@@ -502,7 +502,9 @@ ViewAbstraction.prototype.removeNodeFromFilter = function(node) {
 };
 
 ViewAbstraction.prototype._getAddNodeFilterPart = function(node) {
-  return "[field:" + this.opt.field.nodeId + "[" + node.id + "]]";
+  
+  return "[field:tmap.id[" + node.id + "]]";
+  
 };
 
 /**

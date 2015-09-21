@@ -7,4 +7,35 @@ module-type: library
 @preserve
 
 \*/
-(function(){"use strict";exports.config={field:{nodeId:"tmap.id",nodeLabel:"caption",nodeIcon:"icon",nodeInfo:"description",viewMarker:"isview"},suppressedDialogs:{},edgeClickBehaviour:"manager",debug:"false",notifications:"true",editNodeOnCreate:"false",singleClickMode:"false",editorMenuBar:{showNeighScopeButton:"true",showScreenshotButton:"true"}}})();
+
+(function(){
+    
+/* jslint node: true, browser: true */
+/* global $tw: false */
+"use strict";
+
+/***************************** CODE ******************************/
+
+// Since TW field values are all strings, we are only allowed to
+// use string values as property values (e.g. "true" instead of true)
+
+exports.config = { 
+  field: {
+    nodeLabel: "caption",
+    nodeIcon: "icon",
+    nodeInfo: "description",
+    viewMarker: "isview"
+  },
+  suppressedDialogs: {},
+  edgeClickBehaviour: "manager",
+  debug: "false",
+  notifications: "true",
+  editNodeOnCreate: "false",
+  singleClickMode: "false",
+  editorMenuBar: {
+    showNeighScopeButton: "true",
+    showScreenshotButton: "true"
+  }
+};
+
+})();

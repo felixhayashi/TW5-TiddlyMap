@@ -206,7 +206,6 @@ var updateTiddlerVsIdIndeces = function(parent, allTiddlers) {
   parent = parent || $tw.tmap.indeces;
   allTiddlers = allTiddlers || $tw.wiki.allTitles();
 
-  var nodeId = $tw.tmap.opt.field.nodeId;
   var tById = parent.tById = {}; // tiddlerById
   var idByT = parent.idByT = {}; // idByTiddler
   for(var i = allTiddlers.length; i--;) {
@@ -214,10 +213,10 @@ var updateTiddlerVsIdIndeces = function(parent, allTiddlers) {
     var tObj = $tw.wiki.getTiddler(tRef);
     if(utils.isSystemOrDraft(tObj)) continue;
     
-    var id = tObj.fields[nodeId];
+    var id = tObj.fields["tmap.id"];
     if(!id) {
       id = utils.genUUID();
-      utils.setField(tObj, nodeId, id);
+      utils.setField(tObj, "tmap.id", id);
     }
     
     tById[id] = tRef; // tiddlerById
@@ -346,13 +345,12 @@ var routineCheck = function() {
 
 var checkForDublicates = function(tObj) {
 
-  var idField = $tw.tmap.opt.field.nodeId;
-  var id = tObj.fields[idField];
+  var id = tObj.fields["tmap.id"];
   
   if(!id) return;
   
   var opt = $tw.tmap.opt;
-  var dublicates = utils.getTiddlersWithField(idField, id, { limit: 2 });
+  var dublicates = utils.getTiddlersWithField("tmap.id", id, { limit: 2 });
   delete dublicates[tObj.fields.title];
   
   var dublicate = Object.keys(dublicates)[0];
@@ -363,7 +361,6 @@ var checkForDublicates = function(tObj) {
       param: {
         changedTiddler: tObj.fields.title,
         existingTiddler: dublicate,
-        idField: idField,
         id: id
       }
     }
@@ -433,7 +430,6 @@ var registerChangeListener = function(callbackManager) {
   
   var nodeTypePath = $tw.tmap.opt.path.nodeTypes;
   var optionsPath = $tw.tmap.opt.path.options;
-  var nodeId = $tw.tmap.opt.field.nodeId;
   var loopCount = 0;
 
   $tw.wiki.addEventListener("change", function(changedTiddlers) {
@@ -492,7 +488,7 @@ var registerChangeListener = function(callbackManager) {
           continue;
         }
         
-        var tWithId = utils.getTiddlerWithField(nodeId, id);
+        var tWithId = utils.getTiddlerWithField("tmap.id", id);
         
         if(tWithId) { // only renamed
         

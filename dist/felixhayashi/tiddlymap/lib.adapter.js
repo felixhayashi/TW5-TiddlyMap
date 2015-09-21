@@ -8,4 +8,1335 @@ module-type: library
 @preserve
 
 \*/
-(function(){"use strict";var e=require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction").ViewAbstraction;var t=require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;var i=require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;var r=require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;var s=require("$:/core/modules/macros/contrastcolour.js").run;var o=require("$:/plugins/felixhayashi/vis/vis.js");var a=function(){this.opt=$tw.tmap.opt;this.logger=$tw.tmap.logger;this.indeces=$tw.tmap.indeces;this.visShapesWithTextInside=r.getLookupTable(["ellipse","circle","database","box","text"])};a.prototype.deleteEdge=function(e){return this._processEdge(e,"delete")};a.prototype.deleteEdges=function(e){e=r.convert(e,"array");for(var t=e.length;t--;){this.deleteEdge(e[t])}};a.prototype.insertEdge=function(e){return this._processEdge(e,"insert")};a.prototype._processEdge=function(e,i){this.logger("debug","Edge",i,e);if(typeof e!=="object"||!i||!e.from)return;if(i==="insert"&&!e.to)return;var s=this.indeces.tById[e.from];if(!s||!r.tiddlerExists(s))return;var o=new t(e.type);var a=r.getTiddler(s);var n=o.getNamespace();if(n==="tw-list"){if(!e.to)return;return this._processListEdge(a,e,o,i)}else if(n==="tw-field"){if(!e.to)return;return this._processFieldEdge(a,e,o,i)}else if(n==="tw-body"){return null}else{return this._processTmapEdge(a,e,o,i)}return e};a.prototype._processTmapEdge=function(e,t,i,s){if(s==="delete"&&!t.id)return;var o=r.parseFieldData(e,"tmap.edges",{});if(s==="insert"){t.id=t.id||r.genUUID();o[t.id]={to:t.to,type:i.getId()};if(!i.exists()){i.persist()}}else{delete o[t.id]}r.writeFieldData(e,"tmap.edges",o);return t};a.prototype._processListEdge=function(e,t,i,s){var o=i.getId(true);var a=r.getTiddler(e);var n=$tw.utils.parseStringArray(e.fields[o]);n=(n||[]).slice();var d=this.indeces.tById[t.to];if(s==="insert"){n.push(d);if(!i.exists()){i.persist()}}else{var l=n.indexOf(d);if(l>-1){n.splice(l,1)}}r.setField(a,o,$tw.utils.stringifyList(n));return t};a.prototype._processFieldEdge=function(e,t,i,s){var o=this.indeces.tById[t.to];if(o==null)return;var a=s==="insert"?o:"";r.setField(e,i.getId(true),a);if(!i.exists()){i.persist()}return t};a.prototype.getAdjacencyList=function(e,t){$tw.tmap.start("Creating adjacency list");t=t||{};if(!t.edges){var i=r.getMatches(this.opt.selector.allPotentialNodes);t.edges=this.getEdgesForSet(i,t.toWL,t.typeWL)}var s=r.groupByProperty(t.edges,e);$tw.tmap.stop("Creating adjacency list");return s};a.prototype.getNeighbours=function(e,t){$tw.tmap.start("Get neighbours");t=t||{};e=e.slice();var i=t.addProperties;var s=this.getAdjacencyList("to",t);var o=r.getDataMap();var a=r.getDataMap();var n=parseInt(t.steps)>0?t.steps:1;var d=function(){var n=r.getArrayValuesAsHashmapKeys(e);for(var d=e.length;d--;){if(r.isSystemOrDraft(e[d]))continue;var l=this.getEdges(e[d],t.toWL,t.typeWL);$tw.utils.extend(o,l);for(var p in l){var g=this.indeces.tById[l[p].to];if(!n[g]&&!a[l[p].to]){var f=this.makeNode(g,i);if(f){a[l[p].to]=f;e.push(g)}}}var c=s[this.indeces.idByT[e[d]]];if(c){for(var h=0;h<c.length;h++){var u=this.indeces.tById[c[h].from];if(n[u])continue;if(!a[c[h].from]){var f=this.makeNode(u,i);if(f){a[c[h].from]=f;e.push(u)}}o[c[h].id]=c[h]}}}}.bind(this);for(var l=0;l<n;l++){var p=e.length;d();if(p===e.length)break}var g={nodes:a,edges:o};this.logger("debug","Retrieved neighbourhood",g,"steps",l);$tw.tmap.stop("Get neighbours");return g};a.prototype.getGraph=function(t){$tw.tmap.start("Assembling Graph");t=t||{};var i=new e(t.view);var s=r.getMatches(t.filter||i.getNodeFilter("compiled"));var o=r.getArrayValuesAsHashmapKeys(s);var a=this.getEdgeTypeWhiteList(i.getEdgeFilter("compiled"));var n=parseInt(t.neighbourhoodScope||i.getConfig("neighbourhood_scope"));var d={edges:this.getEdgesForSet(s,o,a),nodes:this.selectNodesByReferences(s,{view:i,outputType:"hashmap"})};if(n){var l=this.getNeighbours(s,{steps:n,view:i,typeWL:a,addProperties:{group:"tmap:neighbour"}});r.merge(d,l);if(i.isEnabled("show_inter_neighbour_edges")){var p=this.getTiddlersById(l.nodes);var o=r.getArrayValuesAsHashmapKeys(p);$tw.utils.extend(d.edges,this.getEdgesForSet(p,o))}}this._removeObsoleteViewData(d.nodes,i);this.attachStylesToNodes(d.nodes,i);$tw.tmap.stop("Assembling Graph");this.logger("debug","Assembled graph:",d);return d};a.prototype.getEdges=function(e,t,i){if(!r.tiddlerExists(e)||r.isSystemOrDraft(e)){return}var s=r.getTiddler(e);var o=r.getTiddlerRef(e);var a=this._getTmapEdges(e,t,i);var n=r.getMatches($tw.tmap.opt.selector.allListEdgeStores);var d=r.getDataMap();d["tw-body:link"]=$tw.wiki.getTiddlerLinks(o);for(var l=n.length;l--;){d["tw-list:"+n[l]]=$tw.utils.parseStringArray(s.fields[n[l]])}var n=r.getMatches($tw.tmap.opt.selector.allFieldEdgeStores);for(var l=n.length;l--;){d["tw-field:"+n[l]]=[s.fields[n[l]]]}$tw.utils.extend(a,this._getEdgesFromRefArray(o,d,t,i));return a};a.prototype._getEdgesFromRefArray=function(e,i,s,o){var a=r.getDataMap();for(var n in i){var d=i[n];if(!d||o&&!o[n])continue;n=new t(n);for(var l=d.length;l--;){var p=d[l];if(!p||!$tw.wiki.tiddlerExists(p)||r.isSystemOrDraft(p)||s&&!s[p])continue;var g=n.getId()+$tw.utils.hashString(e+p);var f=this.makeEdge(this.getId(e),this.getId(p),n,g);if(f){a[f.id]=f}}}return a};a.prototype._getTmapEdges=function(e,t,i){var s=r.parseFieldData(e,"tmap.edges",{});var o=r.getDataMap();for(var a in s){var n=s[a];var d=this.indeces.tById[n.to];if(d&&(!t||t[d])&&(!i||i[n.type])){var l=this.makeEdge(this.getId(e),n.to,n.type,a);if(l){o[a]=l}}}return o};a.prototype.getEdgeTypeWhiteList=function(e){var i=r.getDataMap();var s=r.getMatches(this.opt.selector.allEdgeTypes);var o=e?r.getMatches(e,s):s;for(var a=o.length;a--;){var n=new t(o[a]);i[n.getId()]=n}return i};a.prototype.getEdgesForSet=function(e,t,i){var s=r.getDataMap();for(var o=e.length;o--;){$tw.utils.extend(s,this.getEdges(e[o],t,i))}return s};a.prototype.selectEdgesByType=function(e){var i=r.getDataMap();i[new t(e).getId()]=true;var s=r.getMatches(this.opt.selector.allPotentialNodes);var o=this.getEdgesForSet(s,null,i);return o};a.prototype._processEdgesWithType=function(e,i){e=new t(e);this.logger("debug","Processing edges",e,i);var r=this.selectEdgesByType(e);if(i.action==="rename"){var s=new t(i.newName);s.loadDataFromType(e);s.persist()}for(var o in r){this._processEdge(r[o],"delete");if(i.action==="rename"){r[o].type=i.newName;this._processEdge(r[o],"insert")}}$tw.wiki.deleteTiddler(e.getPath())};a.prototype.selectNodesByFilter=function(e,t){var i=r.getMatches(e);return this.selectNodesByReferences(i,t)};a.prototype.selectNodesByReferences=function(e,t){t=t||{};var i=t.addProperties;var s=r.getDataMap();var o=Object.keys(e);for(var a=o.length;a--;){var n=this.makeNode(e[o[a]],i);if(n){s[n.id]=n}}return r.convert(s,t.outputType)};a.prototype.selectNodesByIds=function(e,t){var i=this.getTiddlersById(e);return this.selectNodesByReferences(i,t)};a.prototype.selectNodeById=function(e,t){t=r.merge(t,{outputType:"hashmap"});var i=this.selectNodesByIds([e],t);return i[e]};a.prototype.makeEdge=function(e,i,s,o){if(!e||!i)return;if(e instanceof $tw.Tiddler){e=e.fields[this.opt.field.nodeId]}else if(typeof e==="object"){e=e.id}s=new t(s);var a={id:o||r.genUUID(),from:e,to:i,type:s.getId(),title:s.getData("description")||undefined};a.label=r.isTrue(s.getData("show-label"),true)?s.getLabel():null;a=$tw.utils.extend(a,s.getData("style"));return a};a.prototype.removeNodeType=function(e){$tw.wiki.deleteTiddler(new i(e).getPath())};a.prototype.makeNode=function(e,t){var i=r.getTiddler(e);if(!i||i.isDraft()||$tw.wiki.isSystemTiddler(i.fields.title)){return}var s=r.merge({},t);s.id=this.assignId(i);var o=i.fields[this.opt.field.nodeLabel];s.label=o&&this.opt.field.nodeLabel!=="title"?$tw.wiki.renderText("text/plain","text/vnd-tiddlywiki",o):i.fields.title;return s};a.prototype.getInheritedNodeStyles=function(t,i){i=i?new e(i).getLabel():null;var s=this.getTiddlersById(t);var o={};var a=this.indeces.loGlNTy;for(var n=a.length;n--;){var d=a[n].data;if(i&&d.view&&d.view!==i)continue;var l=a[n].getInheritors(s);if(!l.length)continue;for(var p=l.length;p--;){var g=l[p];o[g]=o[g]||{};o[g].style=r.merge(o[g].style||{},d.style);if(d["fa-icon"]){o[g]["fa-icon"]=d["fa-icon"]}else if(d["tw-icon"]){o[g]["tw-icon"]=d["tw-icon"]}}}return o};a.prototype.attachStylesToEdges=function(e,t){};a.prototype._removeObsoleteViewData=function(t,i){i=new e(i);if(!i.exists()||!t)return;var r=i.getNodeData();var s=0;for(var o in r){if(t[o]===undefined){delete r[o];s++}}if(s){this.logger("debug","Removed "+s+" node data records from view "+i.getLabel());i.saveNodeData(r)}};a.prototype.attachStylesToNodes=function(t,o){o=new e(o);var a=this.getInheritedNodeStyles(t,o);var n=new i("tmap:neighbour").getData("style");var d=o.exists()?o.getNodeData():{};var l=!o.isEnabled("physics_mode");var p=this.opt.field.nodeInfo;var g=this.opt.field.nodeIcon;var f=this.indeces.tById;for(var c in t){var h=f[c];var u=$tw.wiki.getTiddler(h);var v=u.fields;var y=t[c];if(a[h]){if(a[h].style){r.merge(y,a[h].style)}this._addNodeIcon(y,a[h]["fa-icon"],a[h]["tw-icon"])}if(y.group==="tmap:neighbour"){r.merge(y,n);delete y.group}if(v.color){y.color=v.color}if(v["tmap.style"]){r.merge(y,r.parseJSON(v["tmap.style"]))}this._addNodeIcon(y,v["tmap.fa-icon"],v[g]);if(d[c]){r.merge(y,d[c]);if(l){y.fixed={x:true,y:true}}}y.color=typeof y.color==="object"?y.color.background:y.color;y.font=y.font||{};if(typeof y.font==="object"&&!y.font.color){var w=y.shape;if(w&&!this.visShapesWithTextInside[w]){y.font.color="black"}else{if(y.color){y.font.color=s(y.color,y.color,"black","white")}}}if(y.shape==="icon"&&typeof y.icon==="object"){y.icon.color=y.color}if(v[p]){y.title=$tw.wiki.renderText("text/html","text/vnd-tiddlywiki",v[p])}else if(y.label!==h){y.title=h}}};a.prototype.deleteNode=function(t){if(!t)return;var i=typeof t==="object"?t.id:t;var s=this.indeces.tById[i];if(s){r.deleteTiddlers([s])}var o=$tw.tmap.opt.selector.allViews;var a=r.getMatches(o);for(var n=0;n<a.length;n++){var d=new e(a[n]);if(d.getNodeData(i)){d.saveNodeData(i,null)}}var l=this.getNeighbours([s]);this.deleteEdges(l.edges)};a.prototype.getView=function(t,i){return new e(t,i)};a.prototype.createView=function(t){if(typeof t!=="string"||t===""){t="My view"}var i=$tw.wiki.generateNewTitle(this.opt.path.views+"/"+t);return new e(i,true)};a.prototype.createType=function(e,r){r=r||"me:new-type";var s=e==="edge"?this.opt.path.edgeTypes:this.opt.path.nodeTypes;var o=$tw.wiki.generateNewTitle(s+"/"+r);var e=e==="edge"?new t(o):new i(o);e.persist();return e};a.prototype.storePositions=function(t,i){i=new e(i);i.saveNodeData(t)};a.prototype.assignId=function(e,t){var i=r.getTiddler(e,true);if(!i)return;var s=this.opt.field.nodeId;var o=i.fields[s];if(!o||t&&s!=="title"){o=r.genUUID();r.setField(i,s,o);this.logger("info","Assigning new id to",i.fields.title)}this.indeces.tById[o]=i.fields.title;this.indeces.idByT[i.fields.title]=o;return o};a.prototype.insertNode=function(t,i){if(!i||typeof i!=="object")i={};if(!t||typeof t!=="object"){t=r.getDataMap()}var s=r.getDataMap();s.title=$tw.wiki.generateNewTitle(t.label?t.label:"New node");t.label=s.title;if(this.opt.field.nodeId==="title"){t.id=s.title}else{t.id=r.genUUID();s[this.opt.field.nodeId]=t.id}if(i.view){var o=new e(i.view);o.addNodeToView(t)}$tw.wiki.addTiddler(new $tw.Tiddler(s,$tw.wiki.getModificationFields(),$tw.wiki.getCreationFields()));return t};a.prototype.getTiddlersById=function(e){if(Array.isArray(e)){e=r.getArrayValuesAsHashmapKeys(e)}else if(e instanceof o.DataSet){e=r.getLookupTable(e,"id")}var t=[];var i=this.indeces.tById;for(var s in e){if(i[s])t.push(i[s])}return t};a.prototype.getId=function(e){return this.indeces.idByT[r.getTiddlerRef(e)]};a.prototype._addNodeIcon=function(e,t,i){if(t){e.shape="icon";e.icon={shape:"icon",face:"FontAwesome",color:e.color,code:String.fromCharCode("0x"+t)};return}if(!i)return;var s=r.getTiddler(i);if(s&&s.fields.text){var o=s.fields.type||"image/svg+xml";var a=s.fields.text;e.shape="image";if(o==="image/svg+xml"){a=a.replace(/\r?\n|\r/g," ");if(!r.inArray("xmlns",a)){a=a.replace(/<svg/,'<svg xmlns="http://www.w3.org/2000/svg"')}}var n=$tw.config.contentTypeInfo[o].encoding==="base64"?a:window.btoa(a);e.image="data:"+o+";base64,"+n}};exports.Adapter=a})();
+
+(/** @lends module:TiddlyMap*/function(){
+
+/*jslint node: true, browser: true */
+/*global $tw: false */
+
+"use strict";
+
+/**************************** IMPORTS ******************************/
+
+var ViewAbstraction =   require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction").ViewAbstraction;
+var EdgeType =          require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
+var NodeType =          require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;
+var utils =             require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var getContrastColour = require("$:/core/modules/macros/contrastcolour.js").run;
+var vis =               require("$:/plugins/felixhayashi/vis/vis.js");
+  
+/***************************** CODE ********************************/
+
+/**
+ * This library acts as an abstraction layer above the tiddlywiki
+ * system. All the provided methods give the api-user the chance
+ * to interact with tiddlywiki as if it was a simple graph database.
+ * 
+ * Everything that is related to retrieving or inserting nodes and
+ * edges is handled by the adapter class.
+ * 
+ * You don't need to create your own instance of this class.
+ * The adapter service may be accessed from anywhere using
+ * `$tw.tmap.apapter`.
+ * 
+ * @constructor
+ * @param {object} wiki - An optional wiki object
+ */
+var Adapter = function() {
+  
+  // create shortcuts for services and frequently used vars
+  this.opt = $tw.tmap.opt;
+  this.logger = $tw.tmap.logger;
+  this.indeces = $tw.tmap.indeces;
+  this.visShapesWithTextInside = utils.getLookupTable([
+      "ellipse", "circle", "database", "box", "text"
+  ]);
+  
+};
+
+/**
+ * This function will delete the specified edge object from
+ * the system.
+ *
+ * @param {Edge} edge - The edge to be deleted. The edge necessarily
+ *     needs to possess an `id` and a `from` property.
+ * @return {Edge} The deleted edge is returned.
+ */
+Adapter.prototype.deleteEdge = function(edge) {
+      
+  return this._processEdge(edge, "delete");
+  
+};
+  
+/**
+ * Removes multiple edges from several stores.
+ * 
+ * @param {EdgeCollection} edges - The edges to be deleted.
+ */
+Adapter.prototype.deleteEdges = function(edges) {
+  
+  edges = utils.convert(edges, "array");
+  for(var i = edges.length; i--;) {
+    this.deleteEdge(edges[i]);
+  }
+  
+};
+  
+/**
+ * Persists an edge by storing the vector (from, to, type).
+ * 
+ * @param {Edge} edge - The edge to be saved. The edge necessarily
+ *     needs to possess a `to` and a `from` property.
+ * @return {Edge} The newly inserted edge.
+ */  
+Adapter.prototype.insertEdge = function(edge) {
+  
+  return this._processEdge(edge, "insert");
+  
+};
+
+/**
+ * Private function to handle the insertion or deletion of an edge.
+ * It prepares the process arcoding to the action type and delegates
+ * the task to more specific functions.
+ * 
+ * The edge type is optional!!
+ * 
+ * @private
+ * @return {Edge} The processed edge.
+ */
+Adapter.prototype._processEdge = function(edge, action) {
+  
+  this.logger("debug", "Edge", action, edge);
+
+  if(typeof edge !== "object" || !action || !edge.from) return;
+  if(action === "insert" && !edge.to) return;
+  
+  // get from-node and corresponding tiddler
+  var fromTRef = this.indeces.tById[edge.from];
+  if(!fromTRef || !utils.tiddlerExists(fromTRef)) return;
+
+  var type = new EdgeType(edge.type);
+  var tObj = utils.getTiddler(fromTRef);
+  var namespace = type.getNamespace();
+  
+  if(namespace === "tw-list") {
+    if(!edge.to) return;
+    return this._processListEdge(tObj, edge, type, action);
+
+  } else if(namespace === "tw-field") {
+    if(!edge.to) return;
+    return this._processFieldEdge(tObj, edge, type, action);
+    
+  } else if(namespace === "tw-body") {
+    return null; // cannot delete links
+    
+  } else { // edge has no special meaning
+    return this._processTmapEdge(tObj, edge, type, action);
+    
+  }
+
+  return edge;
+      
+};
+
+/**
+ * This method handles insertion or deletion of tiddlymap edges that
+ * are stored as json using a tiddlymap structure.
+ * 
+ * @param {Tiddler} tiddler - A tiddler reference or object that
+ *     represents the from part of the edge and will be used as store.
+ * @param {Edge} edge - The edge to be saved.
+ *     Required properties:
+ *     * In case of deletion: `id`.
+ *     * In case of insertion: `to`.
+ * @param {EdgeType} type - The type of the edge.
+ * @param {string} [action=delete] - Either "insert" or "delete".
+ * @return {Edge} The processed edge.
+ */
+Adapter.prototype._processTmapEdge = function(tiddler, edge, type, action) {
+  
+  if(action === "delete" && !edge.id) return;
+  
+  // load
+  var connections = utils.parseFieldData(tiddler, "tmap.edges", {});
+  
+  // transform
+  if(action === "insert") {
+    // assign new id if not present yet
+    edge.id = edge.id || utils.genUUID();
+    // add to connections object
+    connections[edge.id] = { to: edge.to, type: type.getId() };
+    // if type is not know, create it
+    if(!type.exists()) {
+      type.persist();
+    }
+  } else { // delete
+    delete connections[edge.id];
+  }
+  
+  // save
+  utils.writeFieldData(tiddler, "tmap.edges", connections);
+  
+  return edge;
+  
+};
+
+
+/**
+ * This method handles insertion or deletion of edges that are stored
+ * inside list fields.
+ * 
+ * @param {Tiddler} tiddler - A tiddler reference or object that
+ *     represents the from part of the edge and will be used as store.
+ * @param {Edge} edge - The edge to be saved. Required properties: `to`.
+ * @param {EdgeType} type - The type of the edge.
+ * @param {string} [action=delete] - Either "insert" or "delete".
+ * @return {Edge} The processed edge.
+ */
+Adapter.prototype._processListEdge = function(tiddler, edge, type, action) {
+      
+  // load
+  var name = type.getId(true);
+  var tObj = utils.getTiddler(tiddler);
+  var list = $tw.utils.parseStringArray(tiddler.fields[name]);
+  // we need to clone the array since tiddlywiki might directly
+  // returned the auto-parsed field value (as in case of tags, or list)
+  // and this array would be read only!
+  list = (list || []).slice()
+  
+  // transform
+  var toTRef = this.indeces.tById[edge.to];
+      
+  if(action === "insert") {
+    list.push(toTRef);
+    if(!type.exists()) {
+      type.persist();
+    }
+  } else { // delete
+    var index = list.indexOf(toTRef);
+    if(index > -1) {
+      list.splice(index, 1);
+    }
+  }
+
+  // save
+  utils.setField(tObj, name, $tw.utils.stringifyList(list));
+  
+  return edge;
+  
+};
+
+/**
+ * This method handles insertion or deletion of an edge that
+ * is stored inside a field that can only hold one connection.
+ * 
+ * @param {Tiddler} tiddler - A tiddler reference or object that
+ *     represents the from part of the edge and will be used as store.
+ * @param {Edge} edge - The edge to be saved. Required properties: `to`.
+ * @param {EdgeType} type - The type of the edge.
+ * @param {string} [action=delete] - Either "insert" or "delete".
+ * @return {Edge} The processed edge.
+ */
+Adapter.prototype._processFieldEdge = function(tiddler, edge, type, action) {
+
+  var toTRef = this.indeces.tById[edge.to];
+  if(toTRef == null) return; // null or undefined
+  
+  var val = (action === "insert" ? toTRef : "");
+  utils.setField(tiddler, type.getId(true), val);
+
+  if(!type.exists()) {
+    type.persist();
+  }
+  
+  return edge;
+  
+};
+
+/**
+ * This function will return an adjacency list for the nodes
+ * present in the current system. The list may be restricted by
+ * optional filters.
+ *
+ * @param {string} groupBy - Specifies by which property the
+ *     adjacency list is indexed. May be either "from" or "to".
+ * @param {Hashmap} [opts] - An optional options object.
+ * @param {Hashmap} [opts.typeWL] - A whitelist lookup-table
+ *    that restricts which edges are travelled to reach a neighbour.
+ * @param {Hashmap} [opts.edges] - An initial set of edges
+ *     define the adjacency. If `opts.edges` is not provided,
+ *     all edges in the system are considered.
+ * @return {Object<Id, Array<Edge>>} For each key (a node id) an
+ *     array of edges pointing from (or to; depends on `groupBy`)
+ *     is supplied as value.
+ */
+Adapter.prototype.getAdjacencyList = function(groupBy, opts) {
+  
+  $tw.tmap.start("Creating adjacency list");
+  
+  opts = opts || {};
+  
+  if(!opts.edges) {
+    var tRefs = utils.getMatches(this.opt.selector.allPotentialNodes);
+    opts.edges = this.getEdgesForSet(tRefs, opts.toWL, opts.typeWL);
+  }
+  
+  var adjList = utils.groupByProperty(opts.edges, groupBy);
+  
+  $tw.tmap.stop("Creating adjacency list");
+  
+  return adjList;
+  
+};
+
+/**
+ * This function will return all neighbours of a graph denoted by
+ * a set of tiddlers.
+ * 
+ * @param {Array<TiddlerReference>} - The original set of nodes
+ *    denoted by an array of tiddler titles for which we want to
+ *    retrieve the neighbours.
+ * @param {Hashmap} [opts] - An optional options object.
+ * @param {Hashmap} [opts.typeWL] - A whitelist lookup-table
+ *    that restricts which edges are travelled to reach a neighbour.
+ * @param {Hashmap} [opts.edges] - An initial set of edges that is
+ *    used in the first step to reach immediate neighbours, if no
+ *    set of edges is specified, all exsisting edges will be considered.
+ * @param {number} [opts.steps] - An integer value that specifies
+ *    the scope of the neighbourhood. A node is considered a neighbour
+ *    if it can be reached within the given number of steps starting
+ *    from original set of tiddlers returned by the node filter.
+ * @param {Hashmap} [opts.addProperties] - a hashmap
+ *     containing properties to be added to each node.
+ *     For example:
+ *     {
+ *       group: "g1",
+ *       color: "red"
+ *     }
+ * @return {Object} An object of the form:
+ *     {
+ *       nodes: { *all neighbouring nodes* },
+ *       edges: { *all edges connected to neighbours* },
+ *     }
+ */
+Adapter.prototype.getNeighbours = function(tiddlers, opts) {
+  
+  $tw.tmap.start("Get neighbours");
+  
+  opts = opts || {};
+  
+  // clone array
+  tiddlers = tiddlers.slice();
+  
+  var protoNode = opts.addProperties;
+  var adjList = this.getAdjacencyList("to", opts);
+  var neighEdges = utils.getDataMap();
+  var neighNodes = utils.getDataMap();
+  var maxSteps = (parseInt(opts.steps) > 0 ? opts.steps : 1);
+      
+  var discover = function() {
+    
+    var lookupTable = utils.getArrayValuesAsHashmapKeys(tiddlers);
+    
+    // loop over all nodes in the original set
+    // we loop backwards so we can add neighbours to the set
+    for(var i = tiddlers.length; i--;) {
+      
+      if(utils.isSystemOrDraft(tiddlers[i])) continue;
+              
+      // 1) get all edges from inside that point outwards the set
+      var outgoing = this.getEdges(tiddlers[i], opts.toWL, opts.typeWL);
+      $tw.utils.extend(neighEdges, outgoing);
+      
+      // 2) add nodes for these edges
+      for(var id in outgoing) {
+        var toTRef = this.indeces.tById[outgoing[id].to];
+        if(!lookupTable[toTRef] && !neighNodes[outgoing[id].to]) {
+          // not included in original set and not already discovered
+          var node = this.makeNode(toTRef, protoNode);
+          if(node) { // since edges may be obsolete
+            neighNodes[outgoing[id].to] = node;
+            tiddlers.push(toTRef);
+          }
+        }
+      }
+      
+      // 3) get all edges from outside that point towards the set
+      var incoming = adjList[this.indeces.idByT[tiddlers[i]]];
+      if(incoming) {
+        for(var j = 0; j < incoming.length; j++) {
+          var fromTRef = this.indeces.tById[incoming[j].from];
+          if(lookupTable[fromTRef]) continue; // included in original set
+          if(!neighNodes[incoming[j].from]) {              
+            var node = this.makeNode(fromTRef, protoNode);
+            if(node) {
+              neighNodes[incoming[j].from] = node; // ATTENTION: edges may be obsolete
+              tiddlers.push(fromTRef);
+            }
+          }
+          neighEdges[incoming[j].id] = incoming[j];
+        }
+      }
+    }
+    
+  }.bind(this);
+  
+  for(var steps = 0; steps < maxSteps; steps++) {
+    var beforeSize = tiddlers.length;
+    discover();
+    if(beforeSize === tiddlers.length) break; // TODO put this in the loop condition
+  }
+  
+  var neighbourhood = {
+    nodes: neighNodes,
+    edges: neighEdges
+  };
+  
+  this.logger("debug", "Retrieved neighbourhood", neighbourhood, "steps", steps);
+  
+  $tw.tmap.stop("Get neighbours");
+  
+  return neighbourhood;
+  
+};
+
+/**
+ * This function will assemble a graph object based on the supplied
+ * node and edge filters. Optionally, a neighbourhood may be
+ * merged into the graph neighbourhood.
+ * 
+ * @param {Hashmap} [opts] - An optional options object.
+ * @param {string|ViewAbstraction} [opts.view] - The view in which
+ *     the graph will be displayed.
+ * @param {string|ViewAbstraction} [opts.filter] - If supplied,
+ *     this will act as node filter that defines which nodes
+ *     are to be displayed in the graph; a possible view node filter
+ *     would be ignored.
+ * @param {Hashmap} [opts.typeWL] - A whitelist lookup-table
+ *     that restricts which edges are travelled to reach a neighbour.
+ * @param {number} [opts.neighbourhoodScope] - An integer value that
+ *     specifies the scope of the neighbourhood in steps.
+ *     See {@link Adapter#getNeighbours}
+ * @return {Object} An object of the form:
+ *     {
+ *       nodes: { *all nodes in the graph* },
+ *       edges: { *all edges in the graph* },
+ *     }
+ *     Neighbours will be receive the "tmap:neighbour" type. 
+ */
+Adapter.prototype.getGraph = function(opts) {
+  
+  $tw.tmap.start("Assembling Graph");
+  
+  opts = opts || {};
+
+  var view = new ViewAbstraction(opts.view);
+  var matches = utils.getMatches(opts.filter || view.getNodeFilter("compiled"));
+  var toWL = utils.getArrayValuesAsHashmapKeys(matches);
+  var typeWL = this.getEdgeTypeWhiteList(view.getEdgeFilter("compiled"));
+  var neighScope = parseInt(opts.neighbourhoodScope || view.getConfig("neighbourhood_scope"));
+  
+  var graph = {
+    edges: this.getEdgesForSet(matches, toWL, typeWL),
+    nodes: this.selectNodesByReferences(matches, {
+      view: view,
+      outputType: "hashmap"
+    })
+  };
+  
+  if(neighScope) {
+    var neighbours = this.getNeighbours(matches, {
+      steps: neighScope,
+      view: view,
+      typeWL: typeWL,
+      addProperties: {
+        group: "tmap:neighbour"
+      }
+    });
+    
+    // merge neighbours (nodes and edges) into graph
+    utils.merge(graph, neighbours);
+    
+    if(view.isEnabled("show_inter_neighbour_edges")) {
+      var nodeTRefs = this.getTiddlersById(neighbours.nodes);
+      var toWL = utils.getArrayValuesAsHashmapKeys(nodeTRefs)
+      $tw.utils.extend(graph.edges, this.getEdgesForSet(nodeTRefs, toWL));
+    }
+  }
+  
+  // this is pure maintainance!
+  this._removeObsoleteViewData(graph.nodes, view);
+  
+  // add styles to nodes
+  this.attachStylesToNodes(graph.nodes, view);
+  
+  $tw.tmap.stop("Assembling Graph");
+  
+  this.logger("debug", "Assembled graph:", graph);
+  
+  return graph;
+  
+};
+
+/**
+ * Returns all outgoing edges of a given tiddler. This includes
+ * virtual edges (links, tag-relations) and user created relations.
+ * 
+ * @param {Hashmap<TiddlerReference, *>} [opts.toWL.filter]
+ *     A hashmap on which basis it is decided, whether to include
+ *     an edge with a certain to-value in the result or not.
+ *     `toWL` hashmap are included.
+ * @param {string} [opts.toWL.type="blacklist"]
+ *       Either "blacklist" or "whitelist".
+ * @param {Hashmap<string, *>} [opts.typeWL.filter]
+ *     A hashmap on which basis it is decided, whether to include
+ *     an edge of a given type in the result or not.
+ * @param {string} [opts.typeWL.type="blacklist"]
+ *       Either "blacklist" or "whitelist".
+ * @return {Hashmap<Id, Edge>} An edge collection.
+ */
+Adapter.prototype.getEdges = function(tiddler, toWL, typeWL) {
+
+  if(!utils.tiddlerExists(tiddler) || utils.isSystemOrDraft(tiddler)) {
+    return;
+  }
+  
+  var tObj = utils.getTiddler(tiddler);
+  var fromTRef = utils.getTiddlerRef(tiddler);
+  
+  // get all edges stored in tmap json format
+  var edges = this._getTmapEdges(tiddler, toWL, typeWL);
+  
+  // get all edges stored as list items
+  var fields = utils.getMatches($tw.tmap.opt.selector.allListEdgeStores);
+  var refsByType = utils.getDataMap();
+  
+  // add links to reference array
+  refsByType["tw-body:link"] = $tw.wiki.getTiddlerLinks(fromTRef)
+  
+  for(var i = fields.length; i--;) {
+    refsByType["tw-list:" + fields[i]] =
+        $tw.utils.parseStringArray(tObj.fields[fields[i]]);
+  }
+  
+  // get all edges from fields that reference tiddlers
+  // TODO: this is a performance bottleneck!
+  var fields = utils.getMatches($tw.tmap.opt.selector.allFieldEdgeStores);
+  for(var i = fields.length; i--;) {
+    refsByType["tw-field:" + fields[i]] = [tObj.fields[fields[i]]];
+  }
+  
+  $tw.utils.extend(edges, this._getEdgesFromRefArray(fromTRef, refsByType, toWL, typeWL));
+
+  return edges;
+
+};
+
+/**
+ * Create edges based on an array of references.
+ * 
+ * Hashes are used for edge ids on the basis of the from and to parts
+ * of the edges. This has the advantage that (1) ids are unique and
+ * (2) only change if the underlying link/tag changes.
+ */
+Adapter.prototype._getEdgesFromRefArray = function(fromTRef, refsByType, toWL, typeWL) {
+
+  var edges = utils.getDataMap();
+  
+  for(var type in refsByType) {
+    var toRefs = refsByType[type];
+    
+    if(!toRefs || (typeWL && !typeWL[type])) continue;
+    
+    type = new EdgeType(type);
+    for(var i = toRefs.length; i--;) {
+      
+      var toTRef = toRefs[i];
+      
+      if(!toTRef
+         || !$tw.wiki.tiddlerExists(toTRef)
+         || utils.isSystemOrDraft(toTRef)
+         || (toWL && !toWL[toTRef])) continue;
+
+      var id = type.getId() + $tw.utils.hashString(fromTRef + toTRef); 
+      var edge = this.makeEdge(this.getId(fromTRef),
+                               this.getId(toTRef),
+                               type,
+                               id);
+
+      if(edge) {
+        edges[edge.id] = edge;
+      }
+      
+    }
+  }    
+
+  return edges;
+  
+};
+
+/**
+ * Returns all outgoing tmap edges of a given tiddler.
+ * 
+ * @private
+ * @param {Tiddler} tiddler - The tiddler obj or reference.
+ * @param {Hashmap} [toWL] - An optional whitelist with tiddler
+ *     references as keys. If supplied, only edges pointing to
+ *     tiddlers contained in the whitelist are returned.
+ * @param {Hashmap} [typeWL] - An whitelist with edge-type ids as
+ *     keys. Only edges of the type specified in the whitelist
+ *     are returned.
+ * @return {Hashmap<Id, Edge>} An edge collection.
+ */
+Adapter.prototype._getTmapEdges = function(tiddler, toWL, typeWL) {
+  
+  var connections = utils.parseFieldData(tiddler, "tmap.edges", {});
+  var edges = utils.getDataMap();
+  
+  for(var conId in connections) {
+    var con = connections[conId];
+    var toTRef = this.indeces.tById[con.to];
+    if(toTRef && (!toWL || toWL[toTRef]) && (!typeWL || typeWL[con.type])) {
+      var edge = this.makeEdge(this.getId(tiddler), con.to, con.type, conId);
+      if(edge) {
+        edges[conId] = edge;
+      }
+    }
+  }
+  
+  return edges;
+  
+};
+
+/**
+ * This method will return an edge-type whitelist based on the filter
+ * it receives. The whitelist is an object that holds all edge-types
+ * that exist in the system and are accepted by the filter.
+ * 
+ * @param {string|function} [edgeTypeFilter] - An optional tw-filter.
+ *     If no filter is specified, all edge-types are returned.
+ * @return {Hashmap<string, EdgeType>} An object that represents
+ *     the whitelist and acts as lookuptable. The edge-type ids
+ *     are used as keys.
+ */
+Adapter.prototype.getEdgeTypeWhiteList = function(edgeTypeFilter) {
+
+  var typeWhiteList = utils.getDataMap();
+  
+  var source = utils.getMatches(this.opt.selector.allEdgeTypes);
+  var matches = (edgeTypeFilter
+                 ? utils.getMatches(edgeTypeFilter, source) // filter source
+                 : source); // use whole source
+
+  for(var i = matches.length; i--;) {
+    var type = new EdgeType(matches[i]);
+    typeWhiteList[type.getId()] = type;
+  }
+  
+  return typeWhiteList;
+
+};
+  
+/**
+ * The method will return all outgoing edges for a subset of tiddlers.
+ * 
+ * @param {Array<Tiddler>} tiddlers - The set of tiddlers to consider.
+ * @return {Hashmap<Id, Edge>} An edge collection.
+ */
+Adapter.prototype.getEdgesForSet = function(tiddlers, toWL, typeWL) {
+
+  var edges = utils.getDataMap();
+  for(var i = tiddlers.length; i--;) {
+    $tw.utils.extend(edges, this.getEdges(tiddlers[i], toWL, typeWL));
+  }
+  
+  return edges;
+
+};
+
+/**
+ * 
+ */
+Adapter.prototype.selectEdgesByType = function(type) {
+
+  var typeWhiteList = utils.getDataMap();
+  typeWhiteList[new EdgeType(type).getId()] = true;
+  var tRefs = utils.getMatches(this.opt.selector.allPotentialNodes);
+  var edges = this.getEdgesForSet(tRefs, null, typeWhiteList);
+  
+  return edges;
+  
+};
+
+/**
+ * 
+ * 
+ */
+Adapter.prototype._processEdgesWithType = function(type, task) {
+
+  type = new EdgeType(type);
+  
+  this.logger("debug", "Processing edges", type, task);
+  
+  // get edges
+  var edges = this.selectEdgesByType(type);
+  
+  if(task.action === "rename") {
+    
+    // clone type first to prevent auto-creation
+    var newType = new EdgeType(task.newName);
+    newType.loadDataFromType(type);
+    newType.persist();
+      
+  }
+  
+  for(var id in edges) {
+    this._processEdge(edges[id], "delete");
+    if(task.action === "rename") {
+      edges[id].type = task.newName;
+      this._processEdge(edges[id], "insert");
+    }
+  }
+  
+  // finally remove the old type
+  $tw.wiki.deleteTiddler(type.getPath());
+
+};
+
+/**
+ * Returns a set of nodes that corresponds to the given filter.
+ *
+ * @param {TiddlyWikiFilter} filter - The filter to use.
+ * @param {Hashmap} [options] - An optional options object.
+ * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectNodesByReferences}.
+ * @return {NodeCollection} A collection of a type specified in the options.
+ */
+Adapter.prototype.selectNodesByFilter = function(filter, options) {
+  
+  var matches = utils.getMatches(filter);
+  return this.selectNodesByReferences(matches, options);
+
+};
+
+/**
+ * Returns a set of nodes that corresponds to a set of tiddlers.
+ * 
+ * @param {TiddlerCollection} tiddlers - A collection of tiddlers.
+ * @param {Hashmap} [options] - An optional options object.
+ * @param {CollectionTypeString} [options.outputType="dataset"] - The result type.
+ * @param {View} [options.view] - A viewname used to retrieve positions
+ * @param {Hashmap} [options.addProperties] - a hashmap
+ *     containing properties to be added to each node.
+ *     For example:
+ * 
+ *     {
+ *       group: "g1",
+ *       color: "red"
+ *     }
+ * 
+ * @return {NodeCollection} A collection of a type specified in the options.
+ */
+Adapter.prototype.selectNodesByReferences = function(tiddlers, options) {
+
+  options = options || {};
+
+  var protoNode = options.addProperties;
+  var result = utils.getDataMap();
+  var keys = Object.keys(tiddlers);
+  
+  for(var i = keys.length; i--;) {
+    
+    var node = this.makeNode(tiddlers[keys[i]], protoNode);
+    if(node) { result[node.id] = node; }  // ATTENTION: edges may be obsolete
+        
+  }
+    
+  return utils.convert(result, options.outputType);
+  
+};
+
+/**
+ * Retrieve nodes based on the a list of ids that corrspond to tiddlers
+ * id fields.
+ * 
+ * @param {Array.<Id>|Hashmap.<Id, *>|vis.DataSet} nodeIds - The ids of the tiddlers
+ *     that represent the nodes.
+ * @param {Hashmap} [options.!! INHERITED !!] - See {@link Adapter#selectNodesByReferences}.
+ * @return {NodeCollection} A collection of a type specified in the options.
+ */
+Adapter.prototype.selectNodesByIds = function(nodeIds, options) {
+  
+  var tRefs = this.getTiddlersById(nodeIds);
+  return this.selectNodesByReferences(tRefs, options);
+  
+};
+
+/**
+ * Select a single node by id.
+ * 
+ * @param {Id} id - A node's id
+ * @param {Hashmap} [options] - An optional options object.
+ * @param {Hashmap} [options.!! PARTLY INHERITED !!]
+ *     Except from the outputType option, all options
+ *     are inherited from {@link Adapter#selectNodesByIds}.
+ * @return {Node|undefined} A node or nothing.
+ */
+Adapter.prototype.selectNodeById = function(id, options) {
+  
+  options = utils.merge(options, { outputType: "hashmap" });
+  var result = this.selectNodesByIds([ id ], options);
+  return result[id];
+  
+};
+
+/**
+ * Sets up an edge object that is ready to be consumed by vis.
+ * 
+ * @param {$tw.Tiddler|Id} from - A tiddler **object** or a node id
+ *     representing the from part of the relationship.
+ * @param {Object} connection - The connection object having
+ *     the properties *to*, *id*, *type*.
+ * @param {string|EdgeType} [type] - An optional edge type that
+ *     overrides the type possibly specified by the connection object.
+ * @return {Edge} An edge object.
+ */
+Adapter.prototype.makeEdge = function(from, to, type, id) {
+  
+  if(!from || !to) return;
+  
+  if(from instanceof $tw.Tiddler) {
+    from = from.fields["tmap.id"];
+  } else if(typeof from === "object") { // expect node
+    from = from.id;
+  } // else use from value as id
+  
+  type = new EdgeType(type);
+  var label = type.getLabel();
+      
+  var edge = {
+    id: (id || utils.genUUID()),
+    from: from,
+    to: to,
+    type: type.getId()
+  };
+  
+  var description = type.getData("description");
+
+  edge.title = (description
+                || this.indeces.tById[from]
+                   + " " + (label || edge.id) + " "
+                   + this.indeces.tById[to]);
+  
+  if(utils.isTrue(type.getData("show-label"), true)) {
+    edge.label = label;
+  }
+
+  edge = $tw.utils.extend(edge, type.getData("style"));
+  
+  return edge;
+  
+};
+  
+Adapter.prototype.removeNodeType = function(type) {
+  
+  // finally remove the old type
+  $tw.wiki.deleteTiddler(new NodeType(type).getPath());
+  
+};
+
+
+Adapter.prototype.makeNode = function(tiddler, protoNode) {
+
+  var tObj = utils.getTiddler(tiddler);
+    
+  if(!tObj
+     || tObj.isDraft()
+     || $tw.wiki.isSystemTiddler(tObj.fields.title)) {
+    return; // silently ignore
+  }
+  
+  var node = utils.merge({}, protoNode);
+  
+  // assignId() will not assign an id if it already exists!  
+  node.id = this.assignId(tObj);
+   
+  // add label
+  var label = tObj.fields[this.opt.field.nodeLabel];
+  node.label = (label && this.opt.field.nodeLabel !== "title"
+                ? $tw.wiki.renderText("text/plain", "text/vnd-tiddlywiki", label)
+                : tObj.fields.title);
+        
+  return node;
+  
+};
+
+Adapter.prototype.getInheritedNodeStyles = function(nodes, view) {
+  
+  view = (view ? new ViewAbstraction(view).getLabel() : null);
+
+  var src = this.getTiddlersById(nodes);
+  var protoByTRef = {};
+  // we decrement and therefore use the loGlNTy index which
+  // first contains local and at the end global node-types.
+  var loGlNTy = this.indeces.loGlNTy;
+  
+  for(var i = loGlNTy.length; i--;) {
+  
+    var data = loGlNTy[i].data;
+    if(view && data.view && data.view !== view) continue;
+    
+    var inheritors = loGlNTy[i].getInheritors(src);
+    if(!inheritors.length) continue;
+    
+    for(var j = inheritors.length; j--;) {
+      var tRef = inheritors[j];
+      protoByTRef[tRef] = protoByTRef[tRef] || {};
+      protoByTRef[tRef].style = utils.merge(
+        protoByTRef[tRef].style || {}, data.style
+      );
+      
+      if(data["fa-icon"]) {
+        protoByTRef[tRef]["fa-icon"] = data["fa-icon"];
+      } else if(data["tw-icon"]) {
+        protoByTRef[tRef]["tw-icon"] = data["tw-icon"];
+      }
+      
+    }
+  }
+
+  return protoByTRef;
+  
+};
+
+Adapter.prototype.attachStylesToEdges = function(edges, view) {
+  // TODO
+};
+
+Adapter.prototype._removeObsoleteViewData = function(nodes, view) {
+  
+  view = new ViewAbstraction(view);
+  if(!view.exists() || !nodes) return;
+  
+  var data = view.getNodeData();
+    
+  var obsoleteDataItems = 0;
+  for(var id in data) {
+    if(nodes[id] === undefined) {
+      delete data[id];
+      obsoleteDataItems++;
+    }
+  }
+  
+  if(obsoleteDataItems) {
+    this.logger("debug", "Removed " + obsoleteDataItems
+                         + " node data records from view "
+                         + view.getLabel());
+    view.saveNodeData(data);
+  }
+  
+};
+
+Adapter.prototype.attachStylesToNodes = function(nodes, view) {
+  
+  view = new ViewAbstraction(view);
+  
+  var inheritedStyles = this.getInheritedNodeStyles(nodes, view);
+  var neighbourStyle = new NodeType("tmap:neighbour").getData("style");
+  var viewNodeData = (view.exists() ? view.getNodeData() : {});
+  var isFixedNode = !view.isEnabled("physics_mode");
+  
+  // shortcuts (for performance and readability)
+  var nodeInfoField = this.opt.field.nodeInfo;
+  var nodeIconField = this.opt.field.nodeIcon;
+  var tById = this.indeces.tById;
+  
+  for(var id in nodes) {
+    var tRef = tById[id];
+    var tObj = $tw.wiki.getTiddler(tRef);
+    var fields = tObj.fields;
+    var node = nodes[id];
+        
+    // == group styles ==
+    
+    // will add local and global group styles
+    if(inheritedStyles[tRef]) {
+      
+      if(inheritedStyles[tRef].style) {
+        utils.merge(node, inheritedStyles[tRef].style);
+      }
+      this._addNodeIcon(node,
+                        inheritedStyles[tRef]["fa-icon"],
+                        inheritedStyles[tRef]["tw-icon"]);
+    }
+    
+    // maybe add neighbour style
+    if(node.group === "tmap:neighbour") {
+      utils.merge(node, neighbourStyle);
+      delete node.group;
+    }
+        
+    // == global node styles ==
+         
+    // background color
+    if(fields.color) { node.color = fields.color }
+        
+    // global node style from vis editor
+    if(fields["tmap.style"]) {
+      utils.merge(node, utils.parseJSON(fields["tmap.style"]));
+    }
+    
+    // icon;
+    // ATTENTION: this function needs to be called after color is assigned
+    // and global node style as been merged as it uses the color property
+    this._addNodeIcon(node,
+                      fields["tmap.fa-icon"],
+                      fields[nodeIconField]);
+    
+    // == local node styles ==
+    
+    // local node style and positions
+    if(viewNodeData[id]) {
+      utils.merge(node, viewNodeData[id]);
+      if(isFixedNode) { node.fixed = { x: true, y: true }; }
+    }
+  
+    // == tweaks ==
+    
+    node.color = (typeof node.color === "object"
+                  ? node.color.background
+                  : node.color);
+  
+    // determine font color if not defined via a group- or node-style;
+    // in case of global and local default styles, the user is responsible
+    // him- or herself to adjust the font
+    node.font = node.font || {};
+    if(typeof node.font === "object" && !node.font.color) {
+      var shape = node.shape;
+      if(shape && !this.visShapesWithTextInside[shape]) {
+        node.font.color = "black";
+      } else {
+        if(node.color) {
+          node.font.color = getContrastColour(node.color, node.color,
+                                              "black", "white");
+        }
+      }
+    }
+    
+    if(node.shape === "icon" && typeof node.icon === "object") {
+      node.icon.color = node.color;
+    }
+    
+    // == independent information ==
+  
+    // tooltip
+    if(fields[nodeInfoField]) {
+      node.title = $tw.wiki.renderText("text/html",
+                                       "text/vnd-tiddlywiki",
+                                       fields[nodeInfoField]);
+    } else if(node.label !== tRef) {
+      node.title = tRef;
+    }
+             
+  }
+  
+};
+
+/**
+ * This function will remove all tiddlers from the wiki that correspond
+ * to a node in the collection. Drafts are also removed. The default
+ * storylist is updated eventually.
+ * call deleteNode which does the following
+ * 1. get id using IdByT
+ * 2. remove id using adapter.deleteEdgesByTo(idByT[tRef])
+ * 3. remove from all indeces
+ *
+ * @see: https://github.com/Jermolene/TiddlyWiki5/issues/1550
+ * 
+ * @param {NodeCollection} nodes - A collection of nodes.
+ */
+Adapter.prototype.deleteNode = function(node) {
+
+  if(!node) return;
+  
+  var id = (typeof node === "object" ? node.id : node);
+  var tRef = this.indeces.tById[id];
+  
+  // delete tiddler and remove it from the river; this will
+  // automatically remove the global node style and the outgoing edges
+  
+  if(tRef) {
+    // checking for tRef is needed;
+    // see: https://github.com/Jermolene/TiddlyWiki5/issues/1919
+    utils.deleteTiddlers([ tRef ]);
+  }
+    
+  // delete local node-data in views containing the node
+  
+  var filter = $tw.tmap.opt.selector.allViews;
+  var viewRefs = utils.getMatches(filter);
+  for(var i = 0; i < viewRefs.length; i++) {
+    var view = new ViewAbstraction(viewRefs[i]);
+    if(view.getNodeData(id)) {
+      view.saveNodeData(id, null);
+    }
+  }
+      
+  // remove obsolete connected edges
+  
+  var neighbours = this.getNeighbours([ tRef ]);
+  this.deleteEdges(neighbours.edges);
+  
+  // -------------------------------------------
+  // NEVER DELETE AN INDEX THAT ALREADY EXISTED!
+  // -------------------------------------------
+  // Some threads may have cached the index and get confused!
+  // It does not do harm to leave indeces as is since we do not
+  // iterate over them(!) and when a tiddler has the same title or
+  // id as a deleted tiddler, which is highly unlikely, then it will
+  // simply override the index, which is totally fine. The indeces
+  // are refreshed on every boot anyway so it is not a big deal.
+  // 
+  // THEREFORE:
+  //
+  // DO NOT DO delete this.indeces.tById[id];
+  // DO NOT DO delete this.indeces.idByT[tRef];
+  
+};
+
+/**
+ * Function to create or abstract a view from outside.
+ * 
+ * @param {View} view - The view.
+ * @result {ViewAbstraction}
+ */
+Adapter.prototype.getView = function(view, isCreate) {
+  
+  return new ViewAbstraction(view, isCreate);
+  
+};
+
+/**
+ * Create a view with a given label (name).
+ * 
+ * @param {string} [label="My View"] - The name of the view (__not__ a TiddlerReference).
+ * @return {ViewAbstraction} The newly created view.
+ */
+Adapter.prototype.createView = function(label) {
+    
+  if(typeof label !== "string" || label === "") {
+    label = "My view";
+  }
+  var tRef = $tw.wiki.generateNewTitle(this.opt.path.views + "/" + label);
+      
+  return new ViewAbstraction(tRef, true);
+
+};
+
+/**
+ * Create a new type.
+ * 
+ * @param {string} type - Either "node" or "edge".
+ * @param {string} [id] - An optional id. Has to be unique.
+ * @return {EdgeType|NodeType} The newly created type.
+ */
+Adapter.prototype.createType = function(type, id) {
+  
+  id = id || "me:new-type";
+  var root = (type === "edge" ? this.opt.path.edgeTypes : this.opt.path.nodeTypes);
+  var title = $tw.wiki.generateNewTitle(root + "/" + id);
+  var type = (type === "edge" ? new EdgeType(title) : new NodeType(title));
+  type.persist();              
+  return type;
+
+};
+
+
+  
+/**
+ * This function will store the positions into the sprecified view.
+ * 
+ * @param {object} positions A hashmap ids as keys and x, y properties as values
+ * @param {ViewAbstraction|Tiddler|string} 
+ */
+Adapter.prototype.storePositions = function(positions, view) {
+  
+  view = new ViewAbstraction(view);
+  view.saveNodeData(positions);
+    
+}
+
+/**
+ * This method will assign an id to an *existing* tiddler that does
+ * not already possess and id. Any assigned id will be registered
+ * at the id->tiddler index.
+ * 
+ * @param {Tiddler} tiddler - The tiddler to assign the id to.
+ * @param {boolean} isForce - True if the id should be overridden,
+ *     false otherwise. Only works if the id field is not set to title.
+ * @return {Id} The assigned or retrieved id.
+ */
+Adapter.prototype.assignId = function(tiddler, isForce) {
+
+  // ALWAYS reload from store to avoid setting wrong ids on tiddler
+  // being in the role of from and to at the same time.  
+  // Therefore, do not use utils.getTiddler(tiddler)!
+  var tObj = utils.getTiddler(tiddler, true);
+
+  if(!tObj) return;
+  
+  var id = tObj.fields["tmap.id"];
+  
+  if(!id || isForce) {
+    id = utils.genUUID();
+    utils.setField(tObj, "tmap.id", id);
+    this.logger("info", "Assigning new id to", tObj.fields.title);
+  }
+  
+  // blindly update the index IN ANY CASE because tiddler may have
+  // an id but it is not indexed yet (e.g. because of renaming operation)
+  this.indeces.tById[id] = tObj.fields.title;
+  this.indeces.idByT[tObj.fields.title] = id;
+  
+  return id;
+  
+};
+
+/**
+ * Create a new tiddler that gets a non-existant title and is opened
+ * for edit. If a view is registered, the fields of the tiddler match
+ * the current view. If arguments network and position are specified,
+ * the node is also inserted directly into the graph at the given
+ * position.
+ * 
+ * @param {object} node A node object to be inserted
+ * @param {object|null} options An optional options object.
+ *     Options include:
+ *       - editNodeOnCreate: True, if the node should be opened in edit
+ *         mode after it was created, false otherwise. Overwrites the
+ *         global default
+ *       - view: a viewname used to set positions and register the node to
+ */
+Adapter.prototype.insertNode = function(node, options) {
+  
+  if(!options || typeof options !== "object") options = {};
+  
+  if(!node || typeof node !== "object") {
+    node = utils.getDataMap();
+  }
+  
+  var fields = utils.getDataMap();
+  fields.title = $tw.wiki.generateNewTitle((node.label ? node.label : "New node"));
+  // title might has changed after generateNewTitle()
+  node.label = fields.title;
+  
+  // always override any incoming id 
+  
+  if(this.opt.field.nodeId === "title") {
+    node.id = fields.title;
+  } else {
+    node.id = utils.genUUID();
+    fields["tmap.id"] = node.id;
+  }
+  
+  if(options.view) {
+    var view = new ViewAbstraction(options.view);
+    view.addNodeToView(node);
+  }
+  
+  $tw.wiki.addTiddler(new $tw.Tiddler(
+    fields,
+    $tw.wiki.getModificationFields(),
+    $tw.wiki.getCreationFields())
+  );
+          
+  return node;
+  
+};
+
+/**** Helper *******************************************************/
+
+/**
+ * Retrieve tiddlers based on the a list of corresponding ids.
+ * 
+ * @param {Array.<Id>|Hashmap.<Id, *>|vis.DataSet} nodeIds - The ids.
+ * @return {Array<TiddlerReference>} The resulting tiddlers.
+ */
+Adapter.prototype.getTiddlersById = function(nodeIds) {
+
+  // transform into a hashmap with all values being true
+  if(Array.isArray(nodeIds)) {
+    nodeIds = utils.getArrayValuesAsHashmapKeys(nodeIds);
+  } else if(nodeIds instanceof vis.DataSet) {
+    nodeIds = utils.getLookupTable(nodeIds, "id"); // use id field as key
+  }
+  
+  var result = [];
+  var tById = this.indeces.tById;
+  for(var id in nodeIds) {
+    if(tById[id]) result.push(tById[id]);
+  }
+  
+  return result;
+  
+};
+
+Adapter.prototype.getId = function(tiddler) {
+  
+  return this.indeces.idByT[utils.getTiddlerRef(tiddler)];
+  //return utils.getField(tiddler, "tmap.id");
+  
+};
+
+/**
+ * 
+ */
+Adapter.prototype._addNodeIcon = function(node, faIcon, twIcon) {
+  
+  // Font Awesome style
+  if(faIcon) {
+    node.shape = "icon";
+    node.icon = {
+      shape: "icon",
+      face: "FontAwesome",
+      color: node.color,
+      code: String.fromCharCode("0x" + faIcon)
+    };
+    //~ console.log(String.fromCharCode(parseInt(charCode, 16)));
+    return;
+  }
+  
+  // TiddlyWiki stored icons
+  
+  if(!twIcon) return;
+
+  var imgTObj = utils.getTiddler(twIcon);
+  if(imgTObj && imgTObj.fields.text) {
+    var type = imgTObj.fields.type || "image/svg+xml";
+    var body = imgTObj.fields.text;
+    node.shape = "image";
+    if(type === "image/svg+xml") {
+      // see http://stackoverflow.com/questions/10768451/inline-svg-in-css
+      body = body.replace(/\r?\n|\r/g, " ");
+      if(!utils.inArray("xmlns", body)) {
+        // @tiddlywiki it is bad to remove xmlns attribute!
+        body = body.replace(/<svg/,
+                            '<svg xmlns="http://www.w3.org/2000/svg"');
+      }
+    }
+
+    var encBody = ($tw.config.contentTypeInfo[type].encoding === "base64"
+                   ? body
+                   : window.btoa(body));
+
+    node.image = "data:" + type + ";base64," + encBody;
+    
+  }
+    
+};
+
+/**** Export *******************************************************/
+
+exports.Adapter = Adapter
+
+})();

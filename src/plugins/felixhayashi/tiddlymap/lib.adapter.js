@@ -44,7 +44,7 @@ var vis =               require("$:/plugins/felixhayashi/vis/vis.js");
  */
 var Adapter = function() {
   
-  // create shortcuts to services
+  // create shortcuts for services and frequently used vars
   this.opt = $tw.tmap.opt;
   this.logger = $tw.tmap.logger;
   this.indeces = $tw.tmap.indeces;
@@ -806,24 +806,31 @@ Adapter.prototype.makeEdge = function(from, to, type, id) {
   if(!from || !to) return;
   
   if(from instanceof $tw.Tiddler) {
-    from = from.fields[this.opt.field.nodeId];
+    from = from.fields["tmap.id"];
   } else if(typeof from === "object") { // expect node
     from = from.id;
   } // else use from value as id
   
   type = new EdgeType(type);
+  var label = type.getLabel();
       
   var edge = {
     id: (id || utils.genUUID()),
     from: from,
     to: to,
-    type: type.getId(),
-    title: type.getData("description") || undefined
+    type: type.getId()
   };
   
-  edge.label = (utils.isTrue(type.getData("show-label"), true)
-                ? type.getLabel()
-                : null); // needs to be set/unset explicitly 
+  var description = type.getData("description");
+
+  edge.title = (description
+                || this.indeces.tById[from]
+                   + " " + (label || edge.id) + " "
+                   + this.indeces.tById[to]);
+  
+  if(utils.isTrue(type.getData("show-label"), true)) {
+    edge.label = label;
+  }
 
   edge = $tw.utils.extend(edge, type.getData("style"));
   
@@ -1178,13 +1185,11 @@ Adapter.prototype.assignId = function(tiddler, isForce) {
 
   if(!tObj) return;
   
-  var idField = this.opt.field.nodeId;
-  var id = tObj.fields[idField];
+  var id = tObj.fields["tmap.id"];
   
-  // note: when idField is "title" it is always defined
-  if(!id || (isForce && idField !== "title")) {
+  if(!id || isForce) {
     id = utils.genUUID();
-    utils.setField(tObj, idField, id);
+    utils.setField(tObj, "tmap.id", id);
     this.logger("info", "Assigning new id to", tObj.fields.title);
   }
   
@@ -1231,7 +1236,7 @@ Adapter.prototype.insertNode = function(node, options) {
     node.id = fields.title;
   } else {
     node.id = utils.genUUID();
-    fields[this.opt.field.nodeId] = node.id;
+    fields["tmap.id"] = node.id;
   }
   
   if(options.view) {
@@ -1277,8 +1282,10 @@ Adapter.prototype.getTiddlersById = function(nodeIds) {
 };
 
 Adapter.prototype.getId = function(tiddler) {
+  
   return this.indeces.idByT[utils.getTiddlerRef(tiddler)];
-  //return utils.getField(tiddler, this.opt.field.nodeId);
+  //return utils.getField(tiddler, "tmap.id");
+  
 };
 
 /**

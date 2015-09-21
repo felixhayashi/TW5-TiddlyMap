@@ -8,4 +8,171 @@ module-type: widget
 @preserve
 
 \*/
-(function(){"use strict";var e=require("$:/core/modules/widgets/widget.js").widget;var t=require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;var r=function(t,r){e.call(this,t,r);this.utils=$tw.tmap.utils};r.prototype=Object.create(e.prototype);r.prototype.render=function(e,t){this.parentDomNode=e;this.computeAttributes();this.execute();this.renderChildren(e,t)};r.prototype.execute=function(){var e=[this.getVariable("currentTiddler")];var t=this.getAttribute("filter","");var r={typeWL:$tw.tmap.adapter.getEdgeTypeWhiteList(t)};var i=$tw.tmap.adapter.getNeighbours(e,r);var s=i.nodes;var a=i.edges;var o=[];for(var n in a){var h=a[n];var p=s[h.to]?"To":"From";var d=s[h[p.toLowerCase()]];if(!d)continue;o.push({type:"tmap-edgelistitem",edge:h,neighbour:d,direction:p,children:this.parseTreeNode.children})}if(!o.length){this.wasEmpty=true;o=this.getEmptyMessage()}else if(this.wasEmpty){this.removeChildDomNodes()}this.makeChildWidgets(o)};r.prototype.getEmptyMessage=function(){var e=this.wiki.parseText("text/vnd.tiddlywiki",this.getAttribute("emptyMessage",""),{parseAsInline:true});return e?e.tree:[]};r.prototype.refresh=function(e){var t=this.computeAttributes();if(t.filter||t.emptyMessage){this.refreshSelf();return true}for(var r in e){if(!this.utils.isSystemOrDraft(r)){this.refreshSelf();return true}}return this.refreshChildren(e)};exports["tmap-connections"]=r;var i=function(t,r){e.call(this,t,r);this.utils=$tw.tmap.utils};i.prototype=Object.create(e.prototype);i.prototype.execute=function(){var e=this.parseTreeNode;var t=$tw.tmap.indeces.tById[e.neighbour.id];var r=this.utils.flatten(e.edge);for(var i in r){if(typeof r[i]==="string"){this.setVariable("edge."+i,r[i])}}this.setVariable("currentTiddler",t);this.setVariable("neighbour",t);this.setVariable("direction",e.direction);this.makeChildWidgets()};i.prototype.refresh=function(e){return this.refreshChildren(e)};exports["tmap-edgelistitem"]=i})();
+
+(/** @lends module:TiddlyMap*/function(){
+
+/*jslint node: true, browser: true */
+/*global $tw: false */
+"use strict";
+
+// import classes
+var Widget = require("$:/core/modules/widgets/widget.js").widget;
+var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
+
+/**
+ * @constructor
+ */
+var EdgeListWidget = function(parseTreeNode,options) {
+  
+  // call the parent constructor  
+  Widget.call(this, parseTreeNode, options);
+  
+  // import services
+  this.utils = $tw.tmap.utils;
+    
+};
+
+// !! EXTENSION !!
+EdgeListWidget.prototype = Object.create(Widget.prototype);
+// !! EXTENSION !!
+
+EdgeListWidget.prototype.render = function(parent,nextSibling) {
+  
+  this.parentDomNode = parent;
+  this.computeAttributes();
+  this.execute();
+  this.renderChildren(parent,nextSibling);
+  
+};
+
+EdgeListWidget.prototype.execute = function() {
+  
+  var nodes = [ this.getVariable("currentTiddler") ];
+  var filter = this.getAttribute("filter", "");
+  var options = {
+    typeWL: $tw.tmap.adapter.getEdgeTypeWhiteList(filter)
+  };
+
+  var neighbourhood = $tw.tmap.adapter.getNeighbours(nodes, options);
+
+  // retrieve nodes and edges
+  var neighbours = neighbourhood.nodes;
+  var edges = neighbourhood.edges;
+  
+  var entries = [];
+  for(var id in edges) {
+    var edge = edges[id];
+    var direction = (neighbours[edge.to] ? "To" : "From");
+    var neighbour = neighbours[edge[direction.toLowerCase()]];
+    
+    if(!neighbour) continue; // obsolete edge from old times;
+    
+    // make item template
+    entries.push({
+      type: "tmap-edgelistitem",
+      edge: edge,
+      neighbour: neighbour,
+      direction: direction,
+      // the children of this widget (=what is wrapped inside the
+      // widget-element's body) is used as template for the list items
+      children: this.parseTreeNode.children
+    });
+  }
+  
+  if(!entries.length) {
+    this.wasEmpty = true;
+    entries = this.getEmptyMessage();
+  } else if(this.wasEmpty) {
+    // we need to remove the empty message
+    this.removeChildDomNodes();
+  }
+
+  this.makeChildWidgets(entries);
+  
+};
+
+EdgeListWidget.prototype.getEmptyMessage = function() {
+  
+  var parser = this.wiki.parseText(
+                  "text/vnd.tiddlywiki",
+                  this.getAttribute("emptyMessage", ""),
+                  {parseAsInline: true});
+    
+  return parser ? parser.tree : [];
+  
+};
+
+EdgeListWidget.prototype.refresh = function(changedTiddlers) {
+  
+  var changedAttributes = this.computeAttributes();
+
+  if(changedAttributes.filter || changedAttributes.emptyMessage) {
+    this.refreshSelf();
+    return true;
+  }
+
+  for(var tRef in changedTiddlers) {
+    if(!this.utils.isSystemOrDraft(tRef)) {
+      this.refreshSelf();
+      return true;
+    } 
+  }
+    
+  // let children decide for themselves
+  return this.refreshChildren(changedTiddlers);
+
+};
+
+// !! EXPORT !!
+exports["tmap-connections"] = EdgeListWidget;
+// !! EXPORT !!
+
+/**
+ * @constructor
+ */
+var EdgeListItemWidget = function(parseTreeNode, options) {
+  
+  Widget.call(this, parseTreeNode, options);
+  
+  // import services
+  this.utils = $tw.tmap.utils;
+  
+};
+
+// !! EXTENSION !!
+EdgeListItemWidget.prototype = Object.create(Widget.prototype);
+// !! EXTENSION !!
+
+EdgeListItemWidget.prototype.execute = function() {
+  
+  var item = this.parseTreeNode;
+  var tRef = $tw.tmap.indeces.tById[item.neighbour.id];
+  
+  // make edge properties available as variables
+  var edge = this.utils.flatten(item.edge);
+  for(var p in edge) {
+    if(typeof edge[p] === "string") {
+      this.setVariable("edge." + p, edge[p]);
+    }
+  }
+    
+  this.setVariable("currentTiddler", tRef);
+  this.setVariable("neighbour", tRef);
+  this.setVariable("direction", item.direction);
+  
+  // Construct the child widgets
+  this.makeChildWidgets();
+  
+};
+
+EdgeListItemWidget.prototype.refresh = function(changedTiddlers) {
+  
+  return this.refreshChildren(changedTiddlers);
+  
+};
+
+// !! EXPORT !!
+exports["tmap-edgelistitem"] = EdgeListItemWidget;
+// !! EXPORT !!
+
+})();

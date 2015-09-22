@@ -10,6 +10,10 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.9.2
+
+* Dynamic creation of edge labels if they do not exist
+
 ### v0.9.1
 
 * Added fullscreen preview and draft tabs when opening a node
@@ -27,6 +31,14 @@ Major enhancements
 
 Important Bugfixes
 ----------------------------
+
+### v0.9.2
+
+* Fixed bug that null labels where displayed for edges.
+* Added safeguard to prevent that multiline editors allowed newlines
+  to be written into single line fields (with regard to the
+  type manager).
+  See: https://github.com/Jermolene/TiddlyWiki5/issues/1955
 
 ### v0.9.1
 

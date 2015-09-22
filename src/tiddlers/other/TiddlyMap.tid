@@ -1,7 +1,7 @@
 created: 20150103202237610
 modified: 20150401210835005
 title: TiddlyMap
-tmap.edges: {"67748704-c227-4e45-b899-4aee7a2a172b":{"to":"B0528516-51F2-477C-94F3-F1195C0718C6","type":"demo:author"},"1fc78225-3618-4d3d-a5b4-cee181af3a11":{"to":"D0B54F1D-8D7A-4C2E-9490-D3DF8866A6EC","type":"demo:uses"},"78a81800-2cb6-4b2f-bc73-c73d89f50ada":{"to":"746FEF43-FCAD-4229-8601-50ACE50AE49B","type":"runs inside"},"b57b75be-4365-4aa4-8ca2-41008350f72e":{"to":"1748576e-74bb-4165-85bb-0d312e3e4f1f","type":"related"},"1abac37e-53cf-4ef1-a3e5-b9f24cdbc3a3":{"to":"c5a23686-8e59-4415-9b6e-0eaf35247980","type":"hosted at"}}
+tmap.edges: {"1fc78225-3618-4d3d-a5b4-cee181af3a11":{"to":"D0B54F1D-8D7A-4C2E-9490-D3DF8866A6EC","type":"demo:uses"},"78a81800-2cb6-4b2f-bc73-c73d89f50ada":{"to":"746FEF43-FCAD-4229-8601-50ACE50AE49B","type":"runs inside"},"b57b75be-4365-4aa4-8ca2-41008350f72e":{"to":"1748576e-74bb-4165-85bb-0d312e3e4f1f","type":"related"},"1abac37e-53cf-4ef1-a3e5-b9f24cdbc3a3":{"to":"c5a23686-8e59-4415-9b6e-0eaf35247980","type":"source code at"}}
 tmap.id: 77ee9fd0-95ce-4d78-a28a-7e43887ae686
 tmap.style: {}
 type: text/vnd.tiddlywiki

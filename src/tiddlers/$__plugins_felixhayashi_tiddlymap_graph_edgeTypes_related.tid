@@ -1,5 +1,6 @@
 created: 20150910211011966
-modified: 20150910213826626
+label: is related to
+modified: 20150921104948539
 show-label: false
 style: {"arrows":{"middle":{"enabled":false},"to":{"enabled":false},"from":{"enabled":false}},"dashes":true,"color":{"color":"rgba(178,169,26,1)"}}
 title: $:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/related

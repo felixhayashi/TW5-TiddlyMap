@@ -93,16 +93,24 @@ ElementType.prototype.setData = function() {
   var args = arguments;
   
   if(args.length === 2) {
-    if(typeof args[0] === "string") {
-      if(args[1] && utils.inArray(args[0], this.allowedFields)) {
-        var setter = this["set" + utils.ucFirst(args[0])];
+    var key = args[0];
+    var val = args[1];
+    if(typeof key === "string") {
+      
+      if(val && utils.inArray(key, this.allowedFields)) {
+        // a safeguard against multilines since we do not store in
+        // the textfield.
+        if(typeof val === "string") {
+          val = val.replace(/[\n\r]/g, " ");
+        }
+        var setter = this["set" + utils.ucFirst(key)];
         if(typeof setter === "function") {
-          setter.call(this, args[1]);
+          setter.call(this, val);
         } else {
-          this.data[args[0]] = args[1];
+          this.data[key] = val;
         }
       } else {
-        delete this.data[args[0]];
+        delete this.data[key];
       }
     }
   } else if(args.length === 1 && typeof args[0] === "object") {

@@ -19,6 +19,7 @@ module-type: startup
 
 var NodeType = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;
 var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
+var utils =    require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
 
 /***************************** CODE ******************************/
 
@@ -29,11 +30,10 @@ var GlobalListener = function() {
   this.wiki = $tw.wiki;
   this.logger = $tw.tmap.logger;
   this.opt = $tw.tmap.opt;
-  this.utils = $tw.tmap.utils;
   this.dialogManager = $tw.tmap.dialogManager;
     
   // add handlers to the root widget to make them available from everywhere
-  this.utils.addListeners({ 
+  utils.addListeners({ 
     "tmap:tm-remove-edge": this.handleRemoveEdge,
     "tmap:tm-load-type-form": this.handleLoadTypeForm,
     "tmap:tm-save-type-form": this.handleSaveTypeForm,
@@ -51,17 +51,17 @@ var GlobalListener = function() {
 };
 
 GlobalListener.prototype.handleCancelDialog = function(event) {
-  this.utils.setField(event.param, "text", "");
+  utils.setField(event.param, "text", "");
 };
 
 GlobalListener.prototype.handleConfirmDialog = function(event) {
-  this.utils.setField(event.param, "text", "1");
+  utils.setField(event.param, "text", "1");
 };
   
 GlobalListener.prototype.handleSuppressDialog = function(event) {
 
-  if(this.utils.isTrue(event.paramObject.suppress, false)) {
-    this.utils.setEntry(
+  if(utils.isTrue(event.paramObject.suppress, false)) {
+    utils.setEntry(
         this.opt.ref.sysUserConf,
         "suppressedDialogs." + event.paramObject.dialog,
         true
@@ -74,12 +74,12 @@ GlobalListener.prototype.handleDownloadGraph = function(event) {
 
   var graph = this.adapter.getGraph({ view: event.paramObject.view });  
   
-  graph.nodes = this.utils.convert(graph.nodes, "array");
-  graph.edges = this.utils.convert(graph.edges, "array");
+  graph.nodes = utils.convert(graph.nodes, "array");
+  graph.edges = utils.convert(graph.edges, "array");
   
   var tRef = "$:/temp/tmap/export";
 
-  this.utils.setField(tRef, "text", JSON.stringify(graph, null, 2));
+  utils.setField(tRef, "text", JSON.stringify(graph, null, 2));
     
   $tw.rootWidget.dispatchEvent({
     type: "tm-download-file",
@@ -145,11 +145,11 @@ GlobalListener.prototype.handleOpenTypeManager = function(event) {
     mode: mode,
     topic: topic,
     filter: allTypesSelector
-            + " +[search:title{$:/temp/tmap/elementTypeSearch}]"
+            + " +[search:title{$:/temp/tmap/MapElementTypeSearch}]"
             + " +[sort[title]]"
   };
   
-  var dialogTObj = this.dialogManager.open("elementTypeManager", opts);
+  var dialogTObj = this.dialogManager.open("MapElementTypeManager", opts);
   
   if(event.paramObject.type) {
     this.handleLoadTypeForm({
@@ -172,33 +172,33 @@ GlobalListener.prototype.handleLoadTypeForm = function(event) {
               : new NodeType(event.paramObject.id));
   
   // inject all the type data as fields into the dialog output
-  type.persist(outTRef, true);
+  type.save(outTRef);
   
   // fields that need preprocessing
   
   if(event.paramObject.mode === "manage-edge-types") {
     var usage = this.adapter.selectEdgesByType(type);
     var count = Object.keys(usage).length;
-    this.utils.setField(outTRef, "temp.usageCount", count);
+    utils.setField(outTRef, "temp.usageCount", count);
   }
   
   $tw.wiki.addTiddler(new $tw.Tiddler(
-    this.utils.getTiddler(outTRef),
+    utils.getTiddler(outTRef),
     {
-      "temp.idImmutable": (type.isShipped() ? "true" : ""),
-      "temp.newId": type.getId(),
+      "temp.idImmutable": (type.isShipped ? "true" : ""),
+      "temp.newId": type.id,
       "vis-inherited": JSON.stringify(this.opt.config.vis)
     }
   ));
 
   // reset the tabs to default
-  this.utils.deleteByPrefix("$:/state/tabs/elementTypeManager");
+  utils.deleteByPrefix("$:/state/tabs/MapElementTypeManager");
   
 };
 
 GlobalListener.prototype.handleSaveTypeForm = function(event) {
   
-  var tObj = this.utils.getTiddler(event.paramObject.output);  
+  var tObj = utils.getTiddler(event.paramObject.output);  
   if(!tObj) return;
   
   var mode = event.paramObject.mode;
@@ -206,7 +206,7 @@ GlobalListener.prototype.handleSaveTypeForm = function(event) {
               ? new EdgeType(tObj.fields.id)
               : new NodeType(tObj.fields.id));
   
-  if(this.utils.isTrue(tObj.fields["temp.deleteType"], false)) {
+  if(utils.isTrue(tObj.fields["temp.deleteType"], false)) {
     this.deleteType(mode, type, tObj);
   } else {
     this.saveType(mode, type, tObj);
@@ -225,7 +225,7 @@ GlobalListener.prototype.deleteType = function(mode, type, dialogOutput) {
   }
   
   this.wiki.addTiddler(new $tw.Tiddler({
-    title: this.utils.getTiddlerRef(dialogOutput)
+    title: utils.getTiddlerRef(dialogOutput)
   }));
   
   $tw.tmap.notify("Deleted type");
@@ -234,16 +234,19 @@ GlobalListener.prototype.deleteType = function(mode, type, dialogOutput) {
 
 GlobalListener.prototype.saveType = function(mode, type, dialogOutput) {
   
-  var tObj = this.utils.getTiddler(dialogOutput);
+  var tObj = utils.getTiddler(dialogOutput);
   
   // save
-  type.loadDataFromTiddler(tObj);
-  type.persist();
+  type.loadFromTiddler(tObj);
+  if(type instanceof NodeType) {
+    //type.setViews(tObj.fields.tags);
+  }
+  type.save();
   
   if(!tObj.fields["temp.newId"]) { // no new id set
     
     // set id back to original state
-    this.utils.setField(tObj, "temp.newId", tObj.fields["id"]);
+    utils.setField(tObj, "temp.newId", tObj.fields["id"]);
     
   } else if(tObj.fields["temp.newId"] !== tObj.fields["id"]) { //renamed
     
@@ -253,7 +256,7 @@ GlobalListener.prototype.saveType = function(mode, type, dialogOutput) {
         newName: tObj.fields["temp.newId"]
       });
     }
-    this.utils.setField(tObj, "id", tObj.fields["temp.newId"]);
+    utils.setField(tObj, "id", tObj.fields["temp.newId"]);
   }
   
   $tw.tmap.notify("Saved type data");
@@ -262,12 +265,15 @@ GlobalListener.prototype.saveType = function(mode, type, dialogOutput) {
 
 GlobalListener.prototype.handleCreateType = function(event) {
   
-  var id = event.paramObject.id;
-  var type = (event.paramObject.mode === "manage-edge-types" ? "edge" : "node");
+  var id = event.paramObject.id || "New type";
+  var type = (event.paramObject.mode === "manage-edge-types"
+              ? new EdgeType(id)
+              : new NodeType(id));
+  type.save();
 
   this.handleLoadTypeForm({
     paramObject: {
-      id: this.adapter.createType(type, id).getId(),
+      id: type.id,
       mode: event.paramObject.mode,
       output: event.paramObject.output
     }

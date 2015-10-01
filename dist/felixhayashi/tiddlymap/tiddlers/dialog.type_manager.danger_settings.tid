@@ -1,4 +1,4 @@
-title: $:/plugins/felixhayashi/tiddlymap/dialog/elementTypeManager/deleteType
+title: $:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/deleteType
 caption: Removal
 
 \rules except wikilink

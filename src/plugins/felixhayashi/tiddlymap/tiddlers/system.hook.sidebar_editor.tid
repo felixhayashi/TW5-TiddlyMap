@@ -14,13 +14,21 @@ title: $:/plugins/felixhayashi/tiddlymap/hook/editor
 </$tiddlymap>
 \end
 
-<div class="tmap-mobile-editor">
-<!--
-<<map width:"100%" height:"300px" clickToUse:"true">>
--->
-The editor is not displayed in mobile mode.
-</div>
+\define width() calc(100% - 15px)
 
+<div class="tmap-mobile-editor">
+  <div class="tmap-flash-message tmap-warning">
+    {{$:/core/images/info-button}}
+    The editor is not displayed in mobile mode.
+  </div>
+</div>
 <div class="tmap-desktop-editor">
-<<map width:"calc(100% - 15px)" clickToUse:"false">>
+  <$tiddlymap
+    class="tmap-sidebar-map-editor"
+    editor="advanced"
+    object-id="main_editor"
+    click-to-use="false"
+    width=<<width>>
+    bottom-spacing="35px">
+  </$tiddlymap>
 </div>

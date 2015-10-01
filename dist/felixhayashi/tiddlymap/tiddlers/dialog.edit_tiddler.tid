@@ -9,6 +9,6 @@ subtitle: {{$:/core/images/edit-button}} <<draftTRef>>
                           [[$:/core/macros/tabs]]">
 <$macrocall $name="tabs"
     default=<<defaultTab>>
-    state="$:/state/tabs/elementTypeManager"
+    state="$:/state/tabs/MapElementTypeManager"
     tabsList="[all[shadows]prefix[$:/plugins/felixhayashi/tiddlymap/dialog/fullscreenTiddlerEditor/]]" />
 </$importvariables>

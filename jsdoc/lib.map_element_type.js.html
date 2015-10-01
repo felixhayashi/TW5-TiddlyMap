@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>TiddlyMap Source: lib.element_type.js</title>
+	<title>TiddlyMap Source: lib.map_element_type.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -45,14 +45,14 @@ tmap-config
     mode="manage-*"
     refresh-trigger="tRef"
 
-```</a></li><li><a href="module-TiddlyMap-Adapter.html">TiddlyMap~Adapter</a></li><li><a href="module-TiddlyMap-CallbackManager.html">TiddlyMap~CallbackManager</a></li><li><a href="module-TiddlyMap-DialogManager.html">TiddlyMap~DialogManager</a></li><li><a href="module-TiddlyMap-EdgeListItemWidget.html">TiddlyMap~EdgeListItemWidget</a></li><li><a href="module-TiddlyMap-EdgeListWidget.html">TiddlyMap~EdgeListWidget</a></li><li><a href="module-TiddlyMap-EdgeType.html">TiddlyMap~EdgeType</a></li><li><a href="module-TiddlyMap-MapWidget.html">TiddlyMap~MapWidget</a></li><li><a href="module-TiddlyMap-ViewAbstraction.html">TiddlyMap~ViewAbstraction</a></li>
+```</a></li><li><a href="module-TiddlyMap-Adapter.html">TiddlyMap~Adapter</a></li><li><a href="module-TiddlyMap-CallbackManager.html">TiddlyMap~CallbackManager</a></li><li><a href="module-TiddlyMap-DialogManager.html">TiddlyMap~DialogManager</a></li><li><a href="module-TiddlyMap-EdgeListItemWidget.html">TiddlyMap~EdgeListItemWidget</a></li><li><a href="module-TiddlyMap-EdgeListWidget.html">TiddlyMap~EdgeListWidget</a></li><li><a href="module-TiddlyMap-EdgeType.html">TiddlyMap~EdgeType</a></li><li><a href="module-TiddlyMap-MapWidget.html">TiddlyMap~MapWidget</a></li><li><a href="module-TiddlyMap-NodeType.html">TiddlyMap~NodeType</a></li><li><a href="module-TiddlyMap-ViewAbstraction.html">TiddlyMap~ViewAbstraction</a></li>
 				</ul>
 			</li>
 			
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="global.html">Global</a></li>
+					<li><a href="global.html#startup">startup</a></li>
 				</ul>
 			</li>
 			
@@ -69,17 +69,17 @@ tmap-config
 	<div class="col-md-12">
 	
 		<div id="main">
-    		<h1 class="page-title">Source: lib.element_type.js</h1>
+    		<h1 class="page-title">Source: lib.map_element_type.js</h1>
 			
 
-		<h1 class="page-title">Source: lib.element_type.js</h1>
+		<h1 class="page-title">Source: lib.map_element_type.js</h1>
     
 <section>
 	<article>
 		<pre
 			class="sunlight-highlight-javascript linenums">/*\
 
-title: $:/plugins/felixhayashi/tiddlymap/js/ElementType
+title: $:/plugins/felixhayashi/tiddlymap/js/MapElementType
 type: application/javascript
 module-type: library
 
@@ -101,33 +101,92 @@ var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
   
 /***************************** CODE ******************************/
 
-var ElementType = function(type, root, fields) {
+/**
+ * 
+ */
+var MapElementType = function(id, root, fieldMeta, data) {
 
-  if(typeof type !== "string") {
-    throw "Cannot create type"; 
-  }
-
-  // create shortcuts to services
+  // create shortcuts for services and frequently used vars
   this.opt = $tw.tmap.opt;
   this.logger = $tw.tmap.logger;
   
-  this.type = type;
-  this.allowedFields = [
-    "description", "style", "modified", "created"
-  ].concat(fields || []);
   this.root = root;
-  this.data = utils.getDataMap();
-  this.id = utils.getWithoutPrefix(type, this.root + "/");
-  this.loadDataFromType(this.id);
+  this.id = utils.getWithoutPrefix(id, this.root + "/");
+  this._fieldMeta = fieldMeta;
+  this.fullPath = this.root + "/" + this.id;
+  this.isShipped = $tw.wiki.getSubTiddler(this.opt.path.pluginRoot,
+                                          this.fullPath)
+  // finally get the data
+  this.load(data || this.fullPath);
 
 };
 
 /**
- * @return {string}
+ * A list of fields that are used as data identifiers. Only these
+ * listed keys are acknowledged by the load and save functions in
+ * this class.
+ * 
+ * This object resembles tw's field modules that are used by
+ * `boot.js` to decide how fields are parsed and stringified again.
  */
-ElementType.prototype.getPath = function() {
+MapElementType._fieldMeta = {
+  "description": {},
+  "style": {
+    parse: utils.parseJSON,
+    stringify: JSON.stringify
+  },
+  "modified": {},
+  "created": {}
+};
 
-  return (this.root + "/" + this.id);
+/**
+ * Load the type's data. Depending on the constructor arguments,
+ * the data source can be a tiddler, a type store
+ */
+MapElementType.prototype.load = function(data) {
+  
+  if(!data) return;
+  
+  if(typeof data === "string") { // assume id or full path
+    // assume id
+    var tRef = (!utils.startsWith(data, this.root)
+                ? this.root + "/" + type
+                : data);
+    this.loadFromTiddler(tRef);
+    
+  } else if(data instanceof $tw.Tiddler) {
+    this.loadFromTiddler(data);
+    
+  } else if(typeof data === "object") { // = type or a data object
+    for(var field in this._fieldMeta) {
+      this[field] = data[field];
+    }
+  }
+  
+};
+
+
+/**
+ * Retrieve all data from the tiddler provided. If a shadow tiddler
+ * with the same id exists, its data is merged during the load
+ * process.
+ */
+MapElementType.prototype.loadFromTiddler = function(tiddler) {
+  
+  var tObj = utils.getTiddler(tiddler);
+  if(!tObj) return;
+  
+  var shadowTObj = $tw.wiki.getSubTiddler(this.opt.path.pluginRoot,
+                                          this.fullPath) || {};
+  
+  // copy object to allow manipulation of the data
+  var rawData = $tw.utils.extend({}, shadowTObj.fields, tObj.fields);
+  // allow parsers to transform the raw field data
+  for(var field in this._fieldMeta) {
+    var parser = this._fieldMeta[field].parse;
+    var rawVal = rawData[field];
+    this[field] = (parser ? parser.call(this, rawVal) : rawVal);
+  }    
 
 };
 
@@ -138,71 +197,13 @@ ElementType.prototype.getPath = function() {
  * 
  * @return {boolean} True if the type exists, false otherwise.
  */
-ElementType.prototype.exists = function() {
+MapElementType.prototype.exists = function() {
 
-  return utils.tiddlerExists(this.getPath());
-
-};
-    
-ElementType.prototype.getId = function() {
-  
-  return this.id;
+  return utils.tiddlerExists(this.fullPath);
 
 };
 
-ElementType.prototype.getData = function(prop) {
-  
-  if(prop) {
-    var getter = this["get" + utils.ucFirst(prop)];
-    return (typeof getter === "function"
-            ? getter.call(this)
-            : this.data[prop]);
-  }
-
-  return this.data;  
-  
-};
-
-/**
- * If two arguments are provided, a key-value schema is assumed,
- * otherwise, the whole data object is replaced.
- */
-ElementType.prototype.setData = function() {
-  
-  var args = arguments;
-  
-  if(args.length === 2) {
-    var key = args[0];
-    var val = args[1];
-    if(typeof key === "string") {
-      
-      if(val &amp;&amp; utils.inArray(key, this.allowedFields)) {
-        // a safeguard against multilines since we do not store in
-        // the textfield.
-        if(typeof val === "string") {
-          val = val.replace(/[\n\r]/g, " ");
-        }
-        var setter = this["set" + utils.ucFirst(key)];
-        if(typeof setter === "function") {
-          setter.call(this, val);
-        } else {
-          this.data[key] = val;
-        }
-      } else {
-        delete this.data[key];
-      }
-    }
-  } else if(args.length === 1 &amp;&amp; typeof args[0] === "object") {
-    for(var p in args[0]) {
-      this.setData(p, args[0][p]);
-    }
-  }
-  
-  return this;
- 
-};
-
-ElementType.prototype.setStyle = function(style, isMerge) {
+MapElementType.prototype.setStyle = function(style, isMerge) {
 
   // preprocessing: try to turn string into json
   if(typeof style === "string") {
@@ -212,33 +213,29 @@ ElementType.prototype.setStyle = function(style, isMerge) {
   // merge or override
   if(typeof style === "object") {
     if(isMerge) {
-      utils.merge(this.data.style, style);
+      utils.merge(this.style, style);
     } else {
-      this.data.style = style;
+      this.style = style;
     }
   }
-  
-  return this;
     
 };
   
 /**
- * Store the type object as tiddler in the wiki. If the `title`
+ * Store the type object as tiddler in the wiki. If the `tRef`
  * property is not provided, the default type path prefix 
- * will be used with the type id appended. The style data is
- * written as JSON into the text field.
+ * will be used with the type id appended. Stringifiers provided in
+ * the field meta object (that was passed to the constructor) are
+ * called.
  * 
  * @param {string} [tRef] - If `tRef` is provided, the type
  *     data will be written into this tiddler and the id property
- *     is added as extra field value. Do not use this option if you
- *     want the system to recognize the type. This is only for
- *     dumping purposes.
- * @param {boolean} [isPrettifyJSON] - True, if any json data should
- *     be stored in a prettified way, false otherwise.
+ *     is added as extra field value. Only do this is only for
+ *     dumping purposes!
  */
-ElementType.prototype.persist = function(tRef, isPrettifyJSON) {
+MapElementType.prototype.save = function(tRef) {
 
-  if(!tRef) { tRef = this.getPath(); }
+  if(!tRef) { tRef = this.fullPath; }
   
   if(typeof tRef === "string") {
   
@@ -247,93 +244,39 @@ ElementType.prototype.persist = function(tRef, isPrettifyJSON) {
     };
     
     if(!utils.startsWith(tRef, this.root)) {
+      
+      // = not the standard path for storing this type!
+      // in this case we add the id to the output.
       fields.id = this.id;
+      
     } else {
+      
+      // add modification date to the output;
       $tw.utils.extend(fields, $tw.wiki.getModificationFields());
-      if(!this.exists()) {
+      
+      if(!this.exists()) { // newly created
+        // add a creation field as well
         $tw.utils.extend(fields, $tw.wiki.getCreationFields());
       }
+            
+    }
+
+    // allow parsers to transform the raw field data
+    for(var field in this._fieldMeta) {
+      var stringify = this._fieldMeta[field].stringify;
+      fields[field] = (stringify
+                       ? stringify.call(this, this[field])
+                       : this[field]);
     }
     
-
-    var spaces = (isPrettifyJSON ? $tw.config.preferences.jsonSpaces : null);
-    this.data.style = JSON.stringify(this.data.style, null, spaces);
-
-    
-    $tw.wiki.addTiddler(new $tw.Tiddler(this.data, fields));
+    $tw.wiki.addTiddler(new $tw.Tiddler(fields));
     
   }
   
-};
-
-/**
- * Clone all data from the type provided (except the id).
- * 
- * @param {*} type - The type containing the data.
- *     The `type` parameter may be a string denoting the
- *     type's id, a path (tiddler title), a `$tw.Tiddler` object
- *     or an `ElementType` object.
- */
-ElementType.prototype.loadDataFromType = function(type) {
-
-  if(type instanceof ElementType) {
-    
-    this.setData(type.getData());
-    
-  } else {
-    
-    if(type instanceof $tw.Tiddler) {
-      // get only title; we need to check if the prefix is correct 
-      type = type.fields.title;
-    }
-  
-    if(typeof type === "string") {
-      
-      if(!utils.startsWith(type, this.root)) {
-        type = this.root + "/" + type;
-      }
-      
-      this.loadDataFromTiddler($tw.wiki.getTiddler(type), false);
-    }
-  }
-  
-};
-
-ElementType.prototype.isShipped = function() {
-  
-  return $tw.wiki.getSubTiddler(this.opt.path.pluginRoot, this.getPath());
-  
-};
-
-/**
- * Retrieve all data from the tiddler provided. If a shadow tiddler
- * with the same id exists, its data is merged during the load process.
- * 
- * @param {*} edgeType - The edge-type containing the data.
- *     The  `edgeType` parameter may be a string denoting the
- *     type's id, a path (tiddler title), a `$tw.Tiddler` object
- *     or an `ElementType` object.
- * @param {boolean} [isAllowOverideId=false] - If the provided tiddler has
- *     an id field set, setting `isAllowOverideId` to `true` will cause
- *     the currently held id to be overridden.
- */
-ElementType.prototype.loadDataFromTiddler = function(tiddler) {
-  
-  var tObj = utils.getTiddler(tiddler);
-  if(tObj) {
-    
-    var shadowTObj = $tw.wiki.getSubTiddler(this.opt.path.pluginRoot, this.getPath()) || {};
-    
-    var data = $tw.utils.extend({}, shadowTObj.fields, tObj.fields);
-          
-    this.setData(data);
-    
-  }
-    
 };
 
 // !! EXPORT !!
-exports.ElementType = ElementType;
+exports.MapElementType = MapElementType;
 // !! EXPORT !!#
   
 })();</pre>
@@ -365,7 +308,7 @@ exports.ElementType = ElementType;
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-	on 2015-09-22T15:04:24+02:00 using the <a
+	on 2015-10-01T12:31:06+02:00 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>

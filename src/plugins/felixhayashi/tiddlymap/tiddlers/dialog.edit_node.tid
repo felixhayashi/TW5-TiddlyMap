@@ -30,7 +30,7 @@ A node's individual style may be defined on two levels. Click on the tabs for fu
 <$macrocall
   $name="tabs"
   default=<<tab "default">>
-  state="$:/state/tabs/elementTypeManager"
+  state="$:/state/tabs/MapElementTypeManager"
   tabsList="[all[shadows]prefix<template>] -[<template>]"
 />
 

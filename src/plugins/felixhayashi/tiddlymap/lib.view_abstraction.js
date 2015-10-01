@@ -34,7 +34,7 @@ var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
  *     any existing view, false otherwise.
  * @constructor
  */
-var ViewAbstraction = function(view, isCreate) {
+var ViewAbstraction = function(view, isCreate, protoView) {
 
   // register shortcuts and aliases
   this.opt = $tw.tmap.opt;
@@ -46,34 +46,39 @@ var ViewAbstraction = function(view, isCreate) {
   }
 
   // start building paths
-  this._registerPaths(view);
+  this._registerPaths(view, isCreate);
         
   if(isCreate) {
-    this._createView();
+    this._createView(protoView);
   } else if(!this.exists()) { // no valid config path
     return; // skip initialization
   }
   
-  // If a view component was deliberately changed by the owner
-  // of the ViewAbstraction instance this hashmap is used to
-  // prevent rebuildCache() from rebuilding the parts of the
-  // cache again (which is already up to date).
+  // If a view is already up to date because the change
+  // was introduced through the view instance itself then
+  // a flag is set to avoid that the cache is rebuild in the next
+  // refresh cycle.
   this._ignoreOnNextRebuild = utils.getDataMap();
   
   // force complete rebuild
-  this.rebuildCache(utils.getValues(this.path));
+  this.rebuildCache();
   
 };
 
-ViewAbstraction.prototype._registerPaths = function(view) {
+ViewAbstraction.prototype._registerPaths = function(view, isCreate) {
   
   // attention: path is only allowed to have direct child properties
   // otherwise the rebuild mechanism would need a change.
   this.path = this.path || utils.getDataMap(); 
-  this.path.config = this._getConfigPath(view);
-  this.path.map =        this.path.config + "/map";
-  this.path.nodeFilter = this.path.config + "/filter/nodes";
-  this.path.edgeFilter = this.path.config + "/filter/edges";
+  this.path.config = this._getConfigPath(view, isCreate);
+  
+  if(this.path.config) {
+    // the view's store (=local store) for node properties
+    this.path.map =        this.path.config + "/map";
+    // filter stores
+    this.path.nodeFilter = this.path.config + "/filter/nodes";
+    this.path.edgeFilter = this.path.config + "/filter/edges";
+  }
   
 };
 
@@ -82,22 +87,29 @@ ViewAbstraction.prototype._registerPaths = function(view) {
  * 
  * @private
  * @param {*} view - The constructor param to abstract or create the view.
+ * @param {boolean} isCreate - If true and the supplied view did not
+ *     result in a proper path, we will create one.
  * @result {string|undefined} The path or undefined if translation failed.
  */
-ViewAbstraction.prototype._getConfigPath = function(view) {
+ViewAbstraction.prototype._getConfigPath = function(view, isCreate) {
 
   if(view instanceof $tw.Tiddler) { // is a tiddler object
     return view.fields.title;
   }
   
-  if(typeof view == "string") { // is string
+  if(typeof view === "string") {
       
     // remove prefix and slash
     view = utils.getWithoutPrefix(view, this.opt.path.views + "/");
 
-    if(!utils.hasSubString(view, "/")) { // contains no slash; valid label
+    if(view && !utils.hasSubString(view, "/")) {
+      // a valid label must not contain any slashes
       return this.opt.path.views + "/" + view; // add prefix (again)
     }
+  }
+  
+  if(isCreate) {
+    return $tw.wiki.generateNewTitle(this.opt.path.views + "/My view");
   }
   
 };
@@ -117,20 +129,32 @@ ViewAbstraction.prototype.getPaths = function() {
  * 
  * @private
  */
-ViewAbstraction.prototype._createView = function() {
+ViewAbstraction.prototype._createView = function(protoView) {
   
-  // destroy any former view
+  // destroy any former view that existed in this path
   if(this.exists()) { // I am alive!
     this.destroy(); // ...now die!
   }
   
+  protoView = new ViewAbstraction(protoView);
+  if(protoView.exists()) {
+    var results = utils.changePrefix(protoView.getRoot(),
+                                     this.path.config,
+                                     true, // allow override
+                                     false); // only copy
+  }
+    
   // create new view
   var fields = {};
   fields.title = this.path.config;
   fields[this.opt.field.viewMarker] = true;
-  fields.id = utils.genUUID(); // you never know when you will need it
+  // an id is actually not used for view in TM, I just reserve it…
+  fields.id = utils.genUUID();
   
-  $tw.wiki.addTiddler(new $tw.Tiddler(fields));
+  $tw.wiki.addTiddler(new $tw.Tiddler(
+    utils.getTiddler(this.path.config), // in case we cloned the view
+    fields
+  ));
   
 };
 
@@ -151,7 +175,9 @@ ViewAbstraction.prototype.isLocked = function() {
  * @return {Array<TiddlerReference> - A list of tiddlers that got updated.
  */
 ViewAbstraction.prototype.refresh = function(changedTiddlers) {
-  return this.rebuildCache(Object.keys(changedTiddlers));
+  
+  return this.rebuildCache(changedTiddlers);
+  
 }
 
 /**
@@ -169,48 +195,56 @@ ViewAbstraction.prototype.refresh = function(changedTiddlers) {
  *     tiddler references that refer to components managed by the view.
  * @param {boolean} isForceRebuild - Do not selectively rebuild the
  *     cache but rebuild everything no matter what.
- * @return {Array<TiddlerReference>} - A list of tiddlers that got updated.
+ * @return {Object<TiddlerReference, *>} - A list of tiddlers that got
+ *     updated.
  */
-ViewAbstraction.prototype.rebuildCache = function(components, isForceRebuild) {
+ViewAbstraction.prototype.rebuildCache = function(changedTiddlers) {
   
   if(!this.exists()) return [];
 
-  if(utils.inArray(this.path.config, components)) {
-    this.logger("debug", "Reloading config of view", this.getLabel(),  "; trigger full rebuild");
-    components = utils.getValues(this.path);
+  var isForceRebuild = (!changedTiddlers
+                        || changedTiddlers[this.path.config]);
+  if(isForceRebuild) {
+    this.logger("debug", "Full reload of view config");
   }
 
   // dereference the ignore list as it might get freshly updated
   // when some setters are called during this rebuild phase.
   var ignoredOnCurRebuild = this._ignoreOnNextRebuild;
   this._ignoreOnNextRebuild = utils.getDataMap();
-
+  
+  // this object will be used as return value; it indicates, what
+  // view components have changed.
   var modified = [];
   
-  for(var i = 0; i < components.length; i++) {
-    var tRef = components[i];
-
-    if(!isForceRebuild && ignoredOnCurRebuild[tRef]) {
-      continue; // skip changes when already up to date
-      
-    } else if(tRef === this.path.config) {
-      this.config = this.getConfig(null, true);
-      
-    } else if(tRef === this.path.map) {
-      this.nodeData = this.getNodeData(null, true);
-      
-    } else if(tRef === this.path.nodeFilter) {
-      this.nodeFilter = this.getNodeFilter(null, true);
-      
-    } else if(tRef === this.path.edgeFilter) {
-      this.edgeFilter = this.getEdgeFilter(null, true);
-              
+  for(var component in this.path) {
+    var componentPath = this.path[component];
+    
+    if(isForceRebuild || changedTiddlers[componentPath]) {
+      // either we are forced to rebuild or the component has changed
+      modified.push(component);
     } else {
-      continue; // prevents an entry in "modified" list
+      continue;
     }
     
-    modified.push(tRef);
-    
+    if(!isForceRebuild && ignoredOnCurRebuild[component]) {
+      // no need to refresh, as as we are already up to date
+      continue;
+    }
+      
+    if(component === "config") {
+      this.config = this.getConfig(null, true);
+      
+    } else if(component === "map") {
+      this.nodeData = this.getNodeData(null, true);
+      
+    } else if(component === "nodeFilter") {
+      this.nodeFilter = this.getNodeFilter(null, true);
+      
+    } else if(component === "edgeFilter") {
+      this.edgeFilter = this.getEdgeFilter(null, true);
+              
+    }
   }
   
   return modified;
@@ -288,6 +322,10 @@ ViewAbstraction.prototype.destroy = function() {
   
   this.path = utils.getDataMap();
   
+  // rebuild all components to make sure no data remains in this
+  // abstraction instance
+  this.rebuildCache();
+  
 };
 
 /**
@@ -303,7 +341,7 @@ ViewAbstraction.prototype.getReferences = function() {
 ViewAbstraction.prototype.rename = function(newLabel) {
 
   if(!this.exists() || typeof newLabel !== "string") return false;
-  
+    
   if(utils.inArray("/", newLabel)) {
     $tw.tmap.notify("A view name must not contain any \"/\"");
     return false;
@@ -314,19 +352,19 @@ ViewAbstraction.prototype.rename = function(newLabel) {
   
   // start the renaming
   var newRoot = this.opt.path.views + "/" + newLabel;
-  var results = utils.changePrefix(this.getRoot(), newRoot, true);
-  
-  if(!results) return false;
-  
+  var oldRoot = this.getRoot();
+  var results = utils.changePrefix(oldRoot, newRoot, true);
+    
   this._registerPaths(newLabel);
-  this.rebuildCache(utils.getValues(this.path), true);
+  this.rebuildCache();
   
   // iterate over all local node-types.
   var loNTy = $tw.tmap.indeces.loNTy;
   for(var i = loNTy.length; i--;) {
     var type = loNTy[i];
-    if(type.data.view === oldLabel) {
-      type.setData("view", newLabel).persist();
+    if(type.view === oldLabel) {
+      type.view = newLabel;
+      type.save();
     }
   }
   
@@ -369,7 +407,9 @@ ViewAbstraction.prototype.getConfig = function(name, isRebuild, defValue) {
   
   // TODO use regex to add "config."
   return (name
-          ? config[(utils.startsWith(name, "config.") ? name : "config." + name)]
+          ? config[(utils.startsWith(name, "config.")
+                   ? name
+                   : "config." + name)]
           : config);
   
 };
@@ -469,7 +509,7 @@ ViewAbstraction.prototype.setConfig = function() {
     $tw.wiki.getTiddler(this.path.config), this.config
   ));
 
-  this._ignoreOnNextRebuild[this.path.config] = true;
+  this._ignoreOnNextRebuild["config"] = true;
   
 };
 
@@ -487,15 +527,17 @@ ViewAbstraction.prototype.isLiveView = function() {
 };
 
 /**
- * 
+ * Attention: Never remove the node data (i.e. style and positions)
+ * from the node-data store. This will be done by a garbage collector
+ * – @TODO: implement garbage collector.
  */
 ViewAbstraction.prototype.removeNodeFromFilter = function(node) {
-  
+    
   if(!this.isExplicitNode(node)) return false;
     
   var curExpr = this.getNodeFilter("expression");
   var newFilter = curExpr.replace(this._getAddNodeFilterPart(node), "");
-                 
+                   
   this.setNodeFilter(newFilter);
   return true;
   
@@ -503,7 +545,10 @@ ViewAbstraction.prototype.removeNodeFromFilter = function(node) {
 
 ViewAbstraction.prototype._getAddNodeFilterPart = function(node) {
   
-  return "[field:tmap.id[" + node.id + "]]";
+  if(!node) { throw "Supplied param is not a node!"; }
+  
+  var id = (typeof node === "object" ? node.id : node);
+  return "[field:tmap.id[" + id + "]]";
   
 };
 
@@ -534,7 +579,8 @@ ViewAbstraction.prototype.setNodeFilter = function(expr, force) {
 
   // rebuild filter now and prevent another rebuild at refresh
   this.nodeFilter = this.getNodeFilter(null, true);
-  this._ignoreOnNextRebuild[this.path.nodeFilter] = true;
+  
+  this._ignoreOnNextRebuild["nodeFilter"] = true;
   
 };
 
@@ -551,11 +597,13 @@ ViewAbstraction.prototype.setEdgeFilter = function(expr) {
   
   utils.setField(this.path.edgeFilter, "filter", expr);
   
-  this.logger("debug","Edge filter set to", expr, this.path.edgeFilter);
+  this.logger("debug","Edge filter set to", expr);
 
   // rebuild filter now and prevent another rebuild at refresh
   this.edgeFilter = this.getEdgeFilter(null, true);
-  this._ignoreOnNextRebuild[this.path.edgeFilter] = true;
+  
+  // why should I ever want to ignore the view filter???
+  this._ignoreOnNextRebuild["edgeFilter"] = true;
   
 }; 
 
@@ -569,9 +617,15 @@ ViewAbstraction.prototype.appendToNodeFilter = function(filter) {
   var filter = this.getNodeFilter("expression") + " " + filter;
   this.setNodeFilter(filter);
   
+  return true;
+  
 };
 
 ViewAbstraction.prototype.addNodeToView = function(node) {
+   
+  if(this.isExplicitNode(node)) { // already in filter
+    return;
+  }
   
   this.appendToNodeFilter(this._getAddNodeFilterPart(node));
   this.saveNodePosition(node);
@@ -653,7 +707,7 @@ ViewAbstraction.prototype.getNodeData = function(id, isRebuild) {
   
   var data = (!isRebuild && this.nodeData
               ? this.nodeData
-              : utils.parseFieldData(this.getNodeDataStore(), "text", {}));
+              : utils.parseFieldData(this.path.map, "text", {}));
               
   return (id ? data[id] : data);
   
@@ -703,7 +757,7 @@ ViewAbstraction.prototype.saveNodeData = function() {
     
   } else if(args.length === 1 && typeof args[0] === "object") {
     
-    $tw.tmap.logger("log", "Storing data in", this.getNodeDataStore());
+    $tw.tmap.logger("log", "Storing data in", this.path.map);
     
     $tw.utils.extend(data, args[0]);
         
@@ -711,29 +765,12 @@ ViewAbstraction.prototype.saveNodeData = function() {
     return;
   }
   
-  utils.writeFieldData(this.getNodeDataStore(), "text", data);
+  utils.writeFieldData(this.path.map, "text", data);
   
   // cache new values and prevent rebuild at refresh
   this.nodeData = data;
-  this._ignoreOnNextRebuild[this.path.map] = true;
+  this._ignoreOnNextRebuild["map"] = true;
  
-};
-
-ViewAbstraction.prototype.getNodeDataStore = function() {
-  
-  //~ if(this.isLiveView()) {
-    //~ 
-    //~ var tRef = utils.getMatches(this.getNodeFilter("compiled"))[0];
-    //~ if(tRef) {
-      //~ // use a dedicated store for each focussed tiddler
-      //~ return (this.path.map + "/" + $tw.tmap.indeces.idByT[tRef]);
-    //~ }
-    //~ 
-  //~ }
-   
-  // use the global store
-  return this.path.map;
-    
 };
 
 ViewAbstraction.prototype.saveNodePosition = function(node) {

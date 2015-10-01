@@ -4,6 +4,13 @@ buttons: ok
 
 \rules except wikilink
 
+<$list filter="[[$:/plugins/felixhayashi/topstoryview]]">
+<div class="tmap-flash-message tmap-info">
+  {{$:/core/images/info-button}}
+  TiddlyMap configured your wiki for optimal use. Please save &amp; restart after closing this dialog.
+</div>
+</$list>
+
 It seems that you freshly installed TiddlyMap.
 
 * In case you need any help, please consult the [[online docs|http://tiddlymap.org#Documentation]] first.

@@ -44,9 +44,10 @@ var MapWidget = function(parseTreeNode, options) {
   // call initialise on prototype
   this.initialise(parseTreeNode, options);
   
-  // create shortcuts to services
+  // create shortcuts for services and frequently used vars
   this.adapter = $tw.tmap.adapter;
   this.opt = $tw.tmap.opt;
+  this.indeces = $tw.tmap.indeces;
   this.notify = $tw.tmap.notify;
   this.fsapi = utils.getFullScreenApis();
   this.getAttr = this.getAttribute;
@@ -84,6 +85,23 @@ var MapWidget = function(parseTreeNode, options) {
     "tmap:tm-focus-node": this.handleFocusNode,
     "tmap:tm-reset-focus": this.repaintGraph
   }, this, this);
+  
+  // Visjs handlers
+  
+  // register events
+  this.visHandlers = {
+    "click": this.handleVisSingleClickEvent,
+    "doubleClick": this.handleVisDoubleClickEvent,
+    "stabilized": this.handleVisStabilizedEvent,
+    'dragStart': this.handleVisDragStart,
+    "dragEnd": this.handleVisDragEnd,
+    "select": this.handleVisRightClick,
+    "oncontext": this.handleVisSelect,
+    "beforeDrawing": this.handleVisBeforeDrawing,
+    "showPopup": this.handleVisShowPopup,
+    "stabilizationProgress": this.handleVisLoading,
+    "stabilizationIterationsDone": this.handleVisLoadingDone
+  };
     
 };
 
@@ -127,19 +145,19 @@ MapWidget.prototype.handleConnectionEvent = function(edge, callback) {
       type = new EdgeType((ns && !hasNamespace ? ns : "") + type);
       
       // persist the type if it doesn't exist
-      if(!type.exists()) type.persist();
+      if(!type.exists()) type.save();
       
       // add type to edge
-      edge.type = type.getId();
+      edge.type = type.id;
       var isSuccess = this.adapter.insertEdge(edge);
       
       var edgeTypeFilter = this.view.getEdgeFilter("compiled");
       var typeWL = this.adapter.getEdgeTypeWhiteList(edgeTypeFilter);
       
-      if(!typeWL[type.getId()]) {
+      if(!typeWL[type.id]) {
         
         var dialog = {
-          type: type.getId(),
+          type: type.id,
           view: this.view.getLabel()
         }
 
@@ -166,10 +184,32 @@ MapWidget.prototype.handleConnectionEvent = function(edge, callback) {
 MapWidget.prototype.checkForFreshInstall = function() {
 
   var sysMeta = this.opt.ref.sysMeta;
-  if(utils.getEntry(sysMeta, "showWelcomeMessage", true)) {
-    utils.setEntry(sysMeta, "showWelcomeMessage", false);
-    this.dialogManager.open("welcome");
-  }
+  if(!utils.getEntry(sysMeta, "showWelcomeMessage", true)) return;
+  
+  // set flag
+  utils.setEntry(sysMeta, "showWelcomeMessage", false);
+  
+  var args = {};
+  var name = "welcome";
+  this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
+
+    if(utils.tiddlerExists("$:/plugins/felixhayashi/topstoryview")) {
+      utils.setText("$:/view", "top");
+      utils.setText("$:/config/Navigation/openLinkFromInsideRiver", "above");
+      utils.setText("$:/config/Navigation/openLinkFromOutsideRiver", "top");
+      
+      // trigger a save and reload message
+      utils.touch("$:/plugins/felixhayashi/topstoryview");
+    }
+    
+    var welcomeNode = { label: "Have fun with TiddlyMap!", x: 0, y: 0 };
+    
+    welcomeNode = this.adapter.insertNode(welcomeNode, {
+      view: this.opt.misc.defaultViewLabel,
+      editNodeOnCreate: false
+    });
+    
+  });
   
 };
 
@@ -219,12 +259,14 @@ MapWidget.prototype.logger = function(type, message /*, more stuff*/) {
 MapWidget.prototype.render = function(parent, nextSibling) {
   
   // remember our place in the dom
-  this.parentDomNode = parent;
-  
+  var domNode = document.createElement("div");
+  parent.insertBefore(domNode, nextSibling);
+  this.parentDomNode = domNode;
+
   if(utils.isPreviewed(this)) {
-    this.renderPreview(parent);
+    this.renderPreview(this.parentDomNode);
   } else {
-    this.renderFullWidget(parent);
+    this.renderFullWidget(this.parentDomNode);
   }
       
 };
@@ -359,16 +401,11 @@ MapWidget.prototype.rebuildEditorBar = function() {
       viewLabel: this.view.getLabel(),
       isViewBound: String(this.isViewBound()),
       ref: {
-        view: this.view.getRoot(),
+        view: this.view.getLabel(),
         viewHolder: this.getViewHolderRef(),
         edgeFilter: this.view.getPaths().edgeFilter
       },
-      allEdgesFilter: this.opt.selector.allEdgeTypes,
-      searchOutput: "$:/temp/tmap/bar/search",
-      nodeFilter: "[list[$:/temp/tmap/nodes/"
-                  + this.view.getLabel()
-                  + "]"
-                  + "search:title{$:/temp/tmap/bar/search}]"
+      allEdgesFilter: this.opt.selector.allEdgeTypes
     }
   });
   
@@ -411,6 +448,13 @@ MapWidget.prototype.rebuildEditorBar = function() {
       tiddler: { type: "string", value: this.opt.ref.focusButton }
     }
   });
+  
+  //~ body.children.push({
+    //~ type: "element",
+    //~ tag: "div",
+    //~ attributes: { class: { type: "string", value: "tmap-flash-message" }},
+    //~ children: [ {type: "text", text: "hlao" } ]
+  //~ });
 
       
   this.makeChildWidgets([body]);
@@ -457,7 +501,11 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
   var isViewSwitched = this.checkForViewSwitch(changedTiddlers);
   var viewModifications = this.view.refresh(changedTiddlers);
   
-  if(isViewSwitched || viewModifications.length) {
+  // view switched or modified;
+  // if positions or style where modified, we do not update
+  // since this change come most certainly 
+  if(isViewSwitched || (viewModifications.length
+                        && !this.ignoreNextViewModification)) {
 
     // default actions
     var options = {
@@ -472,6 +520,7 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
       
       // views may hold different triggers, so we need to reload them
       this.reloadRefreshTriggers();
+      this.visNetworkDomNode.focus();
       
     } else {
       this.logger("warn", "View modified", viewModifications);
@@ -493,6 +542,9 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
   
   // in any case give child widgets a chance to refresh
   this.checkOnEditorBar(changedTiddlers, isViewSwitched, viewModifications);
+  
+  // reset this again
+  this.ignoreNextViewModification = false;
 
 };
 
@@ -566,11 +618,7 @@ MapWidget.prototype.rebuildGraph = function(options) {
   
   // always reset to allow handling of stabilized-event!
   this.hasNetworkStabilized = false;
-  
-  // make sure no node is selected
-  this.network.selectNodes([]);
-  this.network.releaseNode();
-  
+    
   if(options.resetData) {
     this.graphData.edges.clear();
     this.graphData.nodes.clear();
@@ -676,6 +724,7 @@ MapWidget.prototype.rebuildGraphData = function(isRebuild) {
   
   // TODO: that's a performance killer. this should be loaded when
   // the search is actually used!
+  // update: Careful when refactoring, some modules are using this…
   utils.setField("$:/temp/tmap/nodes/" + this.view.getLabel(),
                  "list",
                  this.adapter.getTiddlersById(nodes));
@@ -703,10 +752,7 @@ MapWidget.prototype.checkForViewSwitch = function(changedTiddlers) {
   
   // check if view has changed
   if(changedTiddlers[this.getViewHolderRef()]) {
-    if(!this.view.isEqual(utils.getText(this.getViewHolderRef()))) {
-      this.prevView = null;
-      return true;
-    }
+    return true;
   }
 
   // check for triggers
@@ -891,8 +937,8 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
     "stabilizationIterationsDone": this.handleVisLoadingDone
   };
   
-  for(var event in handlers) {
-    this.network.on(event, handlers[event].bind(this));
+  for(var event in this.visHandlers) {
+    this.network.on(event, this.visHandlers[event].bind(this));
   }
   
   this.addGraphButtons({
@@ -915,14 +961,89 @@ MapWidget.prototype.addKeyBindings = function(parentDomNode) {
   this.visNetworkDomNode.tabIndex = 0;
   
   var keys = vis.keycharm({
-    container: this.parentDomNode
+    container: this.parentDomNode,
+    preventDefault: true
   });
   
-  keys.bind("delete", function() {
-    this.handleRemoveElement(this.network.getSelection());
+  keys.bind("delete", function(event) {
+    this.handleRemoveElements(this.network.getSelection());
+  }.bind(this));
+  
+  keys.bind("c", function(event) {
+    if(!event.ctrlKey) return;
+    this.handleAddNodesToClipboard("copy");
+  }.bind(this));
+  
+  keys.bind("x", function(event) {
+    if(!event.ctrlKey) return;
+    
+    if(!this.editorMode) {
+      this.notify("This view is read only!");
+      return;
+    }
+    
+    this.handleAddNodesToClipboard("move");
+    
+  }.bind(this));
+  
+  keys.bind("v", function(event) {
+    if(!event.ctrlKey) return;
+
+    if(!this.editorMode) {
+      this.notify("This view is read only!");
+      return;
+    }
+    
+    if($tw.tmap.clipBoard) {
+      
+      if($tw.tmap.clipBoard.type === "nodes") {
+        var nodes = $tw.tmap.clipBoard.nodes;
+        var ids = Object.keys(nodes);
+        if(ids.length) {
+          for(var id in nodes) {
+            
+            // node already present in this view
+            if(this.graphData.nodesById[id]) continue;
+            
+            this.view.addNodeToView(nodes[id]);
+            // paste nodes already so we can select them!
+            this.graphData.nodes.update({
+              id: id
+            });
+          }
+          this.network.selectNodes(ids);
+          this.notify("pasted " + ids.length + " nodes into map.");
+        }
+        return;
+      }
+    }
+    
+    this.notify("TiddlyMap clipboad is empty!");
+    
   }.bind(this));
   
 };  
+
+MapWidget.prototype.handleAddNodesToClipboard = function(mode) {
+  
+  var nodeIds = this.network.getSelectedNodes();
+  if(!nodeIds.length) return;
+  
+  $tw.tmap.clipBoard = {
+    type: "nodes",
+    nodes: this.graphData.nodes.get(nodeIds,
+                                    { returnType: "Object" })
+  };
+  
+  this.notify("Copied " + nodeIds.length + " nodes to clipboard");
+  
+  if(mode === "move") {
+    for(var i = nodeIds.length; i--;) {
+      this.view.removeNodeFromFilter(nodeIds[i]);
+    }
+  }
+    
+};
 
 MapWidget.prototype.isMobileMode = function() {
   
@@ -947,12 +1068,12 @@ MapWidget.prototype.getGraphOptions = function() {
   options.manipulation.enabled = !!this.editorMode;
   
   options.manipulation.deleteNode = function(data, callback) {
-    this.handleRemoveElement(data);
+    this.handleRemoveElements(data);
     this.resetVisManipulationBar(callback);
   }.bind(this);
   
   options.manipulation.deleteEdge = function(data, callback) {
-    this.handleRemoveElement(data);
+    this.handleRemoveElements(data);
     this.resetVisManipulationBar(callback);
   }.bind(this);
   
@@ -1004,21 +1125,49 @@ MapWidget.prototype.resetVisManipulationBar = function(visCallback) {
  */
 MapWidget.prototype.handleCreateView = function() {
   
-  this.dialogManager.open("createView", null, function(isConfirmed, outTObj) {
+  var args = {
+    view: this.view.getLabel()
+  };
   
-    if(isConfirmed) {
+  this.dialogManager.open("createView", args, function(isConfirmed, outTObj) {
+  
+    if(!isConfirmed) return;
       
-      var label = utils.getText(outTObj);
-      var view = new ViewAbstraction(label);
-      
-      if(view.isLocked()) {
-        this.notify("Forbidden!");
-      } else {
-        var view = this.adapter.createView(label);
-        this.setView(view);
-      }
-
+    var label = utils.getText(outTObj);
+    var view = new ViewAbstraction(label);
+    
+    if(view.exists() && view.isLocked()) {
+      this.notify("Forbidden!");
+      return;
     }
+    
+    if(outTObj && outTObj.fields.clone) {
+      
+      view = new ViewAbstraction(label, true, this.view);
+      
+      //~ // In the future, use Jermolene/TiddlyWiki5/issues/1957
+      //~ // instead of tags.
+      //~ var transferredTRefs = outTObj.fields.tags;
+      //~ var isMove = (outTObj.fields["transfer-mode"] === "move");
+      //~ var tById = this.indeces.tById;
+      //~ var nodesInCurView = this.graphData.nodesById;
+      //~ for(var id in nodesInCurView) {
+        //~ if(utils.inArray(tById[id], transferredTRefs)) {
+          //~ if(isMove) {
+            //~ this.view.removeNodeFromFilter(id);
+          //~ }
+        //~ } else {
+          //~ view.removeNodeFromFilter(id);
+        //~ }
+      //~ }
+      
+    } else {
+      
+      view = new ViewAbstraction(label, true);
+      
+    }
+    
+    this.setView(view);
     
   });
   
@@ -1060,27 +1209,31 @@ MapWidget.prototype.handleRenameView = function() {
 };
 
 MapWidget.prototype.handleEditView = function() {
-      
+  
+  var visInherited = JSON.stringify(this.opt.config.vis);
+  
   var params = {
     view: this.view.getLabel(),
     createdOn: this.view.getCreationDate(true),
     numberOfNodes: "" + Object.keys(this.graphData.nodesById).length,
     numberOfEdges: "" + Object.keys(this.graphData.edgesById).length,
     dialog: {
-      preselects: this.view.getConfig()
+      preselects: $tw.utils.extend({},
+                                   this.view.getConfig(),
+                                   { "vis-inherited": visInherited })
     }
   };
-  
-  params.dialog.preselects["vis-inherited"] = JSON.stringify(this.opt.config.vis);
   
   this.dialogManager.open("configureView", params, function(isConfirmed, outTObj) {
     
     if(!isConfirmed) return;
       
-    var config = utils.getPropertiesByPrefix(outTObj.fields, "config.");
+    var config = utils.getPropertiesByPrefix(outTObj.fields, "config.", true);
+    
     this.view.setConfig(config);
-    if(config["config.physics_mode"]) {
-      // otherwise nodes would cludge together…
+    if(config["physics_mode"] && !this.view.isEnabled("physics_mode")) {
+      // when not in physics mode, store positions
+      // to prevent floating afterwards
       this.handleStorePositions();
     }
           
@@ -1140,6 +1293,7 @@ MapWidget.prototype.handleDeleteView = function() {
     if(isConfirmed) {
       this.view.destroy();
       this.setView(this.opt.misc.defaultViewLabel); 
+      this.logger("debug", "view \"" + viewname + "\" deleted ");
       this.notify("view \"" + viewname + "\" deleted ");
     }
 
@@ -1225,31 +1379,34 @@ MapWidget.prototype.handleReconnectEdge = function(updates) {
 };
 
 /**
- * Called by vis when the user tries to delete a node or an edge.
+ * Called by vis when the user tries to delete nodes or edges.
  * The action is delegated to subhandlers.
  * 
- * @param {Object} elements - An object containing the elements to be removed.
+ * @param {Object} elements - An object containing the elements to be
+ *     removed.
  * @param {Array<Id>} elements.nodes - Removed edges.
  * @param {Array<Id>} elements.edges - Removed nodes.
  */
-MapWidget.prototype.handleRemoveElement = function(elements) {
+MapWidget.prototype.handleRemoveElements = function(elements) {
   
   if(elements.edges.length && !elements.nodes.length) {
+    // = only edges are removed
     this.handleRemoveEdges(elements.edges);
   }
                       
   if(elements.nodes.length) {
-    this.handleRemoveNode(this.graphData.nodesById[elements.nodes[0]]);
+    // = nodes and maybe some edges are removed
+    this.handleRemoveNodes(elements.nodes);
   }
   
   this.resetVisManipulationBar();
   
 };
 
-MapWidget.prototype.handleRemoveEdges = function(edges) {
+MapWidget.prototype.handleRemoveEdges = function(edgeIds) {
   
-  this.adapter.deleteEdges(this.graphData.edges.get(edges));
-  this.notify("edge" + (edges.length > 1 ? "s" : "") + " removed");
+  this.adapter.deleteEdges(this.graphData.edges.get(edgeIds));
+  this.notify("edge" + (edgeIds.length > 1 ? "s" : "") + " removed");
   
   this.preventFitAfterRebuild = true;
   
@@ -1265,45 +1422,49 @@ MapWidget.prototype.handleRemoveEdges = function(edges) {
  * which means it will prevent a graph fitting (viewport adjusting)
  * in the course of the next rebuild.
  */
-MapWidget.prototype.handleRemoveNode = function(node) {
+MapWidget.prototype.handleRemoveNodes = function(nodeIds) {
 
+  var tiddlers = this.adapter.getTiddlersById(nodeIds);
   var params = {
-    "var.nodeLabel": node.label,
-    "var.nodeRef": $tw.tmap.indeces.tById[node.id],
+    "count": "" + nodeIds.length,
+    "tiddlers": $tw.utils.stringifyList(tiddlers),
     dialog: {
       preselects: {
-        "opt.delete": "from" + " " + (this.view.isExplicitNode(node) // plain ugly
-                                      ? "filter"
-                                      : "system")
+        "delete-from": "filter"
       }
     }
   };
 
-  this.dialogManager.open("deleteNodeDialog", params, function(isConfirmed, outTObj) {
+  var name = "deleteNodeDialog";
+  this.dialogManager.open(name, params, function(isConfirmed, outTObj) {
     
-    if(isConfirmed) {
+    if(!isConfirmed) return;
       
-      if(outTObj.fields["opt.delete"] === "from system") {
+    if(outTObj.fields["delete-from"] === "system") {
 
-        // will also delete edges
-        this.adapter.deleteNode(node);
+      // will also delete edges
+      this.adapter.deleteNodes(nodeIds);
+      var deletionCount = nodeIds.length; // we just say so ;)
 
-      } else {
+    } else {
+    
+      var deletionCount = 0;
+      for(var i = nodeIds.length; i--;) {
+        
+        var success = this.view.removeNodeFromFilter(nodeIds[i]);
+        if(success) deletionCount++;
       
-        var success = this.view.removeNodeFromFilter(node);
-        
-        if(!success) {
-          this.notify("Couldn't remove node from filter");
-          return;
-        }
-        
       }
       
-      this.preventFitAfterRebuild = true;
-      
-      this.notify("Node removed " + outTObj.fields["opt.delete"]);
-      
     }
+    
+    this.preventFitAfterRebuild = true;
+    
+    this.notify("Removed " +  deletionCount
+                + " of " + nodeIds.length
+                + " from " + outTObj.fields["delete-from"]);
+      
+
     
   });
     
@@ -1398,12 +1559,7 @@ MapWidget.prototype.handleGenerateWidget = function(event) {
 MapWidget.prototype.handleStorePositions = function(withNotify) {
   
   this.view.saveNodeData(this.network.getPositions());
-  
-  if(!this.view.isEnabled("physics_mode")) {
-    // when not in physics mode, rebuild graph to prevent floating afterwards
-    this.rebuildGraph();
-  }
-  
+    
   if(withNotify) {
     this.notify("positions stored");
   }
@@ -1412,24 +1568,24 @@ MapWidget.prototype.handleStorePositions = function(withNotify) {
 
 MapWidget.prototype.handleEditFilters = function() {
 
-  var pnf = utils.getPrettyFilter(this.view.getNodeFilter("expression"));
-  var pef = utils.getPrettyFilter(this.view.getEdgeFilter("expression"));
+  var nf = utils.getPrettyFilter(this.view.getNodeFilter("expression"));
+  var ef = utils.getPrettyFilter(this.view.getEdgeFilter("expression"));
 
   var param = {
     view: this.view.getLabel(),
     dialog: {
       preselects: {
-        prettyNodeFilter: pnf,
-        prettyEdgeFilter: pef 
+        prettyNodeFilter: nf,
+        prettyEdgeFilter: ef 
       }
     }
   };
   
   this.dialogManager.open("editFilters", param, function(isConfirmed, outTObj) {
-    if(isConfirmed) {
-      this.view.setNodeFilter(utils.getField(outTObj, "prettyNodeFilter", pnf));
-      this.view.setEdgeFilter(utils.getField(outTObj, "prettyEdgeFilter", pef));
-    }
+    if(!isConfirmed) return;
+    
+    this.view.setNodeFilter(utils.getField(outTObj, "prettyNodeFilter", ""));
+    this.view.setEdgeFilter(utils.getField(outTObj, "prettyEdgeFilter", ""));
   });
     
 };
@@ -1522,37 +1678,37 @@ MapWidget.prototype.fitGraph = function(delay, duration) {
  * view, unless the operation was cancelled.
  */
 MapWidget.prototype.handleInsertNode = function(node) {
+  
+  var name = "getNodeTitle";
+  this.dialogManager.open(name, null, function(isConfirmed, outTObj) {
+    if(!isConfirmed) return;
       
-  this.dialogManager.open("getNodeTitle", null, function(isConfirmed, outTObj) {
-    if(isConfirmed) {
+    var title = utils.getText(outTObj);
+    
+    if(utils.tiddlerExists(title)) {
       
-      var title = utils.getText(outTObj);
-      
-      if(utils.tiddlerExists(title)) {
+      if(utils.isMatch(title, this.view.getNodeFilter("compiled"))) {
         
-        if(utils.isMatch(title, this.view.getNodeFilter("compiled"))) {
-          
-          this.notify("Node already exists");
-          return;
-          
-        } else {
-          node = this.adapter.makeNode(title, node);
-          this.view.addNodeToView(node);
-        }
+        this.notify("Node already exists");
+        return;
         
       } else {
-      
-        node.label = title;
-        this.adapter.insertNode(node, {
-          view: this.view,
-          editNodeOnCreate: false
-        });
-      
+        node = this.adapter.makeNode(title, node);
+        this.view.addNodeToView(node);
       }
       
-      this.preventFitAfterRebuild = true;
-      
+    } else {
+    
+      node.label = title;
+      this.adapter.insertNode(node, {
+        view: this.view,
+        editNodeOnCreate: false
+      });
+    
     }
+    
+    this.preventFitAfterRebuild = true;
+      
   });
   
 };
@@ -1672,7 +1828,7 @@ MapWidget.prototype.handleVisClickEvent = function(properties) {
     if(behaviour === "manager") {        
       $tw.rootWidget.dispatchEvent({
         type: "tmap:tm-manage-edge-types",
-        paramObject: { type: type.getId() }
+        paramObject: { type: type.id }
       });        
     }
   }
@@ -1715,7 +1871,8 @@ MapWidget.prototype.handleClickEvent = function(event) {
   
   if(this.isZombieWidget() || !this.network) return;
   
-  var element = document.elementFromPoint(event.clientX, event.clientY);
+  var pos = { x: event.clientX, y: event.clientY };
+  var element = document.elementFromPoint(pos.x, pos.y);
   if(!this.parentDomNode.contains(element)) { // clicked outside
     var selected = this.network.getSelection();
     if(selected.nodes.length || selected.edges.length) {
@@ -1725,6 +1882,7 @@ MapWidget.prototype.handleClickEvent = function(event) {
       this.resetVisManipulationBar();
     }
   } else if(this.graphDomNode.contains(element)) {
+    this.lastCanvasClickPos = this.network.DOMtoCanvas(pos);
     this.visNetworkDomNode.focus();
   }
 
@@ -1761,28 +1919,17 @@ MapWidget.prototype.handleVisShowPopup = function(id) {
 MapWidget.prototype.handleVisDragEnd = function(properties) {
   
   if(properties.nodes.length) {
-    
-    var node = this.graphData.nodesById[properties.nodes[0]]; // v4: formerly nodeIds
-    
+        
     // only store positions if in floating mode
     if(!this.view.isEnabled("physics_mode")) { 
       
       // fix node again
-      this.setNodesMoveable([ node ], false);
-      
-      var raster = parseInt(this.opt.config.sys.raster);
-      if(raster) { // apply raster
-        var pos = this.network.getPositions()[node.id];
-        // only update x,y to prevent a lost update (allowedToMove stuff)
-        this.graphData.nodes.update({
-          id: node.id,
-          x: pos.x - (pos.x % raster),
-          y: pos.y - (pos.y % raster)
-        });
-      }
-      
+      this.setNodesMoveable(this.graphData.nodes.get(properties.nodes), false);
+            
       // finally store positions
       this.handleStorePositions();
+      
+      this.ignoreNextViewModification = true;
       
     }
   }
@@ -1818,9 +1965,13 @@ MapWidget.prototype.handleVisLoadingDone = function(params) {
  */
 MapWidget.prototype.handleVisDragStart = function(properties) {
 
+  //~ if(properties.nodes.length) {
+    //~ var node = this.graphData.nodesById[properties.nodes[0]];
+    //~ this.setNodesMoveable([ node ], true);
+  //~ }
+
   if(properties.nodes.length) {
-    var node = this.graphData.nodesById[properties.nodes[0]];
-    this.setNodesMoveable([ node ], true);
+    this.setNodesMoveable(this.graphData.nodes.get(properties.nodes), true);
   }
 };
  
@@ -1859,7 +2010,7 @@ MapWidget.prototype.openTiddlerWithId = function(id) {
       draftTRef = this.wiki.findDraft(tRef);
       
     }
-        
+    
     var args = {
       draftTRef: draftTRef
     };
@@ -1874,8 +2025,7 @@ MapWidget.prototype.openTiddlerWithId = function(id) {
         
       } else if(!wasInDraftAlready) {
         
-        var type = "tm-cancel-tiddler";
-        this.dispatchEvent({ type: type, tiddlerTitle: draftTRef }); 
+        $tw.wiki.deleteTiddler(draftTRef);
         
       }
       
@@ -2000,15 +2150,7 @@ MapWidget.prototype.getView = function(isRebuild) {
                      
   // transform into view object
   var view = new ViewAbstraction(utils.getText(viewHolderRef));
-  
-  // if no view has ever been loaded and we are in a map editor
-  // and there is a default view then use this one; otherwise
-  // use the view that was stored in the holder before.
-  //~ var defaultView = this.opt.config.sys.defaultView;
-  //~ var view = new ViewAbstraction(!this.view && defaultView && this.editorMode
-                                 //~ ? defaultView
-                                 //~ : utils.getText(viewHolderRef));
-  
+    
   this.logger("info", "Retrieved view \"" + view.getLabel() + "\" from holder \"" + viewHolderRef + "\"");
   
   if(view.exists()) {
@@ -2131,6 +2273,10 @@ MapWidget.prototype.dialogPostProcessor = function() {
  *     movement (either by physics or by dragging).
  * @param {boolean} isEnabled - True, if the nodes are allowed to
  *     move or be moved.
+ * 
+ * @TODO: Optimize this function. It does not need objects as nodes
+ * input as it only operates on ids. so instead of passing objects
+ * and using Object.keys() pass an array of ids
  */    
 MapWidget.prototype.setNodesMoveable = function(nodes, isMoveable) {
 

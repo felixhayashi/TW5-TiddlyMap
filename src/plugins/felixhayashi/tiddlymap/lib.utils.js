@@ -72,13 +72,13 @@ utils.deleteTiddlers = function(tiddlers) {
   
 };
 
-// TODO: function "delete tiddlers below path
-
 utils.moveFieldValues = function(oldName,
                                  newName,
                                  isRemoveOldField,
                                  isIncludeSystemTiddlers,
                                  tiddlers) {
+                                   
+  if(oldName === newName) return;
         
   var allTiddlers = tiddlers || $tw.wiki.allTitles();
   for(var i = allTiddlers.length; i--;) {
@@ -133,7 +133,7 @@ utils.ucFirst = function(string) {
  * 
  * @param {Collection} col - The collection to convert.
  * @param {CollectionTypeString} [outputType="dataset"] - The output type.
- * @return {Collection} A collection of type `outputType`.
+ * @return {Collection} A **new** collection of type `outputType`.
  */
 utils.convert = function(col, outputType) {
   
@@ -146,7 +146,7 @@ utils.convert = function(col, outputType) {
     case "hashmap": // fall through alias
     case "object":
       if(col instanceof vis.DataSet) { // a dataset
-        return vis.get({ returnType: "Object" }); // careful has proto
+        return col.get({ returnType: "Object" }); // careful has proto
       } else { // object (array is an object itself)
         return col; // bounce back
       }
@@ -388,7 +388,6 @@ utils.isTrue = function(confVal, defVal) {
   } else if(typeof confVal === "string") {
     var n = parseInt(confVal);
     return (isNaN(n) ? (confVal === "true") : (n !== 0));
-    if(confVal === "1" || this.data[conf] === "true");
   } else if(typeof confVal === "boolean") {
     return confVal;
   } else if(typeof confVal === "number") {
@@ -738,7 +737,7 @@ utils.getPrettyFilter = function(expr) {
 };
 
 /**
- * Set a tiddler field to a given value 
+ * Set a tiddler field to a given value.
  */
 utils.setField = function(tiddler, field, value) {
 
@@ -747,7 +746,7 @@ utils.setField = function(tiddler, field, value) {
       title: utils.getTiddlerRef(tiddler)
     };
     fields[field] = value;
-    // do not use any tObj provided since it may result in a lost update!
+    // do not use any tObj provided, it may result in a lost update!
     var tObj = utils.getTiddler(tiddler, true);
     $tw.wiki.addTiddler(new $tw.Tiddler(tObj, fields));
   }
@@ -775,6 +774,21 @@ utils.getEntry = function(tiddler, prop, defValue) {
 
 
 /**
+ * Compare versions.
+ * @return {boolean} Unlike `$tw.utils.checkVersions`, this function
+ * only returns true if the left argument is greater than the right
+ * argument.
+ */
+utils.isLeftVersionGreater = function(v1, v2) {
+
+  return v1 !== v2 && $tw.utils.checkVersions(v1, v2);
+  
+};
+
+
+
+
+/**
  * Get a tiddler's field value. If the field does not exist or
  * its value is an empty string, return the default or an empty
  * string.
@@ -795,6 +809,12 @@ utils.getField = function(tiddler, field, defValue) {
 utils.getText = function(tiddler, defValue) {
   
   return utils.getField(tiddler, "text", defValue);
+  
+};
+
+utils.setText = function(tiddler, value) {
+
+  utils.setField(tiddler, "text", value);
   
 };
 
@@ -935,9 +955,11 @@ utils.isSystemOrDraft = function(tiddler) {
  * existing title, and `force` is not set, then will happen and
  * undefined is returned by the function.
  */
-utils.changePrefix = function(oldPrefix, newPrefix, force) {
+utils.changePrefix = function(oldPrefix, newPrefix, force, isDeleteOld) {
 
   if(oldPrefix === newPrefix || !oldPrefix || !newPrefix) return;
+  
+  isDeleteOld = (isDeleteOld !== false);
   
   // prepare
   var targets = utils.getTiddlersByPrefix(oldPrefix);
@@ -953,7 +975,7 @@ utils.changePrefix = function(oldPrefix, newPrefix, force) {
   
   for(var oldTRef in fromToMapper) { 
     utils.setField(oldTRef, "title", fromToMapper[oldTRef]);
-    $tw.wiki.deleteTiddler(oldTRef);
+    if(isDeleteOld) $tw.wiki.deleteTiddler(oldTRef);
   }
   
   return fromToMapper;
@@ -1052,9 +1074,21 @@ utils.keyOfItemWithProperty = function(col, key, val) {
  * 
  * @param {string} prefix - The prefix
  */
-utils.deleteByPrefix = function(prefix) {
+utils.deleteByPrefix = function(prefix, tiddlers) {
   
-  utils.deleteTiddlers(utils.getByPrefix(prefix));
+  if(!prefix) return;
+  
+  tiddlers = tiddlers || $tw.wiki.allTitles();
+  
+  var deletedTiddlers = [];
+  for(var i = tiddlers.length; i--;) {
+    if(utils.startsWith(tiddlers[i], prefix)) {
+      $tw.wiki.deleteTiddler(tiddlers[i]);
+      deletedTiddlers.push(deletedTiddlers[i]);
+    }
+  }
+  
+  return deletedTiddlers;
   
 };
 
@@ -1083,10 +1117,11 @@ utils.getIterableCollection = function(col) {
 };
 
 /**
- * In a collection where all elements have a **distinct** property `x`,
- * use the value of each properties `x` as key to identify the object.
- * If no property `x` is specified via `lookupKey`, the collection's
- * values are used as keys.
+ * In a collection where all elements have a **distinct** property
+ * `lookupKey`, use the value of each element's `lookupKey` as key
+ * to identify the object. If no property `lookupKey` is specified,
+ * the collection's values are used as keys and `true` is used as value,
+ * however, if the used keys are not strings, an error is thrown.
  * 
  * @param {Collection} col - The collection for which to create a lookup table.
  * @param {string} [lookupKey] - The property name to use as index in
@@ -1106,12 +1141,12 @@ utils.getLookupTable = function(col, lookupKey) {
     var key = keys[i];
     
     // value to be used as the lookup table's index
-    var ltIndex = (lookupKey ? col[key][lookupKey] : col[key]);
+    var idx = (lookupKey ? col[key][lookupKey] : col[key]);
     
-    if((typeof ltIndex === "string" && ltIndex != "")
-       || typeof ltIndex === "number") {
-      if(!lookupTable[ltIndex]) { // doesn't exist yet!
-        lookupTable[ltIndex] = col[key];
+    var type = typeof idx;
+    if((type === "string" && idx !== "") || type === "number") {
+      if(!lookupTable[idx]) { // doesn't exist yet!
+        lookupTable[idx] = (lookupKey ? col[key] : true);
         continue;
       }
     }
@@ -1123,6 +1158,15 @@ utils.getLookupTable = function(col, lookupKey) {
   
   return lookupTable;
     
+};
+  
+/**
+ * Remove any newline from a string
+ */
+utils.getWithoutNewLines = function(str) {
+  if(typeof str === "string") {
+    return str.replace(/[\n\r]/g, " ");
+  }
 };
   
 /**
@@ -1250,6 +1294,10 @@ utils.generateDraftTitle = function(title) {
     c++;
   } while($tw.wiki.tiddlerExists(draftTitle));
   return draftTitle;
+};
+
+utils.touch = function(tRef) {
+  utils.setField(tRef, "modified", new Date());
 };
 
 /**

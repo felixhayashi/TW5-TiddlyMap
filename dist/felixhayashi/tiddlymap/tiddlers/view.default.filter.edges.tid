@@ -1,2 +1,2 @@
 title: $:/plugins/felixhayashi/tiddlymap/graph/views/Default/filter/edges
-filter: [prefix[$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes]]
+filter: [field:tmap.id[d5af1292-22a0-40b5-bfa4-5f0c947ad85f]]

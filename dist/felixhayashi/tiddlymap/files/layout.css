@@ -12,8 +12,11 @@
 .tmap-flash-message {
   border: 1px solid lightgray;
   padding: 5px;
-  margin: 6px 0; }
+  margin: 6px 0;
+  display: block;
+  color: #333333; }
   .tmap-flash-message svg {
+    color: inherit;
     vertical-align: text-top;
     width: 1em;
     height: 1em; }
@@ -122,10 +125,6 @@ html {
           fill: #ffffff; }
   html .tc-modal-wrapper {
     z-index: 1010; }
-    html .tc-modal-wrapper .tc-modal {
-      boder: 1px solid #999999;
-      left: calc(50% - 400px);
-      width: 802px; }
     html .tc-modal-wrapper .tc-modal-header svg {
       vertical-align: sub; }
     html .tc-modal-wrapper .tc-modal-header h3 {
@@ -133,9 +132,7 @@ html {
     html .tc-modal-wrapper .tc-modal-body {
       min-height: 250px;
       max-height: 70vh;
-      overflow: auto;
-      left: calc(50% - 400px);
-      width: 800px; }
+      overflow: auto; }
       html .tc-modal-wrapper .tc-modal-body > div > p:first-child {
         margin-top: 0px; }
       html .tc-modal-wrapper .tc-modal-body > div > p:last-child {
@@ -203,6 +200,8 @@ html {
             width: 100%;
             /* prevents bad looking select boxes and wrapping in textareas */
             word-wrap: normal; }
+          html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td .tmap-no-stretch input, html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td .tmap-no-stretch textarea, html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td .tmap-no-stretch select {
+            width: auto; }
           html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td div.tmap-button-wrapper {
             text-align: center; }
         html .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr .tmap-note {
@@ -562,4 +561,14 @@ html:-ms-fullscreen .tmap-has-fullscreen-child {
 @media (min-width: {{$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint}}) {
   .tc-sidebar-scrollable .tmap-mobile-editor {
     display: none; }
+
+  .tc-modal-wrapper {
+    z-index: 1010; }
+    .tc-modal-wrapper .tc-modal {
+      boder: 1px solid #999999;
+      left: calc(50% - 400px);
+      width: 802px; }
+    .tc-modal-wrapper .tc-modal-body {
+      left: calc(50% - 400px);
+      width: 800px; }
  }

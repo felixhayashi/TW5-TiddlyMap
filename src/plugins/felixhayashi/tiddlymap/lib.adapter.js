@@ -118,7 +118,7 @@ Adapter.prototype._processEdge = function(edge, action) {
 
   var type = new EdgeType(edge.type);
   var tObj = utils.getTiddler(fromTRef);
-  var namespace = type.getNamespace();
+  var namespace = type.namespace;
   
   if(namespace === "tw-list") {
     if(!edge.to) return;
@@ -166,10 +166,10 @@ Adapter.prototype._processTmapEdge = function(tiddler, edge, type, action) {
     // assign new id if not present yet
     edge.id = edge.id || utils.genUUID();
     // add to connections object
-    connections[edge.id] = { to: edge.to, type: type.getId() };
+    connections[edge.id] = { to: edge.to, type: type.id };
     // if type is not know, create it
     if(!type.exists()) {
-      type.persist();
+      type.save();
     }
   } else { // delete
     delete connections[edge.id];
@@ -196,8 +196,9 @@ Adapter.prototype._processTmapEdge = function(tiddler, edge, type, action) {
  */
 Adapter.prototype._processListEdge = function(tiddler, edge, type, action) {
       
-  // load
+  // the name shall not contain the magic namespace
   var name = type.getId(true);
+  
   var tObj = utils.getTiddler(tiddler);
   var list = $tw.utils.parseStringArray(tiddler.fields[name]);
   // we need to clone the array since tiddlywiki might directly
@@ -211,7 +212,7 @@ Adapter.prototype._processListEdge = function(tiddler, edge, type, action) {
   if(action === "insert") {
     list.push(toTRef);
     if(!type.exists()) {
-      type.persist();
+      type.save();
     }
   } else { // delete
     var index = list.indexOf(toTRef);
@@ -244,10 +245,12 @@ Adapter.prototype._processFieldEdge = function(tiddler, edge, type, action) {
   if(toTRef == null) return; // null or undefined
   
   var val = (action === "insert" ? toTRef : "");
+  
+  // the shall not contain the magic namespace
   utils.setField(tiddler, type.getId(true), val);
 
   if(!type.exists()) {
-    type.persist();
+    type.save();
   }
   
   return edge;
@@ -294,9 +297,8 @@ Adapter.prototype.getAdjacencyList = function(groupBy, opts) {
  * This function will return all neighbours of a graph denoted by
  * a set of tiddlers.
  * 
- * @param {Array<TiddlerReference>} - The original set of nodes
- *    denoted by an array of tiddler titles for which we want to
- *    retrieve the neighbours.
+ * @param {Array<TiddlerReference>} matches - The original set that
+ *     defines the starting point for the neighbourhood discovery
  * @param {Hashmap} [opts] - An optional options object.
  * @param {Hashmap} [opts.typeWL] - A whitelist lookup-table
  *    that restricts which edges are travelled to reach a neighbour.
@@ -320,80 +322,112 @@ Adapter.prototype.getAdjacencyList = function(groupBy, opts) {
  *       edges: { *all edges connected to neighbours* },
  *     }
  */
-Adapter.prototype.getNeighbours = function(tiddlers, opts) {
+Adapter.prototype.getNeighbours = function(matches, opts) {
   
   $tw.tmap.start("Get neighbours");
   
   opts = opts || {};
-  
-  // clone array
-  tiddlers = tiddlers.slice();
+    
+  // index of all tiddlers have already are been visited, either by
+  // having been included in the original set, or by having been
+  // recorded as neighbour during the discovery.
+  var visited = utils.getArrayValuesAsHashmapKeys(matches); 
   
   var protoNode = opts.addProperties;
-  var adjList = this.getAdjacencyList("to", opts);
-  var neighEdges = utils.getDataMap();
-  var neighNodes = utils.getDataMap();
+  var allEdgesLeadingToNeighbours = utils.getDataMap();
+  var allNeighbours = utils.getDataMap();
+  var toWL = opts.toWL;
+  var typeWL = opts.typeWL;
+  var tById = this.indeces.tById;
+  var idByT = this.indeces.idByT;
   var maxSteps = (parseInt(opts.steps) > 0 ? opts.steps : 1);
-      
-  var discover = function() {
-    
-    var lookupTable = utils.getArrayValuesAsHashmapKeys(tiddlers);
+  
+  // note that the adjacency list already acknowledges the whitelists
+  // passed through opts
+  var adjList = this.getAdjacencyList("to", opts);
+  
+  // loop if still steps to be taken and we have a non-empty starting set
+  for(var step = 0; step < maxSteps && matches.length; step++) {
+        
+    // neighbours that are discovered in the current step;
+    // starting off from the current set of matches;
+    var neighboursOfThisStep = []; 
     
     // loop over all nodes in the original set
-    // we loop backwards so we can add neighbours to the set
-    for(var i = tiddlers.length; i--;) {
+    for(var i = matches.length; i--;) {
       
-      if(utils.isSystemOrDraft(tiddlers[i])) continue;
+      if(utils.isSystemOrDraft(matches[i])) {
+        // = this might happen if the user manually created edges
+        // that link to a system/draft tiddler or if the original
+        // set contained system/draft tiddlers.
+        continue;
+      }
               
-      // 1) get all edges from inside that point outwards the set
-      var outgoing = this.getEdges(tiddlers[i], opts.toWL, opts.typeWL);
-      $tw.utils.extend(neighEdges, outgoing);
+      // get all outgoing edges
+      // = edges originating from the starting set and point outwards
+      var outgoing = this.getEdges(matches[i], toWL, typeWL);
       
-      // 2) add nodes for these edges
       for(var id in outgoing) {
-        var toTRef = this.indeces.tById[outgoing[id].to];
-        if(!lookupTable[toTRef] && !neighNodes[outgoing[id].to]) {
-          // not included in original set and not already discovered
+        var edge = outgoing[id];
+                
+        // record all nodes that are pointed to as neighbours
+        var toTRef = tById[edge.to];
+        if(!visited[toTRef]) {
+          visited[toTRef] = true;
+          
           var node = this.makeNode(toTRef, protoNode);
-          if(node) { // since edges may be obsolete
-            neighNodes[outgoing[id].to] = node;
-            tiddlers.push(toTRef);
+          if(node) { // saveguard against obsolete edges or other problems
+            
+            // record node
+            allNeighbours[node.id] = node;
+            neighboursOfThisStep.push(toTRef);
+            
+            // record outgoing edge that leads to this node
+            allEdgesLeadingToNeighbours[id] = edge;
           }
         }
       }
       
-      // 3) get all edges from outside that point towards the set
-      var incoming = adjList[this.indeces.idByT[tiddlers[i]]];
-      if(incoming) {
-        for(var j = 0; j < incoming.length; j++) {
-          var fromTRef = this.indeces.tById[incoming[j].from];
-          if(lookupTable[fromTRef]) continue; // included in original set
-          if(!neighNodes[incoming[j].from]) {              
-            var node = this.makeNode(fromTRef, protoNode);
-            if(node) {
-              neighNodes[incoming[j].from] = node; // ATTENTION: edges may be obsolete
-              tiddlers.push(fromTRef);
-            }
+      // get all incoming edges
+      // = edges originating from outside pointing to the starting set
+      var incoming = adjList[idByT[matches[i]]];
+      if(!incoming) continue;
+      
+      for(var j = incoming.length; j--;) {
+        var edge = incoming[j];
+        
+        var fromTRef = tById[edge.from];
+        
+        if(!visited[fromTRef]) {
+          visited[fromTRef] = true;
+                                
+          var node = this.makeNode(fromTRef, protoNode);
+          if(node) { // saveguard against obsolete edges or other problems
+            
+            // record node
+            allNeighbours[node.id] = node;
+            neighboursOfThisStep.push(fromTRef);
+            
+            // record incoming edge that leads to this node
+            allEdgesLeadingToNeighbours[edge.id] = edge;
           }
-          neighEdges[incoming[j].id] = incoming[j];
+          
         }
       }
     }
     
-  }.bind(this);
-  
-  for(var steps = 0; steps < maxSteps; steps++) {
-    var beforeSize = tiddlers.length;
-    discover();
-    if(beforeSize === tiddlers.length) break; // TODO put this in the loop condition
+    // the current set of newly discovered neighbours forms the
+    // starting point for the next discovery
+    matches = neighboursOfThisStep;
+    
   }
   
   var neighbourhood = {
-    nodes: neighNodes,
-    edges: neighEdges
+    nodes: allNeighbours,
+    edges: allEdgesLeadingToNeighbours
   };
   
-  this.logger("debug", "Retrieved neighbourhood", neighbourhood, "steps", steps);
+  this.logger("debug", "Retrieved neighbourhood", neighbourhood, "steps", step);
   
   $tw.tmap.stop("Get neighbours");
   
@@ -460,6 +494,7 @@ Adapter.prototype.getGraph = function(opts) {
     
     if(view.isEnabled("show_inter_neighbour_edges")) {
       var nodeTRefs = this.getTiddlersById(neighbours.nodes);
+      // this time we need a whitelist based on the nodeTRefs
       var toWL = utils.getArrayValuesAsHashmapKeys(nodeTRefs)
       $tw.utils.extend(graph.edges, this.getEdgesForSet(nodeTRefs, toWL));
     }
@@ -559,7 +594,7 @@ Adapter.prototype._getEdgesFromRefArray = function(fromTRef, refsByType, toWL, t
          || utils.isSystemOrDraft(toTRef)
          || (toWL && !toWL[toTRef])) continue;
 
-      var id = type.getId() + $tw.utils.hashString(fromTRef + toTRef); 
+      var id = type.id + $tw.utils.hashString(fromTRef + toTRef); 
       var edge = this.makeEdge(this.getId(fromTRef),
                                this.getId(toTRef),
                                type,
@@ -631,7 +666,7 @@ Adapter.prototype.getEdgeTypeWhiteList = function(edgeTypeFilter) {
 
   for(var i = matches.length; i--;) {
     var type = new EdgeType(matches[i]);
-    typeWhiteList[type.getId()] = type;
+    typeWhiteList[type.id] = type;
   }
   
   return typeWhiteList;
@@ -661,7 +696,7 @@ Adapter.prototype.getEdgesForSet = function(tiddlers, toWL, typeWL) {
 Adapter.prototype.selectEdgesByType = function(type) {
 
   var typeWhiteList = utils.getDataMap();
-  typeWhiteList[new EdgeType(type).getId()] = true;
+  typeWhiteList[new EdgeType(type).id] = true;
   var tRefs = utils.getMatches(this.opt.selector.allPotentialNodes);
   var edges = this.getEdgesForSet(tRefs, null, typeWhiteList);
   
@@ -687,7 +722,7 @@ Adapter.prototype._processEdgesWithType = function(type, task) {
     // clone type first to prevent auto-creation
     var newType = new EdgeType(task.newName);
     newType.loadDataFromType(type);
-    newType.persist();
+    newType.save();
       
   }
   
@@ -700,7 +735,7 @@ Adapter.prototype._processEdgesWithType = function(type, task) {
   }
   
   // finally remove the old type
-  $tw.wiki.deleteTiddler(type.getPath());
+  $tw.wiki.deleteTiddler(type.fullPath);
 
 };
 
@@ -818,21 +853,21 @@ Adapter.prototype.makeEdge = function(from, to, type, id) {
     id: (id || utils.genUUID()),
     from: from,
     to: to,
-    type: type.getId()
+    type: type.id
   };
   
-  var description = type.getData("description");
+  var description = type.description;
 
   edge.title = (description
                 || this.indeces.tById[from]
                    + " " + (label || edge.id) + " "
                    + this.indeces.tById[to]);
   
-  if(utils.isTrue(type.getData("show-label"), true)) {
+  if(utils.isTrue(type["show-label"], true)) {
     edge.label = label;
   }
 
-  edge = $tw.utils.extend(edge, type.getData("style"));
+  edge = $tw.utils.extend(edge, type.style);
   
   return edge;
   
@@ -883,7 +918,7 @@ Adapter.prototype.getInheritedNodeStyles = function(nodes, view) {
   
   for(var i = loGlNTy.length; i--;) {
   
-    var data = loGlNTy[i].data;
+    var data = loGlNTy[i];
     if(view && data.view && data.view !== view) continue;
     
     var inheritors = loGlNTy[i].getInheritors(src);
@@ -942,8 +977,8 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
   view = new ViewAbstraction(view);
   
   var inheritedStyles = this.getInheritedNodeStyles(nodes, view);
-  var neighbourStyle = new NodeType("tmap:neighbour").getData("style");
-  var viewNodeData = (view.exists() ? view.getNodeData() : {});
+  var neighbourStyle = new NodeType("tmap:neighbour").style;
+  var viewNodeData = view.getNodeData();
   var isFixedNode = !view.isEnabled("physics_mode");
   
   // shortcuts (for performance and readability)
@@ -1104,10 +1139,21 @@ Adapter.prototype.deleteNode = function(node) {
   
 };
 
+Adapter.prototype.deleteNodes = function(nodes) {
+  
+  nodes = utils.convert(nodes, "array");
+  for(var i = nodes.length; i--;) {
+    this.deleteNode(nodes[i]);
+  }
+  
+};
+
 /**
  * Function to create or abstract a view from outside.
  * 
  * @param {View} view - The view.
+ * @param {boolean} [isCreate] - Whether the view should be created
+ *     if it doesn't exist.
  * @result {ViewAbstraction}
  */
 Adapter.prototype.getView = function(view, isCreate) {
@@ -1119,39 +1165,16 @@ Adapter.prototype.getView = function(view, isCreate) {
 /**
  * Create a view with a given label (name).
  * 
- * @param {string} [label="My View"] - The name of the view (__not__ a TiddlerReference).
+ * @deprecated Use getView()
+ * 
+ * @param {string} [label="My View"]
  * @return {ViewAbstraction} The newly created view.
  */
 Adapter.prototype.createView = function(label) {
-    
-  if(typeof label !== "string" || label === "") {
-    label = "My view";
-  }
-  var tRef = $tw.wiki.generateNewTitle(this.opt.path.views + "/" + label);
-      
-  return new ViewAbstraction(tRef, true);
+          
+  return new ViewAbstraction(label, true);
 
 };
-
-/**
- * Create a new type.
- * 
- * @param {string} type - Either "node" or "edge".
- * @param {string} [id] - An optional id. Has to be unique.
- * @return {EdgeType|NodeType} The newly created type.
- */
-Adapter.prototype.createType = function(type, id) {
-  
-  id = id || "me:new-type";
-  var root = (type === "edge" ? this.opt.path.edgeTypes : this.opt.path.nodeTypes);
-  var title = $tw.wiki.generateNewTitle(root + "/" + id);
-  var type = (type === "edge" ? new EdgeType(title) : new NodeType(title));
-  type.persist();              
-  return type;
-
-};
-
-
   
 /**
  * This function will store the positions into the sprecified view.

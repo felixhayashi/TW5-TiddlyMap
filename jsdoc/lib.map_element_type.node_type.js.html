@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>TiddlyMap Source: lib.edge_type.js</title>
+	<title>TiddlyMap Source: lib.map_element_type.node_type.js</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -45,14 +45,14 @@ tmap-config
     mode="manage-*"
     refresh-trigger="tRef"
 
-```</a></li><li><a href="module-TiddlyMap-Adapter.html">TiddlyMap~Adapter</a></li><li><a href="module-TiddlyMap-CallbackManager.html">TiddlyMap~CallbackManager</a></li><li><a href="module-TiddlyMap-DialogManager.html">TiddlyMap~DialogManager</a></li><li><a href="module-TiddlyMap-EdgeListItemWidget.html">TiddlyMap~EdgeListItemWidget</a></li><li><a href="module-TiddlyMap-EdgeListWidget.html">TiddlyMap~EdgeListWidget</a></li><li><a href="module-TiddlyMap-EdgeType.html">TiddlyMap~EdgeType</a></li><li><a href="module-TiddlyMap-MapWidget.html">TiddlyMap~MapWidget</a></li><li><a href="module-TiddlyMap-ViewAbstraction.html">TiddlyMap~ViewAbstraction</a></li>
+```</a></li><li><a href="module-TiddlyMap-Adapter.html">TiddlyMap~Adapter</a></li><li><a href="module-TiddlyMap-CallbackManager.html">TiddlyMap~CallbackManager</a></li><li><a href="module-TiddlyMap-DialogManager.html">TiddlyMap~DialogManager</a></li><li><a href="module-TiddlyMap-EdgeListItemWidget.html">TiddlyMap~EdgeListItemWidget</a></li><li><a href="module-TiddlyMap-EdgeListWidget.html">TiddlyMap~EdgeListWidget</a></li><li><a href="module-TiddlyMap-EdgeType.html">TiddlyMap~EdgeType</a></li><li><a href="module-TiddlyMap-MapWidget.html">TiddlyMap~MapWidget</a></li><li><a href="module-TiddlyMap-NodeType.html">TiddlyMap~NodeType</a></li><li><a href="module-TiddlyMap-ViewAbstraction.html">TiddlyMap~ViewAbstraction</a></li>
 				</ul>
 			</li>
 			
 			<li class="dropdown">
 				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="global.html">Global</a></li>
+					<li><a href="global.html#startup">startup</a></li>
 				</ul>
 			</li>
 			
@@ -69,17 +69,17 @@ tmap-config
 	<div class="col-md-12">
 	
 		<div id="main">
-    		<h1 class="page-title">Source: lib.edge_type.js</h1>
+    		<h1 class="page-title">Source: lib.map_element_type.node_type.js</h1>
 			
 
-		<h1 class="page-title">Source: lib.edge_type.js</h1>
+		<h1 class="page-title">Source: lib.map_element_type.node_type.js</h1>
     
 <section>
 	<article>
 		<pre
 			class="sunlight-highlight-javascript linenums">/*\
 
-title: $:/plugins/felixhayashi/tiddlymap/js/EdgeType
+title: $:/plugins/felixhayashi/tiddlymap/js/NodeType
 type: application/javascript
 module-type: library
 
@@ -97,70 +97,83 @@ module-type: library
 
 /**************************** IMPORTS ****************************/
 
-var ElementType = require("$:/plugins/felixhayashi/tiddlymap/js/ElementType").ElementType;
+var MapElementType = require("$:/plugins/felixhayashi/tiddlymap/js/MapElementType").MapElementType;
 var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
   
 /***************************** CODE ******************************/
 
 /**
- * This class is used to abstract edge types. It facilitates inter
- * alia the parsing of style information, the translation of type
- * names into actual type data or the persistance of edge type data.
- * 
- * @constructor
- * 
- * @param {string|EdgeType} type - Either the edge type id (name)
- *     or a tiddler reference denoting the type or an
- *     `EdgeType` object (that is directly bounced back). If the
- *     id can be translated into a tiddler object that resides in
- *     the edge type path, then its data is retrieved automatically.
+ * Used to define the type of a node.
+ *
+ * @class
+ * @extends MapElementType
+ *
  */
-var EdgeType = function(type) {
+var NodeType = function(id, data) {
 
-  if(type instanceof EdgeType) {
-    return type; // bounce back the object
+  if(id instanceof NodeType) {
+    return id; // bounce back!
   }
-      
+ 
   // call the parent constructor
-  ElementType.call(
+  MapElementType.call(
     this,
-    type || "tmap:unknown",
-    $tw.tmap.opt.path.edgeTypes,
-    [ "label", "show-label" ]
+    id || "tmap:unknown",
+    $tw.tmap.opt.path.nodeTypes,
+    NodeType._fieldMeta,
+    data
   );
 
 };
 
 // !! EXTENSION !!
-EdgeType.prototype = Object.create(ElementType.prototype);
+NodeType.prototype = Object.create(MapElementType.prototype);
 // !! EXTENSION !!
-    
-EdgeType.prototype.getLabel = function() {
 
-  return this.data.label || this.getId(true);
-
-};
-
-EdgeType.prototype.getNamespace = function() {
-
-  var match = this.id.match("^(.*):");
-  return (match ? match[1] : "");
-
-};
+NodeType._fieldMeta = $tw.utils.extend(MapElementType._fieldMeta, {
+  "view": {},
+  "scope": {
+    stringify: utils.getWithoutNewLines
+  },
+  "fa-icon": {},
+  "tw-icon": {}
+});
 
 /**
- * @override
+ * Get all tiddlers that inherit this type.
+ * 
+ * @param {Array&lt;TiddlerReference>} [src=$tw.wiki.allTitles()] - A list
+ *     of tiddlers that is searched for inheritors.
+ * @return {Array&lt;TiddlerReference>} The inheritors.
  */
-EdgeType.prototype.getId = function(stripNamespace) {
+NodeType.prototype.getInheritors = function(src) {
+   
+  var s = this["scope"];
+  return (s ? utils.getMatches(s, src || $tw.wiki.allTitles()) : []);
   
-  return stripNamespace
-         ? this.id.substring(this.id.indexOf(":") + 1)
-         : this.id;
-
 };
+
+//~ /**
+ //~ * Binds the node type to a set of views.
+ //~ * 
+ //~ * @param {Array&lt;string|ViewAbstraction>} views - a set of views
+ //~ *     to bind the array to.
+ //~ */
+//~ NodeType.prototype.setViews = function(views) {
+  //~ 
+  //~ this.views = utils.getArrayValuesAsHashmapKeys(views);
+  //~ 
+//~ };
+//~ 
+//~ NodeType.prototype.getViews = function(src) {
+   
+  //~ var s = this.scope;
+  //~ return (s ? utils.getMatches(s, src || $tw.wiki.allTitles()) : []);
   
+//~ };
+      
 // !! EXPORT !!
-exports.EdgeType = EdgeType;
+exports.NodeType = NodeType;
 // !! EXPORT !!#
   
 })();</pre>
@@ -192,7 +205,7 @@ exports.EdgeType = EdgeType;
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-	on 2015-09-22T15:04:24+02:00 using the <a
+	on 2015-10-01T12:31:06+02:00 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>

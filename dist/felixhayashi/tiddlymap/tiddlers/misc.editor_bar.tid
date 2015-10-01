@@ -34,7 +34,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
         {{$:/core/images/info-button}} Open online help
       </a>
       <$button class="tc-btn-invisible" message="tmap:tm-create-view">
-        {{$:/core/images/new-button}} Create empty view
+        {{$:/core/images/new-button}} Create new view
       </$button>
       <$button class="tc-btn-invisible" message="tmap:tm-generate-widget">
         {{$:/core/images/permalink-button}} Grab widget code
@@ -86,7 +86,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
     <$button class="tc-btn-invisible">Hide neighbourhood
       <$action-setfield
           $tiddler=<<param.ref.view>>
-          config.neighbourhood_scope="0" />
+          config.neighbourhood_scope="" />
     </$button>
     <hr />
     <$list filter="[[1|1 step distance]]

@@ -36,8 +36,28 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
   </$reveal>
 \end
 
+\define input-multi-checkbox(selectFilter, invert=no, default)
+  <div class="tmap-no-stretch">
+  <$list
+      filter="$selectFilter$"
+      emptyMessage="– This list contains no items –">
+    <$checkbox
+        tiddler=<<output>>
+        tag=<<tmap "splitAndSelect" "|" "0">>>
+      <$view
+          tiddler=<<tmap "splitAndSelect" "|" "1">>
+          field="title" />
+    </$checkbox><br />
+  </$list>
+  </div>
+\end
+
 \define input-select(field, index, selectFilter, default, nochoice)
-  <$select tiddler=<<output>> field="$field$" index="$index$" default="$default$">
+  <$select
+      tiddler=<<output>>
+      field="$field$"
+      index="$index$"
+      default="$default$">
     <$set name="nochoice" value="$nochoice$">
       <$list filter="[<nochoice>regexp[.+]]">
         <option value=""><b><<nochoice>></b></option>
@@ -53,13 +73,17 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
 
 \define input-radio(field, index, selectFilter, default)
   <$list filter="$selectFilter$">
-    <$radio tiddler=<<output>> field="$field$" index="$index$" value=<<tmap "splitAndSelect" "|" "0">>>
+    <$radio
+        tiddler=<<output>>
+        field="$field$"
+        index="$index$"
+        value=<<tmap "splitAndSelect" "|" "0">>>
       <<tmap "splitAndSelect" "|" "1">>
     </$radio><br />
   </$list>
 \end
 
-\define tmap-row(title, field, index, type, descr, note, label, default, readonly, reset, selectFilter, nochoice)
+\define tmap-row(title, field, index, type, descr, note, label, default, readonly, reset, selectFilter, nochoice, invert)
   <tr>
     <td class="tmap-title">$title$:</td>
     <td>
@@ -70,6 +94,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
           readonly:"$readonly$"
           default:"$default$"
           label:"$label$"
+          invert:"$invert$"
           selectFilter:"$selectFilter$"
           nochoice:"$nochoice$" >>
         <$reveal type="match" text="true" default="$reset$">

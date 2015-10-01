@@ -29,6 +29,7 @@ function(){
 var visConfig =       require("$:/plugins/felixhayashi/tiddlymap/js/config/vis").config;
 var sysConfig =       require("$:/plugins/felixhayashi/tiddlymap/js/config/sys").config;
 var utils =           require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var fixer =           require("$:/plugins/felixhayashi/tiddlymap/js/fixer").fixer;
 var Adapter =         require("$:/plugins/felixhayashi/tiddlymap/js/Adapter").Adapter;
 var DialogManager =   require("$:/plugins/felixhayashi/tiddlymap/js/DialogManager").DialogManager;
 var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager").CallbackManager;
@@ -205,6 +206,15 @@ var updateTiddlerVsIdIndeces = function(parent, allTiddlers) {
   
   parent = parent || $tw.tmap.indeces;
   allTiddlers = allTiddlers || $tw.wiki.allTitles();
+  
+  // usually the fixer is not to be called at this point but
+  // since the fixer relies on the adapter and the adapter
+  // relies on indeces but the indeces must not be build before
+  // the fixer had a chance to move ids, we have to call the fixer
+  // function at this place :(
+  // @TODO: remove this fixer code in 2016/2017 when it is highly
+  // unlikely that people are still using an older version  
+  fixer.fixId()
 
   var tById = parent.tById = {}; // tiddlerById
   var idByT = parent.idByT = {}; // idByTiddler
@@ -253,7 +263,7 @@ var updateNodeTypesIndeces = function(parent, allTiddlers) {
   for(var i = allTiddlers.length; i--;) {
     if(utils.startsWith(allTiddlers[i], typePath)) {
       var type = new NodeType(allTiddlers[i]);
-      (type.data.view ? loNTy : glNTy).push(type);
+      (type.view ? loNTy : glNTy).push(type);
     }
   }
   
@@ -517,6 +527,13 @@ var registerChangeListener = function(callbackManager) {
   
 };
 
+var cleanup = function() {
+  
+  utils.deleteByPrefix("$:/temp/felixhayashi");
+  utils.deleteByPrefix("$:/temp/tmap");
+                 
+};
+
 var setDefaults = function() {
   
   var defaultView = $tw.tmap.opt.config.sys.defaultView;
@@ -556,25 +573,30 @@ exports.after = [ "startup" ];
 exports.before = [ "rootwidget" ];
 exports.synchronous = true;
 
+/**
+ * Attention: Careful with the order of the function calls in this
+ * functions body!
+ */
 exports.startup = function() {
   
   // create namespaces
   $tw.tmap = utils.getDataMap();
   $tw.tmap.utils = utils;
+  
+  // make classes publicly available
   $tw.tmap.keycharm = vis.keycharm;
-  $tw.tmap.obj = {
-    NodeType: NodeType,
-    EdgeType: EdgeType,
-    ViewAbstraction: ViewAbstraction
-  };
-  
-  
-  // all graphs need to register here. @see routineWalk()
-  $tw.tmap.registry = [];
-  window.setInterval(routineCheck, 5000);
+  $tw.tmap.NodeType = NodeType;
+  $tw.tmap.EdgeType = EdgeType;
+  $tw.tmap.ViewAbstraction = ViewAbstraction;
   
   // build and integrate global options   
   rebuildGlobals($tw.tmap);
+  
+  // register meta file (if not done yet)
+  createMetaFile();
+
+  // cleanup previous session
+  cleanup();
   
   // create indeces
   attachIndeces($tw.tmap);
@@ -584,13 +606,17 @@ exports.startup = function() {
       
   // attach the adapter object to the tiddlymap namespace
   $tw.tmap.adapter = new Adapter();
-      
-  // register meta file (if not done yet)
-  createMetaFile();
-  
+        
+  // Run the fixer to update older wikis
+  fixer.fix()
+    
   // create global callback and dialog managers 
   $tw.tmap.callbackManager = new CallbackManager();
   $tw.tmap.dialogManager = new DialogManager($tw.tmap.callbackManager);
+  
+  // all graphs need to register here. @see routineWalk()
+  $tw.tmap.registry = [];
+  window.setInterval(routineCheck, 5000);
         
   // AT THE VERY END: register change listener with the callback manager
   registerChangeListener($tw.tmap.callbackManager);

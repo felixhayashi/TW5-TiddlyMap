@@ -3,6 +3,10 @@ subtitle: {{$:/core/images/new-button}} Creating a new view
 
 \rules except wikilink
 
+\define nodeFilter() [list[$:/temp/tmap/nodes/$(view)$]]
+
+<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
+
 Please specify a view name.
 
 Name:
@@ -12,9 +16,61 @@ Name:
     field="text"
     type="text"
     tag="input"
-    default=""
-    class="tmap-trigger-field tmap-triggers-ok-button-on-enter" />
+    default="" />
 <sup>[1]</sup>
+
+---
+
+
+<!--
+<fieldset><legend>View configuration</legend>
+  <table class="tmap-config-table">
+    <<tmap-row type:"input-select"
+        title:"View config"
+        field:"clone-config"
+        nochoice:"Use defaults"
+        selectFilter:"[[copy|Copy from current view]]"
+        descr:"Do you want to use the default configuration or use
+               the same configuration as the current view?">>
+  </table>
+</fieldset>
+-->
+
+<!--
+<fieldset><legend>Transfer nodes</legend>
+<div class="tmap-flash-message tmap-info">
+  {{$:/core/images/info-button}}
+  When you transfer nodes of the current view "<<view>>"
+  into the new view, the view's config is cloned.
+</div>
+  <table class="tmap-config-table">
+    <<tmap-row type:"input-select"
+        title:"Transfer mode"
+        field:"transfer-mode"
+        default:"copy"
+        selectFilter:"[[copy|Copy nodes]]
+                      [[move|Move nodes]]"
+        descr:"Should the transferred nodes
+               be copied or moved? In case of 'move', TiddlyMap will
+               try to remove the nodes from the current view's node
+               filter.">>
+    <$macrocall type="input-multi-checkbox"
+          $name="tmap-row"
+          title="Nodes to transfer"
+          selectFilter=<<nodeFilter>>
+          default="true"
+          descr="Select the nodes you want to
+                 transfer to the new view."
+          note="This operation will add the nodes to the new view
+                as if you added all nodes one by one to the view.
+                Node positions are maintained and equal the positions
+                in the current view."
+          />
+  </table>
+</fieldset>
+-->
+
+</$importvariables>
 
 ---
 

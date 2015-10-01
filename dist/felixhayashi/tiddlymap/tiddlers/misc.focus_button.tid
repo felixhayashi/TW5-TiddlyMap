@@ -2,12 +2,14 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/focusButton
 
 \define tooltip() Zoom on a specific node
 
+\define filter() [list[$:/temp/tmap/nodes/$(param.viewLabel)$]search:title{$:/temp/tmap/bar/search}]
+
 <div class="tmap-focus-button">
   <$reveal type="nomatch" state="$:/temp/tmap/state/focus" text=<<qualify>>>
     <$button
         tooltip=<<tooltip>>
         class=<<tv-config-toolbar-class>>>{{$:/core/images/advanced-search-button}}
-     <$action-setfield $tiddler=<<param.searchOutput>> text="" />
+     <$action-setfield $tiddler="$:/temp/tmap/bar/search" text="" />
      <$action-setfield $tiddler="$:/temp/tmap/state/focus" text=<<qualify>> />
      <$action-sendmessage $message="tmap:tm-reset-focus" />
     </$button>
@@ -23,15 +25,15 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/focusButton
       <div class="tc-drop-down">
         <$edit-text
             focus="true"
-            tiddler=<<param.searchOutput>>
+            tiddler="$:/temp/tmap/bar/search"
             field="text"
             type="text"
             tag="input"
             default="" />
-        <small><$count filter=<<param.nodeFilter>> /> results</small>
+        <small><$count filter=<<filter>> /> results</small>
         <hr />
         <div class="tmap-very-small-list">
-          <$list filter=<<param.nodeFilter>>
+          <$list filter=<<filter>>
               variable="item"
               emptyMessage="//No results//">
             <$button

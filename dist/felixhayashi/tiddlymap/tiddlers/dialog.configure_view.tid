@@ -57,7 +57,7 @@ subtitle: {{$:/core/images/options-button}} View configuration -- <<view>>
     <<tmap-row type:"input-select"
         title:"Neighbourhood scope"
         field:"config.neighbourhood_scope" 
-        selectFilter:"[[0|Do not display a neighbourhood]]
+        selectFilter:"[[|Do not display a neighbourhood]]
                       [[1|1 steps away]]
                       [[2|2 steps away]]
                       [[3|3 steps away]]

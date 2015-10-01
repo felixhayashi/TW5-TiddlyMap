@@ -49,7 +49,7 @@ var MapConfigWidget = function(parseTreeNode, options) {
   // call initialise on prototype
   this.initialise(parseTreeNode, options);
   
-  // create shortcuts to services
+  // create shortcuts for services and frequently used vars
   this.adapter = $tw.tmap.adapter;
   this.opt = $tw.tmap.opt;
   this.notify = $tw.tmap.notify;

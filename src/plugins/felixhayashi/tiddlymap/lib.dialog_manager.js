@@ -37,7 +37,7 @@ var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackMana
  */
 var DialogManager = function(callbackManager, context) {
   
-  // create shortcuts to services
+  // create shortcuts for services and frequently used vars
   this.logger = $tw.tmap.logger;
   this.adapter = $tw.tmap.adapter;
   this.opt = $tw.tmap.opt;

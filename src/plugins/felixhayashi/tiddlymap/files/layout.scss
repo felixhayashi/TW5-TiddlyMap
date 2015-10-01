@@ -20,8 +20,11 @@ $default-input-width: 140px;
   border: 1px solid lightgray;
   padding: 5px;
   margin: 6px 0;
+  display: block;
+  color: #333333;
   
   svg {
+    color: inherit;
     vertical-align: text-top;
     width: 1em;
     height: 1em;
@@ -178,12 +181,6 @@ html { // used to increase css importance
 
   .tc-modal-wrapper {
     z-index: 1010; // fix this in core?
-
-    .tc-modal {
-      boder: 1px solid #999999;
-      left: calc(50% - 400px);
-      width: 802px;
-    }
     
     .tc-modal-header {
           
@@ -198,11 +195,9 @@ html { // used to increase css importance
     }
     
     .tc-modal-body { // add this to tw
-      min-height: 250px;
-      max-height: 70vh;
+      min-height: 250px; // tw doesn't have a minheight
+      max-height: 70vh; // tw uses 60vh
       overflow: auto;
-      left: calc(50% - 400px);
-      width: 800px;
 
       > div {
         >p:first-child {
@@ -337,6 +332,12 @@ html { // used to increase css importance
                 width: 100%;
                 /* prevents bad looking select boxes and wrapping in textareas */
                 word-wrap: normal;
+              }
+              
+              .tmap-no-stretch {
+                input, textarea, select {
+                  width: auto;
+                }
               }
               
               div.tmap-button-wrapper {
@@ -830,4 +831,20 @@ html:-ms-fullscreen { @include fullscreen(); }
       display: none;
     }
   }
+
+  .tc-modal-wrapper {
+    z-index: 1010; // fix this in core?
+      
+    .tc-modal {
+      boder: 1px solid #999999;
+      left: calc(50% - 400px);
+      width: 802px;
+    }
+        
+    .tc-modal-body { // add this to tw
+      left: calc(50% - 400px);
+      width: 800px;
+    }
+  }
+  
 }

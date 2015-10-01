@@ -18,7 +18,7 @@ module-type: library
 
 /**************************** IMPORTS ****************************/
 
-var ElementType = require("$:/plugins/felixhayashi/tiddlymap/js/ElementType").ElementType;
+var MapElementType = require("$:/plugins/felixhayashi/tiddlymap/js/MapElementType").MapElementType;
 var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
   
 /***************************** CODE ******************************/
@@ -28,7 +28,8 @@ var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
  * alia the parsing of style information, the translation of type
  * names into actual type data or the persistance of edge type data.
  * 
- * @constructor
+ * @class
+ * @extends MapElementType
  * 
  * @param {string|EdgeType} type - Either the edge type id (name)
  *     or a tiddler reference denoting the type or an
@@ -36,33 +37,41 @@ var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
  *     id can be translated into a tiddler object that resides in
  *     the edge type path, then its data is retrieved automatically.
  */
-var EdgeType = function(type) {
-
-  if(type instanceof EdgeType) {
-    return type; // bounce back the object
+var EdgeType = function(id, data) {
+  
+  if(id instanceof EdgeType) {
+    return id; // bounce back!
   }
-      
+        
   // call the parent constructor
-  ElementType.call(
+  MapElementType.call(
     this,
-    type || "tmap:unknown",
+    id || "tmap:unknown",
     $tw.tmap.opt.path.edgeTypes,
-    [ "label", "show-label" ]
+    EdgeType._fieldMeta,
+    data
   );
+  
+  this.namespace = this._getNamespace();
 
 };
 
 // !! EXTENSION !!
-EdgeType.prototype = Object.create(ElementType.prototype);
+EdgeType.prototype = Object.create(MapElementType.prototype);
 // !! EXTENSION !!
-    
+
+EdgeType._fieldMeta = $tw.utils.extend(MapElementType._fieldMeta, {
+  "label": {},
+  "show-label": {}
+});
+
 EdgeType.prototype.getLabel = function() {
 
-  return this.data.label || this.getId(true);
+  return this.label || this.getId(true);
 
 };
 
-EdgeType.prototype.getNamespace = function() {
+EdgeType.prototype._getNamespace = function() {
 
   var match = this.id.match("^(.*):");
   return (match ? match[1] : "");

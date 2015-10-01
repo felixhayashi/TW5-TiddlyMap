@@ -1,20 +1,20 @@
-title: $:/plugins/felixhayashi/tiddlymap/dialog/elementTypeManager
+title: $:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager
 subtitle: {{$:/core/images/tag-button}} <<topic>>
 buttons: element_type_manager
 
 \rules except wikilink
 
-\define defaultTab() $:/plugins/felixhayashi/tiddlymap/dialog/elementTypeManager/overview
-\define settingsTab() $:/plugins/felixhayashi/tiddlymap/dialog/elementTypeManager/generalSettings
+\define defaultTab() $:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/overview
+\define settingsTab() $:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/generalSettings
 
 \define noTypeFound() 
 <li>
 <$button tooltip="Create a new type">
   {{$:/core/images/new-button}} Create type
-  <$action-setfield $tiddler="$:/temp/tmap/elementTypeSearch" text="" />
+  <$action-setfield $tiddler="$:/temp/tmap/MapElementTypeSearch" text="" />
   <$action-sendmessage
       $message="tmap:tm-create-type"
-      mode=<<mode>> id={{$:/temp/tmap/elementTypeSearch}}
+      mode=<<mode>> id={{$:/temp/tmap/MapElementTypeSearch}}
       output=<<output>> />
   <$action-setfield creation-name="" />
 </$button>
@@ -26,14 +26,14 @@ buttons: element_type_manager
 <div id="element-type-manager">
   <div>
     <div class="searchbar">
-      <$edit-text focus="true" tiddler="$:/temp/tmap/elementTypeSearch" type="text" tag="input" default="" />
+      <$edit-text focus="true" tiddler="$:/temp/tmap/MapElementTypeSearch" type="text" tag="input" default="" />
     </div>
     <ul>
     <$list filter=<<filter>> emptyMessage=<<noTypeFound>>>
       <li>
         <$button class="tc-btn-invisible tmap-link">{{!!title}}
           <$action-setfield
-              $tiddler=<<qualify "$:/state/tabs/elementTypeManager">>
+              $tiddler=<<qualify "$:/state/tabs/MapElementTypeManager">>
               text=<<defaultTab>> />
           <$action-sendmessage
               $message="tmap:tm-load-type-form"
@@ -50,8 +50,8 @@ buttons: element_type_manager
       <$macrocall
           $name="tabs"
           default=<<defaultTab>>
-          state="$:/state/tabs/elementTypeManager"
-          tabsList="[all[shadows]prefix[$:/plugins/felixhayashi/tiddlymap/dialog/elementTypeManager/]]" />
+          state="$:/state/tabs/MapElementTypeManager"
+          tabsList="[all[shadows]prefix[$:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/]]" />
     </$reveal>
     <$reveal type="match" text="" default={{!!id}} >
       <div class="tmap-flash-message tmap-info">

@@ -32,6 +32,7 @@ exports.config = {
     hideNodesOnDrag: false,
     hover: false,
     navigationButtons: true,
+    multiselect: true,
     selectable: true,
     selectConnectedEdges: true,
     tooltipDelay: 300,

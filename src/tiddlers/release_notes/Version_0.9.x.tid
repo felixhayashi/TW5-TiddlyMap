@@ -43,6 +43,10 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.9.5
+
+* Styles relicts made it into the graph when in live view
+
 ### v0.9.4
 
 * Editor was not working correctly

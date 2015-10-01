@@ -43,6 +43,10 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.9.4
+
+* Editor was not working correctly
+
 ### v0.9.3
 
 * Fixed bug that was introduced with v0.9.1: No alerts anymore

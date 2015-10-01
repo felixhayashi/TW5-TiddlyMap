@@ -398,13 +398,11 @@ MapWidget.prototype.rebuildEditorBar = function() {
   
   var variables = utils.flatten({
     param: {
-      viewLabel: this.view.getLabel(),
       isViewBound: String(this.isViewBound()),
-      ref: {
-        view: this.view.getLabel(),
-        viewHolder: this.getViewHolderRef(),
-        edgeFilter: this.view.getPaths().edgeFilter
-      },
+      view: this.view.getRoot(),
+      viewLabel: this.view.getLabel(),
+      viewHolder: this.getViewHolderRef(),
+      edgeFilter: this.view.getPaths().edgeFilter,
       allEdgesFilter: this.opt.selector.allEdgeTypes
     }
   });

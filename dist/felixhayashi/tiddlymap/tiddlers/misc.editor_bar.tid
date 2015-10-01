@@ -9,9 +9,9 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
   View:
   <$reveal type="match" text="false" default=<<param.isViewBound>> >
     <$select
-        tiddler=<<param.ref.viewHolder>>
+        tiddler=<<param.viewHolder>>
         field="text"
-        default=<<param.ref.view>> >
+        default=<<param.viewLabel>> >
       <$list filter=<<tmap "option" "selector.allViewsByLabel">> >
         <option value={{!!title}}>
           <$view tiddler={{!!title}} field="title" />
@@ -85,7 +85,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
     <div class="tc-drop-down">
     <$button class="tc-btn-invisible">Hide neighbourhood
       <$action-setfield
-          $tiddler=<<param.ref.view>>
+          $tiddler=<<param.view>>
           config.neighbourhood_scope="" />
     </$button>
     <hr />
@@ -97,14 +97,14 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
       <$button class="tc-btn-invisible">
         <<tmap "splitAndSelect" "|" "1">>
         <$action-setfield
-            $tiddler=<<param.ref.view>>
+            $tiddler=<<param.view>>
             config.neighbourhood_scope=<<tmap "splitAndSelect" "|" "0">> />
       </$button>
     </$list>
     <hr />
     <$button class="tc-btn-invisible">No limit
       <$action-setfield
-          $tiddler=<<param.ref.view>>
+          $tiddler=<<param.view>>
           config.neighbourhood_scope="100" />
     </$button>
     </div>

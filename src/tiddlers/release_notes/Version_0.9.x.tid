@@ -10,6 +10,17 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.9.3
+
+* #168  Enhanced the create view dialog; Allow moving portions of a
+  map to a new map via copy/cut and paste.
+* It is now possible to select multiple nodes or edges by holding
+  down the ctrl key or by a longheld click (1 second).
+* In addition to the multi-select, it is now possible to delete
+  multiple nodes at once.
+* Selecting, dragging, moving, copying **multiple nodes** is now possible.
+* Resolves #169: Better installation experience
+
 ### v0.9.2
 
 * Dynamic creation of edge labels if they do not exist
@@ -32,6 +43,17 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.9.3
+
+* Fixed bug that was introduced with v0.9.1: No alerts anymore
+  that contain questions whether to cancel the draft or not.
+* Fixed bug that node filters couldn't be deleted
+* Fixed wrong modal css in mobile
+* Fixed a critical bug that assigned new ids when upgrading from
+  very early versions (where users could manually define the tmap id
+  field). This happened because "tmap.id" is now always used as id
+  field.
+
 ### v0.9.2
 
 * Fixed bug that null labels where displayed for edges.
@@ -43,6 +65,7 @@ Important Bugfixes
 ### v0.9.1
 
 * Fixes #165: Unexpected behaviour from sidebar map resize button
+* Changed the way the fullscreen cancellation of drafts is handled
 
 ### v0.9.0
 

@@ -18,7 +18,7 @@ For example open firebug and enter the following in the console:
 
 ```javascript
 // create a new view
-var myView = $tw.tmap.adapter.createView("My new View");
+var myView = $tw.tmap.adapter.getView("My new View", true);
 
 // insert a node in this view
 var node = { label: "I am a node" };

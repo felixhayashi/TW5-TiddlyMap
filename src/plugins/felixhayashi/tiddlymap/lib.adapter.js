@@ -972,13 +972,6 @@ Adapter.prototype._removeObsoleteViewData = function(nodes, view) {
   
 };
 
-/**
- * Add style to nodes.
- * 
- * Warning: never add an object as default property (e.g. font = {})
- * because this will prevent the node in the dataset being reset on
- * reload since vis merges old properties into the new node on update.
- */
 Adapter.prototype.attachStylesToNodes = function(nodes, view) {
   
   view = new ViewAbstraction(view);
@@ -1045,27 +1038,37 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
   
     // == tweaks ==
     
-    node.color = (typeof node.color === "object"
-                  ? node.color.background
-                  : node.color);
+    var color = (typeof node.color === "object"
+                 ? node.color.background
+                 : node.color);
+
+    node.color = {
+      border: "#cccccc",
+      background: color,
+      highlight: {
+        border: "#B6AA1B", // ~ yellow
+        background: "#C6C6C6"
+      },
+    };
+    
   
     // determine font color if not defined via a group- or node-style;
     // in case of global and local default styles, the user is responsible
     // him- or herself to adjust the font
-    if(node.font && typeof node.font === "object" && !node.font.color) {
+    node.font = node.font || {};
+    if(typeof node.font === "object" && !node.font.color) {
       var shape = node.shape;
       if(shape && !this.visShapesWithTextInside[shape]) {
         node.font.color = "black";
       } else {
-        if(node.color) {
-          node.font.color = getContrastColour(node.color, node.color,
-                                              "black", "white");
+        if(color) {
+          node.font.color = getContrastColour(color, color, "black", "white");
         }
       }
     }
     
     if(node.shape === "icon" && typeof node.icon === "object") {
-      node.icon.color = node.color;
+      node.icon.color = color;
     }
     
     // == independent information ==

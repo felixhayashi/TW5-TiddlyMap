@@ -58,10 +58,6 @@ exports.config = {
       highlight: {
         border: "#2B7CE9",
         background: "#D2E5FF"
-        },
-      hover: {
-        border: "white",
-        background: "white"
       }
     }
   },

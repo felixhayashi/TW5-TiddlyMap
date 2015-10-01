@@ -404,6 +404,7 @@ var rebuildGlobals = function(parent) {
   
 };
 
+var lastCurrentTiddler = null;
 var updateLiveViewTrigger = function(changedTiddlers) {
   
   if(changedTiddlers["$:/HistoryList"]) {
@@ -412,7 +413,8 @@ var updateLiveViewTrigger = function(changedTiddlers) {
     var tRef = utils.getField("$:/temp/focussedTiddler", "text");
   }
   
-  if(tRef != null) { // not null or undefined
+  if(tRef != null && lastCurrentTiddler !== tRef) {
+    lastCurrentTiddler = tRef;
     utils.setField("$:/temp/tmap/currentTiddler", "text", tRef);
   }   
       

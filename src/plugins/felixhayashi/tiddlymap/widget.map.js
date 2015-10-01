@@ -628,6 +628,10 @@ MapWidget.prototype.rebuildGraph = function(options) {
     this.reloadOptions();
   }
   
+  if(options.resetSelection) {
+    this.network.unselectAll();
+  }
+  
   if(!options.resetFocus) {
     // option or data resets always overrule any flags!
     this.doFitAfterStabilize = false;
@@ -672,6 +676,8 @@ MapWidget.prototype.getContainer = function() {
 MapWidget.prototype.reloadOptions = function() {
   
   // reset all previous options
+  // it's a hack to avoid options from the old view making it into
+  // the new view
   this.network.setOptions({
     nodes: undefined,
     edges: undefined,
@@ -709,7 +715,8 @@ MapWidget.prototype.rebuildGraphData = function(isRebuild) {
       
   this.graphData.nodes = this.getRefreshedDataSet(nodes, // new nodes
                                        this.graphData.nodesById, // old nodes
-                                       this.graphData.nodes); // dataset
+                                       this.graphData.nodes, // dataset
+                                       true); // remove old properties first
                                                                                 
   this.graphData.edges = this.getRefreshedDataSet(edges, // new edges
                                        this.graphData.edgesById, // old edges
@@ -1313,6 +1320,7 @@ MapWidget.prototype.handleTriggeredRefresh = function(trigger) {
     this.rebuildGraph({
       resetData: false,
       resetOptions: false,
+      resetSelection: true,
       resetFocus: { delay: 1000, duration: 1000 }
     });
   
@@ -2170,46 +2178,55 @@ MapWidget.prototype.getView = function(isRebuild) {
  *     *old* set of nodes.
  * @param {vis.DataSet} [ds] - The dataset to be updated
  */
-MapWidget.prototype.getRefreshedDataSet = function(ltNew, lTOld, ds) {
+MapWidget.prototype.getRefreshedDataSet = function(ltNew, ltOld, ds, doClear) {
   
   if(!ds) {
-    return new vis.DataSet(utils.convert(ltNew, "array"));
+    return new vis.DataSet(utils.getValues(ltNew));
   }
   
-  // first remove
-  var removes = [];
-  for(var id in lTOld) {
-    if(!ltNew[id]) {
-      removes.push(id);
-    }
-  }
-  ds.remove(removes);
+  // we keep positions
+  // also resetting shape or icons results in a crazy bug where
+  // vis displays icons of other nodes in the graph
+  var noClear = {
+    "id": true,
+    "x": true,
+    "y": true,
+    "shape": true,
+    "icon": true
+  };
   
-  // get all nodes that remain after the remove operation
-  var existing = ds.get({ returnType: "Object" });
-  
-  var updates = [];
-  for(var id in ltNew) {
-    var update = ltNew[id];
+  var remove = [];
+  var clear = [];
+  for(var id in ltOld) {
     
-    // see https://github.com/almende/vis/issues/1226
-    if(existing[id]) { // node already exists in graph
-      for(var prop in existing[id]) {
-        // some stuff like x and y should remain
-        if(prop === "x" || prop === "y") continue;
-        // if not contained in update, explicitly set to null to
-        // override old properties
-
-        if(update[prop] === undefined) {
-          update[prop] = null;
+    if(ltNew[id]) { // in both sets
+      
+      if(doClear) {
+        var oldNode = ltOld[id];
+        var clearer = {  id: id };
+        for(var p in oldNode) {
+          if(!noClear[p]) {
+            clearer[p] = null;
+          }
         }
+        clear.push(clearer); 
       }
+      
+    } else { // in old but not contained in new set
+      
+      remove.push(id);
+      
     }
-    
-    // now push
-    updates.push(update);
   }
-  ds.update(updates);
+  // remove elements that are not contained in the new set
+  ds.remove(remove);
+    
+  // we need to update the clears first, so vis removes all old
+  // nested properties
+  if(doClear) ds.update(clear);
+        
+  // finally inject the new data
+  ds.update(utils.getValues(ltNew));
   
   return ds;
   

@@ -167,35 +167,6 @@ utils.convert = function(col, outputType) {
 };
 
 /**
- * Injects the values of setA into setB. Note that setB will only
- * contain distinct values.
- * 
- * **Note**: Properties are not cloned.
- * 
- * @param {Collection} setA - Collection from which values are read.
- * @param {Collection} setB - Collection into which values are merged.
- * @return {Collection} setB
- */
-utils.inject = function(setA, setB) {
-
-  if(setB instanceof vis.DataSet) { // output is a dataset
-    setB.update(utils.convert(setA, "array"));
-  } else if(Array.isArray(setB)) { // output is an array
-    setA = utils.convert(setA, "object");
-    for(var p in setA) {
-      if(!utils.inArray(setA[p], setB)) { // not contained yet
-        setB.push(setA[p]);
-      }
-    }
-  } else { // assume normal object
-    $tw.utils.extend(setB, utils.convert(setA, "object"));
-  }
-  
-  return setB;
-  
-};
-
-/**
  * Extract all the values from a collection. If `col` is an object,
  * only properties are considered that are its own and iterable.
  * 
@@ -206,7 +177,7 @@ utils.getValues = function(col) {
   
   if(Array.isArray(col)) {
     return col; // bounce back.
-  } if(col instanceof vis.DataSet) { // a dataset
+  } else if(col instanceof vis.DataSet) { // a dataset
     return col.get({ returnType: "Array" });
   }
   

@@ -972,6 +972,13 @@ Adapter.prototype._removeObsoleteViewData = function(nodes, view) {
   
 };
 
+/**
+ * Add style to nodes.
+ * 
+ * Warning: never add an object as default property (e.g. font = {})
+ * because this will prevent the node in the dataset being reset on
+ * reload since vis merges old properties into the new node on update.
+ */
 Adapter.prototype.attachStylesToNodes = function(nodes, view) {
   
   view = new ViewAbstraction(view);
@@ -1045,8 +1052,7 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
     // determine font color if not defined via a group- or node-style;
     // in case of global and local default styles, the user is responsible
     // him- or herself to adjust the font
-    node.font = node.font || {};
-    if(typeof node.font === "object" && !node.font.color) {
+    if(node.font && typeof node.font === "object" && !node.font.color) {
       var shape = node.shape;
       if(shape && !this.visShapesWithTextInside[shape]) {
         node.font.color = "black";

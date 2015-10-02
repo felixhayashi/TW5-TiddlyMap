@@ -10,6 +10,13 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.9.7
+
+* Tries to cater for #171. The user always has a chance to create a
+  new tiddler on the fly and then link to it when searching.
+* Again related to #171: All TiddlyMap popups are now closed when
+  the user is clicking outside.
+  
 ### v0.9.3
 
 * #168  Enhanced the create view dialog; Allow moving portions of a

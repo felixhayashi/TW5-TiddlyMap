@@ -16,7 +16,6 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 
 \define tiddlerSearchFilter()
 [!is[system]!has[draft.of]search:title{$:/temp/quickConnectSearch}sort[title]]
-[{$:/temp/quickConnectSearch}]
 \end
 
 \define showButton(state)
@@ -29,6 +28,34 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 <span class="tc-btn-text"><$text text={{$:/language/Buttons/TiddlyMap/Caption}}/></span>
 </$list>
 </$button>
+\end
+
+\define searchResults()
+<td>
+  <$button>⇦
+    <$action-sendmessage $message="tmap:tm-create-edge"
+                         from=<<item>>
+                         to=<<currentTiddler>>
+                         label={{$:/temp/quickConnectSearch/type}}
+                         view={{$:/temp/quickConnectSearch/view}} />
+  </$button>
+</td>
+<td>
+  <$button>⇨
+    <$action-sendmessage $message="tmap:tm-create-edge"
+                         from=<<currentTiddler>>
+                         to=<<item>>
+                         label={{$:/temp/quickConnectSearch/type}}
+                         view={{$:/temp/quickConnectSearch/view}} />
+  </$button>
+</td>
+<td>
+  <$list
+      filter="[<item>is[tiddler]]"
+      emptyMessage=<<createItemButton>>>
+    <$view tiddler=<<item>> field="title" />
+  </$list>
+</td>
 \end
 
 \define hidePopup()
@@ -71,34 +98,13 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
             <$list
                 filter=<<tiddlerSearchFilter>>
                 variable="item">
-            <tr>
-              <td>
-                <$button>⇦
-                  <$action-sendmessage $message="tmap:tm-create-edge"
-                                       from=<<item>>
-                                       to=<<currentTiddler>>
-                                       label={{$:/temp/quickConnectSearch/type}}
-                                       view={{$:/temp/quickConnectSearch/view}} />
-                </$button>
-              </td>
-              <td>
-                <$button>⇨
-                  <$action-sendmessage $message="tmap:tm-create-edge"
-                                       from=<<currentTiddler>>
-                                       to=<<item>>
-                                       label={{$:/temp/quickConnectSearch/type}}
-                                       view={{$:/temp/quickConnectSearch/view}} />
-                </$button>
-              </td>
-              <td>
-                <$list
-                    filter="[<item>is[tiddler]]"
-                    emptyMessage=<<createItemButton>>>
-                  <$view tiddler=<<item>> field="title" />
-                </$list>
-              </td>
-            </tr>
+            <tr><<searchResults>></tr>
             </$list>
+            <tr>
+            <$list filter="[{$:/temp/quickConnectSearch}regexp[.+]] -[is[tiddler]]" variable="item">
+              <<searchResults>>
+            </$list>
+            </tr>
           </table>
         </td>
       </tr>

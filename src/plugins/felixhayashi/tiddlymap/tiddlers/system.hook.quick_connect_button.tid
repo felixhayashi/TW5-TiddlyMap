@@ -7,8 +7,16 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 
 \define defConFiltr() [!suffix[tw-body:link]]
 
+\define createItemButton()
+<$button>
+  {{$:/core/images/new-button}} Create tiddler "<<item>>"
+  <$action-setfield $tiddler=<<item>> text="" />
+</$button>
+\end
+
 \define tiddlerSearchFilter()
 [!is[system]!has[draft.of]search:title{$:/temp/quickConnectSearch}sort[title]]
+[{$:/temp/quickConnectSearch}]
 \end
 
 \define showButton(state)
@@ -36,7 +44,12 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
       <tr>
         <td>Type:</td>
         <td>
-          <$edit-text tiddler="$:/temp/quickConnectSearch/type" field="text" type="text" tag="input" default="" />
+          <$edit-text
+              tiddler="$:/temp/quickConnectSearch/type"
+              field="text"
+              type="text"
+              tag="input"
+              default="" />
           <$select tiddler="$:/temp/quickConnectSearch/type" default="">
             <option></option>
             <$list filter=<<tmap "option" "selector.allEdgeTypesByLabel">>  >
@@ -55,7 +68,9 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
       <tr>
         <td colspan="2">
           <table class="tmap-very-small-list">
-            <$list filter=<<tiddlerSearchFilter>> variable="item" emptyMessage="//No results//">
+            <$list
+                filter=<<tiddlerSearchFilter>>
+                variable="item">
             <tr>
               <td>
                 <$button>⇦
@@ -75,7 +90,13 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
                                        view={{$:/temp/quickConnectSearch/view}} />
                 </$button>
               </td>
-              <td><$view tiddler=<<item>> field="title" /></td>
+              <td>
+                <$list
+                    filter="[<item>is[tiddler]]"
+                    emptyMessage=<<createItemButton>>>
+                  <$view tiddler=<<item>> field="title" />
+                </$list>
+              </td>
             </tr>
             </$list>
           </table>

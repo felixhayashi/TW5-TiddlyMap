@@ -438,6 +438,35 @@ var printChanges = function(changedTiddlers) {
 
 };
 
+var popupStates = [
+  "$:/temp/tiddlymap/quickConnectButton",
+  "$:/temp/tmap/state/focus"
+];
+
+/**
+ * @TODO: suggest this to Jeremy for TW popup handling
+ */
+var registerClickListener = function() {
+    
+  window.addEventListener("click", function(evt) {
+    
+    for(var i = popupStates.length; i--;) {
+      if(utils.getText(popupStates[i])) break;
+    }
+    
+    if(i === -1) return;
+    
+    var el = document.elementFromPoint(evt.clientX, evt.clientY);
+                                          
+    if(!utils.getAncestorWithClass(el, "tc-drop-down")) {
+      for(var i = popupStates.length; i--;) {
+        utils.setText(popupStates[i], "");
+      }
+    }
+    
+  }, false);
+};
+
 var registerChangeListener = function(callbackManager) {
   
   var nodeTypePath = $tw.tmap.opt.path.nodeTypes;
@@ -532,6 +561,7 @@ var registerChangeListener = function(callbackManager) {
 var cleanup = function() {
   
   utils.deleteByPrefix("$:/temp/felixhayashi");
+  utils.deleteByPrefix("$:/temp/tiddlymap");
   utils.deleteByPrefix("$:/temp/tmap");
                  
 };
@@ -622,6 +652,7 @@ exports.startup = function() {
         
   // AT THE VERY END: register change listener with the callback manager
   registerChangeListener($tw.tmap.callbackManager);
+  registerClickListener();
   
   // issue notification
   $tw.tmap.logger("warn", "TiddlyMap's caretaker successfully started");

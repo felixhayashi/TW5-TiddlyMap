@@ -92,13 +92,14 @@ var attachOptions = function(parent) {
   // Never modify the imported config objects; instead, merge them
   // into a new object  
 
+  // attention! it is a tw-data-tiddler!
   opt.config.sys = utils.merge(
     {}, sysConfig,
     utils.unflatten($tw.wiki.getTiddlerData(opt.ref.sysUserConf))
   );
   
   opt.config.vis = utils.merge(
-    {}, visConfig, $tw.wiki.getTiddlerData(opt.ref.visUserConf)
+    {}, visConfig, utils.parseFieldData(opt.ref.visUserConf)
   );
 
   // a shortcut for fields property

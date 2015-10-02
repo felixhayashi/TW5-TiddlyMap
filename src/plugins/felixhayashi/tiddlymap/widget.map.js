@@ -201,13 +201,16 @@ MapWidget.prototype.checkForFreshInstall = function() {
       // trigger a save and reload message
       utils.touch("$:/plugins/felixhayashi/topstoryview");
     }
-    
-    var welcomeNode = { label: "Have fun with TiddlyMap!", x: 0, y: 0 };
-    
-    welcomeNode = this.adapter.insertNode(welcomeNode, {
-      view: this.opt.misc.defaultViewLabel,
-      editNodeOnCreate: false
-    });
+        
+    var opt = { view: this.opt.misc.defaultViewLabel };
+    var n1 = this.adapter.insertNode({
+      label: "Have fun with", x: 0, y: 0
+    }, opt);
+    var n2 = this.adapter.insertNode({
+      label: "TiddlyMap!!", x: 100, y: 100
+    }, opt);
+
+    this.adapter.insertEdge({ from: n1.id, to: n2.id });
     
   });
   
@@ -1340,7 +1343,7 @@ MapWidget.prototype.handleConfigureSystem = function() {
       var config = utils.getPropertiesByPrefix(outTObj.fields,
                                                "config.sys.",
                                                true);
-
+      // carefull: this is a data tiddler!
       this.wiki.setTiddlerData(this.opt.ref.sysUserConf, config);
       
       // tw doesn't translate the json to an object so this is already a string

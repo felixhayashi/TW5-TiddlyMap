@@ -54,11 +54,7 @@ exports.config = {
     shape: "box",
     color: {
       border: "#2B7CE9",
-      background: "#97C2FC",
-      highlight: {
-        border: "#2B7CE9",
-        background: "#D2E5FF"
-      }
+      background: "#97C2FC"
     }
   },
   edges: {

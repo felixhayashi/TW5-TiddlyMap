@@ -1,8 +1,8 @@
 caption: v0.9.x
 created: 20150726142912155
-modified: 20150901173329867
+modified: 20151002100143269
 released: not really
-tags: ReleaseNote [[Map Constructs]] Usability Configurability Storage
+tags: ReleaseNote [[Map Constructs]] Usability Configurability Storage Performance
 title: Version 0.9.x
 tmap.id: 16976ded-1d7e-4798-b7ef-a12fc5cdaeef
 type: text/x-markdown
@@ -42,6 +42,12 @@ Major enhancements
 
 Important Bugfixes
 ----------------------------
+
+### v0.9.6
+
+* In v0.9.5 I introduced a very ugly node highlighting. Removed! :)
+* Fixes #174: Keylisteners of the clipboard feature swallow letters.
+* Fixed some visjs css
 
 ### v0.9.5
 

@@ -1,0 +1,8 @@
+created: 20151002100154723
+modified: 20151002100303811
+tags: Challenges
+title: Performance
+tmap.id: 28e3a702-7078-4413-a017-603ddf033f28
+type: text/vnd.tiddlywiki
+
+Making TiddlyMap faster by writing code that is optimizable by JavaScript engines (like V8).

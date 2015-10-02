@@ -1,6 +1,7 @@
 created: 20151001154150530
 description: Neighbours are all nodes that are not part of the original set of nodes ("matches") but are connected (either outgoing or incoming) to a node of the original set.
-style: {"color":"#E6E6E6","font":{"color":"rgba(0,0,0,1)"}}
+modified: 20151002101542372
+style: {"color":{"background":"rgba(86,86,86,1)"}}
 title: $:/plugins/felixhayashi/tiddlymap/graph/nodeTypes/tmap:neighbour
 type: text/vnd.tiddlywiki
 

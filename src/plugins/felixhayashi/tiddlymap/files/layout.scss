@@ -503,9 +503,14 @@ html { // used to increase css importance
           white-space: normal;
         }
       
+        .vis-edit-mode {
+          height: 26px;
+        }
         .vis-manipulation {
+          height: 34px;
           border-top: 1px solid #d6d9d8;
           background: rgba(245, 245, 245, 0.7);
+          
         }
       
         .vis-navigation .vis-button {

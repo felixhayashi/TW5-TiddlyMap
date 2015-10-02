@@ -1042,14 +1042,7 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
                  ? node.color.background
                  : node.color);
 
-    node.color = {
-      border: "#cccccc",
-      background: color,
-      highlight: {
-        border: "#B6AA1B", // ~ yellow
-        background: "#C6C6C6"
-      },
-    };
+    node.color = color;
     
   
     // determine font color if not defined via a group- or node-style;

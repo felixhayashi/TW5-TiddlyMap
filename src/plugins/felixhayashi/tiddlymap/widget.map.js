@@ -627,11 +627,7 @@ MapWidget.prototype.rebuildGraph = function(options) {
   if(options.resetOptions) {
     this.reloadOptions();
   }
-  
-  if(options.resetSelection) {
-    this.network.unselectAll();
-  }
-  
+    
   if(!options.resetFocus) {
     // option or data resets always overrule any flags!
     this.doFitAfterStabilize = false;
@@ -715,8 +711,7 @@ MapWidget.prototype.rebuildGraphData = function(isRebuild) {
       
   this.graphData.nodes = this.getRefreshedDataSet(nodes, // new nodes
                                        this.graphData.nodesById, // old nodes
-                                       this.graphData.nodes, // dataset
-                                       true); // remove old properties first
+                                       this.graphData.nodes); // dataset
                                                                                 
   this.graphData.edges = this.getRefreshedDataSet(edges, // new edges
                                        this.graphData.edgesById, // old edges
@@ -925,7 +920,7 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
   
   this.visNetworkDomNode = this.graphDomNode.firstElementChild;
 
-  this.addKeyBindings();
+  this.addGraphKeyBindings(this.graphDomNode);
 
   // register events
   var handlers = {
@@ -960,74 +955,74 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
 
 };
 
-MapWidget.prototype.addKeyBindings = function(parentDomNode) {
+MapWidget.prototype.addGraphKeyBindings = function(container) {
   
   // asign a tabindex to make it focussable
   this.visNetworkDomNode.tabIndex = 0;
   
-  var keys = vis.keycharm({
-    container: this.parentDomNode,
-    preventDefault: true
-  });
-  
-  keys.bind("delete", function(event) {
-    this.handleRemoveElements(this.network.getSelection());
-  }.bind(this));
-  
-  keys.bind("c", function(event) {
-    if(!event.ctrlKey) return;
-    this.handleAddNodesToClipboard("copy");
-  }.bind(this));
-  
-  keys.bind("x", function(event) {
-    if(!event.ctrlKey) return;
+  this.graphKeydownHandler = function(event) {
     
-    if(!this.editorMode) {
-      this.notify("This view is read only!");
-      return;
-    }
-    
-    this.handleAddNodesToClipboard("move");
-    
-  }.bind(this));
-  
-  keys.bind("v", function(event) {
-    if(!event.ctrlKey) return;
-
-    if(!this.editorMode) {
-      this.notify("This view is read only!");
-      return;
-    }
-    
-    if($tw.tmap.clipBoard) {
+    if(event.keyCode === 46) { // delete
+      this.handleRemoveElements(this.network.getSelection());
       
-      if($tw.tmap.clipBoard.type === "nodes") {
-        var nodes = $tw.tmap.clipBoard.nodes;
-        var ids = Object.keys(nodes);
-        if(ids.length) {
-          for(var id in nodes) {
-            
-            // node already present in this view
-            if(this.graphData.nodesById[id]) continue;
-            
-            this.view.addNodeToView(nodes[id]);
-            // paste nodes already so we can select them!
-            this.graphData.nodes.update({
-              id: id
-            });
-          }
-          this.network.selectNodes(ids);
-          this.notify("pasted " + ids.length + " nodes into map.");
+    } else if(event.ctrlKey) { // ctrl key is hold down
+      
+      if(event.keyCode === 88) { // x
+        if(this.editorMode) {
+          this.handleAddNodesToClipboard("move");
+        } else {
+          this.notify("Map is read only!");
         }
-        return;
+        
+      } else if(event.keyCode === 67) { // c
+        this.handleAddNodesToClipboard("copy");
+        
+      } else if(event.keyCode === 86) { // v
+        this.handlePasteNodesFromClipboard();
       }
+      
+      event.preventDefault();
     }
     
-    this.notify("TiddlyMap clipboad is empty!");
-    
-  }.bind(this));
+  }.bind(this);
   
-};  
+  container.addEventListener('keyup', this.graphKeydownHandler, true);
+  
+};
+
+MapWidget.prototype.handlePasteNodesFromClipboard = function() {
+  
+  if(!this.editorMode) {
+    this.notify("Map is read only!");
+    return;
+  }
+  
+  if($tw.tmap.clipBoard) {
+    if($tw.tmap.clipBoard.type === "nodes") {
+      var nodes = $tw.tmap.clipBoard.nodes;
+      var ids = Object.keys(nodes);
+      if(ids.length) {
+        for(var id in nodes) {
+          
+          // node already present in this view
+          if(this.graphData.nodesById[id]) continue;
+          
+          this.view.addNodeToView(nodes[id]);
+          // paste nodes already so we can select them!
+          this.graphData.nodes.update({
+            id: id
+          });
+        }
+        this.network.selectNodes(ids);
+        this.notify("pasted " + ids.length + " nodes into map.");
+      }
+      return;
+    }
+  }
+  
+  this.notify("TiddlyMap clipboad is empty!");
+    
+};
 
 MapWidget.prototype.handleAddNodesToClipboard = function(mode) {
   
@@ -1320,7 +1315,6 @@ MapWidget.prototype.handleTriggeredRefresh = function(trigger) {
     this.rebuildGraph({
       resetData: false,
       resetOptions: false,
-      resetSelection: true,
       resetFocus: { delay: 1000, duration: 1000 }
     });
   
@@ -1394,15 +1388,14 @@ MapWidget.prototype.handleReconnectEdge = function(updates) {
  * @param {Array<Id>} elements.edges - Removed nodes.
  */
 MapWidget.prototype.handleRemoveElements = function(elements) {
-  
-  if(elements.edges.length && !elements.nodes.length) {
-    // = only edges are removed
-    this.handleRemoveEdges(elements.edges);
-  }
-                      
+          
   if(elements.nodes.length) {
-    // = nodes and maybe some edges are removed
+    // the adapter also removes edges when nodes are removed.
     this.handleRemoveNodes(elements.nodes);
+    
+  } else if(elements.edges.length) {
+    this.handleRemoveEdges(elements.edges);
+    
   }
   
   this.resetVisManipulationBar();
@@ -1990,7 +1983,13 @@ MapWidget.prototype.destruct = function() {
   window.removeEventListener("click", this.handleClickEvent);
   window.removeEventListener("click", this.handleFullScreenChange);
   
-  if(this.network) { this.network.destroy(); }
+  // while the container should be destroyed and the listeners
+  // garbage collected, we remove them manually just to be save
+  this.graphDomNode.removeEventListener('keyup', this.graphKeydownHandler, true);
+  
+  if(this.network) {
+    this.network.destroy();
+  }
   
 };
 
@@ -2178,54 +2177,23 @@ MapWidget.prototype.getView = function(isRebuild) {
  *     *old* set of nodes.
  * @param {vis.DataSet} [ds] - The dataset to be updated
  */
-MapWidget.prototype.getRefreshedDataSet = function(ltNew, ltOld, ds, doClear) {
+MapWidget.prototype.getRefreshedDataSet = function(ltNew, ltOld, ds) {
   
   if(!ds) {
     return new vis.DataSet(utils.getValues(ltNew));
   }
-  
-  // we keep positions
-  // also resetting shape or icons results in a crazy bug where
-  // vis displays icons of other nodes in the graph
-  var noClear = {
-    "id": true,
-    "x": true,
-    "y": true,
-    "shape": true,
-    "icon": true
-  };
-  
-  var remove = [];
-  var clear = [];
-  for(var id in ltOld) {
-    
-    if(ltNew[id]) { // in both sets
-      
-      if(doClear) {
-        var oldNode = ltOld[id];
-        var clearer = {  id: id };
-        for(var p in oldNode) {
-          if(!noClear[p]) {
-            clearer[p] = null;
-          }
-        }
-        clear.push(clearer); 
-      }
-      
-    } else { // in old but not contained in new set
-      
-      remove.push(id);
-      
-    }
-  }
-  // remove elements that are not contained in the new set
-  ds.remove(remove);
-    
-  // we need to update the clears first, so vis removes all old
-  // nested properties
-  if(doClear) ds.update(clear);
+
+  // remove all elements;
+  // formerly I kept all elements that were included in the new set in
+  // the dataset. I would then set properties to null that are
+  // not present anymore to prevent property relicts. This turned out
+  // to be cumbersome and didn't really work with vis, especially
+  // setting nested properties to null. therefore I decided to simply
+  // remove all previous elements – surprisingly you don't see any
+  // performance decrease…
+  if(ltOld) ds.remove(Object.keys(ltOld));
         
-  // finally inject the new data
+  // inject the new data
   ds.update(utils.getValues(ltNew));
   
   return ds;

@@ -293,7 +293,10 @@ html {
       html .tmap-widget .tmap-vis-graph .vis-network .vis-network-tooltip {
         max-width: 250px;
         white-space: normal; }
+      html .tmap-widget .tmap-vis-graph .vis-network .vis-edit-mode {
+        height: 26px; }
       html .tmap-widget .tmap-vis-graph .vis-network .vis-manipulation {
+        height: 34px;
         border-top: 1px solid #d6d9d8;
         background: rgba(245, 245, 245, 0.7); }
       html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button.tmap-button-enabled {

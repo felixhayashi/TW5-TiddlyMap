@@ -837,7 +837,7 @@ utils.isDraft = function(tiddler) {
  * @param {...Object} src - At least one object to merge into `dest`.
  * @return {Object} The original `dest` object.
  */
-utils.merge = function(dest /*[,src], src*/) {
+utils.merge = (function() {
   
   var _merge = function(dest, src) {
     
@@ -855,56 +855,60 @@ utils.merge = function(dest /*[,src], src*/) {
       
     return dest;
   };
-  
-  // start the merging; i = 1 since first argument is the destination
-  for(var i = 1, l = arguments.length; i < l; i++) {
-    var src = arguments[i];
-    if(src != null && typeof src === "object") {
-      dest = _merge(dest, src);
-    }
-  }
-  
-  return dest;
 
-};
-
-  /**
-   * This function will draw a raster on the network canvas that will
-   * adjust to the network's current scaling factor and viewport offset.
-   * 
-   * @param {CanvasRenderingContext2D} context - The canvas's context
-   *     passed by vis.
-   * @param {number} scaleFactor - The current scale factor of the network.
-   * @param {Object} viewPosition - Object with x and y that represent the
-   *     current central focus point of the view.
-   * @param {number} rasterSize - The size of the squares that are drawn.
-   * @param {string} color - A string parsed as CSS color value.
-   */
-  utils.drawRaster = function(context, scaleFactor, viewPosition, rasterSize, color) {
+  return function(dest /*[,src], src*/) {
     
-    var rasterSize = parseInt(rasterSize) || 10;
-    var canvas = context.canvas;
-    var width = canvas.width / scaleFactor;
-    var height = canvas.width / scaleFactor;
-    var offsetLeft = viewPosition.x - (width / 2);
-    var offsetTop = viewPosition.y - (height / 2);
-        
-    // draw vertical lines
-    for(var x = offsetLeft; x < width; x += rasterSize) {
-      context.moveTo(x, offsetTop);
-      context.lineTo(x, height);
+    // start the merging; i = 1 since first argument is the destination
+    for(var i = 1, l = arguments.length; i < l; i++) {
+      var src = arguments[i];
+      if(src != null && typeof src === "object") {
+        dest = _merge(dest, src);
+      }
     }
-        
-    // draw horizontal lines
-    for(var y = offsetTop; y < height; y += rasterSize) {
-      context.moveTo(offsetLeft, y);
-      context.lineTo(width, y);
-    }
-
-    context.strokeStyle = color || "#D9D9D9";
-    context.stroke();
+    
+    return dest;
 
   };
+
+})();
+
+/**
+ * This function will draw a raster on the network canvas that will
+ * adjust to the network's current scaling factor and viewport offset.
+ * 
+ * @param {CanvasRenderingContext2D} context - The canvas's context
+ *     passed by vis.
+ * @param {number} scaleFactor - The current scale factor of the network.
+ * @param {Object} viewPosition - Object with x and y that represent the
+ *     current central focus point of the view.
+ * @param {number} rasterSize - The size of the squares that are drawn.
+ * @param {string} color - A string parsed as CSS color value.
+ */
+utils.drawRaster = function(context, scaleFactor, viewPosition, rasterSize, color) {
+  
+  var rasterSize = parseInt(rasterSize) || 10;
+  var canvas = context.canvas;
+  var width = canvas.width / scaleFactor;
+  var height = canvas.width / scaleFactor;
+  var offsetLeft = viewPosition.x - (width / 2);
+  var offsetTop = viewPosition.y - (height / 2);
+      
+  // draw vertical lines
+  for(var x = offsetLeft; x < width; x += rasterSize) {
+    context.moveTo(x, offsetTop);
+    context.lineTo(x, height);
+  }
+      
+  // draw horizontal lines
+  for(var y = offsetTop; y < height; y += rasterSize) {
+    context.moveTo(offsetLeft, y);
+    context.lineTo(width, y);
+  }
+
+  context.strokeStyle = color || "#D9D9D9";
+  context.stroke();
+
+};
 
 /**
  * Get a tiddler's text or otherwise return a default text.

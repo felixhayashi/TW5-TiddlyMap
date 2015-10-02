@@ -215,12 +215,18 @@ MapConfigWidget.prototype.getOptionFilter = function(mode) {
       color: {
         background: true
       },
-      font: true,
+      font: {
+        color: true,
+        size: true
+      },
       icon: true,
       labelHighlightBold: true,
       shadow: true,
       shape: true,
-      shapeProperties: true,
+      shapeProperties: {
+        borderDashes: true,
+        
+      },
       size: true
     },
     edges: {
@@ -230,7 +236,7 @@ MapConfigWidget.prototype.getOptionFilter = function(mode) {
       font: true,
       labelHighlightBold: true,
       length: true,
-      selfReferenceSize: true,
+      selfReferenceSize: false,
       shadow: true,
       smooth: true,
       width: true

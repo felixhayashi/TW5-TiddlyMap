@@ -1,7 +1,7 @@
 created: 20150627125908877
-modified: 20150824192414491
+modified: 20151002210349314
 tags: 
 title: $:/plugins/felixhayashi/tiddlymap/config/vis/user
 type: application/json
 
-{"edges":{"color":{"color":"#B22222"},"arrows":{"to":true,"middle":{"enabled":false},"from":{"enabled":false}}},"nodes":{"font":{"size":15,"color":"#FFFFFF"},"color":{"background":"rgba(178,34,34,1)","border":"rgba(112,2,4,1)","highlight":{"border":"rgba(112,2,4,1)","background":"rgba(178,34,34,1)"}}}}
+{"edges":{"color":{"color":"#B22222"},"arrows":{"to":true,"middle":{"enabled":false},"from":{"enabled":false}}},"nodes":{"font":{"size":15,"color":"#FFFFFF"},"color":{"background":"rgba(178,34,34,1)","border":"rgba(112,2,4,1)"}}}

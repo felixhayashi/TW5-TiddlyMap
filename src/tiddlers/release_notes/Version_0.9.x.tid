@@ -50,6 +50,15 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.9.8
+
+* Fixed installation issues: In new wikis, the config was not read
+  because the getTiddlerData function was used on tiddlers that
+  were not marked as data tiddlers.
+* By accident a wrong edge filter was added to the default view. wtf?
+* Fixed bug that a node inserted with the adapter was not immediately
+  inserted into the node-index, only after refresh!
+
 ### v0.9.6
 
 * In v0.9.5 I introduced a very ugly node highlighting. Removed! :)

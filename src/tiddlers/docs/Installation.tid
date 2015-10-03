@@ -1,5 +1,5 @@
 created: 20141218163905294
-modified: 20150930184354525
+modified: 20151003192229146
 tags: Documentation
 title: Installation
 tmap.edges: {}
@@ -12,28 +12,28 @@ type: text/vnd.tiddlywiki
 
 By using this plugin you agree to the product's [[License Terms|$:/plugins/felixhayashi/tiddlymap/license]] (~TiddlyMap is distributed under the [[BSD 2-Clause License|http://opensource.org/licenses/BSD-2-Clause]]).
 
-!! Installation procedure
+!! Installation and update procedure
 
 <i class="fa fa-exclamation-circle"></i>  Before installing, I highly recommend you have a quick look at [[Common Pitfalls]] and [[Best Practices]].
 
-# Create a backup of your current TiddlyWiki HTML file (just in case)
-# Open your TiddlyWiki in a browser 
+# Create a backup of your current TiddlyWiki HTML file (just in case).
+# Open your TiddlyWiki in a browser.
 # Drag all <sup>[1]</sup> the links below to the browser window containing your TiddlyWiki:
 #; [[TW5-TiddlyMap|$:/plugins/felixhayashi/tiddlymap]]
-#: This will install tiddlymap.
+#: This is the core TiddlyMap plugin.
 #; [[TW5-Vis.js|$:/plugins/felixhayashi/vis]]
-#: This plugin will install vis.js which is needed for the graph's rendering.
+#: This plugin will install vis.js which is required for the graph's rendering.
 #; [[TW5-HotZone|$:/plugins/felixhayashi/hotzone]]
-#: This plugin is necessary when you want to use the live view.
+#: This plugin is necessary when you want to use the //live view//.
 #; [[TW5-TopStoryView|$:/plugins/felixhayashi/topstoryview]]
-#: Unless you are using the zoomin or stacked story view, install this plugin to achieve a better live view experience.
-# Save your TiddlyWiki
-# Refresh the window
-# Confirm the welcome dialog (appears only when installed for the first time).
-# The plugin should now be available for use
-# Also make sure to always check back to this site to see whether your version is up-to-date as updates and bugfixes come quick! For any bug you discover, please create an issue at [[github.com|https://github.com/felixhayashi/TW5-TiddlyMap/issues]].
+#: Unless you are using the //zoomin// or //stacked// story view, install this plugin to achieve a better live view experience.
+# Save your TiddlyWiki.
+# Refresh the window.
+# Click on the Map tab in your wiki's sidebar.
+# Read and confirm the welcome dialog (appears only when installed for the first time).
+# The plugin should now be available for use.
 
-To update an existing version of TiddlyMap, simply repeat all the steps above.
+Also make sure to always check back to this site to see whether your version is up-to-date as updates and bugfixes come quick! For any bug you discover, please create an issue at [[github.com|https://github.com/felixhayashi/TW5-TiddlyMap/issues]].
 
 For more Information visit: http://tiddlywiki.com/#Plugins
 

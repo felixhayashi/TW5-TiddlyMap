@@ -10,6 +10,13 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.9.9
+
+* Improved the closing behaviour of dropdowns (focus button and
+  tiddler toolbar button).
+* Added indicator when neighbourhood scope is active
+* Optimized font-color assignments
+
 ### v0.9.7
 
 * Tries to cater for #171. The user always has a chance to create a
@@ -50,6 +57,11 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.9.9
+
+* Adding node borders is now allowed and working.
+* Node selection now works with correct styles being set (finally!)
+
 ### v0.9.8
 
 * Fixed installation issues: In new wikis, the config was not read
@@ -67,7 +79,7 @@ Important Bugfixes
 
 ### v0.9.5
 
-* Styles relicts made it into the graph when in live view
+* Style relicts made it into the graph when in live view
 
 ### v0.9.4
 

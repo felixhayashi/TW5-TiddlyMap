@@ -743,6 +743,15 @@ utils.getEntry = function(tiddler, prop, defValue) {
   
 };
 
+//~ utils.getNestedProperty = function(obj, propPath) {
+//~ 
+  //~ propPath = propPath.split(".");
+  //~ for(var i = propPath.length; i--;) {
+    //~ if(obj !== null && typeof obj === "object") {
+      //~ obj = obj[propPath[i]];
+  //~ }
+  //~ 
+//~ };
 
 /**
  * Compare versions.

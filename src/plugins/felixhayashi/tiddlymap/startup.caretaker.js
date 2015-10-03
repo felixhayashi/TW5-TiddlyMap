@@ -240,6 +240,10 @@ var updateTiddlerVsIdIndeces = function(parent, allTiddlers) {
  * For faster access to node-type styles, we store all node-type
  * objects as indeces in a table.
  * 
+ * Types without a filter are not indexed since they are either
+ * special types that TiddlyMap manually assignes (e.g. tmap:neighbour,
+ * or tmap:selected).
+ * 
  * Four indeces are added to the indeces chain:
  * 1. glNTy – all global node types
  * 2. loNTy – all local node types
@@ -255,6 +259,9 @@ var updateTiddlerVsIdIndeces = function(parent, allTiddlers) {
 var updateNodeTypesIndeces = function(parent, allTiddlers) {
 
   parent = parent || $tw.tmap.indeces;
+  
+  // Attention: doesn't include shadow tiddlers unless they are
+  // overridden.
   allTiddlers = allTiddlers || $tw.wiki.allTitles();
 
   var typePath = $tw.tmap.opt.path.nodeTypes;
@@ -264,7 +271,9 @@ var updateNodeTypesIndeces = function(parent, allTiddlers) {
   for(var i = allTiddlers.length; i--;) {
     if(utils.startsWith(allTiddlers[i], typePath)) {
       var type = new NodeType(allTiddlers[i]);
-      (type.view ? loNTy : glNTy).push(type);
+      if(type.scope) {
+        (type.view ? loNTy : glNTy).push(type);
+      }
     }
   }
   
@@ -448,7 +457,7 @@ var popupStates = [
  * @TODO: suggest this to Jeremy for TW popup handling
  */
 var registerClickListener = function() {
-    
+
   window.addEventListener("click", function(evt) {
     
     for(var i = popupStates.length; i--;) {
@@ -459,7 +468,8 @@ var registerClickListener = function() {
     
     var el = document.elementFromPoint(evt.clientX, evt.clientY);
                                           
-    if(!utils.getAncestorWithClass(el, "tc-drop-down")) {
+    if(!$tw.utils.hasClass(el, "tc-drop-down")
+       && !utils.getAncestorWithClass(el, "tc-drop-down")) {
       for(var i = popupStates.length; i--;) {
         utils.setText(popupStates[i], "");
       }

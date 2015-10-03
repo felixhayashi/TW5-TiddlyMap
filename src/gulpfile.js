@@ -36,7 +36,7 @@ gulp.task("compile", ["clean"], function () {
     
   // compile styles
   gulp.src("plugins/**/*.scss")
-    .pipe(sass({ style: "expanded" }))
+    .pipe(sass({ style: "compressed" }))
     .pipe(gulp.dest("../dist/"));
     
   // uglify js

@@ -7,11 +7,11 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
 
 <div class="tmap-menu-bar">
   View:
-  <$reveal type="match" text="false" default=<<param.isViewBound>> >
+  <$reveal type="match" text="false" default=<<isViewBound>> >
     <$select
-        tiddler=<<param.viewHolder>>
+        tiddler=<<viewHolder>>
         field="text"
-        default=<<param.viewLabel>> >
+        default=<<viewLabel>> >
       <$list filter=<<tmap "option" "selector.allViewsByLabel">> >
         <option value={{!!title}}>
           <$view tiddler={{!!title}} field="title" />
@@ -19,8 +19,8 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
       </$list>
     </$select>
   </$reveal>
-  <$reveal type="match" text="true" default=<<param.isViewBound>> >
-    <b><<param.viewLabel>></b>
+  <$reveal type="match" text="true" default=<<isViewBound>> >
+    <b><<viewLabel>></b>
   </$reveal>
 
   <$button
@@ -75,8 +75,8 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
       text="true"
       default=<<tmap "option" "config.sys.editorMenuBar.showNeighScopeButton">>>
     <$button
-        class="tmap-neigh-scope-button"
-        tooltip="Show or hide the neighbourhood"
+        class=<<neighScopeBtnClass>>
+        tooltip="Change the neighbourhood scope"
         popup=<<qualify "$:/temp/neighScope">>>☀
     </$button>
   </$reveal>
@@ -85,7 +85,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
     <div class="tc-drop-down">
     <$button class="tc-btn-invisible">Hide neighbourhood
       <$action-setfield
-          $tiddler=<<param.view>>
+          $tiddler=<<viewRoot>>
           config.neighbourhood_scope="" />
     </$button>
     <hr />
@@ -97,14 +97,14 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
       <$button class="tc-btn-invisible">
         <<tmap "splitAndSelect" "|" "1">>
         <$action-setfield
-            $tiddler=<<param.view>>
+            $tiddler=<<viewRoot>>
             config.neighbourhood_scope=<<tmap "splitAndSelect" "|" "0">> />
       </$button>
     </$list>
     <hr />
     <$button class="tc-btn-invisible">No limit
       <$action-setfield
-          $tiddler=<<param.view>>
+          $tiddler=<<viewRoot>>
           config.neighbourhood_scope="100" />
     </$button>
     </div>
@@ -132,7 +132,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
         {{$:/core/images/permalink-button}} Save as JSON file
       <$action-sendmessage
           $message="tmap:tm-download-graph"
-          view=<<param.viewLabel>> />
+          view=<<viewLabel>> />
     </$button>
     <$button
         class="tc-btn-invisible"

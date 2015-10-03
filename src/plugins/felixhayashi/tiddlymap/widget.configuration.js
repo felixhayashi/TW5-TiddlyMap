@@ -213,14 +213,15 @@ MapConfigWidget.prototype.getOptionFilter = function(mode) {
       borderWidth: true, 
       borderWidthSelected: true,
       color: {
-        background: true
+        background: true,
+        border: true
       },
       font: {
         color: true,
         size: true
       },
       icon: true,
-      labelHighlightBold: true,
+      labelHighlightBold: false,
       shadow: true,
       shape: true,
       shapeProperties: {
@@ -234,7 +235,7 @@ MapConfigWidget.prototype.getOptionFilter = function(mode) {
       color: true,
       dashes: true,
       font: true,
-      labelHighlightBold: true,
+      labelHighlightBold: false,
       length: true,
       selfReferenceSize: false,
       shadow: true,
@@ -244,12 +245,7 @@ MapConfigWidget.prototype.getOptionFilter = function(mode) {
     interaction: {
       hideEdgesOnDrag: true,
       hideNodesOnDrag: true,
-      tooltipDelay: true,
-      labelHighlightBold: true,
-      shadow: true,
-      shape: true,
-      shapeProperties: true,
-      size: true
+      tooltipDelay: true
     },
     layout: {
       hierarchical: false

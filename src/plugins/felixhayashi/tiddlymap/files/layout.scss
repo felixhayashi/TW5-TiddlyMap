@@ -595,9 +595,18 @@ html { // used to increase css importance
       .tmap-topbar {
         background: #d6d9d8;
         
+        .tmap-active-button {
+          background: #007180;
+          color: white;
+          
+          svg {
+            fill: white;
+          }
+        }
+        
         .tmap-neigh-scope-button {
           font-size: 1.5em;
-          vertical-align: middle;
+          vertical-align: bottom;
         }
         
       }

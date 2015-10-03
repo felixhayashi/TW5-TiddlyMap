@@ -349,9 +349,14 @@ html {
       background: #F2F2F2; }
       html .tmap-widget.tmap-advanced-editor .tmap-topbar {
         background: #d6d9d8; }
+        html .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-active-button {
+          background: #007180;
+          color: white; }
+          html .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-active-button svg {
+            fill: white; }
         html .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-neigh-scope-button {
           font-size: 1.5em;
-          vertical-align: middle; }
+          vertical-align: bottom; }
     html .tmap-widget .tmap-menu-bar {
       width: 100%; }
     html .tmap-widget .tmap-topbar {

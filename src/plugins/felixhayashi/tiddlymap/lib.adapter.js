@@ -1008,7 +1008,7 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
     // maybe add neighbour style
     if(node.group === "tmap:neighbour") {
       utils.merge(node, neighbourStyle);
-      delete node.group;
+      node.group = null;
     }
         
     // == global node styles ==
@@ -1042,23 +1042,21 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
                          && typeof node.color === "object");
     // color/border-color may be undefined
     var color = (isColorObject ? node.color.background : node.color);
-    var borderColor = (isColorObject && node.color.border); 
 
-    node.color = color;
+    node.color = {
+      background: color,
+      border: (isColorObject ? node.color.border : undefined)
+    };
   
     // determine font color if not defined via a group- or node-style;
     // in case of global and local default styles, the user is responsible
     // him- or herself to adjust the font
     node.font = node.font || {};
-    if(typeof node.font === "object" && !node.font.color) {
-      var shape = node.shape;
-      if(shape && !this.visShapesWithTextInside[shape]) {
-        node.font.color = "black";
-      } else {
-        if(color) {
-          node.font.color = getContrastColour(color, color, "black", "white");
-        }
-      }
+    
+    if(node.shape && !this.visShapesWithTextInside[node.shape]) {
+      node.font.color = "black"; // force a black color
+    } else if(!node.font.color && color) {
+      node.font.color = getContrastColour(color, color, "black", "white");
     }
     
     if(node.shape === "icon" && typeof node.icon === "object") {

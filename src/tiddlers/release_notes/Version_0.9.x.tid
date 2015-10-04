@@ -10,6 +10,11 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.9.10
+
+* Allowing the `tmap.fa-icon` field to hold different unicode
+  representations (e.g. `&#xf007;`, `&#xf007` or `f007`).
+
 ### v0.9.9
 
 * Improved the closing behaviour of dropdowns (focus button and
@@ -56,6 +61,10 @@ Major enhancements
 
 Important Bugfixes
 ----------------------------
+
+### v0.9.10
+
+* Fixed bug that select style was not assigned when dragging a node.
 
 ### v0.9.9
 

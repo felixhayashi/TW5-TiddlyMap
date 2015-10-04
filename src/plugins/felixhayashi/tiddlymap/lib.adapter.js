@@ -297,6 +297,9 @@ Adapter.prototype.getAdjacencyList = function(groupBy, opts) {
  * This function will return all neighbours of a graph denoted by
  * a set of tiddlers.
  * 
+ * @todo parts of this code may be outsourced into a function to
+ * prevent repeating code.
+ * 
  * @param {Array<TiddlerReference>} matches - The original set that
  *     defines the starting point for the neighbourhood discovery
  * @param {Hashmap} [opts] - An optional options object.
@@ -369,6 +372,9 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
       
       for(var id in outgoing) {
         var edge = outgoing[id];
+        
+        // record outgoing edge that leads to this node in any case
+        allEdgesLeadingToNeighbours[id] = edge;
                 
         // record all nodes that are pointed to as neighbours
         var toTRef = tById[edge.to];
@@ -381,9 +387,7 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
             // record node
             allNeighbours[node.id] = node;
             neighboursOfThisStep.push(toTRef);
-            
-            // record outgoing edge that leads to this node
-            allEdgesLeadingToNeighbours[id] = edge;
+                        
           }
         }
       }
@@ -396,6 +400,9 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
       for(var j = incoming.length; j--;) {
         var edge = incoming[j];
         
+        // record incoming edge that leads to this node
+        allEdgesLeadingToNeighbours[edge.id] = edge;
+        
         var fromTRef = tById[edge.from];
         
         if(!visited[fromTRef]) {
@@ -407,9 +414,7 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
             // record node
             allNeighbours[node.id] = node;
             neighboursOfThisStep.push(fromTRef);
-            
-            // record incoming edge that leads to this node
-            allEdgesLeadingToNeighbours[edge.id] = edge;
+                        
           }
           
         }

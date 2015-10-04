@@ -1276,6 +1276,14 @@ Adapter.prototype.insertNode = function(node, options) {
 
 /**** Helper *******************************************************/
 
+Adapter.prototype._getFAdigits = function(str) {
+  
+  return (str.length === 4
+          ? str
+          : str.substr(3, 4))
+  
+};
+
 /**
  * Retrieve tiddlers based on the a list of corresponding ids.
  * 
@@ -1320,7 +1328,7 @@ Adapter.prototype._addNodeIcon = function(node, faIcon, twIcon) {
       shape: "icon",
       face: "FontAwesome",
       color: node.color,
-      code: String.fromCharCode("0x" + faIcon)
+      code: String.fromCharCode("0x" + this._getFAdigits(faIcon))
     };
     //~ console.log(String.fromCharCode(parseInt(charCode, 16)));
     return;

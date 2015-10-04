@@ -1769,9 +1769,9 @@ MapWidget.prototype.handleEditNode = function(node) {
  * system.
  */
 MapWidget.prototype.handleVisSingleClickEvent = function(properties) {
-  
+    
   if(utils.isTrue(this.opt.config.sys.singleClickMode)) {
-    this.handleVisClickEvent(properties);
+    this.handleOpenMapElementEvent(properties);
   }
   
 };
@@ -1796,15 +1796,16 @@ MapWidget.prototype.handleVisDoubleClickEvent = function(properties) {
     }
     
   } else if(!utils.isTrue(this.opt.config.sys.singleClickMode)) {
-    this.handleVisClickEvent(properties);
+    this.handleOpenMapElementEvent(properties);
   }
   
 };
 
-MapWidget.prototype.handleVisClickEvent = function(properties) {
+MapWidget.prototype.handleOpenMapElementEvent = function(properties) {
   
   if(properties.nodes.length) { // clicked on a node    
     
+    // open tiddler
     this.openTiddlerWithId(properties.nodes[0]);
     
   } else if(properties.edges.length) { // clicked on an edge
@@ -1893,19 +1894,23 @@ MapWidget.prototype.handleVisOnContext = function(properties) {
 
 MapWidget.prototype.handleVisSelectNode = function(properties) {
   
+  // assign selected style
+  this.assignSelectStyle(properties.nodes);
+  
+};
+
+MapWidget.prototype.assignSelectStyle = function(nodeIds) {
+  
   var defaultColor = this.graphOptions.nodes.color;
   
-  //var selectedNodeType = new NodeType("tmap:selected");
-  var selectedNodes = properties.nodes;
-  for(var i = selectedNodes.length; i--;) {
-    var id = selectedNodes[i];
+  // iterate over selected nodes
+  for(var i = nodeIds.length; i--;) {
+    var id = nodeIds[i];
     var node = this.graphData.nodesById[id];
     this.graphData.nodes.update({
       id: id,
       color: {
-        highlight: utils.merge({},
-                               this.graphOptions.nodes.color,
-                               node.color)
+        highlight: utils.merge({}, defaultColor, node.color)
       }
     });
   };
@@ -1916,12 +1921,6 @@ MapWidget.prototype.handleVisDeselectNode = function(properties) {
   
   //~ var prevSelectedNodes = properties.previousSelection.nodes;
   //~ for(var i = prevSelectedNodes.length; i--;) {
-    //~ this.graphData.nodes.update({
-      //~ id: prevSelectedNodes[i],
-      //~ color: {
-        //~ highlight: null
-      //~ }
-    //~ });
   //~ };
   
 };
@@ -1992,8 +1991,11 @@ MapWidget.prototype.handleVisDragStart = function(properties) {
   //~ }
 
   if(properties.nodes.length) {
-    this.setNodesMoveable(this.graphData.nodes.get(properties.nodes), true);
+    this.assignSelectStyle(properties.nodes);
+    this.setNodesMoveable(this.graphData.nodes.get(properties.nodes),
+                          true);
   }
+  
 };
  
 /**

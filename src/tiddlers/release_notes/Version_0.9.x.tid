@@ -62,6 +62,11 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.9.11
+
+* Fixes #174: Not all edges are displayed in live view and in the
+  TMap toolbar button.
+
 ### v0.9.10
 
 * Fixed bug that select style was not assigned when dragging a node.
@@ -83,7 +88,7 @@ Important Bugfixes
 ### v0.9.6
 
 * In v0.9.5 I introduced a very ugly node highlighting. Removed! :)
-* Fixes #174: Keylisteners of the clipboard feature swallow letters.
+* Fixes #172: Keylisteners of the clipboard feature swallow letters.
 * Fixed some visjs css
 
 ### v0.9.5

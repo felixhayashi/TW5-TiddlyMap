@@ -1106,9 +1106,11 @@ MapWidget.prototype.getGraphOptions = function() {
 };
 
 MapWidget.prototype.resetVisManipulationBar = function(visCallback) {
+  
   if(visCallback) visCallback(null);
   this.network.disableEditMode();
   this.network.enableEditMode();
+  
 };
 
 /**
@@ -1859,13 +1861,13 @@ MapWidget.prototype.handleResizeEvent = function(event) {
 /**
  * used to prevent nasty deletion as edges are not unselected when leaving vis
  */
-MapWidget.prototype.handleClickEvent = function(event) {
+MapWidget.prototype.handleClickEvent = function(evt) {
   
   if(this.isZombieWidget() || !this.network) return;
   
-  var pos = { x: event.clientX, y: event.clientY };
-  var element = document.elementFromPoint(pos.x, pos.y);
-  if(!this.parentDomNode.contains(element)) { // clicked outside
+  if(!this.graphDomNode.contains(evt.target)) {
+    
+  // = clicked outside the graph area
     var selected = this.network.getSelection();
     if(selected.nodes.length || selected.edges.length) {
       this.logger("debug", "Clicked outside; deselecting nodes/edges");
@@ -1873,9 +1875,11 @@ MapWidget.prototype.handleClickEvent = function(event) {
       this.network.selectNodes([]); // deselect nodes and edges
       this.resetVisManipulationBar();
     }
-  } else if(this.graphDomNode.contains(element)) {
-    this.lastCanvasClickPos = this.network.DOMtoCanvas(pos);
+    
+  } else {
+    
     this.visNetworkDomNode.focus();
+    
   }
 
 };

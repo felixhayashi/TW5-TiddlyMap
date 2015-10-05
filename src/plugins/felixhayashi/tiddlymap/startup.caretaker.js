@@ -465,11 +465,10 @@ var registerClickListener = function() {
     }
     
     if(i === -1) return;
-    
-    var el = document.elementFromPoint(evt.clientX, evt.clientY);
                                           
-    if(!$tw.utils.hasClass(el, "tc-drop-down")
-       && !utils.getAncestorWithClass(el, "tc-drop-down")) {
+    if(!$tw.utils.hasClass(evt.target, "tc-drop-down")
+       && !utils.getAncestorWithClass(evt.target, "tc-drop-down")) {
+    // = clicked on an element that isn't a dropdown or inside one
       for(var i = popupStates.length; i--;) {
         utils.setText(popupStates[i], "");
       }

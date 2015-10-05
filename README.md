@@ -83,6 +83,6 @@ For general information on how to set up TiddlyWiki5 with Nodejs visit [tiddlywi
 4. The TW5-TopStoryView may not be needed in some cases (please see: [Live View plugin dependencies](http://tiddlymap.org/#Working%20with%20the%20live%20view))
 5. Restart your wiki server via the command line.
 
-### Standalone
+### Drag'n'drop installation / Standalone installation
 
 Please follow the instructions given [here](http://felixhayashi.github.io/TW5-TiddlyMap/index.html#How%20to%20install%20TiddlyMap%3F)

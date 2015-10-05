@@ -62,6 +62,11 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.9.12
+
+* Fixes #175: Clicking on an element in the selectbox in the TM
+  tiddler toolbar dropdown closes the dialog bug
+  
 ### v0.9.11
 
 * Fixes #174: Not all edges are displayed in live view and in the

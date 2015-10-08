@@ -37,12 +37,32 @@
   font-weight: bold;
   font-size: 0.8em; }
 
-.tmap-graph-placeholder::before {
-  content: "Map";
-  display: block;
+.tmap-static-mode.tmap-widget .tmap-topbar {
+  height: initial; }
+.tmap-static-mode.tmap-widget .tmap-vis-graph {
   text-align: center;
-  padding: 20px;
-  background-color: whitesmoke; }
+  cursor: not-allowed; }
+  .tmap-static-mode.tmap-widget .tmap-vis-graph:not(.tmap-graph-placeholder):hover::before {
+    box-shadow: 10px 10px 5px lightgray;
+    color: gray;
+    background: white;
+    content: "Non-interactive snapshot";
+    font-size: 18px;
+    font-weight: bold;
+    left: 50%;
+    margin-left: -100px;
+    position: absolute;
+    text-align: center;
+    top: 50px;
+    width: 200px;
+    z-index: 2000;
+    padding: 5px;
+    pointer-events: none; }
+  .tmap-static-mode.tmap-widget .tmap-vis-graph.tmap-graph-placeholder::before {
+    content: "No Preview";
+    display: block;
+    text-align: center;
+    padding: 20px; }
 
 .tmap-unicode-icon {
   width: 1em;
@@ -121,8 +141,10 @@ html {
         line-height: 1; }
         html .tmap-quick-connect .tc-drop-down button:hover {
           color: #ffffff; }
-        html .tmap-quick-connect .tc-drop-down button svg:hover {
-          fill: #ffffff; }
+        html .tmap-quick-connect .tc-drop-down button svg {
+          fill: inherit; }
+          html .tmap-quick-connect .tc-drop-down button svg:hover {
+            fill: #ffffff; }
   html .tc-modal-wrapper {
     z-index: 1010; }
     html .tc-modal-wrapper .tc-modal-header svg {

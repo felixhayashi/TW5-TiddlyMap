@@ -54,12 +54,40 @@ $default-input-width: 140px;
   font-weight: bold;
   font-size: 0.8em,
 }
-.tmap-graph-placeholder::before {
-  content: "Map";
-  display: block;
-  text-align: center;
-  padding: 20px;
-  background-color: whitesmoke;
+
+.tmap-static-mode.tmap-widget {
+  .tmap-topbar {
+    height: initial;
+  }
+  .tmap-vis-graph {
+    text-align: center;
+    cursor: not-allowed;
+    
+    &:not(.tmap-graph-placeholder):hover::before {
+      box-shadow: 10px 10px 5px lightgray;
+      color: gray;
+      background: white;
+      content: "Non-interactive snapshot";
+      font-size: 18px;
+      font-weight: bold;
+      left: 50%;
+      margin-left: -100px;
+      position: absolute;
+      text-align: center;
+      top: 50px;
+      width: 200px;
+      z-index: 2000;
+      padding: 5px;
+      pointer-events: none;
+    }
+    
+    &.tmap-graph-placeholder::before {
+      content: "No Preview";
+      display: block;
+      text-align: center;
+      padding: 20px;
+    }
+  }
 }
 
 .tmap-unicode-icon {
@@ -172,8 +200,12 @@ html { // used to increase css importance
         &:hover {
           color: #ffffff;
         }
-        svg:hover {
-          fill: #ffffff;
+        svg {
+          fill: inherit;
+          
+          &:hover {
+            fill: #ffffff;
+          }
         }
       }
     }

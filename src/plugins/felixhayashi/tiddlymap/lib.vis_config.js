@@ -73,9 +73,16 @@ exports.config = {
   },
   physics: {
     forceAtlas2Based: {
-      springLength: 200,
-      centralGravity: 0,
-      springConstant: 0.130
+      // <- more repulsion between nodes - 0 - more attraction between nodes ->
+      gravitationalConstant: -300, // default: -50
+      // edge length
+      springLength: 160, // default: 100
+      // stiffness of the edges
+      springConstant: 0.095, // default: 0.08
+      // pulls the entire network back to the center.
+      centralGravity: 0.015, // default: 0.01
+      // kinetic energy reduction
+      damping: 0.4
     },
     solver: "forceAtlas2Based",
     stabilization: {

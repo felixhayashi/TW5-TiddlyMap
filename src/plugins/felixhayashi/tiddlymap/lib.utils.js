@@ -1230,7 +1230,19 @@ utils.getTiddlersByPrefix = function(prefix, tiddlers) {
   
 };
 
-
+utils.addTiddler = function(title) {
+  
+  var tObj = utils.getTiddler(title);
+  if(tObj) return tObj;
+  
+  tObj = new $tw.Tiddler({ title: title },
+                         $tw.wiki.getModificationFields(),
+                         $tw.wiki.getCreationFields());
+  
+  $tw.wiki.addTiddler(tObj);
+  
+  return tObj;
+};
   
 /**
  * Contains all TiddlyMap exceptions
@@ -1244,6 +1256,7 @@ utils.Exception = Exception;
  * https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/widgets/navigator.js
  */
 utils.makeDraftTiddler = function(targetTitle) {
+  
   // See if there is already a draft tiddler for this tiddler
   var draftTitle = $tw.wiki.findDraft(targetTitle);
   if(draftTitle) {
@@ -1264,6 +1277,7 @@ utils.makeDraftTiddler = function(targetTitle) {
   );
   $tw.wiki.addTiddler(draftTiddler);
   return draftTiddler;
+  
 };
 
 /**
@@ -1271,6 +1285,7 @@ utils.makeDraftTiddler = function(targetTitle) {
  * https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/widgets/navigator.js
  */
 utils.generateDraftTitle = function(title) {
+  
   var c = 0,
     draftTitle;
   do {
@@ -1278,10 +1293,13 @@ utils.generateDraftTitle = function(title) {
     c++;
   } while($tw.wiki.tiddlerExists(draftTitle));
   return draftTitle;
+  
 };
 
 utils.touch = function(tRef) {
+  
   utils.setField(tRef, "modified", new Date());
+  
 };
 
 /**
@@ -1289,6 +1307,7 @@ utils.touch = function(tRef) {
  * @deprecated delete this in 2016 and use $tw.utils.getFullScreenApis instead
  */
 utils.getFullScreenApis = function() {
+  
   var d = document,
     db = d.body,
     result = {
@@ -1314,6 +1333,7 @@ utils.getFullScreenApis = function() {
   } else {
     return result;
   }
+  
 };
 
 /**

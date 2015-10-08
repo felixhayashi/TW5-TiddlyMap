@@ -39,10 +39,7 @@ var vis =             require("$:/plugins/felixhayashi/vis/vis.js");
 var MapWidget = function(parseTreeNode, options) {
   
   // call the parent constructor
-  Widget.call(this);
-  
-  // call initialise on prototype
-  this.initialise(parseTreeNode, options);
+  Widget.call(this, parseTreeNode, options);
   
   // create shortcuts for services and frequently used vars
   this.adapter = $tw.tmap.adapter;
@@ -258,19 +255,51 @@ MapWidget.prototype.logger = function(type, message /*, more stuff*/) {
 /**
  * Method to render this widget into the DOM.
  * 
+ * Note that we do not add this.domNode to the list of domNodes
+ * since this widget does never remove itself during a refresh.
+ * 
  * @override
  */
 MapWidget.prototype.render = function(parent, nextSibling) {
   
-  // remember our place in the dom
-  var domNode = document.createElement("div");
-  parent.insertBefore(domNode, nextSibling);
-  this.parentDomNode = domNode;
+  this.parentDomNode = parent;
+  
+  this.domNode = this.document.createElement("div");
+  parent.insertBefore(this.domNode, nextSibling);
+  
+  // in contrast to the graph height, which is assigned to the vis
+  // graph wrapper, the graph width needs to be assigned to the domNode
+  this.domNode.style["width"] = this.getAttr("width", "100%");
+  
+  // add widget classes
+  this.registerClassNames(this.domNode);
+  
+  // get view and view holder
+  this.viewHolderRef = this.getViewHolderRef();
+  this.view = this.getView();
 
-  if(utils.isPreviewed(this)) {
-    this.renderPreview(this.parentDomNode);
+  // create the header div
+  this.graphBarDomNode = this.document.createElement("div");
+  $tw.utils.addClass(this.graphBarDomNode, "tmap-topbar");
+  this.domNode.appendChild(this.graphBarDomNode);
+  
+  // create body div
+  this.graphDomNode = this.document.createElement("div");
+  this.domNode.appendChild(this.graphDomNode);
+      
+  $tw.utils.addClass(this.graphDomNode, "tmap-vis-graph");  
+
+  if(utils.isPreviewed(this) || this.domNode.isTiddlyWikiFakeDom) {
+    
+    $tw.utils.addClass(this.domNode, "tmap-static-mode");
+    this.renderPreview(this.graphBarDomNode, this.graphDomNode);
+    
   } else {
-    this.renderFullWidget(this.parentDomNode);
+   
+    // add a loading bar
+    this.addLoadingBar(this.domNode);
+    this.renderFullWidget(this.graphBarDomNode, this.graphDomNode);
+    
   }
       
 };
@@ -278,32 +307,49 @@ MapWidget.prototype.render = function(parent, nextSibling) {
 /**
  * When the widget is only previewed we do some alternative rendering.
  */
-MapWidget.prototype.renderPreview = function(parent) {
-      
-  $tw.utils.addClass(parent, "tmap-graph-placeholder");
+MapWidget.prototype.renderPreview = function(header, body) {
+    
+  var snapshotTRef = this.view.getRoot() + "/snapshot";
+  var snapshotTObj = utils.getTiddler(snapshotTRef);
   
+  var label = this.document.createElement("span");
+  label.innerHTML = this.view.getLabel();
+  label.className = "tmap-view-label";
+  header.appendChild(label);
+  
+  if(snapshotTObj) {
+
+    // Construct child widget tree
+    this.makeChildWidgets([
+      {
+        type: "transclude",
+        attributes: {
+          tiddler: { type: "string", value: snapshotTRef }
+        }
+      }
+    ]);
+      
+    this.renderChildren(body, null);
+                      
+  } else {
+    
+    $tw.utils.addClass(body, "tmap-graph-placeholder");
+    
+  }
+    
 };
 
 /**
  * The standard way of rendering.
  * Attention: BE CAREFUL WITH THE ORDER OF FUNCTION CALLS IN THIS FUNCTION.
  */
-MapWidget.prototype.renderFullWidget = function(parent) {
-  
-  // add widget classes
-  this.registerClassNames(parent);
-  
-  // add a loading bar
-  this.addLoadingBar(parent);
+MapWidget.prototype.renderFullWidget = function(header, body) {
   
   // register 
   this.sidebar = utils.getFirstElementByClassName("tc-sidebar-scrollable");
   this.isContainedInSidebar = (this.sidebar
-                               && this.sidebar.contains(this.parentDomNode));
-      
-  // get view and view holder
-  this.viewHolderRef = this.getViewHolderRef();
-  this.view = this.getView();
+                               && !this.domNode.isTiddlyWikiFakeDom
+                               && this.sidebar.contains(this.domNode));
                   
   // flag that determines whether to zoom after stabilization finished;
   // always set to false after the next stabilization
@@ -314,10 +360,10 @@ MapWidget.prototype.renderFullWidget = function(parent) {
   this.preventFitAfterRebuild = false;
                   
   // *first* inject the bar
-  this.initAndRenderEditorBar(parent);
+  this.initAndRenderEditorBar(header);
   
   // *second* initialise graph variables and render the graph
-  this.initAndRenderGraph(parent);
+  this.initAndRenderGraph(body);
 
   // register this graph at the caretaker's graph registry
   $tw.tmap.registry.push(this);
@@ -362,7 +408,7 @@ MapWidget.prototype.registerClassNames = function(parent) {
  */
 MapWidget.prototype.addLoadingBar = function(parent) {
                 
-  this.graphLoadingBarDomNode = document.createElement("div");
+  this.graphLoadingBarDomNode = this.document.createElement("div");
   $tw.utils.addClass(this.graphLoadingBarDomNode, "tmap-loading-bar");
   parent.appendChild(this.graphLoadingBarDomNode);
   
@@ -380,13 +426,8 @@ MapWidget.prototype.addLoadingBar = function(parent) {
  *     be injected in.
  */
 MapWidget.prototype.initAndRenderEditorBar = function(parent) {
-      
-    this.graphBarDomNode = document.createElement("div");
-    $tw.utils.addClass(this.graphBarDomNode, "tmap-topbar");
-    parent.appendChild(this.graphBarDomNode);
-    
+          
     this.rebuildEditorBar();
-    this.renderChildren(this.graphBarDomNode);
   
 };
 
@@ -463,6 +504,8 @@ MapWidget.prototype.rebuildEditorBar = function() {
 
       
   this.makeChildWidgets([body]);
+  this.renderChildren(this.graphBarDomNode,
+                      this.graphBarDomNode.firstChild);
 
 };
     
@@ -668,11 +711,13 @@ MapWidget.prototype.rebuildGraph = function(options) {
 };
 
 /**
- * Warning: Do not change this functionname as it is used by the
+ * WARNING: Do not change this functionname as it is used by the
  * caretaker's routinely checkups.
  */
 MapWidget.prototype.getContainer = function() {
-  return this.parentDomNode;
+  
+  return this.domNode;
+  
 };
 
 
@@ -809,7 +854,6 @@ MapWidget.prototype.checkOnEditorBar = function(changedTiddlers, isViewSwitched,
     this.removeChildDomNodes();
     // update all variables and build the tree
     this.rebuildEditorBar();
-    this.renderChildren(this.graphBarDomNode);
     return true;
     
   } else {
@@ -881,16 +925,7 @@ MapWidget.prototype.checkOnGraph = function(changedTiddlers) {
 MapWidget.prototype.initAndRenderGraph = function(parent) {
   
   this.logger("info", "Initializing and rendering the graph");
-      
-  this.graphDomNode = document.createElement("div");
-  parent.appendChild(this.graphDomNode);
-      
-  $tw.utils.addClass(this.graphDomNode, "tmap-vis-graph");
-
-  // in contrast to the graph height, which is assigned to the vis
-  // graph wrapper, the graph width is assigned to the parent
-  parent.style["width"] = this.getAttr("width", "100%");
-    
+          
   // always save reference to a bound function that is used as listener
   // see http://stackoverflow.com/a/22870717
   this.handleResizeEvent = this.handleResizeEvent.bind(this);
@@ -984,7 +1019,7 @@ MapWidget.prototype.addGraphKeyBindings = function(container) {
 
 MapWidget.prototype.handlePasteNodesFromClipboard = function() {
   
-  if(!this.editorMode) {
+  if(!this.editorMode || this.view.isLiveView()) {
     this.notify("Map is read only!");
     return;
   }
@@ -1090,13 +1125,17 @@ MapWidget.prototype.getGraphOptions = function() {
     this.resetVisManipulationBar(callback);
   }.bind(this);
   
-  // gravity needs to be set to very small value so graph still
-  // looks balanced when physics is off!
-  var gravity = (this.view.isEnabled("physics_mode") ? 0.001 : 0);
-  
   var physics = options.physics;
   physics[physics.solver] = physics[physics.solver] || {};
-  physics[physics.solver].centralGravity = gravity;
+  
+  // gravity needs to be set to very small value so graph still
+  // looks balanced when physics is on!
+  //~ var gravity = (this.view.isEnabled("physics_mode")
+                 //~ ? physics[physics.solver].centralGravity
+                 //~ : 0);
+  //~ 
+//~ 
+  //~ physics[physics.solver].centralGravity = physics[physics.solver].centralGravity;
   physics.stabilization.iterations = this.view.getStabilizationIterations();
   
   this.logger("debug", "Loaded graph options", options);
@@ -1241,9 +1280,9 @@ MapWidget.prototype.handleEditView = function() {
  */
 MapWidget.prototype.handleDownloadCanvas = function() {
   
-  var canvas = this.parentDomNode.getElementsByTagName("canvas")[0];
+  var canvas = this.domNode.getElementsByTagName("canvas")[0];
   var dataURL = canvas.toDataURL('image/png');
-  var a = document.createElement("a");
+  var a = this.document.createElement("a");
   a.download = "Map snapshot – " + this.view.getLabel() + ".png";
   a.href = dataURL;
 
@@ -1251,6 +1290,32 @@ MapWidget.prototype.handleDownloadCanvas = function() {
   // firefox requires us to create a mouse event…
   var event = new MouseEvent('click');
   a.dispatchEvent(event);
+  
+};
+
+MapWidget.prototype.createAndSaveSnapshot = function() {
+    
+  var now = new Date();
+  $tw.wiki.addTiddler(new $tw.Tiddler({
+    title: this.view.getRoot() + "/snapshot",
+    type: "image/png",
+    text: this.getSnapshot(true),
+    modified: now,
+    caption: "Static snapshot image of view "
+             + "\"" + this.view.getLabel() + "\ "
+             + "from " + now.toLocaleString()
+  }));
+  
+};
+
+
+MapWidget.prototype.getSnapshot = function(stripPreamble) {
+  
+  var canvas = this.domNode.getElementsByTagName("canvas")[0];
+  var data = canvas.toDataURL("image/png");
+  return (stripPreamble
+          ? utils.getWithoutPrefix(data, "data:image/png;base64,")
+          : data);
   
 };
 
@@ -1518,7 +1583,7 @@ MapWidget.prototype.handleToggleFullscreen = function(useHalfscreen) {
                          ? "halfscreen"
                          : "fullscreen");
                          
-    $tw.utils.addClass(this.parentDomNode, "tmap-" + this.enlargedMode);
+    $tw.utils.addClass(this.domNode, "tmap-" + this.enlargedMode);
       
     var pContainer = (this.isContainedInSidebar
                       ? this.sidebar
@@ -1527,7 +1592,7 @@ MapWidget.prototype.handleToggleFullscreen = function(useHalfscreen) {
     $tw.utils.addClass(pContainer, "tmap-has-" + this.enlargedMode + "-child");        
     
     if(this.enlargedMode === "fullscreen") {
-      document.documentElement[this.fsapi["_requestFullscreen"]](Element.ALLOW_KEYBOARD_INPUT);
+      this.document.documentElement[this.fsapi["_requestFullscreen"]](Element.ALLOW_KEYBOARD_INPUT);
     }
         
     this.notify("Activated " + this.enlargedMode + " mode");
@@ -1592,21 +1657,35 @@ MapWidget.prototype.handleEditFilters = function() {
  */
 MapWidget.prototype.handleVisStabilizedEvent = function(properties) {
   
-  if(!this.hasNetworkStabilized) {
-    this.hasNetworkStabilized = true;
-    this.logger("log", "Network stabilized after " + properties.iterations + " iterations");
-    this.view.setStabilizationIterations(properties.iterations);
-    var isFloatingMode = this.view.isEnabled("physics_mode");
+  if(this.hasNetworkStabilized) return;
+    
+  this.hasNetworkStabilized = true;
+  this.logger("log", "Network stabilized after",
+                      properties.iterations,
+                      "iterations");
+  this.view.setStabilizationIterations(properties.iterations);
 
-    this.network.storePositions();
-    this.setNodesMoveable(this.graphData.nodesById, isFloatingMode);
-        
-    if(this.doFitAfterStabilize) {
-      this.doFitAfterStabilize = false;
-      this.fitGraph(1000, 1000);
+  this.network.storePositions();
+  this.setNodesMoveable(this.graphData.nodesById,
+                        this.view.isEnabled("physics_mode"));
+  
+  if(!this.view.isEnabled("physics_mode")) {
+    
+    var physics = this.graphOptions.physics;
+    if(typeof physics[physics.solver] !== "object") {
+      physics[physics.solver] = {};
     }
+    physics[physics.solver].centralGravity = 0;
+    
+    this.network.setOptions(this.graphOptions);
+    
   }
   
+  if(this.doFitAfterStabilize) {
+    this.doFitAfterStabilize = false;
+    this.fitGraph(1000, 1000);
+  }
+      
 };
 
 /**
@@ -1626,9 +1705,18 @@ MapWidget.prototype.handleFocusNode = function(event) {
  * A zombie widget is a widget that is removed from the dom tree
  * but still referenced or still partly executed -- I mean
  * otherwise you couldn't call this function, right?
+ * 
+ * If TiddlyMap is executed in a fake environment, the function
+ * always returns true.
  */
 MapWidget.prototype.isZombieWidget = function() {
-  return !document.body.contains(this.getContainer());
+  
+  if(this.domNode.isTiddlyWikiFakeDom === true) {
+    return true;
+  } else {
+    return !this.document.body.contains(this.getContainer());
+  }
+  
 };
 
 /**
@@ -1644,6 +1732,9 @@ MapWidget.prototype.fitGraph = function(delay, duration) {
   // clear any existing fitting attempt
   window.clearTimeout(this.activeFitTimeout);
   
+  duration = duration || 0;
+  delay = delay || 0;
+  
   var fit = function() {
         
     // happens when widget is removed after stabilize but before fit
@@ -1654,14 +1745,19 @@ MapWidget.prototype.fitGraph = function(delay, duration) {
     
     this.network.fit({ // v4: formerly zoomExtent
       animation: {
-        duration: duration || 0,
+        duration: duration,
         easingFunction: "easeOutQuart"
       }
     });
     
+    //~ window.setTimeout(function() {
+      //~ if(this.isZombieWidget()) return;
+      //~ this.createAndSaveSnapshot();
+    //~ }.bind(this), duration);
+    
   };
   
-  this.activeFitTimeout = window.setTimeout(fit.bind(this), delay || 0);
+  this.activeFitTimeout = window.setTimeout(fit.bind(this), delay);
   
 }
 
@@ -1845,14 +1941,14 @@ MapWidget.prototype.handleResizeEvent = function(event) {
   
   if(!height && this.isContainedInSidebar) {
   
-    var canvasOffset = this.parentDomNode.getBoundingClientRect().top;
+    var canvasOffset = this.domNode.getBoundingClientRect().top;
     var distanceBottom = parseInt(this.getAttr("bottom-spacing", 25));
     var calculatedHeight = window.innerHeight - canvasOffset;
     height = (calculatedHeight - distanceBottom) + "px";
   
   }
   
-  this.parentDomNode.style["height"] = height || "300px";
+  this.domNode.style["height"] = height || "300px";
   
   this.repaintGraph(); // redraw graph
   
@@ -1977,7 +2073,9 @@ MapWidget.prototype.handleVisLoading = function(params) {
 };
 
 MapWidget.prototype.handleVisLoadingDone = function(params) {
+  
   this.graphLoadingBarDomNode.style.display = "none";
+  
 };
 
 /**
@@ -2057,8 +2155,9 @@ MapWidget.prototype.openTiddlerWithId = function(id) {
         this.dispatchEvent({ type: type, tiddlerTitle: draftTRef }); 
         
       } else if(!wasInDraftAlready) {
-        
-        $tw.wiki.deleteTiddler(draftTRef);
+
+        // also removes the draft from the river before deletion!
+        utils.deleteTiddlers([ draftTRef ]);
         
       }
       
@@ -2265,7 +2364,7 @@ MapWidget.prototype.repaintGraph = function() {
 MapWidget.prototype.setGraphButtonEnabled = function(name, enable) {
   
   var className = "vis-button" + " " + "tmap-" + name;
-  var b = utils.getFirstElementByClassName(className, this.parentDomNode);
+  var b = utils.getFirstElementByClassName(className, this.domNode);
   $tw.utils.toggleClass(b, "tmap-button-enabled", enable);
   
 }; 
@@ -2325,10 +2424,10 @@ MapWidget.prototype.setNodesMoveable = function(nodes, isMoveable) {
 MapWidget.prototype.addGraphButtons = function(buttonEvents) {
   
   // v4: formerly network-frame
-  var parent = utils.getFirstElementByClassName("vis-navigation", this.parentDomNode);
+  var parent = utils.getFirstElementByClassName("vis-navigation", this.domNode);
   
   for(var name in buttonEvents) {
-    var div = document.createElement("div");
+    var div = this.document.createElement("div");
     div.className = "vis-button " + " " + "tmap-" + name;
     div.addEventListener("click", buttonEvents[name].bind(this), false);
     parent.appendChild(div);

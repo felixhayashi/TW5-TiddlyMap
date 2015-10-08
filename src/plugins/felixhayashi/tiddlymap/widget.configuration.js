@@ -258,7 +258,8 @@ MapConfigWidget.prototype.getOptionFilter = function(mode) {
         gravitationalConstant: true,
         springLength: true,
         springConstant: true,
-        damping: true        
+        damping: true,  
+        centralGravity: true
       }
     }
   };  

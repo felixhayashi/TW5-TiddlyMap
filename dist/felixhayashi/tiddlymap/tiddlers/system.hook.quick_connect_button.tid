@@ -7,11 +7,8 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 
 \define defConFiltr() [!suffix[tw-body:link]]
 
-\define createItemButton()
-<$button>
-  {{$:/core/images/new-button}} Create tiddler "<<item>>"
-  <$action-setfield $tiddler=<<item>> text="" />
-</$button>
+\define nonExistentItem()
+<<item>> <span style="color: #9E9E9E">(will be created)</span>
 \end
 
 \define tiddlerSearchFilter()
@@ -36,6 +33,7 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
     <$action-sendmessage $message="tmap:tm-create-edge"
                          from=<<item>>
                          to=<<currentTiddler>>
+                         force="true"
                          label={{$:/temp/quickConnectSearch/type}}
                          view={{$:/temp/quickConnectSearch/view}} />
   </$button>
@@ -45,6 +43,7 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
     <$action-sendmessage $message="tmap:tm-create-edge"
                          from=<<currentTiddler>>
                          to=<<item>>
+                         force="true"
                          label={{$:/temp/quickConnectSearch/type}}
                          view={{$:/temp/quickConnectSearch/view}} />
   </$button>
@@ -52,7 +51,7 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 <td>
   <$list
       filter="[<item>is[tiddler]]"
-      emptyMessage=<<createItemButton>>>
+      emptyMessage=<<nonExistentItem>>>
     <$view tiddler=<<item>> field="title" />
   </$list>
 </td>
@@ -120,8 +119,14 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
     <p>
       <$tmap-connections filter={{$:/temp/tmap/qc!!filter}} emptyMessage="–">
         <div>
-          <$button class="tc-btn-invisible">{{$:/core/images/close-button}}
-            <$action-sendmessage $message="tmap:tm-remove-edge" id=<<edge.id>> from=<<edge.from>> to=<<edge.to>> type=<<edge.type>> />
+          <$button
+              tooltip="Delete this connection"
+              class="tc-btn-invisible">{{$:/core/images/close-button}}
+            <$action-sendmessage $message="tmap:tm-remove-edge"
+                id=<<edge.id>>
+                from=<<edge.from>>
+                to=<<edge.to>>
+                type=<<edge.type>> />
           </$button>
           <<direction>>
           <$link to=<<neighbour>>>
@@ -135,4 +140,4 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 </div>
 \end
 
-<$list filter="[{$:/temp/tiddlymap/quickConnectButton}prefix<qualify>]" variable="item" emptyMessage=<<hidePopup>>><<showPopup>></$list>
+<$list filter="[all[current]is[tiddler]]"><$list filter="[{$:/temp/tiddlymap/quickConnectButton}prefix<qualify>]" variable="item" emptyMessage=<<hidePopup>>><<showPopup>></$list></$list>

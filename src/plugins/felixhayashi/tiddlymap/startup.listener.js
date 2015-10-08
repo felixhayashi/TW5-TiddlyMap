@@ -114,15 +114,29 @@ GlobalListener.prototype.handleRemoveEdge = function(event) {
 
 GlobalListener.prototype.handleCreateEdge = function(event) {
 
-  var edge = {
-    from: this.adapter.makeNode(event.paramObject.from).id,
-    to: this.adapter.makeNode(event.paramObject.to).id,
-    type: event.paramObject.label,
-    id: event.paramObject.id
-  }
+  var from = event.paramObject.from;
+  var to = event.paramObject.to;
+  var isForce = event.paramObject.force;
   
-  this.adapter.insertEdge(edge);
-  $tw.tmap.notify("Edge inserted");
+  if(!from || !to) return;
+  
+  if((utils.tiddlerExists(from) && utils.tiddlerExists(to)) || isForce) {
+
+    // will not override any existing tiddlers…
+    utils.addTiddler(to);
+    utils.addTiddler(from);
+
+    var edge = {
+      from: this.adapter.makeNode(from).id,
+      to: this.adapter.makeNode(to).id,
+      type: event.paramObject.label,
+      id: event.paramObject.id
+    }
+    
+    this.adapter.insertEdge(edge);
+    $tw.tmap.notify("Edge inserted");
+    
+  }
    
 };
 

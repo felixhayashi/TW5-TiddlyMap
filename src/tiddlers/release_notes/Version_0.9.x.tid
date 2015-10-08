@@ -10,6 +10,11 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.9.13
+
+* Now allowing the user to change the central gravity and damping
+* Improved the placeholder that is displayed when in preview mode
+
 ### v0.9.10
 
 * Allowing the `tmap.fa-icon` field to hold different unicode
@@ -61,6 +66,19 @@ Major enhancements
 
 Important Bugfixes
 ----------------------------
+
+### v0.9.13
+
+* Hide TM tiddler toolbar button when tiddler is a system tiddler.
+* Fixes #176: Static HTML export of tiddler with embedded graph.
+* Fixed small bug where when exiting fullscreen while being in draft
+  mode the draft removal didn't remove the tiddler from the river.
+* Fixes #177: Prevent nodes from floating far away when added to the
+  canvas using a filter.
+* Fixed bug where connection to non existent edge via message threw
+  an exception. Related to #171.
+* Fixed small bug where it was possible to paste nodes into the live
+  view
 
 ### v0.9.12
 
@@ -135,7 +153,7 @@ Important Bugfixes
 * Fixes #154: Using icons might cause false font color
 * Fixes error when pressing the save button in type manager when no
   type is loaded
-
+  
 Incompatibilities to previous versions
 ----------------------------
 

@@ -33,8 +33,11 @@ view="{{!!view}}"
 <$list filter="[field:title<output>field:var.show-buttons[false]]">
   show-buttons="false"
 </$list>
+<$list filter="[field:title<output>has[var.design]]">
+  design="<$view tiddler=<<output>> field='var.design' />"
+</$list>
 
-&gt;&lt;/$tiddlymap&gt;
+/&gt;
 </pre>
 
 If you are unsure about a parameter, just leave everything as is and simply copy the widget code displayed above.
@@ -54,7 +57,14 @@ If you are unsure about a parameter, just leave everything as is and simply copy
           selectFilter:"[[|Hidden]]
                         [[vis|Simple]]
                         [[advanced|Advanced]]"
-          descr:"Whether the widget should act as an editor or not">>
+          descr:"Whether the widget should act as an editor or not.">>
+      <<tmap-row type:"input-select"
+          title:"Design"
+          field:"var.design"
+          selectFilter:"[[|Normal]]
+                        [[plain|Plain]]"
+          descr:"Usually a header is displayed and borders. Plain
+                 design will only show the mere graph.">>
       <<tmap-row type:"input-text"
           title:"Height"
           field:"var.height"

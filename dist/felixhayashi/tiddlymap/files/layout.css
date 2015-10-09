@@ -28,6 +28,14 @@
     background: #EED5D1; }
 
 /*******************************************************************/
+.tmap-save-canvas-preview {
+  text-align: center; }
+  .tmap-save-canvas-preview img {
+    background-color: white;
+    border: 1px solid lightgray;
+    max-width: 100%;
+    max-height: 100px; }
+
 .tmap-list-separator {
   display: block;
   background-color: #efefef;
@@ -36,33 +44,6 @@
   border-bottom: 1px dotted gray;
   font-weight: bold;
   font-size: 0.8em; }
-
-.tmap-static-mode.tmap-widget .tmap-topbar {
-  height: initial; }
-.tmap-static-mode.tmap-widget .tmap-vis-graph {
-  text-align: center;
-  cursor: not-allowed; }
-  .tmap-static-mode.tmap-widget .tmap-vis-graph:not(.tmap-graph-placeholder):hover::before {
-    box-shadow: 10px 10px 5px lightgray;
-    color: gray;
-    background: white;
-    content: "Non-interactive snapshot";
-    font-size: 18px;
-    font-weight: bold;
-    left: 50%;
-    margin-left: -100px;
-    position: absolute;
-    text-align: center;
-    top: 50px;
-    width: 200px;
-    z-index: 2000;
-    padding: 5px;
-    pointer-events: none; }
-  .tmap-static-mode.tmap-widget .tmap-vis-graph.tmap-graph-placeholder::before {
-    content: "No Preview";
-    display: block;
-    text-align: center;
-    padding: 20px; }
 
 .tmap-unicode-icon {
   width: 1em;
@@ -268,186 +249,221 @@ html {
       z-index: 1000; }
       html .tc-sidebar-scrollable .tmap-widget.tmap-halfscreen .tmap-fullscreen-button {
         display: none; }
-  html .tmap-widget {
-    position: relative;
-    border: 1px dotted lightgray;
-    padding: 2px;
-    width: 100%;
-    color: #666666;
-    display: block; }
-    html .tmap-widget.tmap-fullscreen .vis-network .tmap-halfscreen-button {
+
+/**** TMap Widget **************************************************/
+.tmap-widget {
+  position: relative;
+  border: 1px dotted lightgray;
+  padding: 2px;
+  width: 100%;
+  color: #666666;
+  display: block; }
+  .tmap-widget.tmap-fullscreen .vis-network .tmap-halfscreen-button {
+    display: none; }
+  .tmap-widget.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) {
+    cursor: pointer; }
+    .tmap-widget.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) .vis-navigation {
       display: none; }
-    html .tmap-widget.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) {
-      cursor: pointer; }
-      html .tmap-widget.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) .vis-navigation {
-        display: none; }
-      html .tmap-widget.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active):hover:before {
-        box-shadow: 10px 10px 5px lightgray;
-        color: gray;
-        background: white;
-        content: "Click to use";
-        font-size: 18px;
-        font-weight: bold;
-        left: 50%;
-        margin-left: -100px;
-        position: absolute;
-        text-align: center;
-        top: 50px;
-        width: 200px;
-        z-index: 2000;
-        padding: 5px;
-        pointer-events: none; }
-    html .tmap-widget .tmap-loading-bar {
-      display: block;
+    .tmap-widget.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active):hover:before {
+      box-shadow: 10px 10px 5px lightgray;
+      color: gray;
+      background: white;
+      content: "Click to use";
+      font-size: 18px;
+      font-weight: bold;
+      left: 50%;
+      margin-left: -100px;
       position: absolute;
       text-align: center;
-      font-size: 2em;
-      padding: 10px;
-      top: 50%;
-      background: rgba(245, 245, 245, 0.5);
-      z-index: 1;
-      width: 250px;
-      margin: auto;
-      left: 0px;
-      right: 0px; }
-    html .tmap-widget .tmap-vis-graph {
-      height: calc(100% - 35px); }
-      html .tmap-widget .tmap-vis-graph .vis-network .vis-network-tooltip {
-        max-width: 250px;
-        white-space: normal; }
-      html .tmap-widget .tmap-vis-graph .vis-network .vis-edit-mode {
-        height: 26px; }
-      html .tmap-widget .tmap-vis-graph .vis-network .vis-manipulation {
-        height: 34px;
-        border-top: 1px solid #d6d9d8;
-        background: rgba(245, 245, 245, 0.7); }
-      html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button.tmap-button-enabled {
-        right: 15px; }
-        html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button.tmap-button-enabled.tmap-fullscreen-button {
-          bottom: 90px;
-          background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />); }
-        html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button.tmap-button-enabled.tmap-halfscreen-button {
-          bottom: 130px;
-          background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/halfscreen.png}} />); }
-      html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover {
-        box-shadow: 0 0 3px 3px rgba(75, 75, 75, 0.3); }
-        html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover:before {
-          background: beige;
-          display: block;
-          color: black;
-          padding: 3px;
-          position: relative;
-          border: 1px solid lightgray;
-          width: 80px;
-          left: -70px;
-          top: -30px;
-          z-index: 1000;
-          text-align: center; }
-        html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-up:before {
-          left: 30px;
-          content: "Scroll up"; }
-        html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-down:before {
-          left: 30px;
-          content: "Scroll down"; }
-        html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-right:before {
-          left: 30px;
-          content: "Scroll right"; }
-        html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-left:before {
-          left: 30px;
-          content: "Scroll left"; }
-        html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-zoomOut:before {
-          content: "Zoom out"; }
-        html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-zoomIn:before {
-          content: "Zoom in"; }
-        html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-zoomExtends:before {
-          content: "Fit whole graph"; }
-        html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.tmap-fullscreen-button:before {
-          content: "Toggle Fullscreen"; }
-        html .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.tmap-halfscreen-button:before {
-          content: "Toggle Halfscreen"; }
-    html .tmap-widget.tmap-no-buttons .vis-navigation {
-      display: none; }
-    html .tmap-widget.tmap-advanced-editor {
-      background: #F2F2F2; }
-      html .tmap-widget.tmap-advanced-editor .tmap-topbar {
-        background: #d6d9d8; }
-        html .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-active-button {
-          background: #007180;
-          color: white; }
-          html .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-active-button svg {
-            fill: white; }
-        html .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-neigh-scope-button {
-          font-size: 1.5em;
-          vertical-align: bottom; }
-    html .tmap-widget .tmap-menu-bar {
-      width: 100%; }
-    html .tmap-widget .tmap-topbar {
-      background: #F5F5F5;
-      border-bottom: 1px solid lightgray;
-      padding: 3px 5px;
-      height: 35px;
+      top: 50px;
+      width: 200px;
+      z-index: 2000;
+      padding: 5px;
+      pointer-events: none; }
+  .tmap-widget .tmap-loading-bar {
+    display: block;
+    position: absolute;
+    text-align: center;
+    font-size: 2em;
+    padding: 10px;
+    top: 50%;
+    background: rgba(245, 245, 245, 0.5);
+    z-index: 1;
+    width: 250px;
+    margin: auto;
+    left: 0px;
+    right: 0px; }
+  .tmap-widget .tmap-vis-graph {
+    height: calc(100% - 35px); }
+    .tmap-widget .tmap-vis-graph .vis-network .vis-network-tooltip {
+      max-width: 250px;
+      white-space: normal; }
+    .tmap-widget .tmap-vis-graph .vis-network .vis-edit-mode {
+      height: 26px; }
+    .tmap-widget .tmap-vis-graph .vis-network .vis-manipulation {
+      height: 34px;
+      border-top: 1px solid #d6d9d8;
+      background: rgba(245, 245, 245, 0.7); }
+    .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button.tmap-button-enabled {
+      right: 15px; }
+      .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button.tmap-button-enabled.tmap-fullscreen-button {
+        bottom: 90px;
+        background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />); }
+      .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button.tmap-button-enabled.tmap-halfscreen-button {
+        bottom: 130px;
+        background-image: url(<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/halfscreen.png}} />); }
+    .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover {
+      box-shadow: 0 0 3px 3px rgba(75, 75, 75, 0.3); }
+      .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover:before {
+        background: beige;
+        display: block;
+        color: black;
+        padding: 3px;
+        position: relative;
+        border: 1px solid lightgray;
+        width: 80px;
+        left: -70px;
+        top: -30px;
+        z-index: 1000;
+        text-align: center; }
+      .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-up:before {
+        left: 30px;
+        content: "Scroll up"; }
+      .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-down:before {
+        left: 30px;
+        content: "Scroll down"; }
+      .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-right:before {
+        left: 30px;
+        content: "Scroll right"; }
+      .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-left:before {
+        left: 30px;
+        content: "Scroll left"; }
+      .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-zoomOut:before {
+        content: "Zoom out"; }
+      .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-zoomIn:before {
+        content: "Zoom in"; }
+      .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-zoomExtends:before {
+        content: "Fit whole graph"; }
+      .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.tmap-fullscreen-button:before {
+        content: "Toggle Fullscreen"; }
+      .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.tmap-halfscreen-button:before {
+        content: "Toggle Halfscreen"; }
+  .tmap-widget.tmap-no-buttons .vis-navigation {
+    display: none; }
+  .tmap-widget.tmap-advanced-editor {
+    background: #F2F2F2; }
+    .tmap-widget.tmap-advanced-editor .tmap-topbar {
+      background: #d6d9d8; }
+      .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-active-button {
+        background: #007180;
+        color: white; }
+        .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-active-button svg {
+          fill: white; }
+      .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-neigh-scope-button {
+        font-size: 1.5em;
+        vertical-align: bottom; }
+  .tmap-widget .tmap-menu-bar {
+    width: 100%; }
+  .tmap-widget .tmap-topbar {
+    background: #F5F5F5;
+    border-bottom: 1px solid lightgray;
+    padding: 3px 5px;
+    height: 35px;
+    position: relative; }
+    .tmap-widget .tmap-topbar .tmap-view-label {
+      width: 100%;
+      text-align: center;
+      font-weight: bold;
+      padding-top: 3px; }
+    .tmap-widget .tmap-topbar .tmap-focus-button {
+      position: absolute;
+      right: 10px; }
+      .tmap-widget .tmap-topbar .tmap-focus-button input {
+        width: 140px; }
+    .tmap-widget .tmap-topbar .tmap-popup {
       position: relative; }
-      html .tmap-widget .tmap-topbar .tmap-view-label {
-        width: 100%;
-        text-align: center;
-        font-weight: bold;
-        padding-top: 3px; }
-      html .tmap-widget .tmap-topbar .tmap-focus-button {
+      .tmap-widget .tmap-topbar .tmap-popup .tc-drop-down {
         position: absolute;
-        right: 10px; }
-        html .tmap-widget .tmap-topbar .tmap-focus-button input {
-          width: 140px; }
-      html .tmap-widget .tmap-topbar .tmap-popup {
-        position: relative; }
-        html .tmap-widget .tmap-topbar .tmap-popup .tc-drop-down {
-          position: absolute;
-          z-index: 999;
-          right: 0px; }
-      html .tmap-widget .tmap-topbar .tc-drop-down {
-        background-color: #F3F3F3;
-        min-width: 170px;
-        max-width: 210px;
-        padding: 5px;
-        margin: 5px 0; }
-        html .tmap-widget .tmap-topbar .tc-drop-down button, html .tmap-widget .tmap-topbar .tc-drop-down a {
-          padding: 0px;
-          text-decoration: none; }
-          html .tmap-widget .tmap-topbar .tc-drop-down button:hover, html .tmap-widget .tmap-topbar .tc-drop-down a:hover {
-            color: #ffffff; }
-          html .tmap-widget .tmap-topbar .tc-drop-down button svg, html .tmap-widget .tmap-topbar .tc-drop-down a svg {
-            vertical-align: middle; }
-      html .tmap-widget .tmap-topbar [hidden] {
-        display: none; }
-      html .tmap-widget .tmap-topbar .tc-block-dropdown {
-        width: 370px;
-        min-width: 370px;
-        padding: 5px;
-        margin: 15px 0 0 -370px; }
-        html .tmap-widget .tmap-topbar .tc-block-dropdown a {
-          display: inline;
-          padding: 0px; }
-      html .tmap-widget .tmap-topbar select {
-        width: 30%;
-        max-width: 200px;
-        word-wrap: initial;
+        z-index: 999;
+        right: 0px; }
+    .tmap-widget .tmap-topbar .tc-drop-down {
+      background-color: #F3F3F3;
+      min-width: 170px;
+      max-width: 210px;
+      padding: 5px;
+      margin: 5px 0; }
+      .tmap-widget .tmap-topbar .tc-drop-down button, .tmap-widget .tmap-topbar .tc-drop-down a {
+        padding: 0px;
+        text-decoration: none; }
+        .tmap-widget .tmap-topbar .tc-drop-down button:hover, .tmap-widget .tmap-topbar .tc-drop-down a:hover {
+          color: #ffffff; }
+        .tmap-widget .tmap-topbar .tc-drop-down button svg, .tmap-widget .tmap-topbar .tc-drop-down a svg {
+          vertical-align: middle; }
+    .tmap-widget .tmap-topbar [hidden] {
+      display: none; }
+    .tmap-widget .tmap-topbar .tc-block-dropdown {
+      width: 370px;
+      min-width: 370px;
+      padding: 5px;
+      margin: 15px 0 0 -370px; }
+      .tmap-widget .tmap-topbar .tc-block-dropdown a {
+        display: inline;
         padding: 0px; }
-      html .tmap-widget .tmap-topbar button {
-        line-height: inherit;
-        color: #666666; }
-      html .tmap-widget .tmap-topbar > * {
-        display: inline-block; }
-      html .tmap-widget .tmap-topbar .tmap-separator:after {
-        color: #bdbdbd;
-        margin: 3px;
-        content: " | "; }
-      html .tmap-widget .tmap-topbar .tc-edit-add-tag .tc-add-tag-name input {
-        width: 70%; }
-      html .tmap-widget .tmap-topbar .tc-sidebar-header {
-        text-shadow: none; }
-      html .tmap-widget .tmap-topbar .tc-edit-tags {
-        border: none;
-        padding: inherit;
-        box-shadow: none; }
+    .tmap-widget .tmap-topbar select {
+      width: 30%;
+      max-width: 200px;
+      word-wrap: initial;
+      padding: 0px; }
+    .tmap-widget .tmap-topbar button {
+      line-height: inherit;
+      color: #666666; }
+    .tmap-widget .tmap-topbar > * {
+      display: inline-block; }
+    .tmap-widget .tmap-topbar .tmap-separator:after {
+      color: #bdbdbd;
+      margin: 3px;
+      content: " | "; }
+    .tmap-widget .tmap-topbar .tc-edit-add-tag .tc-add-tag-name input {
+      width: 70%; }
+    .tmap-widget .tmap-topbar .tc-sidebar-header {
+      text-shadow: none; }
+    .tmap-widget .tmap-topbar .tc-edit-tags {
+      border: none;
+      padding: inherit;
+      box-shadow: none; }
+
+.tmap-widget.tmap-static-mode .tmap-topbar {
+  height: initial; }
+.tmap-widget.tmap-static-mode .tmap-vis-graph {
+  text-align: center;
+  cursor: not-allowed; }
+  .tmap-widget.tmap-static-mode .tmap-vis-graph:not(.tmap-graph-placeholder):hover::before {
+    box-shadow: 10px 10px 5px lightgray;
+    color: gray;
+    background: white;
+    content: "Static";
+    font-size: 18px;
+    font-weight: bold;
+    left: 50%;
+    margin-left: -100px;
+    position: absolute;
+    text-align: center;
+    top: 50px;
+    width: 200px;
+    z-index: 2000;
+    padding: 5px;
+    pointer-events: none; }
+  .tmap-widget.tmap-static-mode .tmap-vis-graph.tmap-graph-placeholder::before {
+    content: "No Preview";
+    display: block;
+    text-align: center;
+    padding: 20px; }
+
+.tmap-widget.tmap-plain-design {
+  border: none;
+  padding: 0px; }
+  .tmap-widget.tmap-plain-design .tmap-topbar {
+    display: none; }
 
 /**** Config Widget ************************************************/
 .tmap-config-widget {

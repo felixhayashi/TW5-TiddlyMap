@@ -128,7 +128,9 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
       state=<<qualify "$:/temp/mapExport">>>
     <div class="tc-drop-down">
     <$button
-        class="tc-btn-invisible">
+        class="tc-btn-invisible"
+        tooltip="Export the graph and all its elements
+                 in form of a JSON file">
         {{$:/core/images/permalink-button}} Save as JSON file
       <$action-sendmessage
           $message="tmap:tm-download-graph"
@@ -136,9 +138,10 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
     </$button>
     <$button
         class="tc-btn-invisible"
-        tooltip="Download graph as png image">
+        tooltip="Create a png image to download or save it
+                 as image or view-placeholder in your wiki">
         {{$:/core/images/palette}} Save as png image
-      <$action-sendmessage $message="tmap:tm-download-canvas" />
+      <$action-sendmessage $message="tmap:tm-save-canvas" />
     </$button>
     </div>
   </$reveal>

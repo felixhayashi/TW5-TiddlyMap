@@ -1,5 +1,7 @@
 $filterbar-height: 35px;
 $default-input-width: 140px;
+$padding : 5px;
+$color: #666666;
 
 /**** TiddlyWiki ***************************************************/
 
@@ -45,6 +47,16 @@ $default-input-width: 140px;
 
 /*******************************************************************/
 
+.tmap-save-canvas-preview {
+  text-align: center;
+  img {
+    background-color: white;
+    border: 1px solid lightgray;
+    max-width: 100%;
+    max-height: 100px;
+  }
+}
+
 .tmap-list-separator {
   display: block;
   background-color: rgb(239, 239, 239);
@@ -53,41 +65,6 @@ $default-input-width: 140px;
   border-bottom: 1px dotted gray;
   font-weight: bold;
   font-size: 0.8em,
-}
-
-.tmap-static-mode.tmap-widget {
-  .tmap-topbar {
-    height: initial;
-  }
-  .tmap-vis-graph {
-    text-align: center;
-    cursor: not-allowed;
-    
-    &:not(.tmap-graph-placeholder):hover::before {
-      box-shadow: 10px 10px 5px lightgray;
-      color: gray;
-      background: white;
-      content: "Non-interactive snapshot";
-      font-size: 18px;
-      font-weight: bold;
-      left: 50%;
-      margin-left: -100px;
-      position: absolute;
-      text-align: center;
-      top: 50px;
-      width: 200px;
-      z-index: 2000;
-      padding: 5px;
-      pointer-events: none;
-    }
-    
-    &.tmap-graph-placeholder::before {
-      content: "No Preview";
-      display: block;
-      text-align: center;
-      padding: 20px;
-    }
-  }
 }
 
 .tmap-unicode-icon {
@@ -416,9 +393,6 @@ html { // used to increase css importance
   }
 
 
-  $padding : 5px;
-  $color: #666666;
-
   /*
   body {
     background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/tiddlymap/media/surface.png!!type}} text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}}/>'));
@@ -469,292 +443,338 @@ html { // used to increase css importance
       }
     }
   }
+}
 
-  .tmap-widget {
-    position: relative;
-    border: 1px dotted lightgray;
-    padding: 2px;
-    width: 100%;
-    color: $color;
-    display: block; // sometimes tw puts us into a span
-        
-    &.tmap-fullscreen {
-     .vis-network .tmap-halfscreen-button {
-        display: none;
-      }
+/**** TMap Widget **************************************************/
+
+.tmap-widget {
+  position: relative;
+  border: 1px dotted lightgray;
+  padding: 2px;
+  width: 100%;
+  color: $color;
+  display: block; // sometimes tw puts us into a span
+      
+  &.tmap-fullscreen {
+   .vis-network .tmap-halfscreen-button {
+      display: none;
+    }
+  }
+  
+  &.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) {
+    cursor: pointer;
+    
+    .vis-navigation {
+      display: none;
     }
     
-    &.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) {
-      cursor: pointer;
-      
-      .vis-navigation {
-        display: none;
-      }
-      
-      &:hover:before {
-        box-shadow: 10px 10px 5px lightgray;
-        color: gray;
-        background: white;
-        content: "Click to use";
-        font-size: 18px;
-        font-weight: bold;
-        left: 50%;
-        margin-left: -100px;
-        position: absolute;
-        text-align: center;
-        top: 50px;
-        width: 200px;
-        z-index: 2000;
-        padding: 5px;
-        pointer-events: none;
-      }
-    }
-    
-    .tmap-loading-bar {
-      display: block;
+    &:hover:before {
+      box-shadow: 10px 10px 5px lightgray;
+      color: gray;
+      background: white;
+      content: "Click to use";
+      font-size: 18px;
+      font-weight: bold;
+      left: 50%;
+      margin-left: -100px;
       position: absolute;
       text-align: center;
-      font-size: 2em;
-      padding: 10px;
-      top: 50%;
-      background: rgba(245, 245, 245, 0.5);
-      z-index: 1;
-      width: 250px;
-      margin: auto;
-      left: 0px;
-      right: 0px;
+      top: 50px;
+      width: 200px;
+      z-index: 2000;
+      padding: 5px;
+      pointer-events: none;
     }
+  }
+  
+  .tmap-loading-bar {
+    display: block;
+    position: absolute;
+    text-align: center;
+    font-size: 2em;
+    padding: 10px;
+    top: 50%;
+    background: rgba(245, 245, 245, 0.5);
+    z-index: 1;
+    width: 250px;
+    margin: auto;
+    left: 0px;
+    right: 0px;
+  }
 
-    .tmap-vis-graph {
-      height: calc(100% - 35px);
+  .tmap-vis-graph {
+    height: calc(100% - 35px);
+  
+    .vis-network {
     
-      .vis-network {
-      
-        .vis-network-tooltip {
-          max-width: 250px;
-          white-space: normal;
-        }
-      
-        .vis-edit-mode {
-          height: 26px;
-        }
-        .vis-manipulation {
-          height: 34px;
-          border-top: 1px solid #d6d9d8;
-          background: rgba(245, 245, 245, 0.7);
-          
-        }
-      
-        .vis-navigation .vis-button {
-        
-          &.tmap-button-enabled {
-            right: 15px;
-            
-            &.tmap-fullscreen-button {
-              bottom: 90px;
-              background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />'));
-            }
-            &.tmap-halfscreen-button {
-              bottom: 130px;
-              background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/halfscreen.png}} />'));
-            }
-          }
-          
-          &:hover {
-            box-shadow: 0 0 3px 3px rgba(75, 75, 75, 0.3);
-            
-            &:before {
-              background: beige;
-              display: block;
-              color: black;
-              padding: 3px;
-              position: relative;
-              border: 1px solid lightgray;
-              width: 80px;
-              left: -70px;
-              top: -30px;
-              z-index: 1000;
-              text-align: center;
-            }
-            
-            &.vis-up:before {
-              left: 30px;
-              content: "Scroll up";              
-            }
-            &.vis-down:before {
-              left: 30px;
-              content: "Scroll down";              
-            }
-            &.vis-right:before {
-              left: 30px;
-              content: "Scroll right";              
-            }
-            &.vis-left:before {
-              left: 30px;
-              content: "Scroll left";              
-            }
-            &.vis-zoomOut:before {
-              content: "Zoom out";              
-            }
-            &.vis-zoomIn:before {
-              content: "Zoom in";              
-            }
-            &.vis-zoomExtends:before {
-              content: "Fit whole graph";              
-            }
-            &.tmap-fullscreen-button:before {
-              content: "Toggle Fullscreen";              
-            }
-            &.tmap-halfscreen-button:before {
-              content: "Toggle Halfscreen";              
-            }
-            
-          }
-          
-        }
+      .vis-network-tooltip {
+        max-width: 250px;
+        white-space: normal;
       }
-    }
     
-    &.tmap-no-buttons {
-      .vis-navigation {
-        display: none;
+      .vis-edit-mode {
+        height: 26px;
       }
-    }
-    
-    &.tmap-advanced-editor {
-      background: #F2F2F2;
-      
-      .tmap-topbar {
-        background: #d6d9d8;
+      .vis-manipulation {
+        height: 34px;
+        border-top: 1px solid #d6d9d8;
+        background: rgba(245, 245, 245, 0.7);
         
-        .tmap-active-button {
-          background: #007180;
-          color: white;
+      }
+    
+      .vis-navigation .vis-button {
+      
+        &.tmap-button-enabled {
+          right: 15px;
           
-          svg {
-            fill: white;
+          &.tmap-fullscreen-button {
+            bottom: 90px;
+            background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />'));
+          }
+          &.tmap-halfscreen-button {
+            bottom: 130px;
+            background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/halfscreen.png}} />'));
           }
         }
         
-        .tmap-neigh-scope-button {
-          font-size: 1.5em;
-          vertical-align: bottom;
+        &:hover {
+          box-shadow: 0 0 3px 3px rgba(75, 75, 75, 0.3);
+          
+          &:before {
+            background: beige;
+            display: block;
+            color: black;
+            padding: 3px;
+            position: relative;
+            border: 1px solid lightgray;
+            width: 80px;
+            left: -70px;
+            top: -30px;
+            z-index: 1000;
+            text-align: center;
+          }
+          
+          &.vis-up:before {
+            left: 30px;
+            content: "Scroll up";              
+          }
+          &.vis-down:before {
+            left: 30px;
+            content: "Scroll down";              
+          }
+          &.vis-right:before {
+            left: 30px;
+            content: "Scroll right";              
+          }
+          &.vis-left:before {
+            left: 30px;
+            content: "Scroll left";              
+          }
+          &.vis-zoomOut:before {
+            content: "Zoom out";              
+          }
+          &.vis-zoomIn:before {
+            content: "Zoom in";              
+          }
+          &.vis-zoomExtends:before {
+            content: "Fit whole graph";              
+          }
+          &.tmap-fullscreen-button:before {
+            content: "Toggle Fullscreen";              
+          }
+          &.tmap-halfscreen-button:before {
+            content: "Toggle Halfscreen";              
+          }
+          
         }
         
       }
     }
-    
-    .tmap-menu-bar {
-      width: 100%;
+  }
+  
+  &.tmap-no-buttons {
+    .vis-navigation {
+      display: none;
     }
+  }
+  
+  &.tmap-advanced-editor {
+    background: #F2F2F2;
     
     .tmap-topbar {
-      background: #F5F5F5;
-      border-bottom: 1px solid lightgray;
-      padding: 3px $padding;
-      height: $filterbar-height;
-      position: relative;
+      background: #d6d9d8;
       
-      .tmap-view-label {
-        width: 100%;
-        text-align: center;
-        font-weight: bold;
-        padding-top: 3px;
-      }
-      
-      .tmap-focus-button {
-        position: absolute;
-        right: 10px;
+      .tmap-active-button {
+        background: #007180;
+        color: white;
         
-        input {
-          width: $default-input-width;
+        svg {
+          fill: white;
         }
       }
       
-      .tmap-popup {
-        position: relative;
-      
-        .tc-drop-down {
-          position: absolute;
-          z-index: 999;
-          right: 0px;
-        }
+      .tmap-neigh-scope-button {
+        font-size: 1.5em;
+        vertical-align: bottom;
       }
       
-      .tc-drop-down {
-          background-color: #F3F3F3;
-          min-width: 170px;
-          max-width: 210px;
-          padding: $padding;
-          margin: 5px 0;
-                   
-          button, a {
-            padding : 0px;
-            text-decoration: none;
-            
-            &:hover {
-              color: #ffffff;
-            }
-      
-            svg {
-              vertical-align: middle;
-            }
-          }
-      }
-      
-      [hidden] {
-        display: none;
-      }
-      
-      .tc-block-dropdown {
-        width: 370px;
-        min-width: 370px;
-        padding: $padding;
-        margin: 15px 0 0 -370px;
-                
-          a {
-            display: inline;
-            padding : 0px;
-          }
-        
-      }
-      
-      select {
-        width: 30%;
-        max-width: 200px;
-        word-wrap: initial;
-        padding: 0px;
-      }
-      
-      button {
-        line-height: inherit;
-        color: $color;
-      }
+    }
+  }
+  
+  .tmap-menu-bar {
+    width: 100%;
+  }
+  
+  .tmap-topbar {
+    background: #F5F5F5;
+    border-bottom: 1px solid lightgray;
+    padding: 3px $padding;
+    height: $filterbar-height;
+    position: relative;
     
-       > * {
-        display: inline-block; // TODO: this is too rigorous
-      }
+    .tmap-view-label {
+      width: 100%;
+      text-align: center;
+      font-weight: bold;
+      padding-top: 3px;
+    }
+    
+    .tmap-focus-button {
+      position: absolute;
+      right: 10px;
       
-      .tmap-separator:after {
-        color: #bdbdbd;
-        margin: 3px;
-        content: " | ";
-      }
-      
-      .tc-edit-add-tag .tc-add-tag-name input {
-        width: 70%;
-      }
-      
-      .tc-sidebar-header {
-        text-shadow: none;
-      }
-      
-      .tc-edit-tags {
-        border: none;
-        padding: inherit;
-        box-shadow: none;
+      input {
+        width: $default-input-width;
       }
     }
+    
+    .tmap-popup {
+      position: relative;
+    
+      .tc-drop-down {
+        position: absolute;
+        z-index: 999;
+        right: 0px;
+      }
+    }
+    
+    .tc-drop-down {
+        background-color: #F3F3F3;
+        min-width: 170px;
+        max-width: 210px;
+        padding: $padding;
+        margin: 5px 0;
+                 
+        button, a {
+          padding : 0px;
+          text-decoration: none;
+          
+          &:hover {
+            color: #ffffff;
+          }
+    
+          svg {
+            vertical-align: middle;
+          }
+        }
+    }
+    
+    [hidden] {
+      display: none;
+    }
+    
+    .tc-block-dropdown {
+      width: 370px;
+      min-width: 370px;
+      padding: $padding;
+      margin: 15px 0 0 -370px;
+              
+        a {
+          display: inline;
+          padding : 0px;
+        }
+      
+    }
+    
+    select {
+      width: 30%;
+      max-width: 200px;
+      word-wrap: initial;
+      padding: 0px;
+    }
+    
+    button {
+      line-height: inherit;
+      color: $color;
+    }
+  
+     > * {
+      display: inline-block; // TODO: this is too rigorous
+    }
+    
+    .tmap-separator:after {
+      color: #bdbdbd;
+      margin: 3px;
+      content: " | ";
+    }
+    
+    .tc-edit-add-tag .tc-add-tag-name input {
+      width: 70%;
+    }
+    
+    .tc-sidebar-header {
+      text-shadow: none;
+    }
+    
+    .tc-edit-tags {
+      border: none;
+      padding: inherit;
+      box-shadow: none;
+    }
+  }
+}
+
+.tmap-widget.tmap-static-mode {
+  .tmap-topbar {
+    height: initial;
+  }
+  .tmap-vis-graph {
+    text-align: center;
+    cursor: not-allowed;
+    
+    &:not(.tmap-graph-placeholder):hover::before {
+      box-shadow: 10px 10px 5px lightgray;
+      color: gray;
+      background: white;
+      content: "Static";
+      font-size: 18px;
+      font-weight: bold;
+      left: 50%;
+      margin-left: -100px;
+      position: absolute;
+      text-align: center;
+      top: 50px;
+      width: 200px;
+      z-index: 2000;
+      padding: 5px;
+      pointer-events: none;
+    }
+    
+    &.tmap-graph-placeholder::before {
+      content: "No Preview";
+      display: block;
+      text-align: center;
+      padding: 20px;
+    }
+  }
+}
+
+.tmap-widget.tmap-plain-design {
+  border: none;
+  padding: 0px;
+
+  .tmap-topbar {
+    display: none;
   }
 }
 

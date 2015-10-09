@@ -939,7 +939,7 @@ utils.isSystemOrDraft = function(tiddler) {
  * existing title, and `force` is not set, then will happen and
  * undefined is returned by the function.
  */
-utils.changePrefix = function(oldPrefix, newPrefix, force, isDeleteOld) {
+utils.mv = function(oldPrefix, newPrefix, force, isDeleteOld) {
 
   if(oldPrefix === newPrefix || !oldPrefix || !newPrefix) return;
   
@@ -963,6 +963,12 @@ utils.changePrefix = function(oldPrefix, newPrefix, force, isDeleteOld) {
   }
   
   return fromToMapper;
+  
+};
+
+utils.cp = function(oldPrefix, newPrefix, force) {
+  
+  return utils.mv(oldPrefix, newPrefix, force, false);
   
 };
 
@@ -1242,6 +1248,15 @@ utils.addTiddler = function(title) {
   $tw.wiki.addTiddler(tObj);
   
   return tObj;
+};
+
+utils.getSnapshotTitle = function(viewLabel, type) {
+    
+  return "Snapshot – "
+         + viewLabel
+         + " (" + new Date().toDateString() + ")"
+         + "." + (type || "png");
+  
 };
   
 /**

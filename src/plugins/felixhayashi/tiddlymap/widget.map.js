@@ -73,7 +73,7 @@ var MapWidget = function(parseTreeNode, options) {
       "tmap:tm-store-position": this.handleStorePositions,
       "tmap:tm-edit-filters": this.handleEditFilters,
       "tmap:tm-generate-widget": this.handleGenerateWidget,
-      "tmap:tm-download-canvas": this.handleDownloadCanvas
+      "tmap:tm-save-canvas": this.handleSaveCanvas
     }, this, this);
   }
   
@@ -386,17 +386,23 @@ MapWidget.prototype.registerClassNames = function(parent) {
   
   // add main class
   addClass(parent, "tmap-widget");
-  
-  // maybe add some of these classes as well…
+
   if(this.clickToUse) {
     addClass(parent, "tmap-click-to-use");
   }
+  
   if(this.getAttr("editor") === "advanced") {
     addClass(parent, "tmap-advanced-editor");
   }
+  
+  if(this.getAttr("design") === "plain") {
+    addClass(parent, "tmap-plain-design");
+  }
+  
   if(!utils.isTrue(this.getAttr("show-buttons"), true)) {
     addClass(parent, "tmap-no-buttons");
   }
+  
   if(this.getAttr("class")) {
     addClass(parent, this.getAttr("class"));
   }
@@ -960,6 +966,9 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
   // init the graph with dummy data as events are not registered yet
   this.network = new vis.Network(this.graphDomNode, this.graphData, this.graphOptions);
   
+  // register the canvas element
+  this.canvas = this.graphDomNode.getElementsByTagName("canvas")[0];
+  
   this.visNetworkDomNode = this.graphDomNode.firstElementChild;
 
   this.addGraphKeyBindings(this.graphDomNode);
@@ -1245,7 +1254,7 @@ MapWidget.prototype.handleEditView = function() {
   
   var visInherited = JSON.stringify(this.opt.config.vis);
   
-  var params = {
+  var args = {
     view: this.view.getLabel(),
     createdOn: this.view.getCreationDate(true),
     numberOfNodes: "" + Object.keys(this.graphData.nodesById).length,
@@ -1257,7 +1266,8 @@ MapWidget.prototype.handleEditView = function() {
     }
   };
   
-  this.dialogManager.open("configureView", params, function(isConfirmed, outTObj) {
+  var name = "configureView";
+  this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
     
     if(!isConfirmed) return;
       
@@ -1278,13 +1288,61 @@ MapWidget.prototype.handleEditView = function() {
  * Triggers a download dialog where the user can store the canvas
  * as png on his/her harddrive.
  */
-MapWidget.prototype.handleDownloadCanvas = function() {
+MapWidget.prototype.handleSaveCanvas = function() {
   
-  var canvas = this.domNode.getElementsByTagName("canvas")[0];
-  var dataURL = canvas.toDataURL('image/png');
+  var tempImagePath = "$:/temp/tmap/snapshot";
+  var tempImage = this.createAndSaveSnapshot(tempImagePath);
+  var defaultName = utils.getSnapshotTitle(this.view.getLabel(), "png");
+  
+  var args = {
+    dialog: {
+      snapshot: tempImagePath,
+      width: "" + this.canvas.width,
+      height: "" + this.canvas.height,
+      preselects: {
+        name: defaultName,
+        action: "download"
+      }
+    }
+  };
+
+  var name = "saveCanvas";
+  this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
+    if(!isConfirmed) return;
+    
+    // allow the user to override the default name or if name is
+    // empty use the original default name
+    defaultName = outTObj.fields.name || defaultName;
+    
+    var action = outTObj.fields.action;
+    
+    if(action === "download") {
+      this.handleDownloadSnapshot(defaultName);
+      
+    } else if(action === "wiki") { 
+      utils.cp(tempImagePath, defaultName, true); 
+      this.dispatchEvent({
+        type: "tm-navigate", navigateTo: defaultName
+      });
+      
+    } else if(action === "placeholder") { 
+      this.view.addPlaceholder(tempImagePath);
+      
+    }
+    
+    // in any case
+    $tw.wiki.deleteTiddler("$:/temp/tmap/snapshot");
+          
+  });
+  
+};
+
+MapWidget.prototype.handleDownloadSnapshot = function(title) {
+  
   var a = this.document.createElement("a");
-  a.download = "Map snapshot – " + this.view.getLabel() + ".png";
-  a.href = dataURL;
+  var label = this.view.getLabel();
+  a.download = title || utils.getSnapshotTitle(label, "png");
+  a.href = this.getSnapshot();
 
   // we cannot simply call click() on <a>; chrome is cool with it but
   // firefox requires us to create a mouse event…
@@ -1293,26 +1351,24 @@ MapWidget.prototype.handleDownloadCanvas = function() {
   
 };
 
-MapWidget.prototype.createAndSaveSnapshot = function() {
+MapWidget.prototype.createAndSaveSnapshot = function(title) {
     
-  var now = new Date();
+  var label = this.view.getLabel();
+  var tRef = title || this.view.getRoot() + "/snapshot";
   $tw.wiki.addTiddler(new $tw.Tiddler({
-    title: this.view.getRoot() + "/snapshot",
+    title: tRef,
     type: "image/png",
     text: this.getSnapshot(true),
-    modified: now,
-    caption: "Static snapshot image of view "
-             + "\"" + this.view.getLabel() + "\ "
-             + "from " + now.toLocaleString()
+    modified: new Date()
   }));
+  
+  return tRef;
   
 };
 
-
 MapWidget.prototype.getSnapshot = function(stripPreamble) {
   
-  var canvas = this.domNode.getElementsByTagName("canvas")[0];
-  var data = canvas.toDataURL("image/png");
+  var data = this.canvas.toDataURL("image/png");
   return (stripPreamble
           ? utils.getWithoutPrefix(data, "data:image/png;base64,")
           : data);

@@ -138,7 +138,7 @@ ViewAbstraction.prototype._createView = function(protoView) {
   
   protoView = new ViewAbstraction(protoView);
   if(protoView.exists()) {
-    var results = utils.changePrefix(protoView.getRoot(),
+    var results = utils.mv(protoView.getRoot(),
                                      this.path.config,
                                      true, // allow override
                                      false); // only copy
@@ -177,6 +177,17 @@ ViewAbstraction.prototype.isLocked = function() {
 ViewAbstraction.prototype.refresh = function(changedTiddlers) {
   
   return this.rebuildCache(changedTiddlers);
+  
+}
+
+/**
+ * clones the tiddler denoted via tRef and uses it as placeholder
+ * for this view when a widget using this view is displayed in
+ * static mode
+ */
+ViewAbstraction.prototype.addPlaceholder = function(tRef) {
+  
+  utils.cp(tRef, this.getRoot() + "/snapshot", true);
   
 }
 
@@ -353,7 +364,7 @@ ViewAbstraction.prototype.rename = function(newLabel) {
   // start the renaming
   var newRoot = this.opt.path.views + "/" + newLabel;
   var oldRoot = this.getRoot();
-  var results = utils.changePrefix(oldRoot, newRoot, true);
+  var results = utils.mv(oldRoot, newRoot, true);
     
   this._registerPaths(newLabel);
   this.rebuildCache();

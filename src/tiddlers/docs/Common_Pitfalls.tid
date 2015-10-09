@@ -7,9 +7,26 @@ type: text/vnd.tiddlywiki
 
 \rules except wikilink
 
+!! Widget code generation
+
+It is recommended to use the TiddlyMap [[widget-wizard|Embedding views within tiddlers]] for the creation of the widget code. This way it is guaranteed
+that the widget is configured correctly.
+
+!! Slow movements
+
+<i class="fa fa-exclamation-triangle" /> Sometimes it happens that when moving nodes or edges in a graph, it seems to be a slow or stagnant, while it usually runs smooth. If this happens, despite the graph being not big in size, it always helps to do a click outside the canvas (on the wiki's background area). This is a [[known chrome bug|https://code.google.com/p/chromium/issues/detail?id=507863]]. It usually occurs after closing a TiddlyWiki modal.
+
+!! Performance
+
+Generally speaking, the graph-visualization runs most smoothly in Google Chrome. However, starting from version 38.1, Firefox uses hardware acceleration, which significantly increases performance, making the graph operations as fast as in chrome.
+
+!! Color values for nodes
+
+Do __not__ use css color names (like "red" or "darkcyan" etc.) for //node// coloring, this might cause problems when calculating the node's contrast color in the graph. Instead use the hexadecimal notation (e.g. "#FFFFFF" for "white").
+
 !! Widget's closing tag
 
-Please do not use the following shortcut to close the widget as it may cause conflicts with the visualization.
+Prior to v0.9.3, please do not use the following shortcut to close the widget as it may cause conflicts with the visualization.
 
 ```html
 <$tiddlymap />
@@ -20,17 +37,3 @@ Instead, use this version:
 ```html
 <$tiddlymap></$tiddlymap>
 ```
-
-It is recommended to use the ~TiddlyMap [[widget-wizard|Embedding views within tiddlers]] for the creation of the widget code.
-
-!! Slow movements
-
-<i class="fa fa-exclamation-triangle" /> Sometimes it happens that when moving nodes or edges in a graph, it seems to be a bit slow or stagnant when it usually runs smooth. If this happens, despite the graph being not big in size, it always helps to do a click outside the canvas (on an empty spot in the browser). This is a [[known chrome bug|https://code.google.com/p/chromium/issues/detail?id=507863]]. It usually occurs after closing a TiddlyWiki modal.
-
-!! Performance
-
-Generally speaking, the graph-visualization runs most smoothly in Google Chrome. However, starting from version 38.1, Firefox uses hardware acceleration, which significantly increases performance, making the graph operations as fast as in chrome.
-
-!! Color values for nodes
-
-Do __not__ use css color names (like "red" or "darkcyan" etc.) for //node// coloring, this might cause problems when calculating the node's contrast color in the graph. Instead use the hexadecimal notation (e.g. "#FFFFFF" for "white").

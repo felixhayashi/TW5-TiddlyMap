@@ -76,7 +76,7 @@ exports.config = {
       // <- more repulsion between nodes - 0 - more attraction between nodes ->
       gravitationalConstant: -300, // default: -50
       // edge length
-      springLength: 160, // default: 100
+      springLength: 100, // default: 100
       // stiffness of the edges
       springConstant: 0.095, // default: 0.08
       // pulls the entire network back to the center.

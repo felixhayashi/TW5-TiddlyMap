@@ -434,14 +434,19 @@ ViewAbstraction.prototype.getConfig = function(name, isRebuild, defValue) {
  */
 ViewAbstraction.prototype.getStabilizationIterations = function() {
   
-  return (this.stabIterations ? this.stabIterations : 1000);
+  return 1000;
+  
+  //~ return utils.getText(this.getRoot() + "/stabilizationIterations",
+                       //~ 10000);
   
 };
 
 /**
  * 
  */
-ViewAbstraction.prototype.setStabilizationIterations = function(i) {
+ViewAbstraction.prototype.setStabilizationIterations = function(it) {
+  
+  //utils.setText(this.getRoot() + "/stabilizationIterations", it);
   
 };
 

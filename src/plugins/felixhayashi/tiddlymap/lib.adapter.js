@@ -984,7 +984,7 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
   var inheritedStyles = this.getInheritedNodeStyles(nodes, view);
   var neighbourStyle = new NodeType("tmap:neighbour").style;
   var viewNodeData = view.getNodeData();
-  var isFixedNode = !view.isEnabled("physics_mode");
+  var isStaticMode = !view.isEnabled("physics_mode");
   
   // shortcuts (for performance and readability)
   var nodeInfoField = this.opt.field.nodeInfo;
@@ -1038,7 +1038,13 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
     // local node style and positions
     if(viewNodeData[id]) {
       utils.merge(node, viewNodeData[id]);
-      if(isFixedNode) { node.fixed = { x: true, y: true }; }
+      if(isStaticMode) {
+        // fix x if x-position is set; same for y
+        node.fixed = {
+          x: (node.x != null),
+          y: (node.y != null)
+        };
+      }
     }
   
     // == tweaks ==

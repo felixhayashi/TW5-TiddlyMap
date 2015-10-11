@@ -760,13 +760,28 @@ MapWidget.prototype.rebuildGraph = function(options) {
   }
       
   if(options.resetOptions) {
+    
     this.reloadOptions();
+    
+  }
+  
+  if(!this.view.isEnabled("physics_mode")) {
+    
+    // in static mode we need to ensure that objects spawn
+    // near center so we need to set physics from
+    // zero to something. Yes, we override the users
+    // central gravity value… who cares about central
+    // gravity in static mode anyways.
+    var physics = this.graphOptions.physics;
+    physics[physics.solver].centralGravity = 0.015;
   }
     
   if(!options.resetFocus) {
     // option or data resets always overrule any flags!
     this.doFitAfterStabilize = false;
   }
+  
+  this.network.setOptions(this.graphOptions);
   
   this.rebuildGraphData(true);
   
@@ -1213,17 +1228,10 @@ MapWidget.prototype.getGraphOptions = function() {
     this.resetVisManipulationBar(callback);
   }.bind(this);
   
+  // make sure the actual solver is an object
   var physics = options.physics;
   physics[physics.solver] = physics[physics.solver] || {};
-  
-  // gravity needs to be set to very small value so graph still
-  // looks balanced when physics is on!
-  //~ var gravity = (this.view.isEnabled("physics_mode")
-                 //~ ? physics[physics.solver].centralGravity
-                 //~ : 0);
-  //~ 
-//~ 
-  //~ physics[physics.solver].centralGravity = physics[physics.solver].centralGravity;
+   
   physics.stabilization.iterations = this.view.getStabilizationIterations();
   
   this.logger("debug", "Loaded graph options", options);
@@ -1750,9 +1758,10 @@ MapWidget.prototype.handleGenerateWidget = function(event) {
 };
 
 MapWidget.prototype.handleStorePositions = function(withNotify) {
-  
-  this.view.saveNodeData(this.network.getPositions());
     
+  this.view.saveNodeData(this.network.getPositions());
+  this.ignoreNextViewModification = true;
+      
   if(withNotify) {
     this.notify("positions stored");
   }
@@ -1798,22 +1807,30 @@ MapWidget.prototype.handleVisStabilizedEvent = function(properties) {
   this.logger("log", "Network stabilized after",
                       properties.iterations,
                       "iterations");
-  this.view.setStabilizationIterations(properties.iterations);
-
-  this.network.storePositions();
-  this.setNodesMoveable(this.graphData.nodesById,
-                        this.view.isEnabled("physics_mode"));
   
-  if(!this.view.isEnabled("physics_mode")) {
-    
-    var physics = this.graphOptions.physics;
-    if(typeof physics[physics.solver] !== "object") {
-      physics[physics.solver] = {};
+  // used to improve performance of next stabilization
+  this.view.setStabilizationIterations(properties.iterations);
+  
+  if(!this.view.isEnabled("physics_mode")) { // static mode
+
+    // store positions if new nodes without position were added
+    var nodes = this.graphData.nodesById;
+    var idsOfNodesWithoutPosition = [];
+    for(var id in nodes) {
+      if(!nodes[id].x) { idsOfNodesWithoutPosition.push(id); }
     }
+    if(idsOfNodesWithoutPosition.length) {
+      this.setNodesMoveable(idsOfNodesWithoutPosition, false);
+      this.notify(idsOfNodesWithoutPosition.length
+                  + " nodes were added to the graph");
+      this.doFitAfterStabilize = true;
+    }
+    
+    // after storing positions, set gravity to zero again
+    var physics = this.graphOptions.physics;
     physics[physics.solver].centralGravity = 0;
-    
     this.network.setOptions(this.graphOptions);
-    
+
   }
   
   if(this.doFitAfterStabilize) {
@@ -2177,21 +2194,11 @@ MapWidget.prototype.handleVisShowPopup = function(id) {
  */
 MapWidget.prototype.handleVisDragEnd = function(properties) {
   
-  if(properties.nodes.length) {
-        
-    // only store positions if in floating mode
-    if(!this.view.isEnabled("physics_mode")) { 
-      
-      // fix node again
-      this.setNodesMoveable(this.graphData.nodes.get(properties.nodes), false);
+  if(!properties.nodes.length) return;
             
-      // finally store positions
-      this.handleStorePositions();
-      
-      this.ignoreNextViewModification = true;
-      
-    }
-  }
+  // fix node again and store positions
+  // if in static mode, fixing will be ignored
+  this.setNodesMoveable(properties.nodes, false);      
       
 };
 
@@ -2202,7 +2209,7 @@ MapWidget.prototype.handleVisBeforeDrawing = function(context2d) {
 MapWidget.prototype.handleVisLoading = function(params) {
   
   this.graphLoadingBarDomNode.style.display = "block";
-  var text = "Loading " + ((params.iterations / params.total) * 100) + "%";
+  var text = "Loading " + Math.round((params.iterations / params.total) * 100) + "%";
   this.graphLoadingBarDomNode.innerHTML = text;
 
 };
@@ -2222,15 +2229,9 @@ MapWidget.prototype.handleVisLoadingDone = function(params) {
  */
 MapWidget.prototype.handleVisDragStart = function(properties) {
 
-  //~ if(properties.nodes.length) {
-    //~ var node = this.graphData.nodesById[properties.nodes[0]];
-    //~ this.setNodesMoveable([ node ], true);
-  //~ }
-
   if(properties.nodes.length) {
     this.assignSelectStyle(properties.nodes);
-    this.setNodesMoveable(this.graphData.nodes.get(properties.nodes),
-                          true);
+    this.setNodesMoveable(properties.nodes, true);
   }
   
 };
@@ -2514,38 +2515,38 @@ MapWidget.prototype.dialogPostProcessor = function() {
 /**
  * Allow the given nodes to be moveable.
  * 
- * @param {vis.DataSet} nodes - The nodes for which to allow any
- *     movement (either by physics or by dragging).
- * @param {boolean} isEnabled - True, if the nodes are allowed to
+ * @param {Array&lt;NodeId>} nodeIds - The ids of the nodes for which
+ *     we allow or disallow the movement.
+ * @param {boolean} isMoveable - True, if the nodes are allowed to
  *     move or be moved.
- * 
- * @TODO: Optimize this function. It does not need objects as nodes
- * input as it only operates on ids. so instead of passing objects
- * and using Object.keys() pass an array of ids
  */    
-MapWidget.prototype.setNodesMoveable = function(nodes, isMoveable) {
+MapWidget.prototype.setNodesMoveable = function(nodeIds, isMoveable) {
 
-  this.network.storePositions();
-
+  if(!nodeIds || !nodeIds.length || this.view.isEnabled("physics_mode")) {
+  // = no ids passed or in floating mode
+    return;
+  }
+  
   var updates = [];
-  var keys = Object.keys(nodes);
-  for(var i = keys.length; i--;) {
-    
-    var id = nodes[keys[i]].id;
-    
-    var update = {
-      id: id,
-      fixed: {  // v4: formerly allowToMoveX, allowToMoveY
-        x: !isMoveable,
-        y: !isMoveable
-      }
-    };
-    
-    updates.push(update);
+  var isFixed = !isMoveable;
+  for(var i = nodeIds.length; i--;) {
+        
+    updates.push({
+      id: nodeIds[i],
+      fixed: { x: isFixed, y: isFixed }
+    });
     
   }
-
+    
   this.graphData.nodes.update(updates);
+  
+  if(isFixed) {
+    
+    this.logger("debug", "Fixing", updates.length, "nodes");
+    
+    // if we fix nodes in static mode then we also store the positions
+    this.handleStorePositions();
+  }
 
 };
 
@@ -2629,7 +2630,7 @@ exports.tiddlymap = MapWidget;
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-	on 2015-10-09T15:19:25+02:00 using the <a
+	on 2015-10-11T23:06:50+02:00 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>

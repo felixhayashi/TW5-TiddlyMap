@@ -1,4 +1,4 @@
-config.vis: {"edges":{"arrows":{"to":{"enabled":false},"middle":true}}}
+config.vis: {"edges":{"arrows":{"to":true,"middle":{"enabled":false}}}}
 created: 20150824130601749
 id: 8c5bea5d-ce1d-48e8-bbe3-b0573b8825e5
 isview: true

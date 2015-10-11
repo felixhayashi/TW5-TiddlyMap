@@ -72,6 +72,10 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.9.15
+
+* Furthere improved the fix for #177. This time also for static setups.
+
 ### v0.9.13
 
 * Hide TM tiddler toolbar button when tiddler is a system tiddler.

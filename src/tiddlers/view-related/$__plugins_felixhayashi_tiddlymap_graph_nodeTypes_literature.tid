@@ -1,8 +1,8 @@
 created: 20150824131235495
-fa-icon: f02d
-modified: 20150911180624749
+fa-icon: &#xf1c1;
+modified: 20151009222607150
 scope: [tag[Literature]]
-style: {"color":{"background":"rgba(147,138,94,1)"},"borderWidth":4,"shadow":true,"shape":"square"}
+style: {"color":{"background":"rgba(178,34,34,1)"}}
 title: $:/plugins/felixhayashi/tiddlymap/graph/nodeTypes/literature
 type: text/vnd.tiddlywiki
 

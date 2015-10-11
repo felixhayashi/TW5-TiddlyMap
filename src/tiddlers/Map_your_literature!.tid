@@ -1,0 +1,14 @@
+created: 20151009212706425
+modified: 20151009222955572
+tags: Examples Home
+title: Map your literature!
+tmap.id: bbc74c35-8779-41fe-9b15-109b32397ff7
+type: text/vnd.tiddlywiki
+
+You can use TiddlyMap to organize your thesis or to keep track of what you are reading and how your literature interrelates.
+
+<$tiddlymap view="Activities" />
+
+Note that all icons are assigned using [[group styles|Styling Nodes]]. Group styles are simple rules that allow you to assign styles based on filters. Expressed in a simplified scheme e.g. `[tag[Literature]] → Assign PDF Icon`.
+
+You can use Font Awesome icons to do that. See also [[Tiddler Icons as part of the graph]].

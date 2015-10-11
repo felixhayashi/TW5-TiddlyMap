@@ -1,5 +1,5 @@
 created: 20150112140815454
-modified: 20150910223144138
+modified: 20151009221508449
 rank: 2
 tags: Examples
 title: Tiddler Icons as part of the graph
@@ -8,7 +8,7 @@ type: text/vnd.tiddlywiki
 
 In TiddlyWiki you can assign icons to your tiddlers by referencing a //locally stored// image in the tiddler's icon field. This icon appears next to the tiddler's title. These icons are also displayed in graphs.
 
-<i class="fa fa-exclamation-circle" /> As of v0.9 it is possible to use the font awesome plugin and paste the icon code into a tiddler field tmap.fa-icon: `f072` for e.g. adding the plane icon.
+<i class="fa fa-exclamation-circle" /> As of v0.9 it is possible to use the ''Font Awesome'' plugin and paste the icon code into a tiddler field tmap.fa-icon: `&#xf072;` for e.g. adding the plane icon (alternatively you can just write `f072`).
 
 For example this view shows some tiddlers that have an icon field set.
 

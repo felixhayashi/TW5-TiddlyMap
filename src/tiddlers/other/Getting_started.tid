@@ -1,6 +1,6 @@
 created: 20141217161104178
 creator: @felixhayashi
-modified: 20150930195406791
+modified: 20151011202019887
 modifier: @felixhayashi
 title: Getting started
 tmap.edges: {"30af4ba7-306f-4e68-9e32-d0342d64a717":{"to":"6159DA1A-73F2-451D-B55F-8744480BA7AC","type":"demo:suggestion"}}
@@ -9,10 +9,6 @@ tmap.open-view: Overview
 type: text/vnd.tiddlywiki
 
 \rules except wikilink
-
-<div class="tmap-flash-message tmap-info">
-   <i class="fa fa-exclamation-circle"></i> v0.9 just got released. Be safe and backup your wiki before installing it!
-</div>
 
 |!Current TiddlyMap version |{{ version || plugin }} |
 |!Version's build date |{{ released || plugin }} |

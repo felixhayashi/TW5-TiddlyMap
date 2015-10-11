@@ -1,5 +1,5 @@
 created: 20150930181141101
-modified: 20151004140940096
+modified: 20151011201700847
 tags: Documentation
 title: Best Practices
 tmap.id: f464c5e8-3bb0-44fd-821a-4e4ee9cc8eb1
@@ -15,12 +15,4 @@ If a map becomes to big, try to [[outsource nodes into another view|Moving nodes
 This means: avoid creating different edge types that are highly synonymous like //has created//, //authored//, //created by//, //creator of//. Instead stick to one name that is most suitable and generic.
 
 !! Prefer generic node styles over specific node styles.
-With all the [[different styling levels|Styling Nodes]], you'll save yourself some time if you use global styles whenever possible, especially group styles. For example, if you have tiddlers that represent pieces of literature, then create a //node group// that adds a book icon to all these nodes – instead of styling all literature nodes individually.
-
-! Speed tweaks
-
-!! Disable smooth curves
-Smooth curves are difficult to compute. If you want to make your graphs faster, open the [[The editor menu]] and disable this feature in your TiddlyMap configuration (it's in the visjs section). Alternatively, you can disable it on a view basis in your view configuration (again in the visjs section).
-
-!! Work in the Chrome browser
-Chrome is much faster than firefox when it comes to graph drawing. In order to be able to autosave with Crome, use TiddlyMap with TiddlyWiki in nodejs mode.
+With all the [[different styling levels|Styling Nodes]], you'll save yourself some time if you use global styles whenever possible, especially global group styles. For example, if you have tiddlers that represent pieces of literature, then create a //node group// that adds a book icon to all these nodes – instead of styling all literature nodes individually.

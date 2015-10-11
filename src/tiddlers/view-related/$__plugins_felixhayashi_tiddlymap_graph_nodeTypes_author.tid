@@ -1,7 +1,7 @@
 created: 20150824131342637
-modified: 20150911181258491
+modified: 20151009214902501
 scope: [tag[Author]]
-style: {"font":{"color":"rgba(66,102,58,1)","strokeColor":"rgba(197,202,255,1)","strokeWidth":20}}
+style: {"color":{"background":"rgba(72,178,73,1)"}}
 title: $:/plugins/felixhayashi/tiddlymap/graph/nodeTypes/author
 type: text/vnd.tiddlywiki
 

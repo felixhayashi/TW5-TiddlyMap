@@ -2,7 +2,7 @@ created: 20150824130707313
 modified: 20150824130716739
 tags: Author
 title: Franz Kafka
-tmap.edges: {"6b35631e-b982-48fc-83e0-33591e9442dc":{"to":"8b26d3b9-ddf5-43d9-9fa6-8d9ffcd6d3fc","type":"author of"}}
+tmap.edges: {"6b35631e-b982-48fc-83e0-33591e9442dc":{"to":"8b26d3b9-ddf5-43d9-9fa6-8d9ffcd6d3fc","type":"author of"},"1f0f2ab7-119b-4e01-a85c-68171a5f849f":{"to":"11b9f558-6809-4d91-a7d1-60707c548b2e","type":"knew about"}}
 tmap.id: 6c9256c8-f45d-4276-8d57-83c9a2969d59
 type: text/vnd.tiddlywiki
 

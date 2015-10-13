@@ -10,6 +10,11 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.9.16
+
+* Added possibility to prioritize node types.
+* Improved the way elements are added via the element-type manager
+
 ### v0.9.14
 
 * Resolves #179: Add an option to render widget in plain design feature
@@ -72,9 +77,16 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.9.16
+
+* Fixed bug that renaming an element type didn't work.
+* Reintroduced the closing tag for the widget generator. It caused
+  trouble to have tiddlymap widget's without closing tag.
+* Showing correct timestamps now in the element-type manager.
+
 ### v0.9.15
 
-* Furthere improved the fix for #177. This time also for static setups.
+* Further improved the fix for #177. This time also for static setups.
 
 ### v0.9.13
 
@@ -165,5 +177,11 @@ Important Bugfixes
   
 Incompatibilities to previous versions
 ----------------------------
+
+### v0.9.16
+
+* Removed feature to have local group styles
+
+### v0.9.0
 
 * Positioning the live view nodes and saving the positions is not possible anymore :( I had to remove this feature again since it clashed with different view operations.

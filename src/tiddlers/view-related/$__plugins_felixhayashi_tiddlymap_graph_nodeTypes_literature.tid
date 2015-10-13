@@ -1,6 +1,7 @@
 created: 20150824131235495
 fa-icon: &#xf1c1;
-modified: 20151009222607150
+modified: 20151013104452156
+priority: 2
 scope: [tag[Literature]]
 style: {"color":{"background":"rgba(178,34,34,1)"}}
 title: $:/plugins/felixhayashi/tiddlymap/graph/nodeTypes/literature

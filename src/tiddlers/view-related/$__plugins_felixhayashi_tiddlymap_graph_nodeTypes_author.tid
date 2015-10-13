@@ -1,5 +1,6 @@
 created: 20150824131342637
 modified: 20151009214902501
+priority: 1
 scope: [tag[Author]]
 style: {"color":{"background":"rgba(72,178,73,1)"}}
 title: $:/plugins/felixhayashi/tiddlymap/graph/nodeTypes/author

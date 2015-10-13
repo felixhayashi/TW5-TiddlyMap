@@ -1,5 +1,5 @@
 created: 20150827151202347
-modified: 20150914161333543
+modified: 20151013104409213
 tags: [[Basic concepts]]
 title: Styling Nodes
 tmap.id: f17de47f-0b5c-40d0-9720-a3cafcaa9c10
@@ -73,11 +73,10 @@ TiddlyMap allows you to style nodes in various ways – not only in terms of the
     </td>
     <td>
       <h1>(4) Local group styles</h1>
+      <div class="tmap-flash-message tmap-warning">
+        <i class="fa fa-exclamation-triangle"></i> This feature was removed in v0.9.16
+      </div>
       The styles only apply to nodes corresponding to tiddlers that match the filter ''and'' match the selected view. 
-      <ol>
-        <li>Follow the steps for //global group styles//</li>
-        <li>Then bind the node-type to a view by going to the "General" section and selecting the view's name in the dropdown list</li>
-      </ol>
     </td>
   </tr>
   <tr>

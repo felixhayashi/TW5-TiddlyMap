@@ -1,5 +1,5 @@
 created: 20150103171758988
-modified: 20151011205452801
+modified: 20151013105801013
 tags: Documentation
 title: Common Pitfalls
 tmap.id: a7e46ff2-2010-475f-a430-d757a7659798
@@ -7,9 +7,21 @@ type: text/vnd.tiddlywiki
 
 \rules except wikilink
 
-!! Widget code generation
+!! Widget's closing tag
 
-It is recommended to use the TiddlyMap [[widget-wizard|Embedding views within tiddlers]] for the creation of the widget code. This way it is guaranteed
+Please do not use the following shortcut to close the widget as it often causes conflicts with the widget rendering.
+
+```html
+<$tiddlymap />
+```
+
+Instead, use this version:
+
+```html
+<$tiddlymap></$tiddlymap>
+```
+
+Generally speaking, it is recommended to use the TiddlyMap [[widget-wizard|Embedding views within tiddlers]] for the creation of the widget code. This way it is guaranteed
 that an embedded widget is configured correctly.
 
 !! Slow movements
@@ -23,17 +35,3 @@ Generally speaking, the graph-visualization runs most smoothly in Google Chrome.
 !! Color values for nodes
 
 Do __not__ use css color names (like "red" or "darkcyan" etc.) for //node// coloring, this might cause problems when calculating the node's contrast color in the graph. Instead use the hexadecimal notation (e.g. "#FFFFFF" for "white").
-
-!! Widget's closing tag
-
-Prior to v0.9.3, please do not use the following shortcut to close the widget as it may cause conflicts with the widget rendering.
-
-```html
-<$tiddlymap />
-```
-
-Instead, use this version:
-
-```html
-<$tiddlymap></$tiddlymap>
-```

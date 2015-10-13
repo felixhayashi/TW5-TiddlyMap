@@ -23,13 +23,11 @@ caption: General
              this node-type and its style.">>
   <$macrocall type="input-select"
       $name="tmap-row" 
-      title="View"
-      field="view"
-      nochoice="All views"
-      selectFilter=<<tmap "option" "selector.allViewsByLabel">>
-      descr="Per default, this node type applies to nodes in all
-             views. However, you can bind this type to a certain
-             view only." />
+      title="Priority"
+      field="priority"
+      selectFilter=<<tmap "scale" "100">>
+      descr="When a type has a a higher priority than another type,
+             its style will override the other style" />
   </$list>
 \end
 

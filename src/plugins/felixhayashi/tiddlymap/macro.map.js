@@ -79,6 +79,14 @@ exports.run = function() {
     case "uuid":
 
       return utils.genUUID();
+      
+    case "scale":
+      
+      var str = "";
+      for(var i = 1, l = parseInt(arguments[1]); i < l; i++) {
+        str += "[[" + i + "]]";
+      }
+      return str;
 
     case "option":
     

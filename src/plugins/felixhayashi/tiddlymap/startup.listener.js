@@ -149,21 +149,22 @@ GlobalListener.prototype.handleOpenTypeManager = function(event) {
   
   if(mode === "manage-edge-types") {
     var topic = "Edge-Type Manager";
-    var allTypesSelector = this.opt.selector.allEdgeTypesByLabel;
+    var allTypesSelector = this.opt.selector.allEdgeTypes;
+    var typeRootPath = this.opt.path.edgeTypes;
   } else {
     var topic = "Node-Type Manager";
-    var allTypesSelector = this.opt.selector.allNodeTypesByLabel;
+    var allTypesSelector = this.opt.selector.allNodeTypes;
+    var typeRootPath = this.opt.path.nodeTypes;
   }
                           
-  var opts = {
+  var args = {
     mode: mode,
     topic: topic,
-    filter: allTypesSelector
-            + " +[search:title{$:/temp/tmap/MapElementTypeSearch}]"
-            + " +[sort[title]]"
+    searchSelector: allTypesSelector,
+    typeRootPath: typeRootPath
   };
   
-  var dialogTObj = this.dialogManager.open("MapElementTypeManager", opts);
+  var dialogTObj = this.dialogManager.open("MapElementTypeManager", args);
   
   if(event.paramObject.type) {
     this.handleLoadTypeForm({

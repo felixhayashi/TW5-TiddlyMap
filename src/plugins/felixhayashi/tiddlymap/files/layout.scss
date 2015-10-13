@@ -188,211 +188,6 @@ html { // used to increase css importance
     }
   }
 
-  .tc-modal-wrapper {
-    z-index: 1010; // fix this in core?
-    
-    .tc-modal-header {
-          
-      svg {
-        vertical-align: sub;
-      }
-      
-      h3 {
-        line-height: 10px;
-      }
-      
-    }
-    
-    .tc-modal-body { // add this to tw
-      min-height: 250px; // tw doesn't have a minheight
-      max-height: 70vh; // tw uses 60vh
-      overflow: auto;
-
-      > div {
-        >p:first-child {
-          margin-top: 0px;
-        }
-        >p:last-child {
-          margin-bottom: 0px;
-        }
-      }
-                        
-      .tc-image-button {
-        font-size: 14px;
-      }
-      
-      .tmap-modal-editor {
-      
-        .tc-tiddler-frame {
-          padding: 0px;
-          width: auto;
-          margin: 0px;
-          border: none;
-          
-          .tc-tiddler-title {
-            display: none;
-          }
-        }
-        
-      }
-      
-      
-      #element-type-manager {
-      
-        .tc-tab-buttons {
-          padding-top: 0px;
-        }
-              
-        >div:first-child {
-          height: 100%;
-          float: left;
-          width: 20%;
-          position: fixed;
-          
-          .searchbar {
-            input {
-              width: 100%;
-            }
-          }
-
-          ul {
-            height: calc(100% - 135px);
-            overflow: auto;
-            margin: 5px 0 0 0;
-            padding-left: 0px;
-            list-style: none;
-            background: linear-gradient(45deg, rgba(245,245,245,1) 0%,rgba(255,255,255,1) 50%,rgba(245,245,245,1) 100%);
-            
-            li {
-              white-space: nowrap;
-
-              input.tmap-ranking {
-                width: 25px;
-              }
-            }
-          }
-
-        }
-        >div:last-child {
-          height: 100%;
-          width: calc(80% - 20px);
-          margin-left: 22%;
-          
-          .tc-reveal {
-
-          }
-        }
-          
-      }
-      
-      fieldset {
-      
-        legend {
-          font-weight: bold;
-        }
-      
-      }
-        
-      table {
-        margin: 6px 0;
-        clear: both;
-        border: none;
-        width: 100%;
-        
-        td, th {
-          border: 1px solid lightgray;
-        }
-        
-        &.tmap-key-value-table {
-          th {
-            width: 30%;
-            background-color: #F0F0F0;
-          }
-        }
-              
-        &.tmap-config-table {
-
-          tr {
-          
-            &:nth-child(odd) {
-              background-color: #F0F0F0;
-            }
-            &:nth-child(even) {
-              background-color: #FFFFFF;
-            }
-            &:hover {
-              background-color: #FFFFF3;
-            }
-          
-            td {
-              border: none;
-              vertical-align: top;
-              padding: 5px;
-              
-              &:first-child {
-                width: 15%;
-              }
-              
-              &:last-child {
-                width: 40%;
-              }
-              
-              input:not([type=radio]), textarea, select {
-                width: 100%;
-                /* prevents bad looking select boxes and wrapping in textareas */
-                word-wrap: normal;
-              }
-              
-              .tmap-no-stretch {
-                input, textarea, select {
-                  width: auto;
-                }
-              }
-              
-              div.tmap-button-wrapper {
-                text-align: center;
-              }
-
-            }
-
-            .tmap-note {
-              margin-top: 0.5em;
-            }
-            
-            .tmap-description {
-              font-style: italic;
-            }
-          } //config table
-        } // table
-                
-        
-        ul {
-          
-          padding-left: 30px;
-          
-          li {
-            list-style: none;
-          }
-          
-        }
-      }
-    }
-    
-    .tc-modal-footer {
-      padding: 8px;
-      
-      .tmap-dialog-button {
-        font-weight: bold;
-      }
-      
-      .tmap-hidden-close-button {
-        display: none;
-      }
-    }
-    
-  }
-
-
   /*
   body {
     background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/tiddlymap/media/surface.png!!type}} text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}}/>'));
@@ -443,6 +238,228 @@ html { // used to increase css importance
       }
     }
   }
+}
+
+/**** Modal related ************************************************/
+
+.tc-modal-wrapper {
+  z-index: 1010; // fix this in core?
+  
+  .tc-modal-header {
+        
+    svg {
+      vertical-align: sub;
+    }
+    
+    h3 {
+      line-height: 10px;
+    }
+    
+  }
+  
+  .tc-modal-body { // add this to tw
+    min-height: 250px; // tw doesn't have a minheight
+    max-height: 70vh; // tw uses 60vh
+    overflow: auto;
+
+    > div {
+      >p:first-child {
+        margin-top: 0px;
+      }
+      >p:last-child {
+        margin-bottom: 0px;
+      }
+    }
+                      
+    .tc-image-button {
+      font-size: 14px;
+    }
+    
+    .tmap-modal-editor {
+    
+      .tc-tiddler-frame {
+        padding: 0px;
+        width: auto;
+        margin: 0px;
+        border: none;
+        
+        .tc-tiddler-title {
+          display: none;
+        }
+      }
+      
+    }
+    
+    #tmap-element-type-manager {
+    
+      .tc-tab-buttons {
+        padding-top: 0px;
+      }
+            
+      >div:first-child {
+        height: 100%;
+        float: left;
+        width: 20%;
+        position: fixed;
+        
+        .searchbar {
+          input {
+            width: 100%;
+          }
+        }
+
+        ul {
+          height: calc(100% - 135px);
+          overflow: auto;
+          margin: 5px 0 0 0;
+          padding-left: 0px;
+          list-style: none;
+          background: linear-gradient(45deg, rgba(245,245,245,1) 0%,rgba(255,255,255,1) 50%,rgba(245,245,245,1) 100%);
+          
+          li {
+            white-space: nowrap;
+
+            .tmap-ranking {
+              width: 30px;
+              display: inline-block;
+            }
+          }
+        }
+
+      }
+      >div:last-child {
+        height: 100%;
+        width: calc(80% - 20px);
+        margin-left: 22%;
+        
+        .tc-reveal {
+
+        }
+      }
+        
+    }
+    
+    fieldset {
+    
+      legend {
+        font-weight: bold;
+      }
+    
+    }
+      
+    table {
+      margin: 6px 0;
+      clear: both;
+      border: none;
+      width: 100%;
+      
+      td, th {
+        border: 1px solid lightgray;
+      }
+      
+      &.tmap-key-value-table {
+        th {
+          width: 30%;
+          background-color: #F0F0F0;
+        }
+      }
+            
+      &.tmap-config-table {
+
+        tr {
+        
+          &:nth-child(odd) {
+            background-color: #F0F0F0;
+          }
+          &:nth-child(even) {
+            background-color: #FFFFFF;
+          }
+          &:hover {
+            background-color: #FFFFF3;
+          }
+        
+          td {
+            border: none;
+            vertical-align: top;
+            padding: 5px;
+            
+            &:first-child {
+              width: 15%;
+            }
+            
+            &:last-child {
+              width: 40%;
+            }
+            
+            input:not([type=radio]), textarea, select {
+              width: 100%;
+              /* prevents bad looking select boxes and wrapping in textareas */
+              word-wrap: normal;
+            }
+            
+            .tmap-no-stretch {
+              input, textarea, select {
+                width: auto;
+              }
+            }
+            
+            div.tmap-button-wrapper {
+              text-align: center;
+            }
+
+          }
+
+          .tmap-note {
+            margin-top: 0.5em;
+          }
+          
+          .tmap-description {
+            font-style: italic;
+          }
+        } //config table
+      } // table
+              
+      
+      ul {
+        
+        padding-left: 30px;
+        
+        li {
+          list-style: none;
+        }
+        
+      }
+    }
+  }
+  
+  .tc-modal-footer {
+    padding: 8px;
+    
+    .tmap-dialog-button {
+      font-weight: bold;
+    }
+    
+    .tmap-hidden-close-button {
+      display: none;
+    }
+  }
+  
+}
+
+.tmap-manage-node-types {
+
+  .tmap-edge-type-specific {
+    display: none !important;
+  }
+  
+}
+
+.tmap-manage-edge-types {
+
+  .tmap-node-type-specific {
+    display: none !important;
+  }
+  
 }
 
 /**** TMap Widget **************************************************/

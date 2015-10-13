@@ -56,8 +56,8 @@ MapElementType._fieldMeta = {
     parse: utils.parseJSON,
     stringify: JSON.stringify
   },
-  "modified": {},
-  "created": {}
+  "modified": {}, // translation handled by TW's core
+  "created": {} // translation handled by TW's core
 };
 
 /**
@@ -154,46 +154,47 @@ MapElementType.prototype.setStyle = function(style, isMerge) {
  *     is added as extra field value. Only do this is only for
  *     dumping purposes!
  */
-MapElementType.prototype.save = function(tRef) {
+MapElementType.prototype.save = function(tRef, silently) {
 
-  if(!tRef) { tRef = this.fullPath; }
-  
-  if(typeof tRef === "string") {
-  
-    var fields = {
-      title: tRef,
-    };
-    
-    if(!utils.startsWith(tRef, this.root)) {
-      
-      // = not the standard path for storing this type!
-      // in this case we add the id to the output.
-      fields.id = this.id;
-      
-    } else {
-      
-      // add modification date to the output;
-      $tw.utils.extend(fields, $tw.wiki.getModificationFields());
-      
-      if(!this.exists()) { // newly created
-        // add a creation field as well
-        $tw.utils.extend(fields, $tw.wiki.getCreationFields());
-      }
-            
-    }
-
-    // allow parsers to transform the raw field data
-    for(var field in this._fieldMeta) {
-      var stringify = this._fieldMeta[field].stringify;
-      fields[field] = (stringify
-                       ? stringify.call(this, this[field])
-                       : this[field]);
-    }
-    
-    $tw.wiki.addTiddler(new $tw.Tiddler(fields));
-    
+  if(!tRef) {
+    tRef = this.fullPath;
+  } else if(typeof tRef !== "string") {
+    return;
   }
   
+  var fields = {
+    title: tRef,
+  };
+  
+  if(!utils.startsWith(tRef, this.root)) {
+    
+    // = not the standard path for storing this type!
+    // in this case we add the id to the output.
+    fields.id = this.id;
+    
+  }
+
+  if(silently !== true) {
+    // add modification date to the output;
+    this.modified = new Date();
+  }
+  
+  if(!this.exists()) { // newly created
+    // add a creation field as well
+    this.created = this.modified;
+  }
+
+  // allow parsers to transform the raw field data
+  for(var field in this._fieldMeta) {
+    var stringify = this._fieldMeta[field].stringify;
+    fields[field] = (stringify
+                     ? stringify.call(this, this[field])
+                     : this[field]);
+  }
+  
+  $tw.wiki.addTiddler(new $tw.Tiddler(fields));
+    
+
 };
 
 // !! EXPORT !!

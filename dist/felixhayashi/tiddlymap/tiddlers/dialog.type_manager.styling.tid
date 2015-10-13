@@ -11,13 +11,12 @@ caption: Styling
       name="module"
       value="edges"
       emptyValue="nodes">
-    [[vis.js.org|http://visjs.org/docs/network/$(module)$]]
+    [[visjs.org|http://visjs.org/docs/network/$(module)$]]
   </$set>
 \end
 
-\define manage-node-types()
-
-<fieldset><legend>Icon Settings</legend>
+<fieldset class="tmap-node-type-specific">
+  <legend>Icon Settings</legend>
   <table class="tmap-config-table">
     <<tmap-row type:"input-text"
         title:"TW-icon"
@@ -31,14 +30,11 @@ caption: Styling
                For example 'f206' for the bicycle symbol.">>
   </table>
 </fieldset>
-\end
-
+<fieldset><legend>Visjs styles</legend>
 <div class="tmap-flash-message tmap-info">
    {{$:/core/images/info-button}}
    All visjs options below are documented at <<url>>.
 </div>
-<$macrocall $name=<<mode>> />
-<fieldset><legend>Visjs styles</legend>
 <table class="tmap-config-table">
   <tr>
     <td>Reset:</td>

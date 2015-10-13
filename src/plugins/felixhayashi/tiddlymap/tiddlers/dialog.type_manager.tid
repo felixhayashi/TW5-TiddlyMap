@@ -4,45 +4,77 @@ buttons: element_type_manager
 
 \rules except wikilink
 
-\define defaultTab() $:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/overview
-\define settingsTab() $:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/generalSettings
-
-\define noTypeFound() 
-<li>
-<$button tooltip="Create a new type">
-  {{$:/core/images/new-button}} Create type
-  <$action-setfield $tiddler="$:/temp/tmap/MapElementTypeSearch" text="" />
-  <$action-sendmessage
-      $message="tmap:tm-create-type"
-      mode=<<mode>> id={{$:/temp/tmap/MapElementTypeSearch}}
-      output=<<output>> />
-  <$action-setfield creation-name="" />
-</$button>
-</li>
+\define defaultTab() 
+$:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/overview
 \end
 
-<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]] [[$:/core/macros/tabs]]">
+\define settingsTab()
+$:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/generalSettings
+\end
 
-<div id="element-type-manager">
+\define tabsFilter()
+[all[shadows]prefix[$:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/]]
+\end
+
+\define searchFilter()
+$(searchSelector)$
++[sort[title]nsort[priority]]
++[removeprefix<typeRootPath>removeprefix[/]]
++[search:title{$:/temp/tmap/MapElementTypeSearch}]
+\end
+
+\define managerClass() tmap-$(mode)$
+
+\define typePath() $(typeRootPath)$/$(id)$
+
+<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]
+                          [[$:/core/macros/tabs]]">
+
+<div id="tmap-element-type-manager" class=<<managerClass>>>
   <div>
     <div class="searchbar">
-      <$edit-text focus="true" tiddler="$:/temp/tmap/MapElementTypeSearch" type="text" tag="input" default="" />
+      <$edit-text
+          focus="true"
+          tiddler="$:/temp/tmap/MapElementTypeSearch"
+          type="text"
+          tag="input"
+          default="" />
     </div>
     <ul>
-    <$list filter=<<filter>> emptyMessage=<<noTypeFound>>>
+      <$list
+          filter=<<searchFilter>>
+          emptyMessage=<<noTypeFound>>
+          variable="id">
       <li>
-        <$button class="tc-btn-invisible tmap-link">{{!!title}}
+        <span class="tmap-ranking tmap-node-type-specific">
+          # <$view tiddler=<<typePath>> field="priority">1</$view>
+        </span>
+        <$button class="tc-btn-invisible tmap-link"><<id>>
           <$action-setfield
               $tiddler=<<qualify "$:/state/tabs/MapElementTypeManager">>
               text=<<defaultTab>> />
           <$action-sendmessage
               $message="tmap:tm-load-type-form"
-              id={{!!title}}
+              id=<<id>>
               mode=<<mode>>
               output=<<output>> />
         </$button>
       </li>
-    </$list>
+      </$list>
+      <$list filter="[{$:/temp/tmap/MapElementTypeSearch}regexp[.+]]">
+      <li>
+      <$button tooltip="Create a new type">
+        {{$:/core/images/new-button}}
+        Create "{{$:/temp/tmap/MapElementTypeSearch}}"
+        <$action-setfield $tiddler="$:/temp/tmap/MapElementTypeSearch" text="" />
+        <$action-sendmessage
+            $message="tmap:tm-create-type"
+            mode=<<mode>> id={{$:/temp/tmap/MapElementTypeSearch}}
+            output=<<output>> />
+        <$action-setfield creation-name="" />
+      </$button>
+      </li>
+      </$list>
     </ul>
   </div>
   <div>
@@ -51,12 +83,16 @@ buttons: element_type_manager
           $name="tabs"
           default=<<defaultTab>>
           state="$:/state/tabs/MapElementTypeManager"
-          tabsList="[all[shadows]prefix[$:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/]]" />
+          tabsList=<<tabsFilter>> />
     </$reveal>
     <$reveal type="match" text="" default={{!!id}} >
       <div class="tmap-flash-message tmap-info">
         {{$:/core/images/info-button}} Please select a type from the
         list or create a new one by entering the type name in the search field on the left.
+      </div>
+      <div class="tmap-flash-message tmap-info tmap-node-type-specific">
+        {{$:/core/images/info-button}} The number next to the node-type
+        label represents it's priority.
       </div>
     </$reveal>
   </div>

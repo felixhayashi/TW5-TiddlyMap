@@ -36,8 +36,7 @@ view="{{!!view}}"
 <$list filter="[field:title<output>has[var.design]]">
   design="<$view tiddler=<<output>> field='var.design' />"
 </$list>
-
-/&gt;
+&gt;&lt;/$tiddlymap&gt;
 </pre>
 
 If you are unsure about a parameter, just leave everything as is and simply copy the widget code displayed above.

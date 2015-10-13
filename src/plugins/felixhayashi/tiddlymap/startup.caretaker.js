@@ -244,11 +244,8 @@ var updateTiddlerVsIdIndeces = function(parent, allTiddlers) {
  * special types that TiddlyMap manually assignes (e.g. tmap:neighbour,
  * or tmap:selected).
  * 
- * Four indeces are added to the indeces chain:
+ * Indeces added to the indeces chain:
  * 1. glNTy – all global node types
- * 2. loNTy – all local node types
- * 3. glLoNTy – first global, then local node types
- * 4. loGlNTy – first local, then global node types
  * 
  * @param {Object} [parent] - The global indeces object indeces.
  *     If not stated, $tw.tmap.indeces is used.
@@ -267,18 +264,15 @@ var updateNodeTypesIndeces = function(parent, allTiddlers) {
   var typePath = $tw.tmap.opt.path.nodeTypes;
       
   var glNTy = parent.glNTy = [];
-  var loNTy = parent.loNTy = [];
   for(var i = allTiddlers.length; i--;) {
     if(utils.startsWith(allTiddlers[i], typePath)) {
-      var type = new NodeType(allTiddlers[i]);
-      if(type.scope) {
-        (type.view ? loNTy : glNTy).push(type);
-      }
+      glNTy.push(new NodeType(allTiddlers[i]));
     }
   }
   
-  parent.glLoNTy = glNTy.concat(loNTy);
-  parent.loGlNTy = loNTy.concat(glNTy);
+  glNTy.sort(function(a, b) {
+    return a.priority - b.priority;
+  });
 
 };
 

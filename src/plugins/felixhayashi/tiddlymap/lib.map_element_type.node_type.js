@@ -53,6 +53,14 @@ NodeType.prototype = Object.create(MapElementType.prototype);
 
 NodeType._fieldMeta = $tw.utils.extend(MapElementType._fieldMeta, {
   "view": {},
+  "priority": {
+    parse: function(raw) {
+      return (isNaN(raw) ? 1 : parseInt(raw));
+    },
+    stringify: function(num) {
+      return utils.isInteger(num) ? num.toString() : "1";
+    }
+  },
   "scope": {
     stringify: utils.getWithoutNewLines
   },
@@ -69,7 +77,7 @@ NodeType._fieldMeta = $tw.utils.extend(MapElementType._fieldMeta, {
  */
 NodeType.prototype.getInheritors = function(src) {
    
-  var s = this["scope"];
+  var s = this.scope;
   return (s ? utils.getMatches(s, src || $tw.wiki.allTitles()) : []);
   
 };

@@ -726,7 +726,7 @@ Adapter.prototype._processEdgesWithType = function(type, task) {
     
     // clone type first to prevent auto-creation
     var newType = new EdgeType(task.newName);
-    newType.loadDataFromType(type);
+    newType.load(type);
     newType.save();
       
   }
@@ -917,29 +917,29 @@ Adapter.prototype.getInheritedNodeStyles = function(nodes, view) {
 
   var src = this.getTiddlersById(nodes);
   var protoByTRef = {};
-  // we decrement and therefore use the loGlNTy index which
-  // first contains local and at the end global node-types.
-  var loGlNTy = this.indeces.loGlNTy;
+
+  var glNTy = this.indeces.glNTy;
   
-  for(var i = loGlNTy.length; i--;) {
+  for(var i = glNTy.length; i--;) {
   
-    var data = loGlNTy[i];
-    if(view && data.view && data.view !== view) continue;
-    
-    var inheritors = loGlNTy[i].getInheritors(src);
-    if(!inheritors.length) continue;
+    var data = glNTy[i];
+    var inheritors = data.getInheritors(src);
     
     for(var j = inheritors.length; j--;) {
       var tRef = inheritors[j];
-      protoByTRef[tRef] = protoByTRef[tRef] || {};
-      protoByTRef[tRef].style = utils.merge(
-        protoByTRef[tRef].style || {}, data.style
+      var proto = protoByTRef[tRef] = (protoByTRef[tRef] || {});
+      proto.style = utils.merge(
+        proto.style || {},
+        data.style
       );
       
+      // ATTENTION: only override proto icons when data provides
+      // an icon since otherwise we might erase previously
+      // inherited icons.
       if(data["fa-icon"]) {
-        protoByTRef[tRef]["fa-icon"] = data["fa-icon"];
+        proto["fa-icon"] = data["fa-icon"];
       } else if(data["tw-icon"]) {
-        protoByTRef[tRef]["tw-icon"] = data["tw-icon"];
+        proto["tw-icon"] = data["tw-icon"];
       }
       
     }

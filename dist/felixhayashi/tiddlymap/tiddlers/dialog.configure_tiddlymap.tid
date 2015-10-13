@@ -62,6 +62,7 @@ subtitle: {{$:/core/images/options-button}} Configuration of TiddlyMap
         selectFilter:"[[nothing|Nothing]]
                       [[manager|Open edge-type manager]]"
         descr:"What should happen when you click on an edge?">>
+<!--
     <<tmap-row type:"input-select"
         title:"Raster size"
         field:"config.sys.raster"
@@ -75,6 +76,7 @@ subtitle: {{$:/core/images/options-button}} Configuration of TiddlyMap
         descr:"Snap nodes to an invisible raster of the given size
                after drag'n'drop."
         note:"Only works when the view is not in floating mode">>
+-->
     <$macrocall type="input-select"
           $name="tmap-row"
           title="Default startup view"

@@ -1261,12 +1261,13 @@ MapWidget.prototype.handleRenameView = function() {
 MapWidget.prototype.handleEditView = function() {
   
   var visInherited = JSON.stringify(this.opt.config.vis);
+  var data = this.graphData;
   
   var args = {
     view: this.view.getLabel(),
     createdOn: this.view.getCreationDate(true),
-    numberOfNodes: "" + Object.keys(this.graphData.nodesById).length,
-    numberOfEdges: "" + Object.keys(this.graphData.edgesById).length,
+    numberOfNodes: Object.keys(data.nodesById).length.toString(),
+    numberOfEdges: Object.keys(data.edgesById).length.toString(),
     dialog: {
       preselects: $tw.utils.extend({},
                                    this.view.getConfig(),
@@ -1305,8 +1306,8 @@ MapWidget.prototype.handleSaveCanvas = function() {
   var args = {
     dialog: {
       snapshot: tempImagePath,
-      width: "" + this.canvas.width,
-      height: "" + this.canvas.height,
+      width: this.canvas.width.toString(),
+      height: this.canvas.height.toString(),
       preselects: {
         name: defaultName,
         action: "download"
@@ -1548,7 +1549,7 @@ MapWidget.prototype.handleRemoveNodes = function(nodeIds) {
 
   var tiddlers = this.adapter.getTiddlersById(nodeIds);
   var params = {
-    "count": "" + nodeIds.length,
+    "count": nodeIds.length.toString(),
     "tiddlers": $tw.utils.stringifyList(tiddlers),
     dialog: {
       preselects: {

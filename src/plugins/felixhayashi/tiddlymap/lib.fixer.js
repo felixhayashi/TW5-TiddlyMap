@@ -51,6 +51,26 @@ var moveEdges = function(path, view) {
 
 };
 
+var executeUpgrade = function(toVersion, curVersion, upgrade) {
+  
+  if(utils.isLeftVersionGreater(toVersion, curVersion)) {
+  // = current data structure version is outdated
+    
+    $tw.tmap.logger("debug",
+                    "Upgrading data structure to " + toVersion);
+                    
+    // execute fix
+    upgrade();
+
+    // update meta
+    utils.setEntry($tw.tmap.opt.ref.sysMeta,
+                   "dataStructureState",
+                   toVersion);
+     
+  }
+  
+};
+
 var fixer = {};
 
 fixer.fixId = function() {
@@ -184,7 +204,19 @@ fixer.fix = function() {
    * 1. The node id field is moved to tmap.id if **original version**
    *    is below v0.9.2.
    */
-   fixer.fixId();
+  fixer.fixId();
+   
+  
+  /**
+   * This will ensure that all node types have a prioritization field
+   * set.
+   */
+  executeUpgrade("0.9.16", meta.dataStructureState, function() {
+    var glNTy = $tw.tmap.indeces.glNTy;
+    for(var i = glNTy.length; i--;) {
+      glNTy[i].save(null, true);
+    }
+  });
                 
 };
 

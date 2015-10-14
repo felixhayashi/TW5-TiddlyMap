@@ -77,6 +77,13 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.9.17
+
+* Added guards against
+  https://github.com/Jermolene/TiddlyWiki5/issues/2025:
+  Adding tiddler programmatically without text field causes serious
+  recursion error in nodejs mode.
+
 ### v0.9.16
 
 * Fixed bug that renaming an element type didn't work.

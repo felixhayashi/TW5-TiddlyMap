@@ -1,0 +1,24 @@
+created: 20151014195649199
+modified: 20151014201627017
+tags: Insight
+title: Reusing types in different wikis
+tmap.id: ed70b6d5-0c7d-4041-b978-0148bbb588f8
+type: text/vnd.tiddlywiki
+
+You can reuse types by
+
+# opening the edge- or node-type manager
+# and clicking on a type
+# and then dragging the title of the type displayed in the //overview// tab into your other wiki.
+
+! For experts
+
+You can do a system tiddler search to get a list of all existing types in your wiki.
+
+You find all edge types stored below this path:
+
+<code><<tmap "option" "path.edgeTypes">></code>
+
+Node types are stored here:
+
+<code><<tmap "option" "path.nodeTypes">></code>

@@ -1263,6 +1263,9 @@ Adapter.prototype.insertNode = function(node, options) {
   var fields = utils.getDataMap();
   fields.title = $tw.wiki.generateNewTitle((node.label ? node.label : "New node"));
   
+  // guard against https://github.com/Jermolene/TiddlyWiki5/issues/2025
+  fields.text = "";
+  
   // title might has changed after generateNewTitle()
   node.label = fields.title;
   

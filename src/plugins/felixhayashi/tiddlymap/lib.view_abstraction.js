@@ -522,7 +522,8 @@ ViewAbstraction.prototype.setConfig = function() {
   
   // save
   $tw.wiki.addTiddler(new $tw.Tiddler(
-    $tw.wiki.getTiddler(this.path.config), this.config
+    $tw.wiki.getTiddler(this.path.config),
+    this.config
   ));
 
   this._ignoreOnNextRebuild["config"] = true;

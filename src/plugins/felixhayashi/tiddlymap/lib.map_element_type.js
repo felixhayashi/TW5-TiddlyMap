@@ -162,8 +162,11 @@ MapElementType.prototype.save = function(tRef, silently) {
     return;
   }
   
+  // also add an empty text field to guard against
+  // https://github.com/Jermolene/TiddlyWiki5/issues/2025
   var fields = {
     title: tRef,
+    text: ""
   };
   
   if(!utils.startsWith(tRef, this.root)) {

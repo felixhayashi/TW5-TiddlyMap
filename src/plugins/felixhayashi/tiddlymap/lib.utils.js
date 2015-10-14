@@ -432,7 +432,8 @@ utils.notify = function(message) {
   
   var tRef = "$:/temp/tiddlymap/notify";
   $tw.wiki.addTiddler(new $tw.Tiddler({
-    title : tRef, text : message
+    title : tRef,
+    text : message
   }));
   $tw.notifier.display(tRef);
   
@@ -709,19 +710,43 @@ utils.getPrettyFilter = function(expr) {
 
 /**
  * Set a tiddler field to a given value.
+ * 
+ * This method is guarded against
+ * https://github.com/Jermolene/TiddlyWiki5/issues/2025
+ * 
+ * @return {$tw.Tiddler|undefined} The tiddler object containing
+ *     the field with the assigned value.
  */
 utils.setField = function(tiddler, field, value) {
 
-  if(tiddler && field) {
-    var fields = {
-      title: utils.getTiddlerRef(tiddler)
-    };
-    fields[field] = value;
-    // do not use any tObj provided, it may result in a lost update!
-    var tObj = utils.getTiddler(tiddler, true);
-    $tw.wiki.addTiddler(new $tw.Tiddler(tObj, fields));
+  if(!tiddler || !field) return;
+
+  var tRef = utils.getTiddlerRef(tiddler);
+  var fields = { title: tRef };
+  fields[field] = value;
+  
+  // do not use any tObj provided, it may result in a lost update!
+  var tObj = $tw.wiki.getTiddler(tRef, true);
+  
+  if(field !== "text" && tObj && !tObj.fields.text) {
+    fields.text = "";
   }
   
+  var tObj = new $tw.Tiddler(tObj, fields);
+  $tw.wiki.addTiddler(tObj);
+  
+  return tObj;
+
+};
+
+/**
+ * Clone a tiddler and give it another title.
+ * This means the tiddlers are equal except from their titles.
+ */
+utils.clone = function(src, dest) {
+
+  utils.setField(src, "title", dest);
+
 };
 
 /**
@@ -1236,12 +1261,24 @@ utils.getTiddlersByPrefix = function(prefix, tiddlers) {
   
 };
 
-utils.addTiddler = function(title) {
+/**
+ * Advanced addTiddler method.
+ * 
+ * It adds timestamps and only adds the tiddler if it doesn't exist
+ * yet or the force option is used.
+ * 
+ * This method is guarded against
+ * https://github.com/Jermolene/TiddlyWiki5/issues/2025
+ */
+utils.addTiddler = function(tiddler, force) {
   
-  var tObj = utils.getTiddler(title);
-  if(tObj) return tObj;
+  var tObj = utils.getTiddler(tiddler);
+  if(!force && tObj) return tObj;
   
-  tObj = new $tw.Tiddler({ title: title },
+  tObj = new $tw.Tiddler({
+                           title: title,
+                           text: ""
+                         },
                          $tw.wiki.getModificationFields(),
                          $tw.wiki.getCreationFields());
   

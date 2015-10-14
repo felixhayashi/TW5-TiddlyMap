@@ -200,6 +200,7 @@ GlobalListener.prototype.handleLoadTypeForm = function(event) {
   $tw.wiki.addTiddler(new $tw.Tiddler(
     utils.getTiddler(outTRef),
     {
+      "typeTRef": type.fullPath,
       "temp.idImmutable": (type.isShipped ? "true" : ""),
       "temp.newId": type.id,
       "vis-inherited": JSON.stringify(this.opt.config.vis)

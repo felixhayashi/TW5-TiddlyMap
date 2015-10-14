@@ -5,7 +5,7 @@ caption: Overview
 
 \define date(f) <$view field=$f$ format="date" template="DDth mmm hh:mm:ss"/>
 
-! {{!!id}}
+! <$link to={{!!typeTRef}}><$view field="id" /></$link>
 
 <table class="tmap-key-value-table">
   <tr>

@@ -1,12 +1,12 @@
 created: 20150112140815454
-modified: 20151015122435062
+modified: 20151015123129519
 rank: 2
 tags: Examples [[Styling Nodes]] Home
 title: Custom node icons
 tmap.id: 4fe33f8e-2a84-45dd-ab5c-4bfcf205e44e
 type: text/vnd.tiddlywiki
 
-In TiddlyWiki you can assign icons to your tiddlers by referencing a [[locally stored image|Local images]] in the tiddler's `icon` field. This icon will also appears next to the tiddler's title. TiddlyMap will also make use of this icon and when the tiddler is displayed as node in a graph, it will display the icon. For a complete list of shipped TiddlyWiki Images see: [[TiddlyWiki images as node icons]]
+In TiddlyWiki you can assign icons to your tiddlers by referencing a [[locally stored image|Local images]] in the tiddler's `icon` field. This icon will also appear next to the tiddler's title. When TiddlyMap sees that a Tiddler has an icon field set, it will try to make use of it by displaying it as node icon in a graph. For a complete list of shipped TiddlyWiki images see: [[TiddlyWiki images as node icons]].
 
 <i class="fa fa-exclamation-circle" /> As of [[v0.9.0|Version 0.9.x]] it is possible to use [[Font Awesome for TiddlyWiki]] and paste the icon code (e.g. `&#xf072;` or simply `f072`) into a tiddler field `tmap.fa-icon`. This icon, however, will only be displayed in the graph, not in the tiddler title. Also it is now possible to use [[group styles|Styling Nodes]] to assign an image to multiple nodes at once.
 

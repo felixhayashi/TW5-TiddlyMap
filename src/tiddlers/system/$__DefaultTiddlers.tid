@@ -1,10 +1,8 @@
 created: 20141217211122847
 id: 9E1A0223-57F0-486E-A750-BDF6ACAD398D
-modified: 20151009223036729
+modified: 20151015122409882
 title: $:/DefaultTiddlers
 type: text/vnd.tiddlywiki
 
 [[Getting started]]
-[[TaskManagementExample 2.0]]
-[[Map your literature!]]
-[[Tiddler Icons as part of the graph]]
+[tag[Home]sort[rank]]

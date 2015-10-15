@@ -1,5 +1,5 @@
 created: 20151009212706425
-modified: 20151013131155204
+modified: 20151015120942476
 tags: Examples
 title: Map your literature!
 tmap.id: bbc74c35-8779-41fe-9b15-109b32397ff7
@@ -11,6 +11,6 @@ In this example, icons are assigned to the nodes with the help of [[group styles
 
 <$tiddlymap view="Activities"></$tiddlymap>
 
-<i class="fa fa-exclamation-circle" /> Yes, you can use Font Awesome icons as node icons!! See also [[Tiddler Icons as part of the graph]].
+<i class="fa fa-exclamation-circle" /> Yes, you can use Font Awesome icons as node icons!! See also [[Custom node icons]].
 
 <i class="fa fa-exclamation-circle" /> Did you notice that the the icons for books and scientific papers are the same but have a different color? This is because the icon is assigned by the literature [[group style|Styling Nodes]] and the group style used for papers partially overrides the literature style by specifying another color. How does TiddlyMap know which style should be preferred? You can [[Prioritize group styles]]!

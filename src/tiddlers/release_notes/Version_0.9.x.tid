@@ -10,6 +10,10 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.9.19
+
+* Added keycombo "ctrl + a" to select all nodes in a map.
+
 ### v0.9.16
 
 * Added possibility to prioritize node types.

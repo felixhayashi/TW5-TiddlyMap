@@ -77,6 +77,10 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.9.18
+
+* The TiddlyMap tiddler toolbar button produced an error.
+  
 ### v0.9.17
 
 * Added guards against

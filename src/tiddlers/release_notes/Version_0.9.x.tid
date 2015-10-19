@@ -77,6 +77,11 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.9.19
+
+* Creating a node type resulted in the creation of a tiddler with the
+  same title as the id of the type.
+
 ### v0.9.18
 
 * The TiddlyMap tiddler toolbar button produced an error.

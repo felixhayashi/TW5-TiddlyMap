@@ -71,7 +71,6 @@ $(searchSelector)$
             $message="tmap:tm-create-type"
             mode=<<mode>> id={{$:/temp/tmap/MapElementTypeSearch}}
             output=<<output>> />
-        <$action-setfield creation-name="" />
       </$button>
       </li>
       </$list>

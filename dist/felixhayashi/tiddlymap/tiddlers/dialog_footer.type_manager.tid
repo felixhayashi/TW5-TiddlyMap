@@ -2,22 +2,6 @@ title: $:/plugins/felixhayashi/tiddlymap/dialogFooter/element_type_manager
 
 \rules except wikilink
 
-<!--
-<$tiddler tiddler=<<temp>>>
-<$edit-text field="creation-name" type="text" tag="input" />
-<$button
-    class="tmap-dialog-button tmap-create-button"
-    tooltip="Create a new type">Create
-  <$action-sendmessage
-      $message="tmap:tm-create-type"
-      mode=<<mode>> id={{!!creation-name}}
-      output=<<output>>
-  />
-  <$action-setfield creation-name=""
-  />
-</$button>
-</$tiddler>
--->
 <$button
     class="tmap-dialog-button tmap-save-button"
     tooltip="Save the current changes">Save

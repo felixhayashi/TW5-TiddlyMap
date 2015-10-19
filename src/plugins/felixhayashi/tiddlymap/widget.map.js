@@ -1030,6 +1030,10 @@ MapWidget.prototype.addGraphKeyBindings = function(container) {
         
       } else if(event.keyCode === 86) { // v
         this.handlePasteNodesFromClipboard();
+      
+      } else if(event.keyCode === 65) { // a
+        var allNodes = Object.keys(this.graphData.nodesById);
+        this.network.selectNodes(allNodes);
       }
       
       event.preventDefault();
@@ -1037,7 +1041,7 @@ MapWidget.prototype.addGraphKeyBindings = function(container) {
     
   }.bind(this);
   
-  container.addEventListener('keyup', this.graphKeydownHandler, true);
+  container.addEventListener('keydown', this.graphKeydownHandler, true);
   
 };
 

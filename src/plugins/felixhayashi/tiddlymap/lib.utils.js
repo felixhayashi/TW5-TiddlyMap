@@ -1276,7 +1276,7 @@ utils.addTiddler = function(tiddler, force) {
   if(!force && tObj) return tObj;
   
   tObj = new $tw.Tiddler({
-                           title: title,
+                           title: tiddler,
                            text: ""
                          },
                          $tw.wiki.getModificationFields(),
@@ -1285,6 +1285,7 @@ utils.addTiddler = function(tiddler, force) {
   $tw.wiki.addTiddler(tObj);
   
   return tObj;
+  
 };
 
 utils.getSnapshotTitle = function(viewLabel, type) {

@@ -60,7 +60,7 @@ var EdgeType = function(id, data) {
 EdgeType.prototype = Object.create(MapElementType.prototype);
 // !! EXTENSION !!
 
-EdgeType._fieldMeta = $tw.utils.extend(MapElementType._fieldMeta, {
+EdgeType._fieldMeta = $tw.utils.extend({}, MapElementType._fieldMeta, {
   "label": {},
   "show-label": {}
 });

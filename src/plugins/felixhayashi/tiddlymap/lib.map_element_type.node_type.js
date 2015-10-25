@@ -51,7 +51,7 @@ var NodeType = function(id, data) {
 NodeType.prototype = Object.create(MapElementType.prototype);
 // !! EXTENSION !!
 
-NodeType._fieldMeta = $tw.utils.extend(MapElementType._fieldMeta, {
+NodeType._fieldMeta = $tw.utils.extend({}, MapElementType._fieldMeta, {
   "view": {},
   "priority": {
     parse: function(raw) {

@@ -17,9 +17,10 @@ module-type: startup
 
 /**************************** IMPORTS ****************************/
 
-var NodeType = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;
-var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
-var utils =    require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var NodeType =   require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;
+var EdgeType =   require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
+var utils =      require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var visDefConf = require("$:/plugins/felixhayashi/tiddlymap/js/config/vis").config;
 
 /***************************** CODE ******************************/
 
@@ -42,6 +43,7 @@ var GlobalListener = function() {
     "tmap:tm-suppress-dialog": this.handleSuppressDialog,
     "tmap:tm-generate-widget": this.handleGenerateWidget,
     "tmap:tm-download-graph": this.handleDownloadGraph,
+    "tmap:tm-configure-system": this.handleConfigureSystem,
     "tmap:tm-manage-edge-types": this.handleOpenTypeManager,
     "tmap:tm-manage-node-types": this.handleOpenTypeManager,
     "tmap:tm-cancel-dialog": this.handleCancelDialog,
@@ -88,6 +90,42 @@ GlobalListener.prototype.handleDownloadGraph = function(event) {
       filename: event.paramObject.view + ".json"
     }
   });
+  
+};
+
+GlobalListener.prototype.handleConfigureSystem = function() {
+
+  var args = {
+    dialog: {
+      preselects: {
+        "vis-inherited": JSON.stringify(visDefConf),
+        "config.vis": utils.getText(this.opt.ref.visUserConf),
+        "config.sys": this.opt.config.sys
+      }
+    }
+  };
+
+  var name = "configureTiddlyMap";
+  this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
+    
+    if(isConfirmed && outTObj) {
+      
+      var config = utils.getPropertiesByPrefix(outTObj.fields,
+                                               "config.sys.",
+                                               true);
+                                               
+      // carefull: this is a data tiddler!
+      $tw.wiki.setTiddlerData(this.opt.ref.sysUserConf, config);
+      
+      // tw doesn't translate the json to an object so this is
+      // already a string
+      utils.setField(this.opt.ref.visUserConf,
+                     "text",
+                     outTObj.fields["config.vis"]);
+            
+    }
+
+  }.bind(this));
   
 };
 
@@ -252,29 +290,34 @@ GlobalListener.prototype.saveType = function(mode, type, dialogOutput) {
   
   var tObj = utils.getTiddler(dialogOutput);
   
-  // save
+  // update the type with the form data
   type.loadFromTiddler(tObj);
-  if(type instanceof NodeType) {
-    //type.setViews(tObj.fields.tags);
-  }
   type.save();
+    
+  var newId = tObj.fields["temp.newId"];
   
-  if(!tObj.fields["temp.newId"]) { // no new id set
-    
-    // set id back to original state
-    utils.setField(tObj, "temp.newId", tObj.fields["id"]);
-    
-  } else if(tObj.fields["temp.newId"] !== tObj.fields["id"]) { //renamed
+  if(newId && newId !== tObj.fields["id"]) { //renamed
     
     if(mode === "manage-edge-types") {
+      
       this.adapter._processEdgesWithType(type, {
         action: "rename",
-        newName: tObj.fields["temp.newId"]
+        newName: newId
       });
+      
+    } else {
+      
+      var newType = new NodeType(newId);
+      newType.load(type);
+      newType.save();
+      $tw.wiki.deleteTiddler(type.fullPath);
+      
     }
-    utils.setField(tObj, "id", tObj.fields["temp.newId"]);
+    
+    utils.setField(tObj, "id", newId);
+    
   }
-  
+    
   $tw.tmap.notify("Saved type data");
   
 };

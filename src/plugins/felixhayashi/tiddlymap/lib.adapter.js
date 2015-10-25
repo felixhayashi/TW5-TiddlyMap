@@ -473,7 +473,8 @@ Adapter.prototype.getGraph = function(opts) {
   var view = new ViewAbstraction(opts.view);
   var matches = utils.getMatches(opts.filter || view.getNodeFilter("compiled"));
   var toWL = utils.getArrayValuesAsHashmapKeys(matches);
-  var typeWL = this.getEdgeTypeWhiteList(view.getEdgeFilter("compiled"));
+  var typeWL = (opts.edgeTypeWL
+                || this.getEdgeTypeWhiteList(view.getEdgeFilter("compiled")));
   var neighScope = parseInt(opts.neighbourhoodScope || view.getConfig("neighbourhood_scope"));
   
   var graph = {
@@ -881,7 +882,8 @@ Adapter.prototype.makeEdge = function(from, to, type, id) {
 Adapter.prototype.removeNodeType = function(type) {
   
   // finally remove the old type
-  $tw.wiki.deleteTiddler(new NodeType(type).getPath());
+  var type = new NodeType(type);
+  $tw.wiki.deleteTiddler(type.fullPath);
   
 };
 

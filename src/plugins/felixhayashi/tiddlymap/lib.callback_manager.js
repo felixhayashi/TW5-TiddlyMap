@@ -88,18 +88,14 @@ CallbackManager.prototype.remove = function(refOrRefList) {
  */
 CallbackManager.prototype.handleChanges = function(changedTiddlers) {
   
-  if(this.callbacks.length == 0) {
-    this.logger("debug", "No registered callbacks exist at the moment");
-    return;
-  }
+  if(this.callbacks.length == 0) return;
   
   for(var tRef in changedTiddlers) {
-          
     if(!this.callbacks[tRef]) continue;
     
     if($tw.wiki.getTiddler(tRef)) {
       
-      this.logger("debug", "A callback for \"" + tRef + "\" will be executed");
+      this.logger("debug", "Executing a callback for: " + tRef);
       this.callbacks[tRef].execute(tRef);
       
       // a continue prevents deleting the callback

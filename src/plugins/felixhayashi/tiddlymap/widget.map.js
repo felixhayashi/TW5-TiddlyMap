@@ -19,7 +19,6 @@ module-type: widget
 /*** Imports *******************************************************/
  
 var Widget =          require("$:/core/modules/widgets/widget.js").widget;
-var visDefConf =      require("$:/plugins/felixhayashi/tiddlymap/js/config/vis").config;
 var utils =           require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
 var DialogManager =   require("$:/plugins/felixhayashi/tiddlymap/js/DialogManager").DialogManager;
 var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager").CallbackManager;
@@ -69,7 +68,6 @@ var MapWidget = function(parseTreeNode, options) {
       "tmap:tm-rename-view": this.handleRenameView,
       "tmap:tm-delete-view": this.handleDeleteView,
       "tmap:tm-edit-view": this.handleEditView,
-      "tmap:tm-configure-system": this.handleConfigureSystem,
       "tmap:tm-store-position": this.handleStorePositions,
       "tmap:tm-edit-filters": this.handleEditFilters,
       "tmap:tm-generate-widget": this.handleGenerateWidget,
@@ -143,16 +141,16 @@ MapWidget.prototype.handleConnectionEvent = function(edge, callback) {
       type = new EdgeType((ns && !hasNamespace ? ns : "") + type);
       
       // persist the type if it doesn't exist
-      if(!type.exists()) type.save();
+      if(!type.exists()) {
+        type.save();
+        this.rebuildEdgeTypeWL();
+      }
       
       // add type to edge
       edge.type = type.id;
       var isSuccess = this.adapter.insertEdge(edge);
-      
-      var edgeTypeFilter = this.view.getEdgeFilter("compiled");
-      var typeWL = this.adapter.getEdgeTypeWhiteList(edgeTypeFilter);
-      
-      if(!typeWL[type.id]) {
+                  
+      if(!this.edgeTypeWL[type.id]) {
         
         var dialog = {
           type: type.id,
@@ -519,83 +517,100 @@ MapWidget.prototype.rebuildEditorBar = function() {
  * This function is called by the system to notify the widget about
  * tiddler changes.
  * 
- * The changes are analyzed by several functions.
+ * TiddlyMap is interested in the following changes:
  * 
- * 1. checking for callbacks: some processes decide at runtime to 
- * listen to changes of single tiddlers (for example dialogs waiting
- * for results). So at first it is checked if a callback is triggered.
- * 
- * 2. checking for view changes: a view may be replaced (switched)
- * or modified. This will result in recalculation of the graph.
- * 
- * 3. checking for graph refresh: does the graph need an update
- * because nodes/edges have been modified, added or removed or the
- * view has changed?
- * 
- * 4. checking for graphbar refresh: Did some widgets need a rerendering
- * due to changes that affect the topbar (view switched or modified)?
+ * - Callbacks have been triggered (e.g. dialog results)
+ * - A view has been switched
+ * - A view has been modified (= configured)
+ * - Global options have changed
+ * - Node- or edge-types have changed
+ * - Graph elements have changed
+ * - Changes to the graph's topbar
  * 
  * @override
  * @see https://groups.google.com/d/msg/tiddlywikidev/hwtX59tKsIk/EWSG9glqCnsJ
  */
 MapWidget.prototype.refresh = function(changedTiddlers) {
   
-  if(this.isZombieWidget() || !this.network || utils.isPreviewed(this)) return;
-     
+  if(!this.network || this.isZombieWidget() || utils.isPreviewed(this)) {
+    return;
+  }
+  
+  var rebuildEditorBar = false;
+  var rebuildGraph = false;
+  var rebuildGraphOptions = {};
+  
+  // check for callback changes
   this.callbackManager.handleChanges(changedTiddlers);
-  
-  if(utils.hasPropWithPrefix(changedTiddlers, this.opt.path.options)) {
-    this.reloadOptions();
-  }
-  
-  if(utils.hasPropWithPrefix(changedTiddlers, this.opt.path.nodeTypes)) {
-    this.rebuildGraph();
-  }
-  
-  var isViewSwitched = this.checkForViewSwitch(changedTiddlers);
-  var viewModifications = this.view.refresh(changedTiddlers);
-  
-  // view switched or modified;
-  // if positions or style where modified, we do not update
-  // since this change come most certainly 
-  if(isViewSwitched || (viewModifications.length
-                        && !this.ignoreNextViewModification)) {
+      
+  if(this.isViewSwitched(changedTiddlers)) { // we are in a new view
+    
+    rebuildEditorBar = true;
+    rebuildGraph = true;
+    rebuildGraphOptions.resetData = true;
+    rebuildGraphOptions.resetOptions = true;
+    rebuildGraphOptions.resetEdgeTypeWL = true;
+    rebuildGraphOptions.resetFocus = { delay: 0, duration: 0 };
+        
+    this.logger("warn", "View switched");
+    this.view = this.getView(true);
+    this.reloadRefreshTriggers();
+    this.visNetworkDomNode.focus();
+    
+  } else { // view has not been switched
 
-    // default actions
-    var options = {
-      resetData: true,
-      resetOptions: true,
-      resetFocus: { delay: 0, duration: 0 }
-    };
-    
-    if(isViewSwitched) {
-      this.logger("warn", "View switched");
-      this.view = this.getView(true);
-      
-      // views may hold different triggers, so we need to reload them
-      this.reloadRefreshTriggers();
-      this.visNetworkDomNode.focus();
-      
-    } else {
+    var viewModifications = this.view.refresh(changedTiddlers);
+    if(viewModifications.length && !this.ignoreNextViewModification) {
+
       this.logger("warn", "View modified", viewModifications);
-      // not necessary to reset data
-      options.resetData = false;
-      if(this.preventFitAfterRebuild) {
-        options.resetFocus = false;
+      
+      rebuildEditorBar = true;
+      rebuildGraph = true;
+      rebuildGraphOptions.resetOptions = true;
+      rebuildGraphOptions.resetEdgeTypeWL = true;
+      
+      if(!this.preventFitAfterRebuild) {
+        rebuildGraphOptions.resetFocus = { delay: 0, duration: 0 };
       }
-    }
     
-    this.rebuildGraph(options);
-                          
+    } else { // neither view switch or view modification
+    
+      if(this.hasChangedGlobals(changedTiddlers)) {
+        rebuildGraph = true
+        rebuildGraphOptions.resetOptions = true;
+      } 
+            
+      if(this.hasChangedEdgeTypes(changedTiddlers)) {
+        rebuildGraph = true;
+        rebuildGraphOptions.resetEdgeTypeWL = true;
+      }
+      
+      if(!rebuildGraph && this.hasChangedNodeTypes(changedTiddlers)) {
+        rebuildGraph = true;
+      }
+
+      if(!rebuildGraph && this.hasChangedElements(changedTiddlers)){
+        rebuildGraph = true;
+      }
+      
+    }
+  }
+  
+  if(rebuildGraph) {
+    this.rebuildGraph(rebuildGraphOptions);
+  }
+  
+  if(rebuildEditorBar) {
+    
+    this.removeChildDomNodes();
+    this.rebuildEditorBar();
+    
   } else {
     
-    // check for changes that effect the graph on an element level
-    this.checkOnGraph(changedTiddlers);
-          
+    // give children a chance to update themselves
+    this.refreshChildren(changedTiddlers);
+    
   }
-  
-  // in any case give child widgets a chance to refresh
-  this.checkOnEditorBar(changedTiddlers, isViewSwitched, viewModifications);
   
   // reset this again
   this.ignoreNextViewModification = false;
@@ -703,8 +718,10 @@ MapWidget.prototype.rebuildGraph = function(options) {
   }
   
   this.network.setOptions(this.graphOptions);
-  
-  this.rebuildGraphData(true);
+    
+  this.rebuildGraphData({
+    resetEdgeTypeWL: options.resetEdgeTypeWL
+  });
   
   if(!utils.hasElements(this.graphData.nodesById)) {
     return;
@@ -764,21 +781,23 @@ MapWidget.prototype.reloadOptions = function() {
 };
 
 /**
- * param {boolean} isRebuild
- * param {NodeCollection} [nodes] - An optional set of nodes to use
- *     instead of the set created according to the nodes filter. Supplying
- *     a nodes collection will always recreate the cache despite the value
- *     of `isRebuild`.
+ * 
  */
-MapWidget.prototype.rebuildGraphData = function(isRebuild) {
+MapWidget.prototype.rebuildGraphData = function(options) {
   
   $tw.tmap.start("Reloading Network");
   
-  if(!isRebuild && this.graphData) {
-    return this.graphData;
+  options = options || {};
+  
+  if(!this.edgeTypeWL || options.resetEdgeTypeWL) {
+    this.rebuildEdgeTypeWL();
   }
-
-  var graph = this.adapter.getGraph({ view: this.view });    
+  
+  var graph = this.adapter.getGraph({
+    view: this.view,
+    edgeTypeWL: this.edgeTypeWL
+  });    
+  
   var nodes = graph.nodes;
   var edges = graph.edges;
       
@@ -808,132 +827,100 @@ MapWidget.prototype.rebuildGraphData = function(isRebuild) {
       
 };
 
+MapWidget.prototype.rebuildEdgeTypeWL = function() {
+  
+  var edgeTypeFilter = this.view.getEdgeFilter("compiled");
+  this.edgeTypeWL = this.adapter.getEdgeTypeWhiteList(edgeTypeFilter);
+  return this.edgeTypeWL;
+  
+};
+
 MapWidget.prototype.isViewBound = function() {
   
   return utils.startsWith(this.getViewHolderRef(), this.opt.path.localHolders);  
   
 };
   
-MapWidget.prototype.checkForViewSwitch = function(changedTiddlers) {
-
-  if(this.isViewBound()) {
-    // bound views can never be switched!
-    // TODO bound views should also be allowed to switch when
-    // attribute is set.
-    return false;
-  }
-  
-  // check if view has changed
-  if(changedTiddlers[this.getViewHolderRef()]) {
-    return true;
-  }
-
-  // check for triggers
-  //~ if((this.view.isLiveView() || this.prevView)
-     //~ && changedTiddlers["$:/temp/tmap/currentTiddler"]) {
-  //~ 
-    //~ var tRef = utils.getText("$:/temp/tmap/currentTiddler");
-    //~ var view = utils.getField(tRef, "tmap.open-view");
-//~ 
-    //~ if(view) {
-      //~ view = new ViewAbstraction(view);
-      //~ if(!view.exists()) {
-        //~ this.notify("View trigger doesn't exist");
-      //~ } else if(!this.view.isEqual(view)) {
-        //~ this.prevView = this.view;
-        //~ this.setView(view);
-        //~ this.notify("Triggered open view");
-        //~ return true;
-      //~ }
-    //~ }
-    //~ 
-    //~ // current tiddler changed but not trigger was found;
-    //~ // now we need to check if we did a triggered refresh before
-    //~ // and if yes, we need to reset it to normal.
-    //~ if(this.prevView) {
-      //~ this.setView(this.prevView);
-      //~ this.prevView = null;
-      //~ return true;
-    //~ }
-    //~ 
-  //~ }
-      
-  return false;
-  
-};
-
 /**
- * This method will ckeck if any tw-widget needs a refresh.
+ * A view is switched, if the holder was changed.
+ * Bound views cannot switch.
  */
-MapWidget.prototype.checkOnEditorBar = function(changedTiddlers, isViewSwitched, viewModifications) {
+MapWidget.prototype.isViewSwitched = function(changedTiddlers) {
   
-  // @TODO viewModifications is actually really heavy. I could narrow this.
-  if(isViewSwitched || viewModifications.length) {
-    
-    // full rebuild
-    //this.logger("info", "The graphbar needs a full refresh");
-    this.removeChildDomNodes();
-    // update all variables and build the tree
-    this.rebuildEditorBar();
-    return true;
-    
-  } else {
-    
-    // let children decide for themselves
-    //this.logger("info", "Propagate refresh to childwidgets");
-    return this.refreshChildren(changedTiddlers);
-    
+  return (changedTiddlers[this.getViewHolderRef()]
+          && !this.isViewBound());
+  
+};
+
+MapWidget.prototype.hasChangedNodeTypes = function(changedTiddlers) {
+  
+  return utils.hasPropWithPrefix(changedTiddlers,
+                                 this.opt.path.nodeTypes);
+  
+};
+
+MapWidget.prototype.hasChangedGlobals = function(changedTiddlers) {
+  
+  return utils.hasPropWithPrefix(changedTiddlers,
+                                 this.opt.path.options);
+  
+};
+
+MapWidget.prototype.hasChangedEdgeTypes = function(changedTiddlers) {
+  
+  if(utils.hasPropWithPrefix(changedTiddlers,
+                             this.opt.path.edgeTypes)) {
+
+    // do a precise check if relevant edge types have changed   
+    return !!utils.getMatches(this.view.getEdgeFilter("compiled"),
+                              Object.keys(changedTiddlers));
+                              
   }
   
 };
 
 /**
- * Rebuild or update the graph if one of the following events occured:
+ * Rebuild or update the graph if one of the following is true:
  * 
- * 1. A node that matches the node filter has been added or modified.
- * 2. A node that once matched the node filter has been removed
- * 3. An edge that matches the edge filter has been added or removed.
+ * 1. A tiddler currently contained as node in the graph has been
+ *    deleted or modified. This also includes tiddlers that are 
+ *    represented as neighbours in the graph.
+ * 2. A tiddler that matches the node filter has been modified
+ *    (not deleted).
+ * 
+ * Since edges are stored in tiddlers themselves, any edge modification
+ * is always accounted for as in this case the tiddler holding the
+ * edge would be included as changed tiddler.
  * 
  * @param {Hashmap<TiddlerReference, *>} changedTiddlers - A list of
  *     tiddler changes.
+ * 
+ * @return {boolean} true if the graph needs a refresh.
  */
-MapWidget.prototype.checkOnGraph = function(changedTiddlers) {
-   
-  // check for changed or removed nodes and edges
-  
-  var nodeFilter = this.view.getNodeFilter("compiled");
-  var matches = utils.getMatches(nodeFilter, Object.keys(changedTiddlers), true);
-  for(var tRef in changedTiddlers) {
+MapWidget.prototype.hasChangedElements = function(changedTiddlers) {
     
+  var maybeMatches = [];
+  for(var tRef in changedTiddlers) {
     if(utils.isSystemOrDraft(tRef)) continue;
     
-    // whether the tiddler matches the view filter
-    var isMatch = matches[tRef];
-    // whether or not this tiddler is currently represented as node
-    // in the graph (either as match or neighbour)
-    var isContained = this.graphData.nodesById[this.adapter.getId(tRef)];
-        
-    if(isMatch || isContained) {
-      // either (1) a match changed or (2) a former match is not
-      // included anymore; a match change also includes changed
-      // edges as edges are stored in the nodes!
-      this.rebuildGraph();
-      return;
+    if(this.graphData.nodesById[this.adapter.getId(tRef)]) {
+      return true;
     }
+    
+    if(changedTiddlers[tRef].modified) {
+      // still may be a match so we store this and process it later
+      maybeMatches.push(tRef);
+    }
+  }
+  
+  if(maybeMatches.length) {
+    
+    var nodeFilter = this.view.getNodeFilter("compiled");
+    var matches = utils.getMatches(nodeFilter, maybeMatches);
+    return !!matches.length;
     
   }
   
-  // check for changed edge-types
-  
-  var edgeFilter = this.view.getEdgeFilter("compiled");
-  var changedEdgeTypes = utils.getMatches(edgeFilter, Object.keys(changedTiddlers));
-  
-  if(changedEdgeTypes.length) {
-    this.logger("info", "Changed edge-types", changedEdgeTypes);
-    this.rebuildGraph();
-    return;
-  }
-
 };
     
 /**
@@ -1141,17 +1128,14 @@ MapWidget.prototype.getGraphOptions = function() {
     this.handleInsertNode(data);
     this.resetVisManipulationBar(callback);
   }.bind(this);
-
-  options.manipulation.editEdge = function(data, callback) {
-    this.handleReconnectEdge(data);
-    this.resetVisManipulationBar(callback);
-  }.bind(this);
   
-  //~ // v4: formerly onEdit; doesn't work; upstream bug
   options.manipulation.editNode = function(data, callback) {
     this.handleEditNode(data);
     this.resetVisManipulationBar(callback);
   }.bind(this);
+  
+  // not allowed
+  options.manipulation.editEdge = false;
   
   // make sure the actual solver is an object
   var physics = options.physics;
@@ -1445,64 +1429,6 @@ MapWidget.prototype.handleTriggeredRefresh = function(trigger) {
       resetOptions: false,
       resetFocus: { delay: 1000, duration: 1000 }
     });
-  
-};
-  
-MapWidget.prototype.handleConfigureSystem = function() {
-
-  var args = {
-    dialog: {
-      preselects: {
-        "vis-inherited": JSON.stringify(visDefConf),
-        "config.vis": utils.getText(this.opt.ref.visUserConf),
-        "config.sys": this.opt.config.sys
-      }
-    }
-  };
-
-  var name = "configureTiddlyMap";
-  this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
-    
-    if(isConfirmed && outTObj) {
-      
-      var config = utils.getPropertiesByPrefix(outTObj.fields,
-                                               "config.sys.",
-                                               true);
-      // carefull: this is a data tiddler!
-      this.wiki.setTiddlerData(this.opt.ref.sysUserConf, config);
-      
-      // tw doesn't translate the json to an object so this is already a string
-      utils.setField(this.opt.ref.visUserConf, "text", outTObj.fields["config.vis"]);
-            
-    }
-
-  });
-  
-};
-
-/**
- * Handler that guides the user through the process of creating edges
- * 
- * This action represents a direct graph manipulation by the user,
- * which means it will prevent a graph fitting (viewport adjusting)
- * in the course of the next rebuild.
- */
-MapWidget.prototype.handleReconnectEdge = function(updates) {
-  
-  // get current edge data
-  var oldEdge = this.graphData.edges.get(updates.id);
-  
-  // delete old edge from store
-  this.adapter.deleteEdge(oldEdge);
-  
-  // update from and to properties
-  var newEdge = $tw.utils.extend(oldEdge, updates);
-  
-  // prevent focus reset
-  this.preventFitAfterRebuild = true;
-      
-  // insert updated edge into store
-  return this.adapter.insertEdge(newEdge);
   
 };
 
@@ -1980,27 +1906,30 @@ MapWidget.prototype.handleVisDoubleClickEvent = function(properties) {
 MapWidget.prototype.handleOpenMapElementEvent = function(properties) {
   
   if(properties.nodes.length) { // clicked on a node    
-    
-    // open tiddler
     this.openTiddlerWithId(properties.nodes[0]);
     
-  } else if(properties.edges.length) { // clicked on an edge
-    
-    if(!this.editorMode) return;
-    
+  } else if(properties.edges.length) { // clicked on an edge  
     this.logger("debug", "Clicked on an Edge");
-    
-    var behaviour = this.opt.config.sys.edgeClickBehaviour;
-    var type = new EdgeType(this.graphData.edgesById[properties.edges[0]].type);
-    
-    if(behaviour === "manager") {        
-      $tw.rootWidget.dispatchEvent({
-        type: "tmap:tm-manage-edge-types",
-        paramObject: { type: type.id }
-      });        
-    }
+    var typeId = this.graphData.edgesById[properties.edges[0]].type;
+    this.handleEditEdgeType(typeId);
   }
 
+};
+
+MapWidget.prototype.handleEditEdgeType = function(type) {
+  
+  if(!this.editorMode) return;
+  
+  var behaviour = this.opt.config.sys.edgeClickBehaviour;
+  if(behaviour !== "manager") return;
+    
+  $tw.rootWidget.dispatchEvent({
+    type: "tmap:tm-manage-edge-types",
+    paramObject: {
+      type: type
+    }
+  });
+  
 };
 
 /**

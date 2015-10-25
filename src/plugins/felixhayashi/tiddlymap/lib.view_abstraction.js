@@ -368,17 +368,7 @@ ViewAbstraction.prototype.rename = function(newLabel) {
     
   this._registerPaths(newLabel);
   this.rebuildCache();
-  
-  // iterate over all local node-types.
-  var loNTy = $tw.tmap.indeces.loNTy;
-  for(var i = loNTy.length; i--;) {
-    var type = loNTy[i];
-    if(type.view === oldLabel) {
-      type.view = newLabel;
-      type.save();
-    }
-  }
-  
+    
 };
 
 /**

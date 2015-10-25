@@ -319,7 +319,7 @@ var attachFunctions = function(parent) {
     };
     
     fn.start = function(timerName) {
-      console.time("timer: " + timerName);
+      console.time("[timer] " + timerName);
     };
     
     fn.stop = function(timerName) {

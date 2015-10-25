@@ -81,6 +81,11 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.9.20
+
+* Fixes #185: Deleting / renaming node-types doesn't work
+* Fixes #184: Since v0.9.16 renaming views doesn't work anymore
+
 ### v0.9.19
 
 * Creating a node type resulted in the creation of a tiddler with the

@@ -1,0 +1,212 @@
+caption: v0.9.x
+created: 20150726142912155
+modified: 20151002100143269
+released: not really
+tags: ReleaseNote [[Map Constructs]] Usability Configurability Storage Performance
+title: Version 0.9.x
+tmap.id: 16976ded-1d7e-4798-b7ef-a12fc5cdaeef
+type: text/x-markdown
+
+Major enhancements
+----------------------------
+
+### v0.9.19
+
+* Added keycombo "ctrl + a" to select all nodes in a map.
+
+### v0.9.16
+
+* Added possibility to prioritize node types.
+* Improved the way elements are added via the element-type manager
+
+### v0.9.14
+
+* Resolves #179: Add an option to render widget in plain design feature
+* Resolves #178: Enhance export image dialog.
+
+### v0.9.13
+
+* Now allowing the user to change the central gravity and damping
+* Improved the placeholder that is displayed when in preview mode
+
+### v0.9.10
+
+* Allowing the `tmap.fa-icon` field to hold different unicode
+  representations (e.g. `&#xf007;`, `&#xf007` or `f007`).
+
+### v0.9.9
+
+* Improved the closing behaviour of dropdowns (focus button and
+  tiddler toolbar button).
+* Added indicator when neighbourhood scope is active
+* Optimized font-color assignments
+
+### v0.9.7
+
+* Tries to cater for #171. The user always has a chance to create a
+  new tiddler on the fly and then link to it when searching.
+* Again related to #171: All TiddlyMap popups are now closed when
+  the user is clicking outside.
+  
+### v0.9.3
+
+* #168  Enhanced the create view dialog; Allow moving portions of a
+  map to a new map via copy/cut and paste.
+* It is now possible to select multiple nodes or edges by holding
+  down the ctrl key or by a longheld click (1 second).
+* In addition to the multi-select, it is now possible to delete
+  multiple nodes at once.
+* Selecting, dragging, moving, copying **multiple nodes** is now possible.
+* Resolves #169: Better installation experience
+
+### v0.9.2
+
+* Dynamic creation of edge labels if they do not exist
+
+### v0.9.1
+
+* Added fullscreen preview and draft tabs when opening a node
+* Added download graph button
+* Added option to hide editor-menu buttons
+
+### v0.9.0
+
+* Resolves #162: Allow Font Awesome icons to be used with TiddlyMap
+* Resolves #151: Making the vis.js configurator available in tiddlymap
+* Resolves #152: Node-types and node-type manager
+* Adding individual node styling possibilities
+* Enhanced the tiddler-toolbar popup
+* Allows to set the default map which is displayed at startup
+
+Important Bugfixes
+----------------------------
+
+### v0.9.20
+
+* Fixes #185: Deleting / renaming node-types doesn't work
+* Fixes #184: Since v0.9.16 renaming views doesn't work anymore
+
+### v0.9.19
+
+* Creating a node type resulted in the creation of a tiddler with the
+  same title as the id of the type.
+
+### v0.9.18
+
+* The TiddlyMap tiddler toolbar button produced an error.
+  
+### v0.9.17
+
+* Added guards against
+  https://github.com/Jermolene/TiddlyWiki5/issues/2025:
+  Adding tiddler programmatically without text field causes serious
+  recursion error in nodejs mode.
+
+### v0.9.16
+
+* Fixed bug that renaming an element type didn't work.
+* Reintroduced the closing tag for the widget generator. It caused
+  trouble to have tiddlymap widget's without closing tag.
+* Showing correct timestamps now in the element-type manager.
+
+### v0.9.15
+
+* Further improved the fix for #177. This time also for static setups.
+
+### v0.9.13
+
+* Hide TM tiddler toolbar button when tiddler is a system tiddler.
+* Fixes #176: Static HTML export of tiddler with embedded graph.
+* Fixed small bug where when exiting fullscreen while being in draft
+  mode the draft removal didn't remove the tiddler from the river.
+* Fixes #177: Prevent nodes from floating far away when added to the
+  canvas using a filter.
+* Fixed bug where connection to non existent edge via message threw
+  an exception. Related to #171.
+* Fixed small bug where it was possible to paste nodes into the live
+  view
+
+### v0.9.12
+
+* Fixes #175: Clicking on an element in the selectbox in the TM
+  tiddler toolbar dropdown closes the dialog bug
+  
+### v0.9.11
+
+* Fixes #174: Not all edges are displayed in live view and in the
+  TMap toolbar button.
+
+### v0.9.10
+
+* Fixed bug that select style was not assigned when dragging a node.
+
+### v0.9.9
+
+* Adding node borders is now allowed and working.
+* Node selection now works with correct styles being set (finally!)
+
+### v0.9.8
+
+* Fixed installation issues: In new wikis, the config was not read
+  because the getTiddlerData function was used on tiddlers that
+  were not marked as data tiddlers.
+* By accident a wrong edge filter was added to the default view. wtf?
+* Fixed bug that a node inserted with the adapter was not immediately
+  inserted into the node-index, only after refresh!
+
+### v0.9.6
+
+* In v0.9.5 I introduced a very ugly node highlighting. Removed! :)
+* Fixes #172: Keylisteners of the clipboard feature swallow letters.
+* Fixed some visjs css
+
+### v0.9.5
+
+* Style relicts made it into the graph when in live view
+
+### v0.9.4
+
+* Editor was not working correctly
+
+### v0.9.3
+
+* Fixed bug that was introduced with v0.9.1: No alerts anymore
+  that contain questions whether to cancel the draft or not.
+* Fixed bug that node filters couldn't be deleted
+* Fixed wrong modal css in mobile
+* Fixed a critical bug that assigned new ids when upgrading from
+  very early versions (where users could manually define the tmap id
+  field). This happened because "tmap.id" is now always used as id
+  field.
+
+### v0.9.2
+
+* Fixed bug that null labels where displayed for edges.
+* Added safeguard to prevent that multiline editors allowed newlines
+  to be written into single line fields (with regard to the
+  type manager).
+  See: https://github.com/Jermolene/TiddlyWiki5/issues/1955
+
+### v0.9.1
+
+* Fixes #165: Unexpected behaviour from sidebar map resize button
+* Changed the way the fullscreen cancellation of drafts is handled
+
+### v0.9.0
+
+* Fixes #157: Renaming a view creates an error
+* Fixes that a user could enter an empty view name during rename
+* Fixes #154: Using icons might cause false font color
+* Fixes error when pressing the save button in type manager when no
+  type is loaded
+  
+Incompatibilities to previous versions
+----------------------------
+
+### v0.9.16
+
+* Removed feature to have local group styles
+
+### v0.9.0
+
+* Positioning the live view nodes and saving the positions is not possible anymore :( I had to remove this feature again since it clashed with different view operations.

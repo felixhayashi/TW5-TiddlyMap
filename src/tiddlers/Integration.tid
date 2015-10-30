@@ -1,0 +1,25 @@
+created: 20150711224259087
+modified: 20150712152435048
+order.challenges: 2
+tags: Challenges
+title: Integration
+tmap.id: 953d6958-a749-4b8a-a158-6567554fe14e
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+This refers to the quest of seemlessly integrating TiddlyMap with TiddlyWiki and Visjs.
+
+So this is actually a twofolded challenge:
+
+! Integrating TiddlyMap into TiddlyWiki
+
+How should TiddlyMap and its components appear in TiddlyWiki.
+
+* The [[TiddlyMap Toolbar Button]]
+* The sidebar map [[editor|The editor menu]]
+* [[Embedding views within tiddlers]]
+
+! Integration of Visjs
+
+Correctly implementing Visjs in the TiddlyWiki environment, making Visjs options available to the user and keeping TiddlyMap up-to-date with recent Visjs-upstream changes (like the transition from Visjs v3 to v4).

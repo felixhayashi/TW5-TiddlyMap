@@ -1,0 +1,51 @@
+created: 20150630134543615
+modified: 20150630154518632
+tags: Insight
+title: Storage of Edges
+tmap.id: 7f62c0ca-560e-40fd-bc06-92f469dd7f8c
+type: text/vnd.tiddlywiki
+
+! Introduction
+
+TiddlyMap uses json to store its edges. All outgoing edges are stored in the tiddler that represents the from part of the relationship. This means that TiddlyMap actually turns TiddlyWiki in a decentral graph-store where tiddlers are nodes holding the relations to other nodes (tiddlers).
+
+Especially graph traversals can be efficiently performed this way since adjacent nodes can be quickly identified starting from a certain tiddler. This would allow stuff like shortest path calculation (e.g. dikstra) or neighbourhood discoveries.
+
+Per default, TiddlyMap uses the `tmap.edges` field to store edges. 
+
+! Example
+
+Say Tiddler A links to Tiddlers B and C.
+
+Tiddler B has an auto-generated tiddlymap-id:
+
+```
+fa8c4f3e-b216-4744-b65c-5335f02f66a9`
+```
+
+Tiddler C has the id
+
+```
+7017feb5-3955-464b-a4b5-a22a420ab828
+```
+
+Per default ids are stored in the `tmap.id` field. It is noteworthy that the usage of ids to represent tiddlers has the huge advantage that edges will survive tiddler title changes.
+
+The edge between A and B is of the [[type|Edge-Types]] `rel-1` and between A and C of the type `rel-2`.
+
+In this case, the edges will be stored inside A as shown below:
+
+```json
+{
+  "d4ca6750-780f-4640-b8fa-fa2efa449c92": {
+    "to": "fa8c4f3e-b216-4744-b65c-5335f02f66a9",
+    "type": "rel-1"
+  },
+  "97345e5b-505d-4625-8843-5169b7fda209": {
+    "to": "7017feb5-3955-464b-a4b5-a22a420ab828",
+    "type": "rel-2"
+  }
+}
+```
+
+In the example above, `"d4ca6750-780f-4640-b8fa-fa2efa449c92` and `97345e5b-505d-4625-8843-5169b7fda209` are unique auto-generated edge ids.

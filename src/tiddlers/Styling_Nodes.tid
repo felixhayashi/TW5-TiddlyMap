@@ -1,0 +1,111 @@
+created: 20150827151202347
+modified: 20151013104409213
+tags: [[Basic concepts]]
+title: Styling Nodes
+tmap.id: f17de47f-0b5c-40d0-9720-a3cafcaa9c10
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+<style type="text/css">
+.styling-comparison-table tr th:first-child {
+  width: 10%px;
+  text-align: right;
+}
+.styling-comparison-table tr th:not(:first-child) {
+  width: 40%;
+}
+.styling-comparison-table tr > * {
+  padding: 10px;
+  vertical-align: top;
+}
+.styling-comparison-table tr:first-child td:first-child {
+  visibility: hidden;
+}
+.styling-comparison-table h1{ 
+text-align: center;
+border: none;
+}
+</style>
+
+TiddlyMap allows you to style nodes in various ways – not only in terms of the style attributes you can choose, but also with regard to applying styles by filters and inheritance.
+
+! Different ways to add styles to nodes
+
+<table class="styling-comparison-table">
+  <tr>
+    <td></td>
+    <th>All views ("global")</th>
+    <th>View specific ("local")</th>
+  </tr>
+  <tr>
+    <th>Styling of all nodes</th>
+    <td>
+      <h1>(1) Global default style</h1>
+      These configurations and styles affect all nodes in all views.
+      <ol>
+        <li>Go to the map editor in the sidebar</li>
+        <li>Click on the menu button and choose //Configure TiddlyMap//.</li>
+        <li>Then go to the section //Global Vis Configurations//</li>
+      </ol>
+    </td>
+    <td>
+      <h1>(2) Local default style</h1>
+      The configurations are view-specific.
+      <ol>
+        <li>Go to the map editor in the sidebar</li>
+        <li>Click on the menu button and choose //Configure View//.</li>
+        <li>Then go to the section //Vis Configurations//</li>
+      </ol>
+    </td>
+  </tr>
+  <tr>
+    <th>Styling node-groups via filters</th>
+    <td>
+      <h1>(3) Global group styles</h1>
+      The styles only apply to nodes corresponding to tiddlers that match the filter.
+      <ol>
+        <li>Go to the map editor in the sidebar</li>
+        <li>Click on the menu button and choose //Node-Type Manager//.</li>
+        <li>Create a node-type and add some styles to this type in the //Styling// section of the type</li>
+        <li>Then enter a filter (//scope//) that matches the desired subset of tiddlers</li>
+      </ol>
+    </td>
+    <td>
+      <h1>(4) Local group styles</h1>
+      <div class="tmap-flash-message tmap-warning">
+        <i class="fa fa-exclamation-triangle"></i> This feature was removed in v0.9.16
+      </div>
+      The styles only apply to nodes corresponding to tiddlers that match the filter ''and'' match the selected view. 
+    </td>
+  </tr>
+  <tr>
+    <th>Styling individual nodes</th>
+    <td>
+      <h1>(5) Global individual style</h1>
+      A node's global style is only bound to a specific node but affects the style of the node in all views it appears in.
+      <ol>
+        <li>Select an individual node in the map</li>
+        <li>In the manipulation bar above the graph select //Edit node//.</li>
+        <li>Then go to the tab //Global node style// and edit the style.</li>
+      </ol>
+    </td>
+    <td>
+      <h1>(6) Local individual style</h1>
+      The style is specific to this node and only affects the node's style of the current view.
+      <ol>
+        <li>Select an individual node in the map</li>
+        <li>In the manipulation bar above the graph select //Edit node//.</li>
+        <li>Then go to the tab //Local node style// and edit the style.</li>
+      </ol>
+    </td>
+  </tr>  
+</table>
+
+! Inheritance chain for styles
+
+With regard to the table displayed above, all styles on a lower level inherit from styles defined on a higher level and view styles always inherit global styles.
+
+The arrow (←) means "inherits from" and the index refers to the index in the table.
+
+`(1) ← (2) ← (3) ← (4) ← (5) ← (6)`

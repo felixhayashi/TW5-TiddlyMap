@@ -1,0 +1,8 @@
+config.vis: {"edges":{"arrows":{"to":true,"middle":{"enabled":false}}}}
+created: 20150824130601749
+id: 8c5bea5d-ce1d-48e8-bbe3-b0573b8825e5
+isview: true
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/Activities
+type: text/vnd.tiddlywiki
+vis-inherited: {"locale":"en_EN","clickToUse":true,"autoResize":false,"height":"100%","width":"100%","configure":{"enabled":false},"interaction":{"dragNodes":true,"dragView":true,"hideEdgesOnDrag":false,"hideNodesOnDrag":false,"hover":false,"navigationButtons":true,"selectable":true,"selectConnectedEdges":true,"tooltipDelay":300,"zoomView":true,"keyboard":{"enabled":false,"speed":{"x":10,"y":10,"zoom":0.02},"bindToWindow":false}},"manipulation":{"initiallyActive":true},"nodes":{"shape":"box","color":{"border":"rgba(112,2,4,1)","background":"rgba(178,34,34,1)","highlight":{"border":"rgba(112,2,4,1)","background":"rgba(178,34,34,1)"},"hover":{"border":"white","background":"white"}},"font":{"size":15,"color":"#FFFFFF"}},"edges":{"smooth":{"enabled":true},"color":{"color":"#B22222","inherit":false},"arrows":{"to":true,"middle":{"enabled":false},"from":{"enabled":false}}},"physics":{"forceAtlas2Based":{"springLength":200,"centralGravity":0,"springConstant":0.13},"solver":"forceAtlas2Based","stabilization":{"enabled":true,"iterations":1000,"updateInterval":100,"onlyDynamicEdges":false,"fit":false}}}
+

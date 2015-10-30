@@ -1,0 +1,14 @@
+created: 20150131123004185
+modified: 20150930180218308
+tags: [[Basic concepts]]
+title: Working with the live view
+tmap.id: 3d3b602c-f394-4eed-bb31-89022e211576
+type: text/vnd.tiddlywiki
+
+The //live view// shows you the surrounding neighbourhood of the tiddler that is currently focussed.
+
+Just open the //live tab// in your sidebar and start scrolling down the list of currently opened tiddlers in your story river. If you add connections from the currently focussed tiddler via the [[The Quick-Connect Mechanism]], you can immediately see the results in the //live view//.
+
+! Live View plugin dependencies
+
+{{Live View plugin dependencies}}

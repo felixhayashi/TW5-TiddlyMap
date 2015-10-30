@@ -1,0 +1,24 @@
+created: 20151009213505349
+modified: 20151009222659859
+tags: Paper Literature
+title: Hevner2004
+tmap.edges: {"2506bd6b-8ddb-439a-afdb-a64491497719":{"to":"81184984-2203-4c97-b323-7064d6910b88","type":"cites"}}
+tmap.id: a8acbdaa-d54d-4c3d-aaee-5243c88ad231
+type: text/vnd.tiddlywiki
+
+|!Title |Design Science in Information Systems Research |
+|!Authors |Alan R. Hevner, Salvatore T. March, Jinsoo Park, Sudha Ram |
+|!Journal |MISQ |
+
+<<<
+Two paradigms characterize much of the research
+in the Information Systems discipline: behavioral
+science and design science. The behavioral-
+science paradigm seeks to develop and verify
+theories that explain or predict human or organi-
+zational behavior. The design-science paradigm
+seeks to extend the boundaries of human and
+organizational capabilities by creating new and
+innovative artifacts.
+[…]
+<<< Excerpt from the abstract

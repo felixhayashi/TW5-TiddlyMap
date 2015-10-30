@@ -1,0 +1,12 @@
+created: 20141222113720428
+id: CE457D81-8452-4D52-9453-E77BB199902D
+modified: 20141225193733474
+tags: $:/tags/PageControls
+title: $:/_MyRibbon
+type: text/vnd.tiddlywiki
+
+<div class="github-fork-ribbon-wrapper right">
+<div class="github-fork-ribbon" style="background-color:#DF4848;">
+<a href="http://tiddlywiki.com" target="_blank">Powered by ~TiddlyWiki</a>
+</div>
+</div>

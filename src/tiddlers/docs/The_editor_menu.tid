@@ -1,0 +1,29 @@
+created: 20150119190507345
+modified: 20151004135334488
+tags: Interface
+title: The editor menu
+tmap.id: 2b517bc2-f857-42bb-b769-d22b9a2aa257
+type: text/vnd.tiddlywiki
+
+!! The editor's drop-down menu
+
+{{editor_menu.png}}
+
+; View selection
+: You can select an existing view to be displayed in the editor via the selectbox on the very left.
+; Create empty view
+: Click this button to create a new view with an individual view name of your choice. The new view can be separately modified and is independent from the other existing views.
+; Rename view
+: You can always rename your views, however, be careful as existing views with the same name will be overwritten.
+; Delete view
+: Removes the view and all its components, including all private edges. You cannot remove the default view. Also you cannot remove any view that is still used by widgets in the wiki (a dialog will tell you which dependencies exist).
+; Save positions
+: Use this button to explicitly save positions. Positions are normally automatically  saved when a dragged node was dropped.
+; Grab widget code
+: This will open a wizard that helps you to produce the desired widget code you can then copy'n'paste to embed this view in a tiddler.
+; Edit filters
+: Click this option to open a dialog in which you can modify the view's node and edge filters. If you have double clicked somewhere on an empty spot in the graph's canvas before, nodes were automatically added to the node filter for you. For more information on filters visit http://tiddlywiki.com.
+; Manage edge-types
+: See [[Edge-type Manager]]
+; Global configurations
+: See [[System configuration]]

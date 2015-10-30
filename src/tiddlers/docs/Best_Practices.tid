@@ -1,0 +1,18 @@
+created: 20150930181141101
+modified: 20151011201700847
+tags: Documentation
+title: Best Practices
+tmap.id: f464c5e8-3bb0-44fd-821a-4e4ee9cc8eb1
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+!! Try to keep your maps small
+Small maps are faster to process by TiddlyMap and are generally easier to work with.
+If a map becomes to big, try to [[outsource nodes into another view|Moving nodes between graphs]]!
+
+!!Use a small set of generic edge types in your wiki
+This means: avoid creating different edge types that are highly synonymous like //has created//, //authored//, //created by//, //creator of//. Instead stick to one name that is most suitable and generic.
+
+!! Prefer generic node styles over specific node styles.
+With all the [[different styling levels|Styling Nodes]], you'll save yourself some time if you use global styles whenever possible, especially global group styles. For example, if you have tiddlers that represent pieces of literature, then create a //node group// that adds a book icon to all these nodes – instead of styling all literature nodes individually.

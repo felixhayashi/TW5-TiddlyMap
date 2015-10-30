@@ -1,0 +1,8 @@
+created: 20150101152448582
+modified: 20150102011554839
+tags: Person
+title: Adam
+tmap.edges: {"62b28c2f-c6dc-4b6b-b108-722eb47d5972":{"to":"f24ab062-62a1-4555-a57f-dfcd597c3515","type":"family:father of"},"5e0b1a72-ceaa-4543-a524-a098880c4818":{"to":"8b26d3b9-ddf5-43d9-9fa6-8d9ffcd6d3fc","type":"reads"},"9f5487a6-e5a9-42fa-b921-94e854f1659b":{"to":"a8acbdaa-d54d-4c3d-aaee-5243c88ad231","type":"reads"}}
+tmap.id: 35b99ac8-aa07-4834-b508-6e9435f573cb
+type: text/vnd.tiddlywiki
+

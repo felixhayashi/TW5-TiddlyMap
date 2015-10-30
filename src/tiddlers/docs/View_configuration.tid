@@ -1,0 +1,8 @@
+created: 20150330171842146
+modified: 20151004135927608
+tags: Configuration
+title: View configuration
+tmap.id: bf2c68b0-89a0-4df3-a248-d47b98fb1691
+type: text/vnd.tiddlywiki
+
+The view configuration allows you to change the way a particular view behaves. Changing one view's configuration does not affect another view's settings.

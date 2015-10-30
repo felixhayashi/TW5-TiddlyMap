@@ -1,0 +1,29 @@
+{
+  "plugins": [
+    "tiddlywiki/github-fork-ribbon",
+    "tiddlywiki/tiddlyweb",
+    "tiddlywiki/markdown",
+    "tiddlywiki/filesystem",
+    "tiddlywiki/highlight",
+    "felixhayashi/topstoryview",
+    "felixhayashi/hotzone",
+    "felixhayashi/vis",
+    "felixhayashi/tiddlymap",
+    "spangenhelm/enhancedsearch",
+    "danielo/contextPlugin"
+  ],
+  "themes": [
+    "tiddlywiki/vanilla",
+    "tiddlywiki/snowwhite"
+  ],
+  "languages": [
+    "en-US",
+    "de-DE"
+  ],
+  "build": {
+    "index": ["--rendertiddler","$:/core/save/all","demo.html","text/plain"]
+  },
+  "config": {
+    "retain-original-tiddler-path": true
+  }
+}

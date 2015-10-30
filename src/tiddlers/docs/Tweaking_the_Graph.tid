@@ -1,0 +1,56 @@
+created: 20150331124622206
+modified: 20150914161352191
+tags: Configuration
+title: Tweaking the Graph
+tmap.id: 885f501d-575b-4c79-a7f9-790e6de2120a
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+The [[Vis.js]] library offers many ways to change the default graph layout and behaviour.
+
+As far as ~TiddlyMap is concerned, feel free to change the following options:
+
+# http://visjs.org/docs/network.html#Nodes_configuration
+# http://visjs.org/docs/network.html#Edges_configuration
+# http://visjs.org/docs/network.html#Groups_configuration
+# http://visjs.org/docs/network.html#Localization
+# http://visjs.org/docs/network.html#Tooltips
+
+Configuring Vis.js beyond the aspects denoted by the links above is only recommended to experts as ~TiddlyMap is already fine tuned to suit your need.
+
+! After TiddlyMap v0.9
+
+See [[Styling Nodes]].
+
+! Before v0.9
+
+<div class="tmap-flash-message tmap-danger">
+   <i class="fa fa-exclamation-triangle"></i> This way of doing it is obsolete and only applies to versions prior v0.9!
+</div>
+
+To change the vis options, first create a JSON tiddler (see [[DataTiddlers|http://tiddlywiki.com#DataTiddlers]]) named
+
+<pre><<tmap "option" "ref.visUserConf">></pre>
+
+Then you could add properties using nested JSON or a dot notation. For example, if you want to change the way neighbour's are colored, you would add the following to the tiddler's body (make sure you also changed the tiddler's content type to //application/json// and mind the quotation marks!):
+
+```javascript
+{
+  "groups.neighbours.color": "#123456"
+}
+```
+
+Alternatively
+
+```javascript
+{
+  "groups": {
+      "neighbours": {
+        "color": "#123456"
+      }
+    }
+}
+```
+
+As in the example above, you can selectively override the ~TiddlyMap's default configuration. If you are uncomfortable with your configurations, just delete the tiddler and the defaults are used.

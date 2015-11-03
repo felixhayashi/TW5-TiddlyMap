@@ -27,9 +27,6 @@ $(searchSelector)$
 
 \define typePath() $(typeRootPath)$/$(id)$
 
-<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]
-                          [[$:/core/macros/tabs]]">
-
 <div id="tmap-element-type-manager" class=<<managerClass>>>
   <div>
     <div class="searchbar">
@@ -96,5 +93,3 @@ $(searchSelector)$
     </$reveal>
   </div>
 </div>
-
-</$importvariables>

@@ -30,6 +30,7 @@ caption: Styling
                For example 'f206' for the bicycle symbol.">>
   </table>
 </fieldset>
+
 <fieldset><legend>Visjs styles</legend>
 <div class="tmap-flash-message tmap-info">
    {{$:/core/images/info-button}}

@@ -5,8 +5,6 @@ subtitle: {{$:/core/images/options-button}} Configuration of TiddlyMap
 
 \define vis-refresh-trigger() $(temp)$/vis-refresh
 
-<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
-
 <div class="tmap-flash-message tmap-info">
    {{$:/core/images/info-button}}
    Please visit the [[online docs|http://tiddlymap.org#Changing%20TiddlyMap's%20default%20configuration]]
@@ -62,21 +60,6 @@ subtitle: {{$:/core/images/options-button}} Configuration of TiddlyMap
         selectFilter:"[[nothing|Nothing]]
                       [[manager|Open edge-type manager]]"
         descr:"What should happen when you click on an edge?">>
-<!--
-    <<tmap-row type:"input-select"
-        title:"Raster size"
-        field:"config.sys.raster"
-        nochoice:"Disabled"
-        selectFilter:"[[5|5px]]
-                      [[10|10px]]
-                      [[15|15px]]
-                      [[20|20px]]
-                      [[30|30px]]
-                      [[40|40px]]"
-        descr:"Snap nodes to an invisible raster of the given size
-               after drag'n'drop."
-        note:"Only works when the view is not in floating mode">>
--->
     <$macrocall type="input-select"
           $name="tmap-row"
           title="Default startup view"
@@ -84,6 +67,21 @@ subtitle: {{$:/core/images/options-button}} Configuration of TiddlyMap
           nochoice="Last view used at startup"
           selectFilter=<<tmap "option" "selector.allViewsByLabel">>
           descr="The view to display at startup" />
+  </table>
+</fieldset>
+
+<fieldset><legend>Live tab</legend>
+  <table class="tmap-config-table">
+    <<tmap-row type:"input-checkbox"
+        title:"Show Live tab"
+        field:"liveTab" 
+        descr:"Show or hide the live tab in the sidebar.">>
+    <$macrocall type="input-select"
+        $name="tmap-row"
+        title="Fallback view"
+        field="config.sys.liveTab.fallbackView" 
+        selectFilter=<<tmap "option" "selector.allViewsByLabel">>
+        descr="The view to display in the sidebar's live tab in case the current tiddler did not specify a view to open." />
   </table>
 </fieldset>
 
@@ -131,5 +129,3 @@ subtitle: {{$:/core/images/options-button}} Configuration of TiddlyMap
       extension="config.vis"
       refresh-trigger=<<vis-refresh-trigger>> />
 </fieldset>
-
-</$importvariables>

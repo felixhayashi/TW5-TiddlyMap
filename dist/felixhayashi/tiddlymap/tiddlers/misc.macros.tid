@@ -36,7 +36,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
   </$reveal>
 \end
 
-\define input-multi-checkbox(selectFilter, invert=no, default)
+\define input-multi-checkbox(selectFilter, invert:"no", default)
   <div class="tmap-no-stretch">
   <$list
       filter="$selectFilter$"
@@ -111,4 +111,32 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
       </$reveal>
     </td>
   </tr>
+\end
+
+\define visConfiguration(inheritedList,
+                         extensionField,
+                         refreshTrigger,
+                         styleName:"style")
+                         
+  <fieldset><legend>Visjs configurations ($styleName$)</legend>
+    <table class="tmap-config-table">
+      <tr>
+        <td>Reset:</td>
+        <td>
+          <div class="tmap-button-wrapper">
+            <$button>Reset this style
+              <$action-setfield $field="$extensionField$" $value="" />
+              <$action-setfield $tiddler="$refreshTrigger$" text="" />
+            </$button>
+         </div>
+       </td>
+       <td>Press the reset button to clear the $styleName$</td>
+      </tr>
+    </table>
+    <$tmap-config
+        mode="manage-node-types"
+        inherited="$inheritedList$"
+        extension="$extensionField$"
+        refresh-trigger="$refreshTrigger$" />
+  </fieldset>
 \end

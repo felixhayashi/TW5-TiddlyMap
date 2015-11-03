@@ -115,7 +115,8 @@ DialogManager.prototype.open = function(templateId, param, callback) {
     temp: dialogTRef + "/temp",
     template: skeleton.fields.title,
     templateId: templateId,
-    currentTiddler: dialogTRef + "/output"
+    currentTiddler: dialogTRef + "/output",
+    text: utils.getTiddler(this.opt.path.dialogs).fields.text
   };
       
   if(param.dialog) {
@@ -166,8 +167,7 @@ DialogManager.prototype.open = function(templateId, param, callback) {
     }
     
     // close and remove all tiddlers used by the dialog
-    var deletes = utils.getMatches("[prefix[" + dialogTRef + "]]");
-    utils.deleteTiddlers(deletes);
+    utils.deleteByPrefix(dialogTRef);
     
   }.bind(this);
   

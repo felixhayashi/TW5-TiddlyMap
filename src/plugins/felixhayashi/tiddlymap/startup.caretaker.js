@@ -27,7 +27,6 @@ function(){
 /*** Imports *******************************************************/
 
 var visConfig =       require("$:/plugins/felixhayashi/tiddlymap/js/config/vis").config;
-var sysConfig =       require("$:/plugins/felixhayashi/tiddlymap/js/config/sys").config;
 var utils =           require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
 var fixer =           require("$:/plugins/felixhayashi/tiddlymap/js/fixer").fixer;
 var Adapter =         require("$:/plugins/felixhayashi/tiddlymap/js/Adapter").Adapter;
@@ -39,6 +38,129 @@ var NodeType =        require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").N
 var vis =             require("$:/plugins/felixhayashi/vis/vis.js");
 
 /*** Code **********************************************************/
+
+/**
+ * Everything that doesn't change when the global config object is
+ * updated. This includes prefixes (paths) and tiddler titles.
+ * 
+ * ATTENTION: The paths are deliberately written in full so they
+ * are discovered when a search is performed over the TiddlyMap code.
+ */
+var attachStaticConfig = function(parent) {
+  
+  if(parent.path) return; // already assigned
+  
+  var o = parent;
+  
+  // **ATTENTION: NO TRAILING SLASHES IN PATHS EVER**
+  o.path = {
+    pluginRoot:     "$:/plugins/felixhayashi/tiddlymap",
+    edgeTypes:      "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes",
+    nodeTypes:      "$:/plugins/felixhayashi/tiddlymap/graph/nodeTypes",
+    listEdgeTypes:  "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-list:",
+    fieldEdgeTypes: "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-field:",
+    views:          "$:/plugins/felixhayashi/tiddlymap/graph/views",
+    options:        "$:/plugins/felixhayashi/tiddlymap/config",
+    dialogs:        "$:/plugins/felixhayashi/tiddlymap/dialog",
+    footers:        "$:/plugins/felixhayashi/tiddlymap/dialogFooter",
+    tempRoot:       "$:/temp/tmap",
+    localHolders:   "$:/temp/tmap/holders"
+  };
+  
+  var p = o.path;
+
+  // static references to important tiddlers
+  o.ref = {
+    defaultViewHolder:      "$:/plugins/felixhayashi/tiddlymap/misc/defaultViewHolder",
+    graphBar:               "$:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar",
+    sysUserConf:            "$:/plugins/felixhayashi/tiddlymap/config/sys/user",
+    visUserConf:            "$:/plugins/felixhayashi/tiddlymap/config/vis/user",
+    welcomeFlag:            "$:/plugins/felixhayashi/tiddlymap/flag/welcome",
+    focusButton:            "$:/plugins/felixhayashi/tiddlymap/misc/focusButton",
+    sysMeta:                "$:/plugins/felixhayashi/tiddlymap/misc/meta",
+    liveTab:                "$:/plugins/felixhayashi/tiddlymap/hook/liveTab",
+    sidebarBreakpoint:      "$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint"
+  };
+  
+  // some other options
+  o.misc = {
+    // if no edge label is specified, this is used as label
+    unknownEdgeLabel: "tmap:undefined",
+    liveViewLabel: "Live View",
+    defaultViewLabel: "Default"
+  };
+  
+  o.config = {
+    sys: {
+      field: {
+        nodeLabel: "caption",
+        nodeIcon: "icon",
+        nodeInfo: "description",
+        viewMarker: "isview"
+      },
+      liveTab: {
+        fallbackView: o.misc.liveViewLabel
+      },
+      suppressedDialogs: {},
+      edgeClickBehaviour: "manager",
+      debug: "false",
+      notifications: "true",
+      editNodeOnCreate: "false",
+      singleClickMode: "false",
+      editorMenuBar: {
+        showNeighScopeButton: "true",
+        showScreenshotButton: "true"
+      }
+    }
+  };
+  
+  // some popular filters
+  o.filter = {
+    nodeTypes: "[prefix[" + o.path.nodeTypes + "]]",
+    edgeTypes: "[prefix[" + o.path.edgeTypes + "]]",
+    listEdgeTypes: "[prefix[" + o.path.listEdgeTypes + "]]",
+    fieldEdgeTypes: "[prefix[" + o.path.fieldEdgeTypes + "]]",
+    views: "[" + o.config.sys.field.viewMarker + "[true]]"
+  };
+    
+  o.filter.defaultEdgeFilter = o.filter.edgeTypes
+                               + "-[suffix[tw-body:link]]"
+                               + "-[suffix[tw-list:tags]]"
+                               + "-[suffix[tw-list:list]]";
+  
+  // some popular selectors
+  // usually used from within tiddlers via the tmap macro
+  var s = o.selector = {};
+  var allSelector = "[all[tiddlers+shadows]!has[draft.of]]";
+
+  // all edge-types (by label)
+  s.allEdgeTypes = allSelector + " +" + o.filter.edgeTypes;
+  s.allEdgeTypesByLabel = s.allEdgeTypes
+                          + " +[removeprefix[" + p.edgeTypes + "/]]";
+
+  // all node-types (by label)
+  s.allNodeTypes = allSelector + " +" + o.filter.nodeTypes;
+  s.allNodeTypesByLabel = s.allNodeTypes
+                          + " +[removeprefix[" + p.nodeTypes + "/]]";
+
+  // all views (by label)
+  s.allViews = allSelector + " +" + o.filter.views;
+  s.allViewsByLabel = s.allViews + "+[removeprefix[" + p.views + "/]]";
+
+  // all non-draft non-system tiddlers
+  s.allPotentialNodes = "[all[tiddlers]!is[system]!has[draft.of]]";
+
+  // all names of fields that contain multiple references edges
+  s.allListEdgeStores = allSelector
+                        + " +" + o.filter.listEdgeTypes
+                        + " +[removeprefix[" + p.listEdgeTypes + "]]";
+                                   
+  // all names of fields that store edges
+  s.allFieldEdgeStores = allSelector
+                         + " +" + o.filter.fieldEdgeTypes
+                         + " +[removeprefix[" + p.fieldEdgeTypes + "]]";
+  
+};
 
 /**
  * This function will append the global options to the tree. In case
@@ -58,33 +180,8 @@ var attachOptions = function(parent) {
                     
   var opt = parent;
   
-  // persistent plugin environment
-  // **ATTENTION: NO TRAILING SLASHES IN PATHS EVER**
-  if(!opt.path) opt.path = utils.getDataMap();
-  
-  opt.path.pluginRoot =     "$:/plugins/felixhayashi/tiddlymap";
-  opt.path.edgeTypes =      "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes";
-  opt.path.nodeTypes =      "$:/plugins/felixhayashi/tiddlymap/graph/nodeTypes";
-  opt.path.listEdgeTypes =  "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-list:";
-  opt.path.fieldEdgeTypes = "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-field:";
-  opt.path.views =          "$:/plugins/felixhayashi/tiddlymap/graph/views";
-  opt.path.options =        "$:/plugins/felixhayashi/tiddlymap/config";
-  opt.path.dialogs =        "$:/plugins/felixhayashi/tiddlymap/dialog";
-  opt.path.footers =        "$:/plugins/felixhayashi/tiddlymap/dialogFooter";
-  opt.path.tempRoot =       "$:/temp/tmap";
-  opt.path.localHolders =   "$:/temp/tmap/holders";
-  
-  // static references to important tiddlers
-  if(!opt.ref) opt.ref = utils.getDataMap();
-  
-  opt.ref.defaultViewHolder =      "$:/plugins/felixhayashi/tiddlymap/misc/defaultViewHolder";
-  opt.ref.graphBar =               "$:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar";
-  opt.ref.sysUserConf =            "$:/plugins/felixhayashi/tiddlymap/config/sys/user";
-  opt.ref.visUserConf =            "$:/plugins/felixhayashi/tiddlymap/config/vis/user";
-  opt.ref.welcomeFlag =            "$:/plugins/felixhayashi/tiddlymap/flag/welcome";
-  opt.ref.focusButton =            "$:/plugins/felixhayashi/tiddlymap/misc/focusButton";
-  opt.ref.sysMeta =                "$:/plugins/felixhayashi/tiddlymap/misc/meta";
-  opt.ref.sidebarBreakpoint =      "$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint";
+  // first thing to attach
+  attachStaticConfig(opt);
   
   // default configurations mixed with user config
   if(!opt.config) opt.config = utils.getDataMap();
@@ -94,10 +191,11 @@ var attachOptions = function(parent) {
 
   // attention! it is a tw-data-tiddler!
   opt.config.sys = utils.merge(
-    {}, sysConfig,
+    opt.config.sys,
     utils.unflatten($tw.wiki.getTiddlerData(opt.ref.sysUserConf))
   );
   
+  // CAREFUL: Never merge directly into the default vis config object
   opt.config.vis = utils.merge(
     {}, visConfig, utils.parseFieldData(opt.ref.visUserConf)
   );
@@ -105,67 +203,7 @@ var attachOptions = function(parent) {
   // a shortcut for fields property
   if(!opt.field) opt.field = utils.getDataMap();
   $tw.utils.extend(opt.field, opt.config.sys.field);
-      
-  // some other options
-  if(!opt.misc) opt.misc = utils.getDataMap();
-  
-  // if no edge label is specified, this is used as label
-  opt.misc.unknownEdgeLabel = "tmap:undefined";
-  opt.misc.liveViewLabel = "Live View";
-  opt.misc.defaultViewLabel = "Default";
-
-  // some popular filters
-  if(!opt.filter) opt.filter = utils.getDataMap();
-  
-  opt.filter.nodeTypes = "[prefix[" + opt.path.nodeTypes + "]]";
-  opt.filter.edgeTypes = "[prefix[" + opt.path.edgeTypes + "]]";
-  opt.filter.listEdgeTypes = "[prefix[" + opt.path.listEdgeTypes + "]]";
-  opt.filter.fieldEdgeTypes = "[prefix[" + opt.path.fieldEdgeTypes + "]]";
-  opt.filter.views = "[" + opt.field.viewMarker + "[true]]";
-  opt.filter.defaultEdgeFilter = opt.filter.edgeTypes
-                                 + "-[suffix[tw-body:link]]"
-                                 + "-[suffix[tw-list:tags]]";
-                                 + "-[suffix[tw-list:list]]";
-  
-  // some popular selectors (usually used from within tiddlers via tmap)
-  if(!opt.selector) opt.selector = utils.getDataMap();
-  
-  var allSelector = "[all[tiddlers+shadows]!has[draft.of]]";
-
-  // all edge-types (by label)
-  opt.selector.allEdgeTypes = allSelector + " +" + opt.filter.edgeTypes;
-  opt.selector.allEdgeTypesByLabel = opt.selector.allEdgeTypes
-                                     + " +[removeprefix["
-                                     + opt.path.edgeTypes
-                                     + "/]]";
-
-  // all node-types (by label)
-  opt.selector.allNodeTypes = allSelector + " +" + opt.filter.nodeTypes;
-  opt.selector.allNodeTypesByLabel = opt.selector.allNodeTypes
-                                     + " +[removeprefix["
-                                     + opt.path.nodeTypes
-                                     + "/]]";
-
-  // all views (by label)
-  opt.selector.allViews = allSelector + " +" + opt.filter.views;
-  opt.selector.allViewsByLabel = opt.selector.allViews
-                                 + "+[removeprefix["
-                                 + opt.path.views
-                                 + "/]]";
-
-  // all non-draft non-system tiddlers
-  opt.selector.allPotentialNodes = "[all[tiddlers]!is[system]!has[draft.of]]";
-
-  // all names of fields that contain multiple references edges
-  opt.selector.allListEdgeStores = allSelector
-                                   + " +" + opt.filter.listEdgeTypes
-                                   + " +[removeprefix[" + opt.path.listEdgeTypes + "]]";
-                                   
-  // all names of fields that store edges
-  opt.selector.allFieldEdgeStores = allSelector
-                                    + " +" + opt.filter.fieldEdgeTypes
-                                    + " +[removeprefix[" + opt.path.fieldEdgeTypes + "]]";
-  
+        
 };
 
 /**
@@ -176,9 +214,15 @@ var attachIndeces = function(parent) {
   
   $tw.tmap.start("Attaching Indeces");
   
-  parent.indeces = parent.indeces || {};
-  var allTiddlers = $tw.wiki.allTitles();
+  if(!parent.indeces) {
+    parent.indeces = {};
+    
+    var r = $tw.tmap.opt.path.pluginRoot;
+    parent.indeces.tmapTiddlers = $tw.wiki.getPluginInfo(r).tiddlers;
+  }
   
+  var allTiddlers = $tw.wiki.allTitles();
+    
   // tiddler vs. ids
   updateTiddlerVsIdIndeces(parent.indeces, allTiddlers);
   
@@ -257,22 +301,36 @@ var updateNodeTypesIndeces = function(parent, allTiddlers) {
 
   parent = parent || $tw.tmap.indeces;
   
-  // Attention: doesn't include shadow tiddlers unless they are
-  // overridden.
   allTiddlers = allTiddlers || $tw.wiki.allTitles();
-
+  
   var typePath = $tw.tmap.opt.path.nodeTypes;
-      
   var glNTy = parent.glNTy = [];
-  for(var i = allTiddlers.length; i--;) {
-    if(utils.startsWith(allTiddlers[i], typePath)) {
-      glNTy.push(new NodeType(allTiddlers[i]));
+  
+  // Since allTitles doesn't include shadow tiddlers unless they are
+  // overridden, we need to add shadow tiddlers explicitly if they
+  // are not contained yet
+  
+  //~ var tmapTiddlers = parent.tmapTiddlers
+  //~ for(var i = tmapTiddlers.length; i--;) {
+    //~ var tRef = tmapTiddlers[i];
+    //~ if(utils.startsWith(tRef, typePath) && !allTiddlers[tRef]) {
+      //~ glNTy.push(new NodeType(tRef));
+    //~ }
+  //~ }
+  
+  $tw.wiki.eachTiddlerPlusShadows(function(tObj, tRef) {
+    if(utils.startsWith(tRef, typePath)) {
+      glNTy.push(new NodeType(tRef));
     }
-  }
+  });
   
   glNTy.sort(function(a, b) {
     return a.priority - b.priority;
   });
+
+};
+
+var updateAdjacencyList = function(tRefs) {
 
 };
 
@@ -323,7 +381,7 @@ var attachFunctions = function(parent) {
     };
     
     fn.stop = function(timerName) {
-      console.timeEnd("timer: " + timerName);
+      console.timeEnd("[timer] " + timerName);
     };
     
   } else {

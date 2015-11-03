@@ -124,7 +124,7 @@ html { // used to increase css importance
         word-wrap: initial;
       }
       
-      table {
+      table {        
         width: 100%;
         border: none;
         margin-bottom: 0px;
@@ -243,207 +243,202 @@ html { // used to increase css importance
 /**** Modal related ************************************************/
 
 .tc-modal-wrapper {
-  z-index: 1010; // fix this in core?
+  z-index: 1010;
+  
+  p:first-child {
+    margin-top: 0px;
+  }
+  p:last-child {
+    margin-bottom: 0px;
+  }
   
   .tc-modal-header {
-        
     svg {
       vertical-align: sub;
     }
-    
     h3 {
       line-height: 10px;
     }
-    
   }
   
-  .tc-modal-body { // add this to tw
+  .tc-modal-body {
     min-height: 250px; // tw doesn't have a minheight
     max-height: 70vh; // tw uses 60vh
+    padding-top: 0px; // tw uses 15px
+    padding-bottom: 0px; // tw uses 15px
     overflow: auto;
-
-    > div {
-      >p:first-child {
-        margin-top: 0px;
-      }
-      >p:last-child {
-        margin-bottom: 0px;
-      }
-    }
-                      
-    .tc-image-button {
-      font-size: 14px;
-    }
-    
-    .tmap-modal-editor {
-    
-      .tc-tiddler-frame {
-        padding: 0px;
-        width: auto;
-        margin: 0px;
-        border: none;
-        
-        .tc-tiddler-title {
-          display: none;
-        }
-      }
-      
-    }
-    
-    #tmap-element-type-manager {
-    
-      .tc-tab-buttons {
-        padding-top: 0px;
-      }
-            
-      >div:first-child {
-        height: 100%;
-        float: left;
-        width: 20%;
-        position: fixed;
-        
-        .searchbar {
-          input {
-            width: 100%;
-          }
-        }
-
-        ul {
-          height: calc(100% - 135px);
-          overflow: auto;
-          margin: 5px 0 0 0;
-          padding-left: 0px;
-          list-style: none;
-          background: linear-gradient(45deg, rgba(245,245,245,1) 0%,rgba(255,255,255,1) 50%,rgba(245,245,245,1) 100%);
-          
-          li {
-            white-space: nowrap;
-
-            .tmap-ranking {
-              width: 30px;
-              display: inline-block;
-            }
-          }
-        }
-
-      }
-      >div:last-child {
-        height: 100%;
-        width: calc(80% - 20px);
-        margin-left: 22%;
-        
-        .tc-reveal {
-
-        }
-      }
-        
-    }
-    
-    fieldset {
-    
-      legend {
-        font-weight: bold;
-      }
-    
-    }
-      
-    table {
-      margin: 6px 0;
-      clear: both;
-      border: none;
-      width: 100%;
-      
-      td, th {
-        border: 1px solid lightgray;
-      }
-      
-      &.tmap-key-value-table {
-        th {
-          width: 30%;
-          background-color: #F0F0F0;
-        }
-      }
-            
-      &.tmap-config-table {
-
-        tr {
-        
-          &:nth-child(odd) {
-            background-color: #F0F0F0;
-          }
-          &:nth-child(even) {
-            background-color: #FFFFFF;
-          }
-          &:hover {
-            background-color: #FFFFF3;
-          }
-        
-          td {
-            border: none;
-            vertical-align: top;
-            padding: 5px;
-            
-            &:first-child {
-              width: 15%;
-            }
-            
-            &:last-child {
-              width: 40%;
-            }
-            
-            input:not([type=radio]), textarea, select {
-              width: 100%;
-              /* prevents bad looking select boxes and wrapping in textareas */
-              word-wrap: normal;
-            }
-            
-            .tmap-no-stretch {
-              input, textarea, select {
-                width: auto;
-              }
-            }
-            
-            div.tmap-button-wrapper {
-              text-align: center;
-            }
-
-          }
-
-          .tmap-note {
-            margin-top: 0.5em;
-          }
-          
-          .tmap-description {
-            font-style: italic;
-          }
-        } //config table
-      } // table
-              
-      
-      ul {
-        
-        padding-left: 30px;
-        
-        li {
-          list-style: none;
-        }
-        
-      }
-    }
   }
   
   .tc-modal-footer {
     padding: 8px;
-    
     .tmap-dialog-button {
       font-weight: bold;
     }
-    
     .tmap-hidden-close-button {
       display: none;
     }
   }
+}
+
+.tmap-modal-content {
+
+  .tc-tab-set {
+    .tc-tab-buttons {
+    
+    }
+
+    .tc-tab-content {
+      margin-top: 5px; // tw 14px
+      overflow: auto;
+      height: 50vh;
+    }
+  }
+                 
+  .tc-image-button {
+    font-size: 14px;
+  }
+      
+  fieldset {
+    margin: 0px;
+    legend {
+      font-weight: bold;
+    }
   
+  }
+    
+  ul {
+    
+    padding-left: 30px;
+    
+    li {
+      list-style: none;
+    }
+    
+  }
+}
+
+.tmap-modal-editor {
+
+  .tc-tiddler-frame {
+    padding: 0px;
+    width: auto;
+    margin: 0px;
+    border: none;
+    
+    .tc-tiddler-title {
+      display: none;
+    }
+  }
+  
+}
+
+.tc-modal-body table {
+  
+  margin: 6px 0;
+  border: none;
+  width: 100%;
+  
+  td, th {
+    border: 1px solid lightgray;
+  }
+  
+  &.tmap-key-value-table {
+    th {
+      width: 30%;
+      background-color: #F0F0F0;
+    }
+  }
+        
+  &.tmap-config-table {
+    @extend .tmap-table;
+    
+    tr {
+      
+      td {
+        border: none;
+        vertical-align: top;
+        padding: 5px;
+        
+        &:first-child {
+          width: 15%;
+        }
+        
+        &:last-child {
+          width: 40%;
+        }
+        
+        input:not([type=radio]), textarea, select {
+          width: 100%;
+          /* prevents bad looking select boxes and wrapping in textareas */
+          word-wrap: normal;
+        }
+        
+        .tmap-no-stretch {
+          input, textarea, select {
+            width: auto;
+          }
+        }
+        
+        div.tmap-button-wrapper {
+          text-align: center;
+        }
+        
+        .tmap-note {
+          margin-top: 0.5em;
+        }
+        
+        .tmap-description {
+          font-style: italic;
+        }
+
+      } // td
+
+    } // tr
+  } // config-table
+}
+
+#tmap-element-type-manager {
+
+  .tc-tab-buttons {
+    padding-top: 0px;
+  }
+        
+  >div:first-child {
+    height: 50vh;
+    float: left;
+    width: 20%;
+    background: linear-gradient(90deg, rgba(245,245,245,1) 0%, rgba(255,255,255,1) 50%);
+    
+    .searchbar {
+      padding: 1em 15px 0 0;
+      input {
+        width: 100%;
+      }
+    }
+
+    ul {
+      height: calc(100% - 65px); // minus searchbar height (roughly)
+      overflow: auto;
+      padding: 0;
+      list-style: none;
+      margin-top: 15px;
+      
+      li {
+        white-space: nowrap;
+
+        .tmap-ranking {
+          width: 30px;
+          display: inline-block;
+        }
+      }
+    }
+
+  }
+  >div:last-child {
+    height: 100%;
+    width: calc(80% - 15px); // minus distance to left div
+    float: right;
+  }
 }
 
 .tmap-manage-node-types {
@@ -622,11 +617,10 @@ html { // used to increase css importance
       background: #d6d9d8;
       
       .tmap-active-button {
-        background: #007180;
-        color: white;
+        color: #488DCD;
         
         svg {
-          fill: white;
+          fill: #488DCD;
         }
       }
       
@@ -850,6 +844,22 @@ html { // used to increase css importance
     clear: both;
     content: "";
     display: block;
+  }
+}
+
+/**** Other ********************************************************/
+
+table.tmap-table {
+  tr {
+    &:nth-child(odd) {
+      background-color: #F0F0F0;
+    }
+    &:nth-child(even) {
+      background-color: #FFFFFF;
+    }
+    &:hover {
+      background-color: #FFFFF3;
+    }
   }
 }
 

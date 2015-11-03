@@ -1,6 +1,0 @@
-title: $:/plugins/felixhayashi/tiddlymap/dialog/previewContent
-subtitle: {{$:/core/images/video}} Previewing "<<param.ref>>"
-
-\rules except wikilink
-
-<$transclude tiddler=<<param.ref>> field="text" mode="block" />

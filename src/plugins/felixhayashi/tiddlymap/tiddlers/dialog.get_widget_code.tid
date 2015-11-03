@@ -4,8 +4,6 @@ buttons: close
 
 \rules except wikilink
 
-<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
-
 The following wizard will assist you in creating the widget code you can use (copy'n'paste) to embed this view in a tiddler. Please visit the [[online demo|http://tiddlymap.org]] for some examples on how the attributes below affect the displayed graph.
 
 ''Widget-code''
@@ -88,5 +86,3 @@ If you are unsure about a parameter, just leave everything as is and simply copy
           descr:"Show or hide the graph's navigation buttons.">>
   </table>
 </fieldset>
-
-</$importvariables>

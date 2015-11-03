@@ -14,4 +14,3 @@ Therefore TiddlyMap
 
 * assigned a new id to tiddler "<<param.changedTiddler>>"
 * removed all edges from "<<param.changedTiddler>>"
-

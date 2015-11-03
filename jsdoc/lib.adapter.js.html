@@ -341,16 +341,16 @@ Adapter.prototype._processFieldEdge = function(tiddler, edge, type, action) {
  * present in the current system. The list may be restricted by
  * optional filters.
  *
- * @param {string} groupBy - Specifies by which property the
+ * @param {string} [groupBy="to"] - Specifies by which property the
  *     adjacency list is indexed. May be either "from" or "to".
  * @param {Hashmap} [opts] - An optional options object.
  * @param {Hashmap} [opts.typeWL] - A whitelist lookup-table
- *    that restricts which edges are travelled to reach a neighbour.
- * @param {Hashmap} [opts.edges] - An initial set of edges
- *     define the adjacency. If `opts.edges` is not provided,
+ *    that restricts which edge-types are included.
+ * @param {Hashmap} [opts.edges] - A set of edges on which basis
+ *     the adjacency list is build. If not provided,
  *     all edges in the system are considered.
  * @return {Object&lt;Id, Array&lt;Edge>>} For each key (a node id) an
- *     array of edges pointing from (or to; depends on `groupBy`)
+ *     array of edges pointing "from" (or "to"; depends on `groupBy`)
  *     is supplied as value.
  */
 Adapter.prototype.getAdjacencyList = function(groupBy, opts) {
@@ -364,7 +364,7 @@ Adapter.prototype.getAdjacencyList = function(groupBy, opts) {
     opts.edges = this.getEdgesForSet(tRefs, opts.toWL, opts.typeWL);
   }
   
-  var adjList = utils.groupByProperty(opts.edges, groupBy);
+  var adjList = utils.groupByProperty(opts.edges, groupBy || "to");
   
   $tw.tmap.stop("Creating adjacency list");
   
@@ -423,11 +423,29 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
   var tById = this.indeces.tById;
   var idByT = this.indeces.idByT;
   var maxSteps = (parseInt(opts.steps) > 0 ? opts.steps : 1);
+  var isTraceAllEdges = (!opts.direction || opts.direction === "both");
+  var isTraceIncomingEdges = (isTraceAllEdges || opts.direction === "to");
+  var isTraceOutgoingEdges = (isTraceAllEdges || opts.direction === "from");
   
-  // note that the adjacency list already acknowledges the whitelists
-  // passed through opts
-  var adjList = this.getAdjacencyList("to", opts);
+  // adjacency receives whitelists through opts
+  var adjList = (isTraceIncomingEdges
+                 ? this.getAdjacencyList("to", opts)
+                 : {});
   
+  var addAsNeighbour = function(edge, role) {
+    allEdgesLeadingToNeighbours[edge.id] = edge;
+    var tRef = tById[edge[role]];
+    if(!visited[tRef]) {
+      visited[tRef] = true;
+      var node = this.makeNode(tRef, protoNode);
+      if(node) { // saveguard against obsolete edges or other problems  
+        // record node
+        allNeighbours[node.id] = node;
+        neighboursOfThisStep.push(tRef);              
+      }
+    }
+  }.bind(this);
+
   // loop if still steps to be taken and we have a non-empty starting set
   for(var step = 0; step &lt; maxSteps &amp;&amp; matches.length; step++) {
         
@@ -449,27 +467,7 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
       // = edges originating from the starting set and point outwards
       var outgoing = this.getEdges(matches[i], toWL, typeWL);
       
-      for(var id in outgoing) {
-        var edge = outgoing[id];
-        
-        // record outgoing edge that leads to this node in any case
-        allEdgesLeadingToNeighbours[id] = edge;
-                
-        // record all nodes that are pointed to as neighbours
-        var toTRef = tById[edge.to];
-        if(!visited[toTRef]) {
-          visited[toTRef] = true;
-          
-          var node = this.makeNode(toTRef, protoNode);
-          if(node) { // saveguard against obsolete edges or other problems
-            
-            // record node
-            allNeighbours[node.id] = node;
-            neighboursOfThisStep.push(toTRef);
-                        
-          }
-        }
-      }
+      for(var id in outgoing) addAsNeighbour(outgoing[id], "to");
       
       // get all incoming edges
       // = edges originating from outside pointing to the starting set
@@ -477,26 +475,7 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
       if(!incoming) continue;
       
       for(var j = incoming.length; j--;) {
-        var edge = incoming[j];
-        
-        // record incoming edge that leads to this node
-        allEdgesLeadingToNeighbours[edge.id] = edge;
-        
-        var fromTRef = tById[edge.from];
-        
-        if(!visited[fromTRef]) {
-          visited[fromTRef] = true;
-                                
-          var node = this.makeNode(fromTRef, protoNode);
-          if(node) { // saveguard against obsolete edges or other problems
-            
-            // record node
-            allNeighbours[node.id] = node;
-            neighboursOfThisStep.push(fromTRef);
-                        
-          }
-          
-        }
+        addAsNeighbour(incoming[j], "from");
       }
     }
     
@@ -998,29 +977,38 @@ Adapter.prototype.getInheritedNodeStyles = function(nodes, view) {
 
   var src = this.getTiddlersById(nodes);
   var protoByTRef = {};
-
   var glNTy = this.indeces.glNTy;
   
   for(var i = glNTy.length; i--;) {
-  
-    var data = glNTy[i];
-    var inheritors = data.getInheritors(src);
+    var type = glNTy[i];
+    
+    if(type.id === "tmap:neighbour") { // special case
+      var tById = $tw.tmap.indeces.tById;
+      var inheritors = [];
+      for(var id in nodes) {
+        if(nodes[id].group === "tmap:neighbour") {
+          inheritors.push(tById[id]);
+        }
+      }
+    } else {
+      var inheritors = type.getInheritors(src);
+    }
     
     for(var j = inheritors.length; j--;) {
       var tRef = inheritors[j];
       var proto = protoByTRef[tRef] = (protoByTRef[tRef] || {});
       proto.style = utils.merge(
         proto.style || {},
-        data.style
+        type.style
       );
       
-      // ATTENTION: only override proto icons when data provides
+      // ATTENTION: only override proto icons when the type provides
       // an icon since otherwise we might erase previously
       // inherited icons.
-      if(data["fa-icon"]) {
-        proto["fa-icon"] = data["fa-icon"];
-      } else if(data["tw-icon"]) {
-        proto["tw-icon"] = data["tw-icon"];
+      if(type["fa-icon"]) {
+        proto["fa-icon"] = type["fa-icon"];
+      } else if(type["tw-icon"]) {
+        proto["tw-icon"] = type["tw-icon"];
       }
       
     }
@@ -1063,7 +1051,6 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
   view = new ViewAbstraction(view);
   
   var inheritedStyles = this.getInheritedNodeStyles(nodes, view);
-  var neighbourStyle = new NodeType("tmap:neighbour").style;
   var viewNodeData = view.getNodeData();
   var isStaticMode = !view.isEnabled("physics_mode");
   
@@ -1077,6 +1064,8 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
     var tObj = $tw.wiki.getTiddler(tRef);
     var fields = tObj.fields;
     var node = nodes[id];
+    var faIcon = null;
+    var twIcon = null;
         
     // == group styles ==
     
@@ -1086,15 +1075,8 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
       if(inheritedStyles[tRef].style) {
         utils.merge(node, inheritedStyles[tRef].style);
       }
-      this._addNodeIcon(node,
-                        inheritedStyles[tRef]["fa-icon"],
-                        inheritedStyles[tRef]["tw-icon"]);
-    }
-    
-    // maybe add neighbour style
-    if(node.group === "tmap:neighbour") {
-      utils.merge(node, neighbourStyle);
-      node.group = null;
+      faIcon = inheritedStyles[tRef]["fa-icon"];
+      twIcon = inheritedStyles[tRef]["tw-icon"];
     }
         
     // == global node styles ==
@@ -1107,13 +1089,9 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
       utils.merge(node, utils.parseJSON(fields["tmap.style"]));
     }
     
-    // icon;
-    // ATTENTION: this function needs to be called after color is assigned
-    // and global node style as been merged as it uses the color property
-    this._addNodeIcon(node,
-                      fields["tmap.fa-icon"],
-                      fields[nodeIconField]);
-    
+    faIcon = fields["tmap.fa-icon"] || faIcon;
+    twIcon = fields["icon"] || twIcon;
+        
     // == local node styles ==
     
     // local node style and positions
@@ -1126,10 +1104,12 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
           y: (node.y != null)
         };
       }
+      faIcon = viewNodeData[id]["fa-icon"] || faIcon;
+      twIcon = viewNodeData[id]["tw-icon"] || twIcon;
     }
   
     // == tweaks ==
-    
+        
     var isColorObject = (node.color !== null
                          &amp;&amp; typeof node.color === "object");
     // color/border-color may be undefined
@@ -1139,6 +1119,9 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
       background: color,
       border: (isColorObject ? node.color.border : undefined)
     };
+    
+    // ATTENTION: this function needs to be called after color is assigned
+    this._addNodeIcon(node, faIcon, twIcon);
   
     // determine font color if not defined via a group- or node-style;
     // in case of global and local default styles, the user is responsible
@@ -1203,8 +1186,9 @@ Adapter.prototype.deleteNode = function(node) {
   
   var filter = $tw.tmap.opt.selector.allViews;
   var viewRefs = utils.getMatches(filter);
-  for(var i = 0; i &lt; viewRefs.length; i++) {
+  for(var i = viewRefs.length; i--;) {
     var view = new ViewAbstraction(viewRefs[i]);
+    view.removeNodeFromFilter(id);
     if(view.getNodeData(id)) {
       view.saveNodeData(id, null);
     }
@@ -1491,7 +1475,7 @@ exports.Adapter = Adapter
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-	on 2015-10-25T15:05:55+01:00 using the <a
+	on 2015-11-03T12:40:59+01:00 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>

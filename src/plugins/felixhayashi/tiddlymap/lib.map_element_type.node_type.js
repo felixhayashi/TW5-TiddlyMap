@@ -81,25 +81,6 @@ NodeType.prototype.getInheritors = function(src) {
   return (s ? utils.getMatches(s, src || $tw.wiki.allTitles()) : []);
   
 };
-
-//~ /**
- //~ * Binds the node type to a set of views.
- //~ * 
- //~ * @param {Array<string|ViewAbstraction>} views - a set of views
- //~ *     to bind the array to.
- //~ */
-//~ NodeType.prototype.setViews = function(views) {
-  //~ 
-  //~ this.views = utils.getArrayValuesAsHashmapKeys(views);
-  //~ 
-//~ };
-//~ 
-//~ NodeType.prototype.getViews = function(src) {
-   
-  //~ var s = this.scope;
-  //~ return (s ? utils.getMatches(s, src || $tw.wiki.allTitles()) : []);
-  
-//~ };
       
 // !! EXPORT !!
 exports.NodeType = NodeType;

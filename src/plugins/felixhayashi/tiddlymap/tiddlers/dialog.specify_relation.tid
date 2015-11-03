@@ -5,11 +5,18 @@ subtitle: {{$:/plugins/felixhayashi/tiddlymap/icon}} Type specification (optiona
 
 \define filter() $(allEdgeTypes)$ +[search:title[$(term)$]]
 
-You are about to connect "<<fromLabel>>" with "<<toLabel>>". Please specify a type.
+You are about to connect "<<fromLabel>>" with "<<toLabel>>".
+Please specify a type.
 
 ''Type'': 
-<$edit-text focus="true" tiddler=<<output>> field="text" type="text" tag="input" default=""
-            class="tmap-trigger-field tmap-triggers-ok-button-on-enter" />
+<$edit-text
+    focus="true"
+    tiddler=<<output>>
+    field="text"
+    type="text"
+    tag="input"
+    default=""
+    class="tmap-trigger-field tmap-triggers-ok-button-on-enter" />
 
 <$set name="term" value={{!!text}}>
 <$set name="allEdgeTypes" value=<<tmap "option" "selector.allEdgeTypesByLabel">>>
@@ -29,4 +36,3 @@ You are about to connect "<<fromLabel>>" with "<<toLabel>>". Please specify a ty
 
 </$set>
 </$set>
-

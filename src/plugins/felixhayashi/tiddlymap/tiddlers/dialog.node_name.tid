@@ -2,16 +2,24 @@ title: $:/plugins/felixhayashi/tiddlymap/dialog/getNodeTitle
 subtitle: {{$:/core/images/tag-button}} Please specify a node title
 
 \rules except wikilink
-
+  
 ''Title'':
-<$edit-text field="text" type="text" tag="input" default="" focus="true" tiddler=<<output>>
-            class="tmap-trigger-field tmap-triggers-ok-button-on-enter" />
+<$edit-text field="text"
+    type="text"
+    tag="input"
+    default=""
+    focus="true"
+    tiddler=<<output>>
+    class="tmap-trigger-field tmap-triggers-ok-button-on-enter" />
             
 <sup>[1]</sup> 
 
 <ul class="tmap-small-list">
 <$set name="term" value={{!!text}}>
-<$list filter="[all[tiddlers]!is[system]] +[search:title<term>]" emptyMessage="//A tiddler with this title does not exist yet and will be created.//">
+<$list
+    filter="[all[tiddlers]!is[system]] +[search:title<term>]"
+    emptyMessage="//A tiddler with this title does not exist
+                  yet and will be created.//">
   <li>
     <$button class="tc-btn-invisible tmap-link">
       <$view field="title" />
@@ -25,4 +33,6 @@ subtitle: {{$:/core/images/tag-button}} Please specify a node title
 ---
 
 <sup>[1]</sup>
-<small>If you leave the title field blank, a name will be automatically generated for you. By choosing an existing title, you add the tiddler as node to the view.</small>
+<small>If you leave the title field blank, a name will be
+automatically generated for you. By choosing an existing title,
+you add the tiddler as node to the view.</small>

@@ -95,9 +95,12 @@ GlobalListener.prototype.handleDownloadGraph = function(event) {
 
 GlobalListener.prototype.handleConfigureSystem = function() {
 
+  var hasLiveTab = utils.getTiddler(this.opt.ref.liveTab)
+                        .hasTag();
   var args = {
     dialog: {
       preselects: {
+        "liveTab": "" + hasLiveTab,
         "vis-inherited": JSON.stringify(visDefConf),
         "config.vis": utils.getText(this.opt.ref.visUserConf),
         "config.sys": this.opt.config.sys
@@ -108,22 +111,30 @@ GlobalListener.prototype.handleConfigureSystem = function() {
   var name = "configureTiddlyMap";
   this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
     
-    if(isConfirmed && outTObj) {
+    if(!isConfirmed) return;
       
-      var config = utils.getPropertiesByPrefix(outTObj.fields,
-                                               "config.sys.",
-                                               true);
-                                               
-      // carefull: this is a data tiddler!
-      $tw.wiki.setTiddlerData(this.opt.ref.sysUserConf, config);
-      
-      // tw doesn't translate the json to an object so this is
-      // already a string
-      utils.setField(this.opt.ref.visUserConf,
-                     "text",
-                     outTObj.fields["config.vis"]);
-            
+    var config = utils.getPropertiesByPrefix(outTObj.fields,
+                                             "config.sys.",
+                                             true);
+                                             
+    // CAREFUL: this is a data tiddler!
+    $tw.wiki.setTiddlerData(this.opt.ref.sysUserConf, config);
+
+    // show or hide the live tab; to hide the live tab, we override
+    // the shadow tiddler; to show it, we remove the overlay again.
+    if(utils.isTrue(outTObj.fields.liveTab, false)) {
+      utils.setField(this.opt.ref.liveTab, "tags", "$:/tags/SideBar");
+    } else {
+      $tw.wiki.deleteTiddler(this.opt.ref.liveTab);
     }
+    
+    // tw doesn't translate the json to an object so this is
+    // already a string
+    utils.setField(this.opt.ref.visUserConf,
+                   "text",
+                   outTObj.fields["config.vis"]);
+            
+
 
   }.bind(this));
   

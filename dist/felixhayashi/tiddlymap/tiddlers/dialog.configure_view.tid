@@ -5,8 +5,6 @@ subtitle: {{$:/core/images/options-button}} View configuration -- <<view>>
 
 \define vis-refresh-trigger() $(temp)$/vis-refresh
 
-<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
-
 <div class="tmap-flash-message tmap-info">
    {{$:/core/images/info-button}}
    All configurations __only__ affect this view.
@@ -49,6 +47,11 @@ subtitle: {{$:/core/images/options-button}} View configuration -- <<view>>
                this view."
         note:"All namespaces are automatically stripped when the
               edge label is displayed in the graph">>
+    <<tmap-row type:"input-text"
+        title:"Background image"
+        field:"config.background_image" 
+        descr:"A tiddler reference to an image tiddler to be used
+               as background image in the view.">>
   </table>
 </fieldset>
 
@@ -106,5 +109,3 @@ subtitle: {{$:/core/images/options-button}} View configuration -- <<view>>
       extension="config.vis"
       refresh-trigger=<<vis-refresh-trigger>> />
 </fieldset>
-
-</$importvariables>

@@ -1,0 +1,15 @@
+title: $:/plugins/felixhayashi/tiddlymap/hook/liveTab
+caption: Live
+
+<$set name="view"
+    filter="[{$:/temp/tmap/currentTiddler}get[tmap.open-view]]"
+    emptyValue=<<tmap "option" "config.sys.liveTab.fallbackView">>>
+<div>
+  <$tiddlymap
+      view=<<view>>
+      click-to-use="false"
+      refresh-triggers="$:/temp/tmap/currentTiddler"
+      object-id="live_tab">
+  </$tiddlymap>
+</div>
+</$set>

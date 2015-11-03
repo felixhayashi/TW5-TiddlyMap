@@ -21,6 +21,7 @@ caption: General
       field:"scope" 
       descr:"A filter expression that defines, which nodes inherit
              this node-type and its style.">>
+  </$list>
   <$macrocall type="input-select"
       $name="tmap-row" 
       title="Priority"
@@ -28,7 +29,6 @@ caption: General
       selectFilter=<<tmap "scale" "100">>
       descr="When a type has a a higher priority than another type,
              its style will override the other style" />
-  </$list>
 \end
 
 <table class="tmap-config-table">

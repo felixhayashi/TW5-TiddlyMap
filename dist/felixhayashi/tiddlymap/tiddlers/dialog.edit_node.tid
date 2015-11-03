@@ -4,6 +4,7 @@ subtitle: {{$:/core/images/edit-button}} Editing style of node "<<tiddler>>"
 \rules except wikilink
 
 \define tab(name) $(template)$/$name$
+\define vis-refresh-trigger() $(temp)$/vis-refresh
 
 \define maybeShowTidColorWarning()
   <$list filter="[<tidColor>regexp[.+]]">
@@ -15,17 +16,44 @@ subtitle: {{$:/core/images/edit-button}} Editing style of node "<<tiddler>>"
   </$list>
   <$list filter="[<tidIcon>regexp[.+]]">
   <div class="tmap-flash-message tmap-warning">
-    {{$:/core/images/info-button}} The tiddler is displayed as icon in the graph. Do __not__ change the shape property unless
+    {{$:/core/images/info-button}} The tiddler is displayed as
+    icon in the graph. Do __not__ change the shape property unless
     you want the icon to be ignored.
   </div>
   </$list>
 \end
 
-<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]] [[$:/core/macros/tabs]]">
+\define iconSettings(twIconField, faIconField)
+  <fieldset>
+    <legend>Icon Settings</legend>
+    <table class="tmap-config-table">
+      <<tmap-row type:"input-text"
+          title:"TW-icon"
+          field:"$twIconField$"
+          descr:"A tiddlywiki image reference.
+                 For example '$:/core/icon' for Movotun Jack.">>
+      <<tmap-row type:"input-text"
+          title:"FA-icon"
+          field:"$faIconField$"
+          descr:"A Font Awesome icon code.
+                 For example 'f206' for the bicycle symbol.">>
+    </table>
+  </fieldset>
+\end
 
-A node's individual style may be defined on two levels. Click on the tabs for further details. All options are documented at [[vis.js.org|http://visjs.org/docs/network/nodes]].
-
-<<templateTRef>>
+\define sharedSettings(twIconField, faIconField, labelField)
+  <fieldset>
+    <legend>General Settings</legend>
+    <table class="tmap-config-table">
+      <<tmap-row type:"input-text"
+          title:"Label"
+          field:"$labelField$"
+          descr:"Use this value as node label.">>
+    </table>
+  </fieldset>
+  <!-- display icon fieldset -->
+  <<iconSettings "$twIconField$" "$faIconField$">>  
+\end
 
 <$macrocall
   $name="tabs"
@@ -33,5 +61,3 @@ A node's individual style may be defined on two levels. Click on the tabs for fu
   state="$:/state/tabs/MapElementTypeManager"
   tabsList="[all[shadows]prefix<template>] -[<template>]"
 />
-
-</$importvariables>

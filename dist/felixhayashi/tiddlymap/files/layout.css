@@ -158,6 +158,10 @@ html {
 /**** Modal related ************************************************/
 .tc-modal-wrapper {
   z-index: 1010; }
+  .tc-modal-wrapper p:first-child {
+    margin-top: 0px; }
+  .tc-modal-wrapper p:last-child {
+    margin-bottom: 0px; }
   .tc-modal-wrapper .tc-modal-header svg {
     vertical-align: sub; }
   .tc-modal-wrapper .tc-modal-header h3 {
@@ -165,93 +169,95 @@ html {
   .tc-modal-wrapper .tc-modal-body {
     min-height: 250px;
     max-height: 70vh;
+    padding-top: 0px;
+    padding-bottom: 0px;
     overflow: auto; }
-    .tc-modal-wrapper .tc-modal-body > div > p:first-child {
-      margin-top: 0px; }
-    .tc-modal-wrapper .tc-modal-body > div > p:last-child {
-      margin-bottom: 0px; }
-    .tc-modal-wrapper .tc-modal-body .tc-image-button {
-      font-size: 14px; }
-    .tc-modal-wrapper .tc-modal-body .tmap-modal-editor .tc-tiddler-frame {
-      padding: 0px;
-      width: auto;
-      margin: 0px;
-      border: none; }
-      .tc-modal-wrapper .tc-modal-body .tmap-modal-editor .tc-tiddler-frame .tc-tiddler-title {
-        display: none; }
-    .tc-modal-wrapper .tc-modal-body #tmap-element-type-manager .tc-tab-buttons {
-      padding-top: 0px; }
-    .tc-modal-wrapper .tc-modal-body #tmap-element-type-manager > div:first-child {
-      height: 100%;
-      float: left;
-      width: 20%;
-      position: fixed; }
-      .tc-modal-wrapper .tc-modal-body #tmap-element-type-manager > div:first-child .searchbar input {
-        width: 100%; }
-      .tc-modal-wrapper .tc-modal-body #tmap-element-type-manager > div:first-child ul {
-        height: calc(100% - 135px);
-        overflow: auto;
-        margin: 5px 0 0 0;
-        padding-left: 0px;
-        list-style: none;
-        background: linear-gradient(45deg, #f5f5f5 0%, #ffffff 50%, #f5f5f5 100%); }
-        .tc-modal-wrapper .tc-modal-body #tmap-element-type-manager > div:first-child ul li {
-          white-space: nowrap; }
-          .tc-modal-wrapper .tc-modal-body #tmap-element-type-manager > div:first-child ul li .tmap-ranking {
-            width: 30px;
-            display: inline-block; }
-    .tc-modal-wrapper .tc-modal-body #tmap-element-type-manager > div:last-child {
-      height: 100%;
-      width: calc(80% - 20px);
-      margin-left: 22%; }
-    .tc-modal-wrapper .tc-modal-body fieldset legend {
-      font-weight: bold; }
-    .tc-modal-wrapper .tc-modal-body table {
-      margin: 6px 0;
-      clear: both;
-      border: none;
-      width: 100%; }
-      .tc-modal-wrapper .tc-modal-body table td, .tc-modal-wrapper .tc-modal-body table th {
-        border: 1px solid lightgray; }
-      .tc-modal-wrapper .tc-modal-body table.tmap-key-value-table th {
-        width: 30%;
-        background-color: #F0F0F0; }
-      .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr:nth-child(odd) {
-        background-color: #F0F0F0; }
-      .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr:nth-child(even) {
-        background-color: #FFFFFF; }
-      .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr:hover {
-        background-color: #FFFFF3; }
-      .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td {
-        border: none;
-        vertical-align: top;
-        padding: 5px; }
-        .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td:first-child {
-          width: 15%; }
-        .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td:last-child {
-          width: 40%; }
-        .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td input:not([type=radio]), .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td textarea, .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td select {
-          width: 100%;
-          /* prevents bad looking select boxes and wrapping in textareas */
-          word-wrap: normal; }
-        .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td .tmap-no-stretch input, .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td .tmap-no-stretch textarea, .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td .tmap-no-stretch select {
-          width: auto; }
-        .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr td div.tmap-button-wrapper {
-          text-align: center; }
-      .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr .tmap-note {
-        margin-top: 0.5em; }
-      .tc-modal-wrapper .tc-modal-body table.tmap-config-table tr .tmap-description {
-        font-style: italic; }
-      .tc-modal-wrapper .tc-modal-body table ul {
-        padding-left: 30px; }
-        .tc-modal-wrapper .tc-modal-body table ul li {
-          list-style: none; }
   .tc-modal-wrapper .tc-modal-footer {
     padding: 8px; }
     .tc-modal-wrapper .tc-modal-footer .tmap-dialog-button {
       font-weight: bold; }
     .tc-modal-wrapper .tc-modal-footer .tmap-hidden-close-button {
       display: none; }
+
+.tmap-modal-content .tc-tab-set .tc-tab-content {
+  margin-top: 5px;
+  overflow: auto;
+  height: 50vh; }
+.tmap-modal-content .tc-image-button {
+  font-size: 14px; }
+.tmap-modal-content fieldset {
+  margin: 0px; }
+  .tmap-modal-content fieldset legend {
+    font-weight: bold; }
+.tmap-modal-content ul {
+  padding-left: 30px; }
+  .tmap-modal-content ul li {
+    list-style: none; }
+
+.tmap-modal-editor .tc-tiddler-frame {
+  padding: 0px;
+  width: auto;
+  margin: 0px;
+  border: none; }
+  .tmap-modal-editor .tc-tiddler-frame .tc-tiddler-title {
+    display: none; }
+
+.tc-modal-body table {
+  margin: 6px 0;
+  border: none;
+  width: 100%; }
+  .tc-modal-body table td, .tc-modal-body table th {
+    border: 1px solid lightgray; }
+  .tc-modal-body table.tmap-key-value-table th {
+    width: 30%;
+    background-color: #F0F0F0; }
+  .tc-modal-body table.tmap-config-table tr td {
+    border: none;
+    vertical-align: top;
+    padding: 5px; }
+    .tc-modal-body table.tmap-config-table tr td:first-child {
+      width: 15%; }
+    .tc-modal-body table.tmap-config-table tr td:last-child {
+      width: 40%; }
+    .tc-modal-body table.tmap-config-table tr td input:not([type=radio]), .tc-modal-body table.tmap-config-table tr td textarea, .tc-modal-body table.tmap-config-table tr td select {
+      width: 100%;
+      /* prevents bad looking select boxes and wrapping in textareas */
+      word-wrap: normal; }
+    .tc-modal-body table.tmap-config-table tr td .tmap-no-stretch input, .tc-modal-body table.tmap-config-table tr td .tmap-no-stretch textarea, .tc-modal-body table.tmap-config-table tr td .tmap-no-stretch select {
+      width: auto; }
+    .tc-modal-body table.tmap-config-table tr td div.tmap-button-wrapper {
+      text-align: center; }
+    .tc-modal-body table.tmap-config-table tr td .tmap-note {
+      margin-top: 0.5em; }
+    .tc-modal-body table.tmap-config-table tr td .tmap-description {
+      font-style: italic; }
+
+#tmap-element-type-manager .tc-tab-buttons {
+  padding-top: 0px; }
+#tmap-element-type-manager > div:first-child {
+  height: 50vh;
+  float: left;
+  width: 20%;
+  background: linear-gradient(90deg, #f5f5f5 0%, #ffffff 50%); }
+  #tmap-element-type-manager > div:first-child .searchbar {
+    padding: 1em 15px 0 0; }
+    #tmap-element-type-manager > div:first-child .searchbar input {
+      width: 100%; }
+  #tmap-element-type-manager > div:first-child ul {
+    height: calc(100% - 65px);
+    overflow: auto;
+    padding: 0;
+    list-style: none;
+    margin-top: 15px; }
+    #tmap-element-type-manager > div:first-child ul li {
+      white-space: nowrap; }
+      #tmap-element-type-manager > div:first-child ul li .tmap-ranking {
+        width: 30px;
+        display: inline-block; }
+#tmap-element-type-manager > div:last-child {
+  height: 100%;
+  width: calc(80% - 15px);
+  float: right; }
 
 .tmap-manage-node-types .tmap-edge-type-specific {
   display: none !important; }
@@ -364,10 +370,9 @@ html {
     .tmap-widget.tmap-advanced-editor .tmap-topbar {
       background: #d6d9d8; }
       .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-active-button {
-        background: #007180;
-        color: white; }
+        color: #488DCD; }
         .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-active-button svg {
-          fill: white; }
+          fill: #488DCD; }
       .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-neigh-scope-button {
         font-size: 1.5em;
         vertical-align: bottom; }
@@ -509,6 +514,14 @@ html {
     clear: both;
     content: "";
     display: block; }
+
+/**** Other ********************************************************/
+table.tmap-table tr:nth-child(odd), .tc-modal-body table.tmap-config-table tr:nth-child(odd) {
+  background-color: #F0F0F0; }
+table.tmap-table tr:nth-child(even), .tc-modal-body table.tmap-config-table tr:nth-child(even) {
+  background-color: #FFFFFF; }
+table.tmap-table tr:hover, .tc-modal-body table.tmap-config-table tr:hover {
+  background-color: #FFFFF3; }
 
 /**** Fullscreen ***************************************************/
 html:fullscreen body {

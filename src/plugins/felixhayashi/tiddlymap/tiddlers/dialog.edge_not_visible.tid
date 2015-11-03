@@ -4,8 +4,12 @@ buttons: ok_suppress
 
 \rules except wikilink
 
-TiddlyMap just noticed that you created an edge of type "<<type>>" that will not be visible in this view.
+TiddlyMap just noticed that you created an edge of type "<<type>>"
+that will not be visible in this view.
 
-The reason is that the view's edge filter prevents edges of type "<<type>>" from being displayed. To change this, open the view's menu and change the edge-filter configuration.
+The reason is that the view's edge filter prevents edges of type
+"<<type>>" from being displayed. To change this, open the view's
+menu and change the edge-filter configuration.
 
-For further information, please see: [[Node and edge-type filters|http://tiddlymap.org#Node%20and%20edge-type%20filters]].
+For further information, please see:
+[[Node and edge-type filters|http://tiddlymap.org#Node%20and%20edge-type%20filters]].

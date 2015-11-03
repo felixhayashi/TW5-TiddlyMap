@@ -12,8 +12,6 @@ subtitle: {{$:/core/images/options-button}} Save a snapshot image of view "<<vie
 </div>
 \end
 
-<$importvariables filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]">
-
 <table class="tmap-config-table">
 <!--
   <<tmap-row type:"input-text"
@@ -44,5 +42,3 @@ subtitle: {{$:/core/images/options-button}} Save a snapshot image of view "<<vie
                shown. In this case the title input is ignored.">>
   </table>
 </fieldset>
-
-</$importvariables>

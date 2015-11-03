@@ -615,14 +615,24 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
     return;
   }
   
+  var changedAttributes = this.computeAttributes();
+  var hasViewAttributeChanged = (changedAttributes["view"]
+                                 &amp;&amp; (changedAttributes["view"]
+                                     !== this.view.getLabel()));
+  if(hasViewAttributeChanged) {
+    this.setView(changedAttributes["view"]);
+  }
+      
   var rebuildEditorBar = false;
   var rebuildGraph = false;
   var rebuildGraphOptions = {};
   
   // check for callback changes
   this.callbackManager.handleChanges(changedTiddlers);
-      
-  if(this.isViewSwitched(changedTiddlers)) { // we are in a new view
+                             
+  if(this.isViewSwitched(changedTiddlers)
+     || hasViewAttributeChanged) {
+    // we are in a new view
     
     rebuildEditorBar = true;
     rebuildGraph = true;
@@ -633,6 +643,7 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
         
     this.logger("warn", "View switched");
     this.view = this.getView(true);
+    this.reloadBackgroundImage();
     this.reloadRefreshTriggers();
     this.visNetworkDomNode.focus();
     
@@ -642,6 +653,8 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
     if(viewModifications.length &amp;&amp; !this.ignoreNextViewModification) {
 
       this.logger("warn", "View modified", viewModifications);
+      
+      this.reloadBackgroundImage();
       
       rebuildEditorBar = true;
       rebuildGraph = true;
@@ -693,6 +706,9 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
   
   // reset this again
   this.ignoreNextViewModification = false;
+  
+  // TiddlyMap never needs a full refresh so we return false
+  return false;
 
 };
 
@@ -922,12 +938,10 @@ MapWidget.prototype.isViewBound = function() {
   
 /**
  * A view is switched, if the holder was changed.
- * Bound views cannot switch.
  */
 MapWidget.prototype.isViewSwitched = function(changedTiddlers) {
   
-  return (changedTiddlers[this.getViewHolderRef()]
-          &amp;&amp; !this.isViewBound());
+  return changedTiddlers[this.getViewHolderRef()];
   
 };
 
@@ -1067,6 +1081,8 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
       "halfscreen-button": function() { this.handleToggleFullscreen(true); }
     });
   }
+  
+  this.reloadBackgroundImage();
 
   this.rebuildGraph({ resetFocus: { delay: 0, duration: 0 }});
 
@@ -1501,13 +1517,27 @@ MapWidget.prototype.handleDeleteView = function() {
  */
 MapWidget.prototype.handleTriggeredRefresh = function(trigger) {
       
-    this.logger("log", trigger, "Triggered a refresh");
+  this.logger("log", trigger, "Triggered a refresh");
   
-    this.rebuildGraph({
-      resetData: false,
-      resetOptions: false,
-      resetFocus: { delay: 1000, duration: 1000 }
-    });
+  // special case for the live tab
+  if(this.objectId === "live_tab") {
+    var curTiddler = utils.getTiddler(utils.getText(trigger));
+    if(curTiddler) {
+      var view = (curTiddler.fields["tmap.open-view"]
+                  || this.opt.config.sys.liveTab.fallbackView);
+      if(view &amp;&amp; view !== this.view.getLabel()) {
+        this.setView(view);
+        return;
+      }
+    }
+  }
+
+  this.rebuildGraph({
+    resetFocus: {
+      delay: 1000,
+      duration: 1000
+    }
+  });
   
 };
 
@@ -1894,7 +1924,9 @@ MapWidget.prototype.handleEditNode = function(node) {
   var tObj = utils.getTiddler(tRef);
   var globalDefaults = JSON.stringify(this.opt.config.vis);
   var localDefaults = this.view.getConfig("vis");
-  var nodeStylesByTRef = this.adapter.getInheritedNodeStyles([ node.id ]);
+  var nodes = {};
+  nodes[node.id] = node;
+  var nodeStylesByTRef = this.adapter.getInheritedNodeStyles(nodes);
   var groupStyles = JSON.stringify(nodeStylesByTRef[tRef]);
   var globalNodeStyle = JSON.stringify(utils.merge(
                           {},
@@ -1903,41 +1935,74 @@ MapWidget.prototype.handleEditNode = function(node) {
   
   var viewLabel = this.view.getLabel();
   var rawNode = { id: node.id };
-  // we do not used the cashed version since we need a new object
+  
+  // we do not used the cashed version since we need a new object!
   var nodeData = this.view.getNodeData(node.id, true) || {};
   // we need to delete the positions so they are not reset when a user
   // resets the style…
   delete nodeData.x;
   delete nodeData.y;
-  
-  var param = {
+    
+  var args = {
     "view": viewLabel,
     "tiddler": tObj.fields.title,
     "tidColor": tObj.fields["color"],
     "tidIcon": tObj.fields[this.opt.field.nodeIcon]
                || tObj.fields["tmap.fa-icon"],
+    "tidLabelField": "global." + this.opt.field.nodeLabel,
+    "tidIconField": "global." + this.opt.field.nodeIcon,
     dialog: {
       preselects: {
         "inherited-global-default-style": globalDefaults,
         "inherited-local-default-style": localDefaults,
         "inherited-group-styles": groupStyles,
-        "global-node-style": globalNodeStyle,
+        "global.tmap.style": globalNodeStyle,
         "local-node-style": JSON.stringify(nodeData)
       }
     }
   };
+  
+  // function to iterate over attributes that shall be available
+  // in the dialog.
+  var addToPreselects = function(scope, store, keys) {
+    for(var i = keys.length; i--;) {
+      args.dialog.preselects[scope + "." + keys[i]] = store[keys[i]] || "";
+    }
+  };
+  // local values are retrieved from the view's node data store
+  addToPreselects("local", nodeData, [
+    "label", "tw-icon", "fa-icon", "open-view"
+  ]);
+  // global values are taken from the tiddler's field object
+  addToPreselects("global", tObj.fields, [
+    this.opt.field.nodeLabel,
+    this.opt.field.nodeIcon,
+    "tmap.fa-icon",
+    "tmap.open-view"
+  ]);
 
-  this.dialogManager.open("editNode", param, function(isConfirmed, outTObj) {
+  this.dialogManager.open("editNode", args, function(isConfirmed, outTObj) {
     
     if(!isConfirmed) return;
     
-    // save or remove global individual style
-    var globalStyle = outTObj.fields["global-node-style"];
-    utils.setField(tRef, "tmap.style", globalStyle || null);
+    var fields = outTObj.fields;
     
-    // save local individual style
-    var style = utils.parseJSON(outTObj.fields["local-node-style"]);
-    this.view.saveNodeStyle(node.id, style);
+    // save or remove global individual style
+    var global = utils.getPropertiesByPrefix(fields, "global.", true);
+    for(var p in global) {
+      utils.setField(tRef, p, global[p] || undefined);
+    }
+    
+    // save local individual data (style + config)
+    var local = utils.getPropertiesByPrefix(fields, "local.", true);
+    // CAREFUL: Never change "local-node-style" to "local.node-style"
+    // (with a dot) because it will get included in the loop!
+    var data = utils.parseJSON(fields["local-node-style"], {});
+    for(var p in local) {
+      data[p] = local[p] || undefined;
+    } 
+    
+    this.view.saveNodeStyle(node.id, data);
     
     this.preventFitAfterRebuild = true;
      
@@ -1984,8 +2049,15 @@ MapWidget.prototype.handleVisDoubleClickEvent = function(properties) {
 
 MapWidget.prototype.handleOpenMapElementEvent = function(properties) {
   
-  if(properties.nodes.length) { // clicked on a node    
-    this.openTiddlerWithId(properties.nodes[0]);
+  if(properties.nodes.length) { // clicked on a node
+    
+    var node = this.graphData.nodesById[properties.nodes[0]];
+    if(node["open-view"]) {
+//      this.notify("Switching view");
+      this.setView(node["open-view"]);
+    } else {
+      this.openTiddlerWithId(properties.nodes[0]);
+    }
     
   } else if(properties.edges.length) { // clicked on an edge  
     this.logger("debug", "Clicked on an Edge");
@@ -2137,7 +2209,22 @@ MapWidget.prototype.handleVisDragEnd = function(properties) {
 };
 
 MapWidget.prototype.handleVisBeforeDrawing = function(context2d) {
-  //utils.drawRaster(context2d, this.network.getScale(), this.network.getViewPosition());
+  
+  if(this.backgroundImage) {
+    //utils.drawRaster(context2d, this.network.getScale(), this.network.getViewPosition());
+    context2d.drawImage(this.backgroundImage, 0, 0);
+  }
+  
+    //~ this.bgImage = null;
+  //~ var imgTObj = utils.getTiddler(this.view.getConfig("background_image"));
+  //~ if(imgTObj) {
+    //~ var image = new Image();
+    //~ var center = this.network.getCenterCoordinates();
+    //~ image.src = $tw.utils.makeDataUri(imgTObj.fields.text,
+                                      //~ imgTObj.fields.type);
+    //~ this.bgImage = { data: image, x: center.x, y: center.y };
+  //~ }
+
 };
 
 MapWidget.prototype.handleVisLoading = function(params) {
@@ -2282,10 +2369,7 @@ MapWidget.prototype.getViewHolderRef = function() {
       this.logger("log", "Created an independent temporary view holder \"" + holderRef + "\"");
       
       // we do not use setView here because it would store and reload the view unnecessarily...
-      this.wiki.addTiddler(new $tw.Tiddler({ 
-        title: holderRef,
-        text: viewRef
-      }));
+      utils.setText(holderRef, viewRef);
       
       this.logger("log", "View \"" + viewRef + "\" inserted into independend holder");
       
@@ -2330,21 +2414,22 @@ MapWidget.prototype.setView = function(view, viewHolderRef) {
     
   }
   
-  // register the new value; no need to update the adapter as this is done during refresh
+  // register the new value
   this.view = this.getView(true);
+  
 };
 
 /**
  * This function will return a view abstraction that is based on the
  * view specified in the view holder of this graph.
  * 
- * @param {boolean} isRebuild - Retrieve the view reference again
+ * @param {boolean} noCache - Retrieve the view reference again
  *     from the holder and recreate the view abstraction object.
  * @return {ViewAbstraction} the view
  */
-MapWidget.prototype.getView = function(isRebuild) {
+MapWidget.prototype.getView = function(noCache) {
   
-  if(!isRebuild &amp;&amp; this.view) {
+  if(!noCache &amp;&amp; this.view) {
     return this.view;
   }
   
@@ -2355,11 +2440,23 @@ MapWidget.prototype.getView = function(isRebuild) {
     
   this.logger("info", "Retrieved view \"" + view.getLabel() + "\" from holder \"" + viewHolderRef + "\"");
   
-  if(view.exists()) {
-    return view;
-  } else {
-    this.logger("log", "Warning: View \"" + view.getLabel() + "\" doesn't exist. Default is used instead.");
-    return new ViewAbstraction("Default");
+  if(!view.exists()) {
+    this.logger("debug", "Warning: View \"" + view.getLabel() + "\" doesn't exist. Default is used instead.");
+    view = new ViewAbstraction("Default");
+  }
+    
+  return view;
+  
+};
+
+MapWidget.prototype.reloadBackgroundImage = function(noCache) {
+
+  this.backgroundImage = null;
+  var imgTObj = utils.getTiddler(this.view.getConfig("background_image"));
+  if(imgTObj) {
+    this.backgroundImage = new Image();
+    var uri = $tw.utils.makeDataUri(imgTObj.fields.text, imgTObj.fields.type);
+    this.backgroundImage.src = uri;
   }
   
 };
@@ -2564,7 +2661,7 @@ exports.tiddlymap = MapWidget;
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-	on 2015-10-25T15:05:55+01:00 using the <a
+	on 2015-11-03T12:40:59+01:00 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>

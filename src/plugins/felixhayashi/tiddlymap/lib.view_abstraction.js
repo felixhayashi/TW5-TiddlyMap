@@ -365,6 +365,43 @@ ViewAbstraction.prototype.rename = function(newLabel) {
   var newRoot = this.opt.path.views + "/" + newLabel;
   var oldRoot = this.getRoot();
   var results = utils.mv(oldRoot, newRoot, true);
+  
+  // update references
+  
+  if(this.opt.config.sys.defaultView === oldLabel) {
+     utils.setEntry(this.opt.ref.sysUserConf,
+                    "defaultView",
+                    newLabel);
+  }
+  
+  if(this.opt.config.sys.liveTab.fallbackView === oldLabel) {
+     utils.setEntry(this.opt.ref.sysUserConf,
+                    "liveTab.fallbackView",
+                    newLabel);
+  }
+  
+  var allViewsRoot = this.opt.path.views;
+  $tw.wiki.each(function(tObj, tRef) {
+    
+    if(tObj.fields["tmap.open-view"] === oldLabel) {
+      // update global node data fields referencing this view
+      utils.setField(tRef, "tmap.open-view", newLabel);
+      
+    } else if(utils.startsWith(tRef, allViewsRoot)) {
+      // update all local node data referencing this view
+      var view = new ViewAbstraction(tRef);
+      var nodes = view.getNodeData();
+      for(var id in nodes) {
+        if(nodes[id]["open-view"] === oldLabel) {
+          nodes[id]["open-view"] = newLabel;
+        }
+      }
+      view.saveNodeData(nodes);
+    }
+    
+  });
+  
+  
     
   this._registerPaths(newLabel);
   this.rebuildCache();
@@ -522,6 +559,8 @@ ViewAbstraction.prototype.setConfig = function() {
 
 ViewAbstraction.prototype.isExplicitNode = function(node) {
   
+  // @Todo: this way of testing is not 100% save as a node might
+  // have been added to the filter explicitly AND via a group filter.
   var regex = $tw.utils.escapeRegExp(this._getAddNodeFilterPart(node));
   return this.getNodeFilter("expression").match(regex);
              
@@ -576,7 +615,8 @@ ViewAbstraction.prototype.setNodeFilter = function(expr, force) {
   }
   
   if(this.isLiveView() && !force) {
-    $tw.tmap.notify("It is forbidden to change the node filter of the live view!");
+    var text = "You must not change the live view's node filter!";
+    $tw.tmap.notify(text);
     return;
   }
       
@@ -750,13 +790,13 @@ ViewAbstraction.prototype.saveNodeData = function() {
   var args = arguments;
   var data = this.getNodeData();
   
-  if(args.length === 2 && typeof args[0] === "string") {
+  if(args.length === 2) {
     
     if(typeof args[1] === "object") {
       if(args[1] === null) {
         // remember – in js null is an object :D
         // we use null as a signal for deletion of the item
-        delete data[args[0]];
+        data[args[0]] = undefined;
       } else {
         data[args[0]] = $tw.utils.extend(data[args[0]] || {}, args[1]);
       }
@@ -792,12 +832,14 @@ ViewAbstraction.prototype.saveNodeStyle = function(id, style) {
   
   if(!this.exists()) return;
   
+  // remove any previos style from store;
+  // @TODO: optimize this only null in style var needs to be removed
   var data = this.getNodeData()[id];
-  if(!data) return;
-  
-  // delete all previous properties, except positions
-  for(var p in data) {
-    if(p !== "x" && p !== "y") delete data[p];
+  if(data) {
+    // delete all previous properties, except positions
+    for(var p in data) {
+      if(p !== "x" && p !== "y") data[p] = undefined;
+    }
   }
   
   // save new style

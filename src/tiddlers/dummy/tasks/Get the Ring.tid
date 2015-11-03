@@ -1,6 +1,7 @@
 color: #e1e38e
 created: 20130825143100000
 modified: 20150911182135460
+node-style: {"color":"#e1e38e"}
 tags: Task important
 title: Get the Ring
 tmap.fa-icon: f10c

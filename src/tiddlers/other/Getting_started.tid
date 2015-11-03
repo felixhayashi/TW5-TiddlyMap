@@ -1,6 +1,6 @@
 created: 20141217161104178
 creator: @felixhayashi
-modified: 20151011202019887
+modified: 20151103112442708
 modifier: @felixhayashi
 title: Getting started
 tmap.edges: {"30af4ba7-306f-4e68-9e32-d0342d64a717":{"to":"6159DA1A-73F2-451D-B55F-8744480BA7AC","type":"demo:suggestion"}}
@@ -20,4 +20,17 @@ See the [[version history|Version History]] for a list of existing features and 
 
 TiddlyMap is currently in its late beta-phase. If you want to use it in your wiki, check out the [[installation instructions|Installation]]. Many [[thanks|Special Thanks]] to everybody who made this project possible. 
 
-<iframe src="https://ghbtns.com/github-btn.html?user=felixhayashi&repo=TW5-TiddlyMap&type=star&count=true" frameborder="0" scrolling="0" width="80px" height="20px"></iframe>
+<iframe
+    src="https://ghbtns.com/github-btn.html?user=felixhayashi&repo=TW5-TiddlyMap&type=star&count=true" 
+    frameborder="0"
+    scrolling="0"
+    width="80px"
+    height="20px"
+    style="float: left; margin-right: 5px;"></iframe>
+
+<iframe
+    src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Fwww.facebook.com%2Ftiddlymap &send=false&layout=button&width=200&show_faces=false&action=like&colorscheme=light&font&height=21"
+    scrolling="no"
+    frameborder="0" 
+    style="height: 21px; float: left;" 
+    allowTransparency="true"></iframe>

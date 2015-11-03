@@ -1,5 +1,5 @@
 created: 20150103171758988
-modified: 20151013105801013
+modified: 20151030140154915
 tags: Documentation
 title: Common Pitfalls
 tmap.id: a7e46ff2-2010-475f-a430-d757a7659798
@@ -26,7 +26,7 @@ that an embedded widget is configured correctly.
 
 !! Slow movements
 
-<i class="fa fa-exclamation-triangle" /> Sometimes it happens that when moving nodes or edges in a graph, it seems to be a slow or stagnant, while it usually runs smooth. If this happens, despite the graph being not big in size, __it always helps to do a click outside the canvas__ on a non-dynamic spot (e.g. on the wiki's background area). This is a [[known chrome bug|https://code.google.com/p/chromium/issues/detail?id=507863]]. In TiddlyWiki, this usually occurs after a modal is closed.
+<i class="fa fa-exclamation-triangle" /> Sometimes it happens that when moving nodes or edges in a graph, it seems to be a slow or stagnant, while it usually runs smooth. This often happens after closing a modal. In this case __it always helps to do a click outside the canvas__ on a non-dynamic spot (e.g. on the wiki's background area). This is a [[known chrome bug|https://code.google.com/p/chromium/issues/detail?id=507863]].
 
 !! Performance
 

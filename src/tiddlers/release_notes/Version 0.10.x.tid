@@ -1,0 +1,39 @@
+caption: v0.10.x
+created: 20151026154714816
+modified: 20151026154714816
+tags: ReleaseNote Configurability Integration
+title: Version 0.10.x
+tmap.id: 26976ded-1d7e-4798-b7ef-a12fc5cdaeef
+type: text/x-markdown
+
+Major enhancements
+----------------------------
+
+### v0.10.0
+
+* Resolves #182: Option to add a background image to a map
+* Resolves #102: Click node to navigate to different map
+* Resolves #166: Trigger views in the live view
+  This is achieved via the live tab, which is disabled
+  by default.
+* Added the possibility to assign icons on a local node level
+* Added the possibility to specify a caption on a local node level
+
+Important Bugfixes
+----------------------------
+
+### v0.10.0
+
+* Nodes where not removed from view filters when corresponding
+  tiddlers where removed from system.
+* Fixed bug that tmap:neighbour type cannot be assigned a priority
+* Fixed some modal layout issues.
+* Fixed problem that renaming view resulted in inconsistencies.
+  Now when a view is renamed, all places where the user linked the
+  view in the TiddlyMap configurations or fields are updated.
+* Fixed wrong timer code (affected console debugging)
+
+Incompatibilities to previous versions
+----------------------------
+
+\-

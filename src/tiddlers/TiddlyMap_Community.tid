@@ -1,6 +1,6 @@
 color: #3f954d
 created: 20141222182051482
-modified: 20150910205409840
+modified: 20151103112253491
 tags: 
 title: TiddlyMap Community
 tmap.edges: {"b3c89a50-166f-4c63-91e7-c5b11d3d39b0":{"to":"c5a23686-8e59-4415-9b6e-0eaf35247980","type":"feedback"}}
@@ -8,8 +8,21 @@ tmap.fa-icon: f0c0
 tmap.id: 5DC028E2-E75A-45A0-8BC1-742910DE3BBF
 type: text/vnd.tiddlywiki
 
+\rules except wikilink
+
 If you promote TiddlyMap and submit feedback that makes TiddlyMap better, consider yourself part of the community ;)
 
 So at this point, thanks @ all the guys from the community supporting TiddlyMap!
 
 I am very grateful for any feedback submitted at [[github.com|https://github.com/felixhayashi/TW5-TiddlyMap/issues]] or at the TiddlyWiki [[google groups|https://groups.google.com/forum/#!forum/tiddlywiki]]. So big thanks to everybody who makes the step and tells me about an existing problem or points out an interesting idea to me.
+
+! Some cool Blogposts discussing TiddlyMap
+
+//…at least the ones I discovered so far. Please send me an e-mail if yours is missing.//
+
+"""
+[[Exploring TiddlyMap (while waiting for my car to get a tune-up)|http://barbarafillip.blogspot.de/2015/10/exploring-tiddlymap-while-waiting-for.html]]
+by Barbara Fillip
+
+[[Organizing and visualizing knowledge|http://blog.dornea.nu/2015/09/17/organizing-and-visualizing-knowledge/]]
+by Victor Dorneanu

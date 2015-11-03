@@ -1,5 +1,5 @@
 created: 20141218163905294
-modified: 20151011202134560
+modified: 20151030140350579
 tags: Documentation
 title: Installation
 tmap.edges: {}
@@ -31,6 +31,7 @@ By using this plugin you agree to the product's [[License Terms|$:/plugins/felix
 #: This plugin is necessary when you want to use the //live view//.
 #; [[TW5-TopStoryView|$:/plugins/felixhayashi/topstoryview]]
 #: Unless you are using the //zoomin// or //stacked// story view, install this plugin to achieve a better live view experience.
+# Maybe you also want to install [[Font Awesome for TiddlyWiki]]
 # Save your TiddlyWiki.
 # Refresh the window.
 # Click on the Map tab in your wiki's sidebar.

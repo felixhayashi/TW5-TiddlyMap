@@ -1,0 +1,16 @@
+created: 20151104140705024
+modified: 20151104141337192
+tags: Navigation
+title: Open a view by clicking on a node
+tmap.id: ac1ac603-848f-4af2-9c72-ba825d43a55b
+type: text/vnd.tiddlywiki
+
+In the editor, you can select another view using the dropdown selection in the menu bar.
+
+However, you can also define that a click on a node changes the widget to display another view.
+
+# Open the sidebar editor
+# Select a node
+# Click on the button "Edit node" that is now displayed in the toolbar.
+# In the dialog that opens, click on the tab named "local node-style"
+# Go to the option "Open view" and specify which view to open next time when the node is clicked

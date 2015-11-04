@@ -1,5 +1,5 @@
 created: 20151030095514068
-modified: 20151030135108913
+modified: 20151104141409344
 rank: 7
 tags: Home
 title: Think epic. Map your quests!
@@ -10,6 +10,6 @@ Add a background image to your view in your view configuration, add a few nodes,
 
 <$tiddlymap view="Quest" ></$tiddlymap>
 
-For recurring node types (e.g. the temples in the map above), assign [[group styles|Styling Nodes]] by using the node type manager in the [[sidebar editor|The editor menu]]. The map background can be assigned in the view configuration.
+For recurring node types (e.g. the temples in the map above), assign [[group styles|Styling Nodes]] by using the node type manager in the [[sidebar editor|The editor menu]]. The map background can be assigned in the [[view configuration|Adding a background image]].
 
-By the way, the node "Dragonland" does not open a tiddler when clicked. Instead, the map is changed to another view. You can decide which views to open in the current widget by: going to the sidebar editor→selecting a node→clicking "edit node"→opening the local-node-style tab→selecting a view.
+By the way, the node named "Dragonland" does not open a tiddler when clicked. Instead, the map is changed to another view. See [[Open a view by clicking on a node]].

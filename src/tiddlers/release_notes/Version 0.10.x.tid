@@ -22,6 +22,11 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.10.1
+
+* Fixes #186: "_canonical_uri" images should work as background
+  and node images as well.
+
 ### v0.10.0
 
 * Nodes where not removed from view filters when corresponding

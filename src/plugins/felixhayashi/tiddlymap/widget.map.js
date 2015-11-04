@@ -574,7 +574,6 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
     if(viewModifications.length && !this.ignoreNextViewModification) {
 
       this.logger("warn", "View modified", viewModifications);
-      
       this.reloadBackgroundImage();
       
       rebuildEditorBar = true;
@@ -1286,11 +1285,19 @@ MapWidget.prototype.handleEditView = function() {
       
     var config = utils.getPropertiesByPrefix(outTObj.fields, "config.", true);
     
+    // ATTENTION: needs to be tested before applying new config!
+    var prvBg = this.view.getConfig("background_image");
+    
     this.view.setConfig(config);
     if(config["physics_mode"] && !this.view.isEnabled("physics_mode")) {
       // when not in physics mode, store positions
       // to prevent floating afterwards
       this.handleStorePositions();
+    }
+    
+    var curBg = this.view.getConfig("background_image");
+    if(curBg && curBg !== prvBg) {
+      this.notify("Background changed! You may need to zoom out a bit.");      
     }
           
   });
@@ -2135,16 +2142,6 @@ MapWidget.prototype.handleVisBeforeDrawing = function(context2d) {
     //utils.drawRaster(context2d, this.network.getScale(), this.network.getViewPosition());
     context2d.drawImage(this.backgroundImage, 0, 0);
   }
-  
-    //~ this.bgImage = null;
-  //~ var imgTObj = utils.getTiddler(this.view.getConfig("background_image"));
-  //~ if(imgTObj) {
-    //~ var image = new Image();
-    //~ var center = this.network.getCenterCoordinates();
-    //~ image.src = $tw.utils.makeDataUri(imgTObj.fields.text,
-                                      //~ imgTObj.fields.type);
-    //~ this.bgImage = { data: image, x: center.x, y: center.y };
-  //~ }
 
 };
 
@@ -2370,14 +2367,36 @@ MapWidget.prototype.getView = function(noCache) {
   
 };
 
-MapWidget.prototype.reloadBackgroundImage = function(noCache) {
+MapWidget.prototype.reloadBackgroundImage = function(msg) {
 
   this.backgroundImage = null;
-  var imgTObj = utils.getTiddler(this.view.getConfig("background_image"));
-  if(imgTObj) {
-    this.backgroundImage = new Image();
-    var uri = $tw.utils.makeDataUri(imgTObj.fields.text, imgTObj.fields.type);
-    this.backgroundImage.src = uri;
+  var ajaxCallback = function(b64) {
+    this.backgroundImage.src = b64;
+  }.bind(this);
+  
+  var bgFieldValue = this.view.getConfig("background_image");
+  var imgTObj = utils.getTiddler(bgFieldValue);
+  if(!imgTObj && !bgFieldValue) return;
+  
+  this.backgroundImage = new Image();
+  this.backgroundImage.onload = function() {
+    this.repaintGraph();
+    if(msg) { this.notify(msg); }
+  }.bind(this);
+  
+  if(imgTObj) { // try loading from tiddler
+    var urlField = imgTObj.fields["_canonical_uri"];
+    if(urlField) { // try loading by uri field
+      utils.getImgFromWeb(urlField, ajaxCallback);
+    } else if(imgTObj.fields.text) { // try loading from base64
+       var b64 = $tw.utils.makeDataUri(imgTObj.fields.text,
+                                       imgTObj.fields.type);
+       this.backgroundImage.src = b64;
+    }
+    
+  } else if(bgFieldValue) { // try loading directly from reference
+    utils.getImgFromWeb(bgFieldValue, ajaxCallback);
+    
   }
   
 };
@@ -2416,21 +2435,17 @@ MapWidget.prototype.getRefreshedDataSet = function(ltNew, ltOld, ds) {
 };
 
 /**
- * Repaint this graph instance if
- * 0. The network object exists
- * 1. fullscreen is not possible at all
- * 2. no part of the document is running in fullscreen
- *    (halfscreen does not count)
- * 3. this graph instance is currently running fullscreen.
+ * The graph of this widget is only repainted if the following counts:
+ * 
+ * The network object exists (prerequisit).
+ * 
+ * 1. We are not in fullscreen at all
+ * 2. This particular graph instance is currently running fullscreen.
  */
 MapWidget.prototype.repaintGraph = function() {
   
-  if(this.network
-     && (
-       !this.fsapi
-       || !document[this.fsapi["_fullscreenElement"]] 
-       || this.enlargedMode
-     )) {
+  var isInFS = this.fsapi && document[this.fsapi["_fullscreenElement"]];
+  if(this.network && (!isInFS || (isInFS && this.enlargedMode))) {
   
     this.logger("info", "Repainting the whole graph");
   

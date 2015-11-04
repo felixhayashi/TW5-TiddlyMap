@@ -50,8 +50,11 @@ subtitle: {{$:/core/images/options-button}} View configuration -- <<view>>
     <<tmap-row type:"input-text"
         title:"Background image"
         field:"config.background_image" 
-        descr:"A tiddler reference to an image tiddler to be used
-               as background image in the view.">>
+        descr:"The title of an image tiddler to be used as background
+               in the view."
+        note:"You can also use an image url directly, however, the
+              image needs be stored under the same domain as your wiki.
+              Otherwise, it won't be displayed!">>
   </table>
 </fieldset>
 

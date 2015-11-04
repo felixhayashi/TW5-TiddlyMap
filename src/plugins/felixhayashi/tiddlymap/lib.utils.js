@@ -669,6 +669,29 @@ utils.parseFieldData = function(tiddler, field, data) {
 };
 
 /**
+ * Loads the image from web and passes it to the callback as
+ * object url.
+ */
+utils.getImgFromWeb = function(imgUri, callback) {
+  
+  if(!imgUri || typeof callback !== "function") return;
+  
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", imgUri, true);
+  xhr.responseType = "blob";
+  xhr.onerror = function(e) { console.log(e); };
+  xhr.onload = function(e) {
+    if(this.readyState === 4 && this.status === 200) {
+      var blob = this.response;
+      callback(window.URL.createObjectURL(blob));
+    }
+  };
+  
+  try { xhr.send();  } catch(e) { console.log(e); }
+  
+};
+
+/**
  * Try to turn the string into a javascript object. If the
  * transformation fails, return the optionally provided `data` object.
  * 

@@ -1339,10 +1339,17 @@ Adapter.prototype._addNodeIcon = function(node, faIcon, twIcon) {
   if(!twIcon) return;
 
   var imgTObj = utils.getTiddler(twIcon);
-  if(imgTObj && imgTObj.fields.text) {
+  if(!imgTObj) return;
+  
+  if(imgTObj.fields["_canonical_uri"]) { // image is a url address
+    node.image = imgTObj.fields["_canonical_uri"];
+    node.shape = "image";
+    return;
+  }
+  
+  if(imgTObj.fields.text) { // base64 uri
     var type = imgTObj.fields.type || "image/svg+xml";
     var body = imgTObj.fields.text;
-    node.shape = "image";
     if(type === "image/svg+xml") {
       // see http://stackoverflow.com/questions/10768451/inline-svg-in-css
       body = body.replace(/\r?\n|\r/g, " ");
@@ -1358,7 +1365,8 @@ Adapter.prototype._addNodeIcon = function(node, faIcon, twIcon) {
                    : window.btoa(body));
 
     node.image = "data:" + type + ";base64," + encBody;
-    
+    node.shape = "image";
+    return;
   }
     
 };

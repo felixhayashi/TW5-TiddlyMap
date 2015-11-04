@@ -1,5 +1,5 @@
 created: 20151104135634577
-modified: 20151104140501534
+modified: 20151104150713048
 tags: [[View configuration]]
 title: Adding a background image
 tmap.id: 3d0d3a6e-b805-49bb-8acd-726bbec6e78e
@@ -14,3 +14,5 @@ type: text/vnd.tiddlywiki
 #* Reference an image via an url (looks like `http://*.png`).
 
 <i class="fa fa-exclamation-triangle" /> When using an external image, always make sure the image is stored below the domain you use for hosting your wiki. Otherwise it won't work due to browser security restrictions!
+
+<i class="fa fa-exclamation-circle" /> The background image is positioned at the graph's origin (0, 0). It may be the case that the image is not visible because your nodes are positioned too far away from the graph's origin. In this case: Zoom out to see where the image is located in your map, then press `ctrl+a` to select all nodes, finally, drag all nodes towards background.

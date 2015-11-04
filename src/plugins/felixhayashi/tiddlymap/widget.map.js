@@ -2370,16 +2370,16 @@ MapWidget.prototype.getView = function(noCache) {
 MapWidget.prototype.reloadBackgroundImage = function(msg) {
 
   this.backgroundImage = null;
-  var ajaxCallback = function(b64) {
-    this.backgroundImage.src = b64;
-  }.bind(this);
   
   var bgFieldValue = this.view.getConfig("background_image");
   var imgTObj = utils.getTiddler(bgFieldValue);
   if(!imgTObj && !bgFieldValue) return;
   
-  this.backgroundImage = new Image();
-  this.backgroundImage.onload = function() {
+  var img = new Image();
+  var ajaxCallback = function(b64) { img.src = b64; };
+  img.onload = function() {
+    // only now set the backgroundImage to the img object!
+    this.backgroundImage = img;
     this.repaintGraph();
     if(msg) { this.notify(msg); }
   }.bind(this);
@@ -2391,7 +2391,7 @@ MapWidget.prototype.reloadBackgroundImage = function(msg) {
     } else if(imgTObj.fields.text) { // try loading from base64
        var b64 = $tw.utils.makeDataUri(imgTObj.fields.text,
                                        imgTObj.fields.type);
-       this.backgroundImage.src = b64;
+       img.src = b64;
     }
     
   } else if(bgFieldValue) { // try loading directly from reference

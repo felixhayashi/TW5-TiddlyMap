@@ -1,11 +1,11 @@
 created: 20150516165140567
-modified: 20151106170844404
+modified: 20151106201922935
 tags: Installation
 title: Live mode plugin dependencies
 tmap.id: 72b15ed6-6eff-443e-89b1-28c46a8d884d
 type: text/x-markdown
 
-The live tab and the live view feature depend on some plugins in order to function correctly.
+The "live tab" and the "live view" feature depend on some plugins in order to function correctly. If you followed the standard installation routine, most likely, you will have all plugins installed. In case you are unsure, open the TiddlyWiki control panel and see which plugins are currently active in your wiki.
 
 |  | Story view | Installed plugins | Experience | Remark |
 |---|------------|-------------------------------|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

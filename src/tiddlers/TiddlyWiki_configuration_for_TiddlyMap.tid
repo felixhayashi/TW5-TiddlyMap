@@ -1,5 +1,5 @@
 created: 20151106192837140
-modified: 20151106195914501
+modified: 20151106203219144
 tags: Installation
 title: TiddlyWiki configuration for TiddlyMap
 tmap.id: 4a0ba554-696b-415b-955e-74755e086cca
@@ -13,7 +13,7 @@ As of v0.9.3 TiddlyMap tries to automatically configure your wiki for optimal us
 
 Needed by the [[Live view]]. Also see [[Live mode plugin dependencies]].
 
-# Open the TiddlyWiki control panel
+# Open the [[TiddlyWiki control panel]]
 # select "Appearance"
 # select "Story View"
 # choose `Top` or `Zoomin`
@@ -22,7 +22,7 @@ Needed by the [[Live view]]. Also see [[Live mode plugin dependencies]].
 
 Needed by the [[Live view]] to function correctly.
 
-# Open the TiddlyWiki control panel
+# Open the [[TiddlyWiki control panel]]
 # select "Settings"
 # select "Tiddler Opening Behaviour"
 # choose
@@ -33,7 +33,7 @@ Needed by the [[Live view]] to function correctly.
 
 Useful when working with the [[Live view]] as clicking on the title moves it into focus.
 
-# Open the TiddlyWiki control panel
+# Open the [[TiddlyWiki control panel]]
 # select "Settings"
 # select "Tiddler Titles"
 # choose "Display tiddler titles as links"
@@ -42,7 +42,7 @@ Useful when working with the [[Live view]] as clicking on the title moves it int
 
 In case you want to have TiddlyMap immediately displayed at startup.
 
-# Open the TiddlyWiki control panel
+# Open the [[TiddlyWiki control panel]]
 # select "Settings"
 # select "Default Sidebar Tab"
 # choose "Display tiddler titles as links"

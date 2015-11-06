@@ -1,5 +1,5 @@
 created: 20151106153057408
-modified: 20151106202354994
+modified: 20151106202806399
 tags: Interface
 title: Live tab
 tmap.id: 139680b2-e367-4db0-a5a9-7a18d239ec15
@@ -25,4 +25,4 @@ Open the TiddlyMap configuration and activate the live tab feature.
 
 !! Tips
 
-* Configure TiddlyMap to always show the live tab at startup in your [[System configuration]].
+* Configure TiddlyMap to always show the live tab at startup in your [[TiddlyWiki control panel]].

@@ -1,14 +1,14 @@
 created: 20141217210907965
-modified: 20150401212815505
+modified: 20151106141229265
 tags: Insight
 title: TiddlyMap's Components
 tmap.edges: {"bf87b4ae-fb81-452a-ae6c-e01340c9d7f9":{"to":"9d97c1e8-9458-44f9-97c5-82253da987c0","type":"belongs to"}}
 tmap.id: E664D4FC-1605-4A60-8142-9A04576C982F
 type: text/vnd.tiddlywiki
 
+{{$:/me/docs/outdated}}
+
+
 TiddlyMap consists of the modules that are displayed in the graph below. Doubleclick on any node in the graph above to find out more about the module!
 
 <$tiddlymap view="Components" height="300px"></$tiddlymap>
-
-
-

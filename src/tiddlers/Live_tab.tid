@@ -1,0 +1,27 @@
+created: 20151106153057408
+modified: 20151106170700108
+tags: Interface
+title: Live tab
+tmap.id: 139680b2-e367-4db0-a5a9-7a18d239ec15
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+{{The live tab feature exists since v0.10.0 and is disabled by default.||$:/me/info}}
+{{This feature requires additional plugins. See [[Live mode plugin dependencies]]. ||$:/me/warning}}
+
+When you want to use your wiki as a public website, you may want to use TiddlyMap to visualize your content structure like with the sidebar map editor, but in a more presentational, read only way.
+
+!! What it does
+
+* Adds a Liv tab in the sidebar.
+* Opens different views depending on the currently focussed tiddler.
+
+!! Which views are displayed?
+
+* If the focussed tiddler has a field `tmap.open-view` with a valid view name as field value, then this view is shown.
+* Otherwise, a fallback view is used that may be defined by the user beforehand in the TiddlyMap configuration. If no fallback view has been defined, the [[Live view]] is used.
+
+!! Tips
+
+* Configure TiddlyMap to always show the live tab at startup in your [[System configuration]].

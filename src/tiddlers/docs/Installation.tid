@@ -1,5 +1,5 @@
 created: 20141218163905294
-modified: 20151030140350579
+modified: 20151106171114683
 tags: Documentation
 title: Installation
 tmap.edges: {}
@@ -9,7 +9,7 @@ type: text/vnd.tiddlywiki
 \rules except wikilink
 
 <div class="tmap-flash-message tmap-info">
-   <i class="fa fa-exclamation-circle"></i> v0.9 just got released. Be safe and backup your wiki before installing it!
+   <i class="fa fa-exclamation-circle"></i> Always be safe and backup your wiki before installation!
 </div>
 
 !! Disclaimer
@@ -45,4 +45,4 @@ For more Information visit: http://tiddlywiki.com/#Plugins
 ---
 
 <sup>[1]</sup>
-<small>Maybe not all plugins are required depending on your story view configuration and whether you want to use TiddlyMap's live view or not. As for the live view, consult the table "Live View plugin dependencies" table in [[Working with the live view]] for more information.</small>
+<small>Maybe not all plugins are required depending on your story view configuration and whether you want to use TiddlyMap in live mode or not. See [[Live view]] and [[Live tab]] for more info.

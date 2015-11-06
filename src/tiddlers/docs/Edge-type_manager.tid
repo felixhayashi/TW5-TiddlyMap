@@ -1,10 +1,14 @@
 created: 20150330174516777
-modified: 20150401212359238
+modified: 20151106142715057
 tags: Interface
 title: Edge-type manager
 tmap.id: 3dcb4c1b-ec92-4394-a089-58f92924fbf0
 type: text/vnd.tiddlywiki
 
 The Edge-type manager gives you an overview over all edge-types in use. It allows you to remove edge-types and consequently all edges of this type. Moreover you can create new types, style and rename existing types or add a description.
+
+The edge-type manager may be opened by clicking on an edge (unless you have disabled this feature) or by opening it from the [[The editor menu]].
+
+Click this button to open the edge-type manager of this demo site now:
 
 <$button message="tmap:tm-manage-edge-types">Open demo's edge-type manager</$button>

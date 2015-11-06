@@ -1,0 +1,8 @@
+caption: System
+created: 20151106163620727
+modified: 20151106165140372
+tags: $:/tags/SearchResults
+title: $:/me/visualizer/system
+type: text/vnd.tiddlywiki
+
+<$list filter="[is[system]search{$:/temp/search}sort[title]limit[250]] -[[$:/temp/search]]" template="$:/core/ui/ListItemTemplate"/>

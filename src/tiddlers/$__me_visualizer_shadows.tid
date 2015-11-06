@@ -1,0 +1,8 @@
+caption: Shadows
+created: 20151106163358151
+modified: 20151106165119092
+tags: $:/tags/SearchResults
+title: $:/me/visualizer/shadows
+type: text/vnd.tiddlywiki
+
+<$list filter="[all[shadows]search{$:/temp/search}sort[title]limit[250]] -[[$:/temp/search]]" template="$:/core/ui/ListItemTemplate"/>

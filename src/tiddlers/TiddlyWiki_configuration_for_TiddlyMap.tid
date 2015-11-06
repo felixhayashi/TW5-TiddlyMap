@@ -1,0 +1,48 @@
+created: 20151106192837140
+modified: 20151106195914501
+tags: Installation
+title: TiddlyWiki configuration for TiddlyMap
+tmap.id: 4a0ba554-696b-415b-955e-74755e086cca
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+As of v0.9.3 TiddlyMap tries to automatically configure your wiki for optimal use with TiddlyWiki. However, some further suggestions are listed here.
+
+!! Choosing a suitable TiddlyWiki story view
+
+Needed by the [[Live view]]. Also see [[Live mode plugin dependencies]].
+
+# Open the TiddlyWiki control panel
+# select "Appearance"
+# select "Story View"
+# choose `Top` or `Zoomin`
+
+!! Setting the Tiddler Opening Behaviour
+
+Needed by the [[Live view]] to function correctly.
+
+# Open the TiddlyWiki control panel
+# select "Settings"
+# select "Tiddler Opening Behaviour"
+# choose
+#* `Open above the current tiddler`
+#* __and__ `Open at the top of the story river`
+
+!! Display tiddler titles as links:
+
+Useful when working with the [[Live view]] as clicking on the title moves it into focus.
+
+# Open the TiddlyWiki control panel
+# select "Settings"
+# select "Tiddler Titles"
+# choose "Display tiddler titles as links"
+
+!! Settin the default sidebar tab
+
+In case you want to have TiddlyMap immediately displayed at startup.
+
+# Open the TiddlyWiki control panel
+# select "Settings"
+# select "Default Sidebar Tab"
+# choose "Display tiddler titles as links"

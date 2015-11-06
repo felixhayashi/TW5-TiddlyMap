@@ -1,0 +1,9 @@
+created: 20151106160729791
+modified: 20151106160755848
+tags: 
+title: $:/me/info
+type: text/vnd.tiddlywiki
+
+<div class="tmap-flash-message tmap-info">
+   <i class="fa fa-exclamation-circle"></i> {{!!title}}
+</div>

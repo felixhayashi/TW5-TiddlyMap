@@ -1,6 +1,6 @@
 created: 20150119190507345
-modified: 20151004135334488
-tags: Interface
+modified: 20151106173816485
+tags: [[Sidebar map editor]]
 title: The editor menu
 tmap.id: 2b517bc2-f857-42bb-b769-d22b9a2aa257
 type: text/vnd.tiddlywiki
@@ -24,6 +24,6 @@ type: text/vnd.tiddlywiki
 ; Edit filters
 : Click this option to open a dialog in which you can modify the view's node and edge filters. If you have double clicked somewhere on an empty spot in the graph's canvas before, nodes were automatically added to the node filter for you. For more information on filters visit http://tiddlywiki.com.
 ; Manage edge-types
-: See [[Edge-type Manager]]
+: See [[Edge-type manager]]
 ; Global configurations
 : See [[System configuration]]

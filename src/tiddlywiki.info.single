@@ -9,7 +9,8 @@
     "felixhayashi/vis",
     "felixhayashi/tiddlymap",
     "spangenhelm/enhancedsearch",
-    "danielo/contextPlugin"
+    "danielo/contextPlugin",
+    "danielo/keyboardSnippets"
   ],
   "themes": [
     "tiddlywiki/vanilla",

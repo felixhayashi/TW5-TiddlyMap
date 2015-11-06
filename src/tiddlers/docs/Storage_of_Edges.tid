@@ -1,5 +1,5 @@
 created: 20150630134543615
-modified: 20150630154518632
+modified: 20151106173800272
 tags: Insight
 title: Storage of Edges
 tmap.id: 7f62c0ca-560e-40fd-bc06-92f469dd7f8c
@@ -31,7 +31,7 @@ Tiddler C has the id
 
 Per default ids are stored in the `tmap.id` field. It is noteworthy that the usage of ids to represent tiddlers has the huge advantage that edges will survive tiddler title changes.
 
-The edge between A and B is of the [[type|Edge-Types]] `rel-1` and between A and C of the type `rel-2`.
+The edge between A and B is of the [[edge type|Edge types]] `rel-1` and between A and C of the type `rel-2`.
 
 In this case, the edges will be stored inside A as shown below:
 

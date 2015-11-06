@@ -1,5 +1,5 @@
 created: 20150408193831749
-modified: 20150408200537971
+modified: 20151106173909692
 tags: [[View configuration]]
 title: Node and edge-type filters
 tmap.id: 336511aa-c981-4a5d-8f32-0bde79c7a578
@@ -29,7 +29,7 @@ For example information about the "tmap:link" edge-type is stored in a tiddler w
 $:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tmap:link
 ```
 
-Say you want to hide all edges of the type "tmap:tag" in a certain [[view|Graph views]]. In this case, go to the view you want to change and in its menu select "Edit filters". change it into the following:
+Say you want to hide all edges of the type "tmap:tag" in a certain [[view|Views]]. In this case, go to the view you want to change and in its menu select "Edit filters". change it into the following:
 
 ```
 [prefix[$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes]]

@@ -1,5 +1,5 @@
 created: 20150930181141101
-modified: 20151011201700847
+modified: 20151106173938980
 tags: Documentation
 title: Best Practices
 tmap.id: f464c5e8-3bb0-44fd-821a-4e4ee9cc8eb1
@@ -9,7 +9,7 @@ type: text/vnd.tiddlywiki
 
 !! Try to keep your maps small
 Small maps are faster to process by TiddlyMap and are generally easier to work with.
-If a map becomes to big, try to [[outsource nodes into another view|Moving nodes between graphs]]!
+If a map becomes to big, try to [[outsource nodes into another view|Copy & paste nodes between views]]!
 
 !!Use a small set of generic edge types in your wiki
 This means: avoid creating different edge types that are highly synonymous like //has created//, //authored//, //created by//, //creator of//. Instead stick to one name that is most suitable and generic.

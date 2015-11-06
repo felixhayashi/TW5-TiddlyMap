@@ -1,9 +1,11 @@
 created: 20150206100707761
-modified: 20150711211438142
+modified: 20151106173641870
 tags: Interface
 title: TiddlyMap Toolbar Button
 tmap.id: eaca32dd-b5d7-4ccd-a6c9-d04d84739c77
 type: text/vnd.tiddlywiki
+
+\rules except wikilink
 
 The map button ({{$:/plugins/felixhayashi/tiddlymap/icon}}) allows you to quickly connect tiddlers and remove edges from within your tiddler. Clicking it will open the following dialog:
 
@@ -11,7 +13,7 @@ The map button ({{$:/plugins/felixhayashi/tiddlymap/icon}}) allows you to quickl
 
 ---
 
-''Note:'' //working with the map button best works when you open the [[live view|Working with the live view]]//.
+<i class="fa fa-exclamation-circle"></i> Working with the map button best works when you open the [[Live view]].
 
 ---
 

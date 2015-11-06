@@ -1,5 +1,5 @@
 created: 20150627161220782
-modified: 20151103105649579
+modified: 20151106200458112
 title: Special Thanks
 tmap.edges: {"356c04cb-59d2-4018-9563-6a5fd260b0bf":{"to":"5efe0812-cdbd-4710-84ca-ec747cc43b29","type":"to"},"e32efe3b-7a50-4e11-895f-9c785e49f50d":{"to":"6f2d2f7e-9a70-4eec-a3c4-33828e7d0c12","type":"to"},"ee120b7c-26d2-4b7f-afba-35be0eec425c":{"to":"5DC028E2-E75A-45A0-8BC1-742910DE3BBF","type":"to"}}
 tmap.fa-icon: f087
@@ -8,4 +8,4 @@ type: text/vnd.tiddlywiki
 
 \rules except wikilink
 
-First and foremost much thanks to [[Jeremy Ruston]] for inventing and maintaining TiddlyWiki! Also much thanks to the [[developers of Vis.js|Vis.js Developers]] (Almende B.V.) who help me out a lot. Last but not least, a big thanks to the whole [[TiddlyMap Community]] who is supporting this software.
+First and foremost much thanks to [[Jeremy Ruston]] for inventing and maintaining TiddlyWiki! Also many thanks to the [[developers of Vis.js|Vis.js Developers]] (Almende B.V.) who help me out a lot. Last but not least, a big thanks to the whole [[TiddlyMap Community]] who is supporting this software.

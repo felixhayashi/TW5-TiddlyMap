@@ -1,5 +1,5 @@
 created: 20151106153057408
-modified: 20151106170700108
+modified: 20151106202354994
 tags: Interface
 title: Live tab
 tmap.id: 139680b2-e367-4db0-a5a9-7a18d239ec15
@@ -14,13 +14,14 @@ When you want to use your wiki as a public website, you may want to use TiddlyMa
 
 !! What it does
 
-* Adds a Liv tab in the sidebar.
-* Opens different views depending on the currently focussed tiddler.
-
-!! Which views are displayed?
+Enabling the live tab feature will add a tab named "Live" in the sidebar containing a map that opens different views depending on tiddler currently focussed in the story river.
 
 * If the focussed tiddler has a field `tmap.open-view` with a valid view name as field value, then this view is shown.
 * Otherwise, a fallback view is used that may be defined by the user beforehand in the TiddlyMap configuration. If no fallback view has been defined, the [[Live view]] is used.
+
+!! How to enable this feature?
+
+Open the TiddlyMap configuration and activate the live tab feature.
 
 !! Tips
 

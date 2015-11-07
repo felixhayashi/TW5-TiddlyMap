@@ -537,11 +537,10 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
   }
   
   var changedAttributes = this.computeAttributes();
-  var hasViewAttributeChanged = (changedAttributes["view"]
-                                 && (changedAttributes["view"]
-                                     !== this.view.getLabel()));
+  var view = changedAttributes["view"];
+  var hasViewAttributeChanged = (view && (view !== this.view.getLabel()));
   if(hasViewAttributeChanged) {
-    this.setView(changedAttributes["view"]);
+    this.setView(view);
   }
       
   var rebuildEditorBar = false;
@@ -2308,32 +2307,39 @@ MapWidget.prototype.getViewHolderRef = function() {
 
 /**
  * This function will switch the current view reference of the
- * view holder. If no view is specified, the current view is
- * simply updated.
+ * view holder.
  * 
- * @param {ViewAbstraction|string} [view] – A reference to the view.
+ * NOTE:
+ * The changes will be picked up in the next refresh cycle.
+ * This function will never update the view object currently
+ * held by this widget (this.view)! This would create a race
+ * condition where the view has changed, but the graph data hasn't
+ * and maybe a stabilization event fires in this moment. At this point
+ * it would work with graph data that doesn't relate to the view
+ * and do bad things, trust me, big time bad things.
+ * 
+ * @param {ViewAbstraction|string} view – A reference to the view.
  * @param {string} [viewHolderRef] – A reference to the view holder.
  */
 MapWidget.prototype.setView = function(view, viewHolderRef) {
   
-  if(view) {
+  if(!view) return;
     
-    var viewLabel = new ViewAbstraction(view).getLabel();
-    viewHolderRef = viewHolderRef || this.viewHolderRef;
-    this.logger("info", "Inserting view '"
-                        + viewLabel
-                        + "' into holder '"
-                        + viewHolderRef
-                        + "'");
-    this.wiki.addTiddler(new $tw.Tiddler({ 
-      title : viewHolderRef,
-      text : viewLabel
-    }));
-    
-  }
+  var viewLabel = new ViewAbstraction(view).getLabel();
+  viewHolderRef = viewHolderRef || this.viewHolderRef;
+  this.logger("info", "Inserting view '"
+                      + viewLabel
+                      + "' into holder '"
+                      + viewHolderRef
+                      + "'");
+  this.wiki.addTiddler(new $tw.Tiddler({ 
+    title : viewHolderRef,
+    text : viewLabel
+  }));
   
-  // register the new value
-  this.view = this.getView(true);
+  // WARNING: Never set this.view to the new view state at this point.
+  // e.g. via `this.view = this.getView(true)` This would produce a
+  // race condition!
   
 };
 

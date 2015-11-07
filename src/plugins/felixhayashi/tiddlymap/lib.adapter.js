@@ -943,25 +943,32 @@ Adapter.prototype.attachStylesToEdges = function(edges, view) {
   // TODO
 };
 
+
+/**
+ * Garbage collector for node data!
+ */
 Adapter.prototype._removeObsoleteViewData = function(nodes, view) {
-  
+    
   view = new ViewAbstraction(view);
   if(!view.exists() || !nodes) return;
-  
-  var data = view.getNodeData();
     
+  var data = view.getNodeData();
+  
   var obsoleteDataItems = 0;
   for(var id in data) {
-    if(nodes[id] === undefined) {
-      delete data[id];
-      obsoleteDataItems++;
+    if(nodes[id] === undefined && data[id] != null) {
+      // we only set this to undefined as deletion would
+      // slow down V8, however, this necessarily requires
+      // a safeguard agains recursion: data[id] != null
+      data[id] = undefined;
+      obsoleteDataItems++
     }
   }
   
   if(obsoleteDataItems) {
-    this.logger("debug", "Removed " + obsoleteDataItems
-                         + " node data records from view "
-                         + view.getLabel());
+    this.logger("debug", "[Cleanup]",
+                "Removed obsolete node data:",
+                view.getLabel(), obsoleteDataItems);
     view.saveNodeData(data);
   }
   

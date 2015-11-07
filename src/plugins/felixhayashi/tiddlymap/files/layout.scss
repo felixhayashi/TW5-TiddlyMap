@@ -460,6 +460,7 @@ html { // used to increase css importance
 /**** TMap Widget **************************************************/
 
 .tmap-widget {
+  background: #FFFFFF;
   position: relative;
   border: 1px dotted lightgray;
   padding: 2px;
@@ -611,7 +612,6 @@ html { // used to increase css importance
   }
   
   &.tmap-advanced-editor {
-    background: #F2F2F2;
     
     .tmap-topbar {
       background: #d6d9d8;

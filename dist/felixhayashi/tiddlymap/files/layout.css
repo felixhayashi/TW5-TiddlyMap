@@ -267,6 +267,7 @@ html {
 
 /**** TMap Widget **************************************************/
 .tmap-widget {
+  background: #FFFFFF;
   position: relative;
   border: 1px dotted lightgray;
   padding: 2px;
@@ -365,17 +366,15 @@ html {
         content: "Toggle Halfscreen"; }
   .tmap-widget.tmap-no-buttons .vis-navigation {
     display: none; }
-  .tmap-widget.tmap-advanced-editor {
-    background: #F2F2F2; }
-    .tmap-widget.tmap-advanced-editor .tmap-topbar {
-      background: #d6d9d8; }
-      .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-active-button {
-        color: #488DCD; }
-        .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-active-button svg {
-          fill: #488DCD; }
-      .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-neigh-scope-button {
-        font-size: 1.5em;
-        vertical-align: bottom; }
+  .tmap-widget.tmap-advanced-editor .tmap-topbar {
+    background: #d6d9d8; }
+    .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-active-button {
+      color: #488DCD; }
+      .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-active-button svg {
+        fill: #488DCD; }
+    .tmap-widget.tmap-advanced-editor .tmap-topbar .tmap-neigh-scope-button {
+      font-size: 1.5em;
+      vertical-align: bottom; }
   .tmap-widget .tmap-menu-bar {
     width: 100%; }
   .tmap-widget .tmap-topbar {

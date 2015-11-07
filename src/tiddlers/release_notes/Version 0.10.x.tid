@@ -22,6 +22,11 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.10.2
+
+* Fixes #189: View data overridden when a super quickly switching
+  views
+
 ### v0.10.1
 
 * Fixes #186: "_canonical_uri" images should work as background

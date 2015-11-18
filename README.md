@@ -85,4 +85,4 @@ For general information on how to set up TiddlyWiki5 with Nodejs visit [tiddlywi
 
 ### Drag'n'drop installation / Standalone installation
 
-Please follow the instructions given [here](http://felixhayashi.github.io/TW5-TiddlyMap/index.html#How%20to%20install%20TiddlyMap%3F)
+Please follow the instructions given [here](http://tiddlymap.org/#Installation)

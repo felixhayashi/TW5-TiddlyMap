@@ -95,9 +95,18 @@ GlobalListener.prototype.handleDownloadGraph = function(event) {
 
 GlobalListener.prototype.handleConfigureSystem = function() {
 
+  var allTiddlers = this.adapter.getAllPotentialNodes();
+  var allEdges = this.adapter.getEdgesForSet(allTiddlers);
+  var plugin = $tw.wiki.getTiddler(this.opt.path.pluginRoot).fields;
+  var meta = $tw.wiki.getTiddlerData(this.opt.ref.sysMeta);
   var hasLiveTab = utils.getTiddler(this.opt.ref.liveTab)
-                        .hasTag();
+                        .hasTag("$:/tags/SideBar");
+                        
   var args = {
+    numberOfNodes: "" + allTiddlers.length,
+    numberOfEdges: "" + Object.keys(allEdges).length,
+    pluginVersion: "v" + plugin.version,
+    dataStructureVersion: "v" + meta.dataStructureState,
     dialog: {
       preselects: {
         "liveTab": "" + hasLiveTab,

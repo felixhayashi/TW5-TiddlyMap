@@ -52,6 +52,18 @@ var EdgeType = function(id, data) {
     data
   );
   
+  var ar = this.style && this.style.arrows;
+  
+  if(ar) {
+    this.invertedArrow = this._isArrow(ar, "from");
+    this.toArrow = this._isArrow(ar, "to") || this._isArrow(ar, "middle");
+    // determine if bi arrows (either from+to or no arrows)
+    this.biArrow = (this.invertedArrow === this.toArrow);
+    if(this.biArrow) this.toArrow = this.invertedArrow = true;
+  } else {
+    this.toArrow = true;
+  }
+
   this.namespace = this._getNamespace();
 
 };
@@ -76,6 +88,15 @@ EdgeType.prototype._getNamespace = function() {
   var match = this.id.match("^(.*):");
   return (match ? match[1] : "");
 
+};
+
+EdgeType.prototype._isArrow = function(arrowObj, pos) {
+  
+  var type = arrowObj[pos];
+  return (pos === "to" && type == null
+          || type === true
+          || (typeof type === "object" && type.enabled !== false));
+  
 };
 
 /**

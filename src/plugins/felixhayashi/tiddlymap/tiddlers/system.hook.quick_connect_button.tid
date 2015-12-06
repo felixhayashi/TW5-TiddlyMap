@@ -65,8 +65,8 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 <$set name="additional-classes" value="tmap-active-button"><$macrocall $name="showButton" state="" /></$set>
 <div class="tmap-quick-connect tc-reveal tc-popup">
   <div class="tc-drop-down">
-    <div>{{$:/core/images/new-button}} ''Create connection''</div>
-    <table>
+    <div class="title">{{$:/core/images/new-button}} ''Create connection''</div>
+    <table class="tmap-create-connection-table">
       <tr>
         <td>Type:</td>
         <td>
@@ -78,7 +78,7 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
               default="" />
           <$select tiddler="$:/temp/quickConnectSearch/type" default="">
             <option></option>
-            <$list filter=<<tmap "option" "selector.allEdgeTypesByLabel">>  >
+            <$list filter=<<tmap "option" "selector.allEdgeTypesById">>>
               <option>{{!!title}}</option>
             </$list>
           </$select>
@@ -108,17 +108,31 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
         </td>
       </tr>
     </table>
-    <hr />
-    <div>''Existing Connections''
+    <div class="title">{{$:/plugins/felixhayashi/tiddlymap/icon}} ''Existing Connections''
       <span class="tmap-hide-links">
-        <$checkbox tiddler="$:/temp/tmap/qc" field="filter" checked=<<defConFiltr>> unchecked="" default="">
-          hide links
+        <$checkbox
+            tiddler="$:/state/tmap/qc"
+            field="filter"
+            checked=<<defConFiltr>>
+            unchecked=""
+            default=""> hide links
         </$checkbox>
-      </span>
-    </div>
-    <p>
-      <$tmap-connections filter={{$:/temp/tmap/qc!!filter}} emptyMessage="–">
-        <div>
+      </span></div>
+    <table class="tmap-connection-table">
+<!--
+    <tr>
+      <th></th>
+      <th>Tiddler</th>
+      <th>Type</th>
+      <th></th>
+    </tr>
+-->
+    <$tmap-connections filter={{$:/state/tmap/qc!!filter}} emptyMessage="–">
+      <tr>
+        <td><<directionSymbol>></td>
+        <td><$link to=<<neighbour>>><$view field="title" /></$link></td>
+        <td><<edge.type>></td>
+        <td>
           <$button
               tooltip="Delete this connection"
               class="tc-btn-invisible">{{$:/core/images/close-button}}
@@ -128,14 +142,10 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
                 to=<<edge.to>>
                 type=<<edge.type>> />
           </$button>
-          <<direction>>
-          <$link to=<<neighbour>>>
-            <$view field="title" />
-          </$link>
-          (<<edge.type>>)
-        </div>
-      </$tmap-connections>
-    </p>      
+        </td>
+      </tr>
+    </$tmap-connections>
+    </table>   
   </div>
 </div>
 \end

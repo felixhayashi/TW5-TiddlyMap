@@ -414,23 +414,23 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
   // having been included in the original set, or by having been
   // recorded as neighbour during the discovery.
   var visited = utils.getArrayValuesAsHashmapKeys(matches); 
-  
+  var view = new ViewAbstraction(opts.view);
   var protoNode = opts.addProperties;
   var allEdgesLeadingToNeighbours = utils.getDataMap();
+  var allETy = this.indeces.allETy;
   var allNeighbours = utils.getDataMap();
   var toWL = opts.toWL;
   var typeWL = opts.typeWL;
   var tById = this.indeces.tById;
   var idByT = this.indeces.idByT;
   var maxSteps = (parseInt(opts.steps) > 0 ? opts.steps : 1);
-  var isTraceAllEdges = (!opts.direction || opts.direction === "both");
-  var isTraceIncomingEdges = (isTraceAllEdges || opts.direction === "to");
-  var isTraceOutgoingEdges = (isTraceAllEdges || opts.direction === "from");
+  var direction = view.getConfig("neighbourhood_directions") || opts.direction;
+  var isWalkBoth = (!direction || direction === "both");
+  var isWalkIn = (isWalkBoth || direction === "in");
+  var isWalkOut = (isWalkBoth || direction === "out");
   
   // adjacency receives whitelists through opts
-  var adjList = (isTraceIncomingEdges
-                 ? this.getAdjacencyList("to", opts)
-                 : {});
+  var adjList = this.getAdjacencyList("to", opts);
   
   var addAsNeighbour = function(edge, role) {
     allEdgesLeadingToNeighbours[edge.id] = edge;
@@ -466,8 +466,12 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
       // get all outgoing edges
       // = edges originating from the starting set and point outwards
       var outgoing = this.getEdges(matches[i], toWL, typeWL);
-      
-      for(var id in outgoing) addAsNeighbour(outgoing[id], "to");
+      for(var id in outgoing) {
+        var t = allETy[outgoing[id].type];
+        if(isWalkBoth || isWalkOut &amp;&amp; t.toArrow || isWalkIn &amp;&amp; t.invertedArrow) {
+          addAsNeighbour(outgoing[id], "to");
+        }
+      }
       
       // get all incoming edges
       // = edges originating from outside pointing to the starting set
@@ -475,7 +479,10 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
       if(!incoming) continue;
       
       for(var j = incoming.length; j--;) {
-        addAsNeighbour(incoming[j], "from");
+        var t = allETy[incoming[j].type];
+        if(isWalkBoth || isWalkIn &amp;&amp; t.toArrow || isWalkOut &amp;&amp; t.invertedArrow) {
+          addAsNeighbour(incoming[j], "from");
+        }
       }
     }
     
@@ -579,78 +586,119 @@ Adapter.prototype.getGraph = function(opts) {
 };
 
 /**
- * Returns all outgoing edges of a given tiddler. This includes
- * virtual edges (links, tag-relations) and user created relations.
+ * Returns all edges stored in a given tiddler. Any edge stored in a
+ * tiddler is orginally an outgoing edge. Depending on how the user
+ * changes the arrow head (by manipulating the Visjs edge-type style),
+ * the edge may change its orientation and become an incoming edge or
+ * bi-directional. Therefore, the edges retrieved may be incoming,
+ * outgoing or both!
  * 
- * @param {Hashmap&lt;TiddlerReference, *>} [opts.toWL.filter]
+ * Returned edges may be of the following type:
+ * 
+ * - Edges stored in the tiddler text (=links).
+ * - Edges stored in fields denoted by magic edge-types.
+ * - TiddlyMap edges stored in a json format
+ * 
+ * @param {Tiddler} tiddler - A tiddler reference or object from
+ *     which to retrieve the edges.
+ * @param {Hashmap&lt;TiddlerReference, boolean>} [toWL]
  *     A hashmap on which basis it is decided, whether to include
- *     an edge with a certain to-value in the result or not.
- *     `toWL` hashmap are included.
- * @param {string} [opts.toWL.type="blacklist"]
- *       Either "blacklist" or "whitelist".
- * @param {Hashmap&lt;string, *>} [opts.typeWL.filter]
+ *     an edge that leads to a certain tiddler in the result or not.
+ *     In this case, all edges stored in the tiddler are treated as
+ *     outgoing and the arrow head is ignored. If not specified, 
+ *     all edges are included.
+ * @param {Hashmap&lt;string, boolean>} [typeWL]
  *     A hashmap on which basis it is decided, whether to include
- *     an edge of a given type in the result or not.
- * @param {string} [opts.typeWL.type="blacklist"]
- *       Either "blacklist" or "whitelist".
- * @return {Hashmap&lt;Id, Edge>} An edge collection.
+ *     an edge of a given type in the result or not. If not 
+ *     specified, all edges are included.
  */
 Adapter.prototype.getEdges = function(tiddler, toWL, typeWL) {
 
-  if(!utils.tiddlerExists(tiddler) || utils.isSystemOrDraft(tiddler)) {
-    return;
-  }
-  
   var tObj = utils.getTiddler(tiddler);
-  var fromTRef = utils.getTiddlerRef(tiddler);
+  if(!tObj || utils.isSystemOrDraft(tObj)) return;
   
-  // get all edges stored in tmap json format
-  var edges = this._getTmapEdges(tiddler, toWL, typeWL);
-  
-  // get all edges stored as list items
-  var fields = utils.getMatches($tw.tmap.opt.selector.allListEdgeStores);
-  var refsByType = utils.getDataMap();
-  
-  // add links to reference array
-  refsByType["tw-body:link"] = $tw.wiki.getTiddlerLinks(fromTRef)
-  
-  for(var i = fields.length; i--;) {
-    refsByType["tw-list:" + fields[i]] =
-        $tw.utils.parseStringArray(tObj.fields[fields[i]]);
-  }
-  
-  // get all edges from fields that reference tiddlers
-  // TODO: this is a performance bottleneck!
-  var fields = utils.getMatches($tw.tmap.opt.selector.allFieldEdgeStores);
-  for(var i = fields.length; i--;) {
-    refsByType["tw-field:" + fields[i]] = [tObj.fields[fields[i]]];
-  }
-  
-  $tw.utils.extend(edges, this._getEdgesFromRefArray(fromTRef, refsByType, toWL, typeWL));
+  var edges = utils.getDataMap();
+  this._addTmapEdges(edges, tObj, toWL, typeWL);
+  this._addBodyAndFieldEdges(edges, tObj, toWL, typeWL);
 
   return edges;
 
 };
 
 /**
- * Create edges based on an array of references.
+ * Adds body- and field-edges stored in a given tiddler to the
+ * edges list.
  * 
- * Hashes are used for edge ids on the basis of the from and to parts
- * of the edges. This has the advantage that (1) ids are unique and
- * (2) only change if the underlying link/tag changes.
+ * Hashes are used as edge ids based on the from and to parts
+ * of the edge and its type. This has the advantage that
+ * 1. ids are unique
+ * 2. ids only change if the underlying link/tag changes.
+ * 
+ * @private
+ * 
+ * @param {HashMap&lt;Id, Edge>} edges - The list into which to inject
+ *     the edges retrieved.
+ * @param {$tw.Tiddler} tObj - A tiddler object from which to
+ *     retrieve the edges.
+ * @param {Hashmap&lt;TiddlerReference, boolean>} [toWL]
+ *     A hashmap on which basis it is decided, whether to include
+ *     an edge that leads to a certain tiddler in the result or not.
+ *     In this case, all edges stored in the tiddler are treated as
+ *     outgoing and the arrow head is ignored. If not specified, 
+ *     all edges are included.
+ * @param {Hashmap&lt;string, boolean>} [typeWL]
+ *     A hashmap on which basis it is decided, whether to include
+ *     an edge of a given type in the result or not. If not 
+ *     specified, all edges are included.
  */
-Adapter.prototype._getEdgesFromRefArray = function(fromTRef, refsByType, toWL, typeWL) {
+Adapter.prototype._addBodyAndFieldEdges = function(edges, tObj, toWL, typeWL) {
 
-  var edges = utils.getDataMap();
+  // never assign a default to the typeWL. if it is not assigned it means
+  // all types!! NEVER: typeWL = typeWL || utils.getDataMap();
+    
+  var fromTObjFields = tObj.fields;
+  var fromTRef = utils.getTiddlerRef(tObj);
+  var indeces = this.indeces;
+  var fiETy = indeces.fiETy;
+  var liETy = indeces.liETy;
+  var maETyFiNa = indeces.maETyFiNa; // magic edge-type field names
+  var refsByType = utils.getDataMap();
   
-  for(var type in refsByType) {
-    var toRefs = refsByType[type];
+  // 1) Prepare
+  
+  if(!typeWL || typeWL["tw-body:link"]) {
+    refsByType["tw-body:link"] = $tw.wiki.getTiddlerLinks(fromTRef);
+  }
+
+  for(var f in fromTObjFields) {
     
-    if(!toRefs || (typeWL &amp;&amp; !typeWL[type])) continue;
+    if(!maETyFiNa[f]) continue;
     
-    type = new EdgeType(type);
+    var type = fiETy["tw-field:" + f] || liETy["tw-list:" + f];
+    if(typeWL &amp;&amp; !typeWL[type.id]) continue;
+    
+    if(fiETy[type.id]) {
+      refsByType[type.id] = [ fromTObjFields[f] ];
+    } else if(liETy[type.id]) {
+      refsByType[type.id] = $tw.utils.parseStringArray(fromTObjFields[f]);
+    }
+  }
+  
+  if(!refsByType) return;
+    
+  // 2) Add edges to list
+  
+  var fromId = tObj.fields["tmap.id"];
+  var idByT = indeces.idByT;
+  var allETy = indeces.allETy;
+  
+  for(var typeId in refsByType) {
+    var toRefs = refsByType[typeId];
+    
+    if(!toRefs) continue;
+    
+    var type = allETy[typeId];
     for(var i = toRefs.length; i--;) {
-      
       var toTRef = toRefs[i];
       
       if(!toTRef
@@ -659,52 +707,54 @@ Adapter.prototype._getEdgesFromRefArray = function(fromTRef, refsByType, toWL, t
          || (toWL &amp;&amp; !toWL[toTRef])) continue;
 
       var id = type.id + $tw.utils.hashString(fromTRef + toTRef); 
-      var edge = this.makeEdge(this.getId(fromTRef),
-                               this.getId(toTRef),
-                               type,
-                               id);
+      var edge = this.makeEdge(fromId, idByT[toTRef], type, id);
 
       if(edge) {
         edges[edge.id] = edge;
       }
-      
     }
-  }    
-
-  return edges;
+  }
   
 };
 
 /**
- * Returns all outgoing tmap edges of a given tiddler.
+ * Adds tmap-edges stored in a given tiddler to the edges list.
  * 
  * @private
- * @param {Tiddler} tiddler - The tiddler obj or reference.
- * @param {Hashmap} [toWL] - An optional whitelist with tiddler
- *     references as keys. If supplied, only edges pointing to
- *     tiddlers contained in the whitelist are returned.
- * @param {Hashmap} [typeWL] - An whitelist with edge-type ids as
- *     keys. Only edges of the type specified in the whitelist
- *     are returned.
- * @return {Hashmap&lt;Id, Edge>} An edge collection.
+ * 
+ * @param {HashMap&lt;Id, Edge>} edges - The list into which to inject
+ *     the edges retrieved.
+ * @param {$tw.Tiddler} tObj - A tiddler object from which to
+ *     retrieve the edges.
+ * @param {Hashmap&lt;TiddlerReference, boolean>} [toWL]
+ *     A hashmap on which basis it is decided, whether to include
+ *     an edge that leads to a certain tiddler in the result or not.
+ *     In this case, all edges stored in the tiddler are treated as
+ *     outgoing and the arrow head is ignored. If not specified, 
+ *     all edges are included.
+ * @param {Hashmap&lt;string, boolean>} [typeWL]
+ *     A hashmap on which basis it is decided, whether to include
+ *     an edge of a given type in the result or not. If not 
+ *     specified, all edges are included.
  */
-Adapter.prototype._getTmapEdges = function(tiddler, toWL, typeWL) {
+Adapter.prototype._addTmapEdges = function(edges, tObj, toWL, typeWL) {
   
-  var connections = utils.parseFieldData(tiddler, "tmap.edges", {});
-  var edges = utils.getDataMap();
+  var connections = utils.parseFieldData(tObj, "tmap.edges");
+  if(!connections) return;
+  
+  var tById = this.indeces.tById;
+  var fromId = tObj.fields["tmap.id"];
   
   for(var conId in connections) {
     var con = connections[conId];
-    var toTRef = this.indeces.tById[con.to];
+    var toTRef = tById[con.to];
     if(toTRef &amp;&amp; (!toWL || toWL[toTRef]) &amp;&amp; (!typeWL || typeWL[con.type])) {
-      var edge = this.makeEdge(this.getId(tiddler), con.to, con.type, conId);
+      var edge = this.makeEdge(fromId, con.to, con.type, conId);
       if(edge) {
         edges[conId] = edge;
       }
     }
   }
-  
-  return edges;
   
 };
 
@@ -730,7 +780,7 @@ Adapter.prototype.getEdgeTypeWhiteList = function(edgeTypeFilter) {
 
   for(var i = matches.length; i--;) {
     var type = new EdgeType(matches[i]);
-    typeWhiteList[type.id] = type;
+    typeWhiteList[type.id] = true;
   }
   
   return typeWhiteList;
@@ -759,12 +809,15 @@ Adapter.prototype.getEdgesForSet = function(tiddlers, toWL, typeWL) {
  */
 Adapter.prototype.selectEdgesByType = function(type) {
 
-  var typeWhiteList = utils.getDataMap();
-  typeWhiteList[new EdgeType(type).id] = true;
-  var tRefs = utils.getMatches(this.opt.selector.allPotentialNodes);
-  var edges = this.getEdgesForSet(tRefs, null, typeWhiteList);
+  var typeWL = utils.getDataMap();
+  typeWL[new EdgeType(type).id] = true; 
+  return this.getEdgesForSet(this.getAllPotentialNodes(), null, typeWL);
   
-  return edges;
+};
+
+Adapter.prototype.getAllPotentialNodes = function() {
+  
+  return utils.getMatches(this.opt.selector.allPotentialNodes);
   
 };
 
@@ -910,7 +963,7 @@ Adapter.prototype.makeEdge = function(from, to, type, id) {
     from = from.id;
   } // else use from value as id
   
-  type = new EdgeType(type);
+  type = this.indeces.allETy[type] || new EdgeType(type);
   var label = type.getLabel();
       
   var edge = {
@@ -922,10 +975,12 @@ Adapter.prototype.makeEdge = function(from, to, type, id) {
   
   var description = type.description;
 
-  edge.title = (description
-                || this.indeces.tById[from]
-                   + " " + (label || edge.id) + " "
-                   + this.indeces.tById[to]);
+  edge.title = (description || label || edge.id);
+
+  //~ edge.title = (description
+                //~ || this.indeces.tById[from]
+                   //~ + " " + (label || edge.id) + " "
+                   //~ + this.indeces.tById[to]);
   
   if(utils.isTrue(type["show-label"], true)) {
     edge.label = label;
@@ -1398,7 +1453,7 @@ Adapter.prototype.getTiddlersById = function(nodeIds) {
 Adapter.prototype.getId = function(tiddler) {
   
   return this.indeces.idByT[utils.getTiddlerRef(tiddler)];
-  //return utils.getField(tiddler, "tmap.id");
+  // works too: return utils.getField(tiddler, "tmap.id");
   
 };
 
@@ -1490,7 +1545,7 @@ exports.Adapter = Adapter
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-	on 2015-11-07T02:11:15+01:00 using the <a
+	on 2015-12-06T14:34:52+01:00 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>

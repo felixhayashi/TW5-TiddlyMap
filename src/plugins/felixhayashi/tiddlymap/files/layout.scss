@@ -106,88 +106,6 @@ html { // used to increase css importance
     }
   }
   
-  .tmap-quick-connect {
-    font-size: 0.7em;
-  
-    .tc-drop-down {
-      padding: 5px;
-      width: 250px;
-      white-space: normal;
-      line-height: 1em;
-      position: absolute;
-      z-index: 1000;
-      right: 50px;
-      background: linear-gradient(45deg, rgba(245,245,245,1) 0%,rgba(255,255,255,1) 50%,rgba(245,245,245,1) 100%);
-      
-      select {
-        width: 80px;
-        word-wrap: initial;
-      }
-      
-      table {        
-        width: 100%;
-        border: none;
-        margin-bottom: 0px;
-        
-        td {
-          padding: 3px;
-          border: none;
-          vertical-align: top;
-        }
-      }
-      
-      .tmap-scroll-table {
-        height: 120px;
-        overflow: auto;
-        display: block;
-      }
-      
-      hr {
-        border: 0;
-        height: 0;
-        border-top: 1px solid rgba(0, 0, 0, 0.1);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-      }
-            
-      a {
-        display: inline;
-        padding: 0;
-        color: #5778d8;
-        background: transparent;
-        
-        &:hover {
-          background: transparent;
-          color: #5778d8;
-          text-decoration: underline;
-        }
-      }
-      
-      span.tmap-hide-links {
-        float: right;
-      }
-      
-      button {
-        display: inline-block;
-        padding: 0px 3px;
-        width: auto;
-        text-align: left;
-        color: #333333;
-        line-height: 1.0;
-        
-        &:hover {
-          color: #ffffff;
-        }
-        svg {
-          fill: inherit;
-          
-          &:hover {
-            fill: #ffffff;
-          }
-        }
-      }
-    }
-  }
-
   /*
   body {
     background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/tiddlymap/media/surface.png!!type}} text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}}/>'));
@@ -234,6 +152,121 @@ html { // used to increase css importance
         
         .tmap-fullscreen-button {
           display: none;
+        }
+      }
+    }
+  }
+}
+
+/**** Quick connect ************************************************/
+
+.tmap-quick-connect {
+  font-size: 0.7em;
+  
+  p {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  .tc-drop-down {
+    padding: 5px;
+    width: 250px;
+    white-space: normal;
+    line-height: 1em;
+    position: absolute;
+    z-index: 1000;
+    right: 50px;
+    background: linear-gradient(45deg, rgba(245,245,245,1) 0%,rgba(255,255,255,1) 50%,rgba(245,245,245,1) 100%);
+    
+    &:first-child {
+      padding-top: 0;
+      margin-top: 0;
+    }
+    
+    .title {
+      border-bottom: 1px solid #D5D5D5;
+      margin: 1.5em 0 1em 0;
+    }
+    
+    select {
+      width: 80px;
+      word-wrap: initial;
+    }
+    
+    table {        
+      width: 100%;
+      border: none;
+      margin-bottom: 0px;
+      
+      td, th {
+        padding: 3px 3px 3px 0;
+        vertical-align: top;
+        font-weight: normal;
+        border: none;
+      }
+    }
+    
+    .tmap-create-connection-table {
+
+    }
+    
+    .tmap-connection-table {
+      th, td {
+        text-align: left;
+        padding: 1px 1px 1px 0;
+      }
+        
+      button {
+        width: 20px;
+        padding: 0px;
+      }
+    }
+    
+    .tmap-scroll-table {
+      height: 120px;
+      overflow: auto;
+      display: block;
+    }
+    
+    hr {
+      border: 0;
+      height: 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+          
+    a {
+      display: inline;
+      padding: 0;
+      color: #5778d8;
+      background: transparent;
+      
+      &:hover {
+        background: transparent;
+        color: #5778d8;
+        text-decoration: underline;
+      }
+    }
+    
+    span.tmap-hide-links {
+      float: right;
+    }
+    
+    button {
+      display: inline-block;
+      padding: 0px 3px;
+      text-align: center;
+      color: #333333;
+      line-height: 1.0;
+      
+      &:hover {
+        color: #ffffff;
+      }
+      svg {
+        fill: inherit;
+        
+        &:hover {
+          fill: #ffffff;
         }
       }
     }
@@ -501,7 +534,7 @@ html { // used to increase css importance
   }
   
   .tmap-loading-bar {
-    display: block;
+    display: none; //hidden per default
     position: absolute;
     text-align: center;
     font-size: 2em;

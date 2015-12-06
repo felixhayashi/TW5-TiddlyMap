@@ -308,34 +308,6 @@ utils.isMatch = function(tiddler, filter) {
 };
 
 /**
- * This method will return a whitelist hashmap based on the filter
- * it receives. The whitelist is an object that holds all tiddler
- * titles that exist in the system and are accepted by the filter.
- * 
- * @param {string|function} filter - A tw-filter.
- * @return {Hashmap<string, EdgeType>} An object that represents
- *     the whitelist and acts as lookuptable. The edge-type ids
- *     are used as keys.
- */
-utils.getWhiteList = function(filter, factory, tiddlers) {
-
-  var typeWhiteList = utils.getDataMap();
-  
-  var source = utils.getMatches(tiddlers);
-  var matches = (filter
-                 ? utils.getMatches(filter, source) // filter source
-                 : source); // use whole source
-
-  for(var i = matches.length; i--;) {
-    var type = new EdgeType(matches[i]);
-    typeWhiteList[type.id] = type;
-  }
-  
-  return typeWhiteList;
-
-};
-
-/**
  * Polyfill until `isInteger` has become official. If the target
  * value is an integer, return true, otherwise return false.
  * If the value is NaN or infinite, return false.
@@ -553,7 +525,7 @@ utils.getPropertiesByPrefix = function(obj, prefix, removePrefix) {
 };
 
 /**
- * 
+ * Function to remove the prefix of a string
  */
 utils.getWithoutPrefix = function(str, prefix) {
 

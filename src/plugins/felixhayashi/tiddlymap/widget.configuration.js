@@ -268,6 +268,8 @@ MapConfigWidget.prototype.getOptionFilter = function(mode) {
     whitelist = { edges: whitelist.edges };
   } else if(mode === "manage-node-types") {
     whitelist = { nodes: whitelist.nodes };
+  } else {
+    whitelist.edges.arrows = false;
   }
     
   return function(option, path) {

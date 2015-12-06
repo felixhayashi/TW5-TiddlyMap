@@ -15,7 +15,8 @@ caption: Local node style
     <$macrocall type="input-select"
         $name="tmap-row"
         title="Open view"
-        field="local.open-view" 
+        field="local.open-view"
+        nochoice="Disabled"
         selectFilter=<<tmap "option" "selector.allViewsByLabel">>
         descr="Clicking on this node will open the specified
                view instead of the tiddler represented by this node." />

@@ -135,12 +135,12 @@ var attachStaticConfig = function(parent) {
 
   // all edge-types (by label)
   s.allEdgeTypes = allSelector + " +" + o.filter.edgeTypes;
-  s.allEdgeTypesByLabel = s.allEdgeTypes
+  s.allEdgeTypesById = s.allEdgeTypes
                           + " +[removeprefix[" + p.edgeTypes + "/]]";
 
   // all node-types (by label)
   s.allNodeTypes = allSelector + " +" + o.filter.nodeTypes;
-  s.allNodeTypesByLabel = s.allNodeTypes
+  s.allNodeTypesById = s.allNodeTypes
                           + " +[removeprefix[" + p.nodeTypes + "/]]";
 
   // all views (by label)
@@ -223,11 +223,9 @@ var attachIndeces = function(parent) {
   
   var allTiddlers = $tw.wiki.allTitles();
     
-  // tiddler vs. ids
   updateTiddlerVsIdIndeces(parent.indeces, allTiddlers);
-  
-  // update node type indeces
-  updateNodeTypesIndeces(parent.indeces, allTiddlers);
+  updateNodeTypesIndeces(parent.indeces);
+  updateEdgeTypesIndeces(parent.indeces);
   
   $tw.tmap.stop("Attaching Indeces");
   
@@ -263,10 +261,10 @@ var updateTiddlerVsIdIndeces = function(parent, allTiddlers) {
 
   var tById = parent.tById = {}; // tiddlerById
   var idByT = parent.idByT = {}; // idByTiddler
-  for(var i = allTiddlers.length; i--;) {
-    var tRef = allTiddlers[i];
-    var tObj = $tw.wiki.getTiddler(tRef);
-    if(utils.isSystemOrDraft(tObj)) continue;
+  
+  $tw.wiki.each(function(tObj, tRef) {
+  
+    if(utils.isSystemOrDraft(tObj)) return;
     
     var id = tObj.fields["tmap.id"];
     if(!id) {
@@ -276,7 +274,8 @@ var updateTiddlerVsIdIndeces = function(parent, allTiddlers) {
     
     tById[id] = tRef; // tiddlerById
     idByT[tRef] = id; // idByTiddler
-  }
+    
+  });
   
 };
 
@@ -297,27 +296,13 @@ var updateTiddlerVsIdIndeces = function(parent, allTiddlers) {
  *     use as basis for this index. If not stated, all tiddlers in
  *     the wiki are used.
  */
-var updateNodeTypesIndeces = function(parent, allTiddlers) {
+var updateNodeTypesIndeces = function(parent) {
 
   parent = parent || $tw.tmap.indeces;
   
-  allTiddlers = allTiddlers || $tw.wiki.allTitles();
-  
   var typePath = $tw.tmap.opt.path.nodeTypes;
   var glNTy = parent.glNTy = [];
-  
-  // Since allTitles doesn't include shadow tiddlers unless they are
-  // overridden, we need to add shadow tiddlers explicitly if they
-  // are not contained yet
-  
-  //~ var tmapTiddlers = parent.tmapTiddlers
-  //~ for(var i = tmapTiddlers.length; i--;) {
-    //~ var tRef = tmapTiddlers[i];
-    //~ if(utils.startsWith(tRef, typePath) && !allTiddlers[tRef]) {
-      //~ glNTy.push(new NodeType(tRef));
-    //~ }
-  //~ }
-  
+    
   $tw.wiki.eachTiddlerPlusShadows(function(tObj, tRef) {
     if(utils.startsWith(tRef, typePath)) {
       glNTy.push(new NodeType(tRef));
@@ -326,6 +311,35 @@ var updateNodeTypesIndeces = function(parent, allTiddlers) {
   
   glNTy.sort(function(a, b) {
     return a.priority - b.priority;
+  });
+
+};
+
+var updateEdgeTypesIndeces = function(parent) {
+
+  parent = parent || $tw.tmap.indeces;
+
+  var typePath = $tw.tmap.opt.path.edgeTypes;
+  var listEdgeTypes = $tw.tmap.opt.path.listEdgeTypes;
+  var fieldEdgeTypes = $tw.tmap.opt.path.fieldEdgeTypes;
+  var allETy = parent.allETy = utils.getDataMap();
+  var liETy = parent.liETy = utils.getDataMap();
+  var fiETy = parent.fiETy = utils.getDataMap();
+  // magic edge-type field name
+  var maETyFiNa = parent.maETyFiNa = utils.getDataMap();
+  
+  $tw.wiki.eachTiddlerPlusShadows(function(tObj, tRef) {
+    if(utils.startsWith(tRef, typePath)) {
+      var et = new EdgeType(tRef);
+      allETy[et.id] = et;
+      if(utils.startsWith(tRef, listEdgeTypes)) {
+        liETy[et.id] = et;
+        maETyFiNa[et.getId(true)] = true;
+      } else if(utils.startsWith(tRef, fieldEdgeTypes)) {
+        fiETy[et.id] = et;
+        maETyFiNa[et.getId(true)] = true;
+      }
+    }
   });
 
 };
@@ -531,9 +545,11 @@ var registerClickListener = function() {
 
 var registerChangeListener = function(callbackManager) {
   
-  var nodeTypePath = $tw.tmap.opt.path.nodeTypes;
-  var optionsPath = $tw.tmap.opt.path.options;
   var loopCount = 0;
+  var rebuilders = {};
+  rebuilders[$tw.tmap.opt.path.nodeTypes] = updateNodeTypesIndeces;
+  rebuilders[$tw.tmap.opt.path.edgeTypes] = updateEdgeTypesIndeces;
+  rebuilders[$tw.tmap.opt.path.options] = rebuildGlobals;
 
   $tw.wiki.addEventListener("change", function(changedTiddlers) {
     
@@ -547,27 +563,24 @@ var registerChangeListener = function(callbackManager) {
     // check on callbacks
     callbackManager.handleChanges(changedTiddlers);
         
-    var hasUpdatedNodeTypes = false;
-    var hasUpdatedOptions = false;
+    var hasUpdated = [];
+    
     for(var tRef in changedTiddlers) {
+      var tObj = utils.getTiddler(tRef);
+      
+      if(utils.isDraft(tObj)) continue;
       
       // check for relevant system tiddler changes
-      
-      if(utils.isSystemOrDraft(tRef)) {
-        
-        // check for node types
-        if(utils.startsWith(tRef, nodeTypePath) && !hasUpdatedNodeTypes) {
-          updateNodeTypesIndeces();
-          hasUpdatedNodeTypes = true;
+      if($tw.wiki.isSystemTiddler(tRef)) {
+        for(var prefix in rebuilders) {
+          if(utils.startsWith(tRef, prefix) && !hasUpdated[prefix]) {
+            $tw.tmap.logger("warn", "Rebuilding index:", prefix);
+            rebuilders[prefix].call(this);
+            hasUpdated[prefix] = true;
+            break;
+          }
         }
-        
-        // check on global options
-        if(utils.startsWith(tRef, optionsPath) && !hasUpdatedOptions) {
-          rebuildGlobals();
-          hasUpdatedOptions = true;
-        }
-        
-        continue; 
+        continue;
       }
       
       // check for non-system tiddler changes

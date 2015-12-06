@@ -212,10 +212,25 @@ fixer.fix = function() {
    * set.
    */
   executeUpgrade("0.9.16", meta.dataStructureState, function() {
+    
     var glNTy = $tw.tmap.indeces.glNTy;
     for(var i = glNTy.length; i--;) {
       glNTy[i].save(null, true);
     }
+    
+  });
+  
+  /**
+   * Fixes the live tab
+   */
+  executeUpgrade("0.10.3", meta.dataStructureState, function() {
+    
+    var liveTab = $tw.tmap.opt.ref.liveTab;
+    if(utils.getTiddler(liveTab).hasTag("$:/tags/SideBar")) {
+      $tw.wiki.deleteTiddler(liveTab);
+      utils.setField(liveTab, "tags", "$:/tags/SideBar");
+    }
+    
   });
                 
 };

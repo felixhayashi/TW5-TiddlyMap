@@ -88,7 +88,7 @@ exports.config = {
     stabilization: {
       enabled: true,
       iterations: 1000,
-      updateInterval: 100,
+      updateInterval: 10,
       onlyDynamicEdges: false,
       fit: false
     }

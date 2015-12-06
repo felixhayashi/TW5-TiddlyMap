@@ -545,27 +545,22 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
       
   var rebuildEditorBar = false;
   var rebuildGraph = false;
+  var reinitNetwork = false;
   var rebuildGraphOptions = {};
   
   // check for callback changes
   this.callbackManager.handleChanges(changedTiddlers);
                              
-  if(this.isViewSwitched(changedTiddlers)
-     || hasViewAttributeChanged) {
-    // we are in a new view
+  if(this.isViewSwitched(changedTiddlers) || hasViewAttributeChanged) {
+  // = we are in a new view
+    
+    this.logger("warn", "View switched");
+        
+    this.view = this.getView(true);
+    this.reloadRefreshTriggers();
     
     rebuildEditorBar = true;
-    rebuildGraph = true;
-    rebuildGraphOptions.resetData = true;
-    rebuildGraphOptions.resetOptions = true;
-    rebuildGraphOptions.resetEdgeTypeWL = true;
-    rebuildGraphOptions.resetFocus = { delay: 0, duration: 0 };
-        
-    this.logger("warn", "View switched");
-    this.view = this.getView(true);
-    this.reloadBackgroundImage();
-    this.reloadRefreshTriggers();
-    this.visNetworkDomNode.focus();
+    reinitNetwork = true;
     
   } else { // view has not been switched
 
@@ -587,7 +582,7 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
     } else { // neither view switch or view modification
     
       if(this.hasChangedGlobals(changedTiddlers)) {
-        rebuildGraph = true
+        rebuildGraph = true;
         rebuildGraphOptions.resetOptions = true;
       } 
             
@@ -607,7 +602,10 @@ MapWidget.prototype.refresh = function(changedTiddlers) {
     }
   }
   
-  if(rebuildGraph) {
+  if(reinitNetwork) {
+    this.initAndRenderGraph(this.graphDomNode);
+    
+  } else if(rebuildGraph) {
     this.rebuildGraph(rebuildGraphOptions);
   }
   
@@ -730,8 +728,6 @@ MapWidget.prototype.rebuildGraph = function(options) {
     // option or data resets always overrule any flags!
     this.doFitAfterStabilize = false;
   }
-  
-  this.network.setOptions(this.graphOptions);
     
   this.rebuildGraphData({
     resetEdgeTypeWL: options.resetEdgeTypeWL
@@ -778,14 +774,23 @@ MapWidget.prototype.reloadOptions = function() {
   // reset all previous options
   // it's a hack to avoid options from the old view making it into
   // the new view
-  this.network.setOptions({
-    nodes: undefined,
-    edges: undefined,
-    interaction: undefined,
-    layout: undefined,
-    manipulation: undefined,
-    physics: undefined
-  });
+  //~ this.network.setOptions({
+    //~ nodes: undefined,
+    //~ edges: undefined,
+    //~ interaction: undefined,
+    //~ layout: undefined,
+    //~ manipulation: undefined,
+    //~ physics: undefined
+  //~ });
+  
+    //~ var options = utils.flatten(this.getGraphOptions());
+  //~ for(var key in options) {
+    //~ if(utils.startsWith(key, edges) {
+      //~ options[key] = undefined;
+    //~ }
+  //~ }
+  //~ console.log(utils.unflatten(options));
+  //~ this.network.setOptions(utils.unflatten(options));
   
   // load and register new options
   this.graphOptions = this.getGraphOptions();
@@ -944,6 +949,13 @@ MapWidget.prototype.hasChangedElements = function(changedTiddlers) {
  */
 MapWidget.prototype.initAndRenderGraph = function(parent) {
   
+  if(this.network) {
+        
+    // destroy the previous instance
+    this.destruct()
+    
+  }
+  
   this.logger("info", "Initializing and rendering the graph");
           
   // always save reference to a bound function that is used as listener
@@ -968,8 +980,8 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
   
   this.handleResizeEvent();
 
-  // register options and data
   this.graphOptions = this.getGraphOptions();
+  this.edgeTypeWL = null;
   this.graphData = {
     nodes: new vis.DataSet(),
     edges: new vis.DataSet(),
@@ -1002,7 +1014,8 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
   }
   
   this.reloadBackgroundImage();
-
+  this.visNetworkDomNode.focus();
+  
   this.rebuildGraph({ resetFocus: { delay: 0, duration: 0 }});
 
 };
@@ -1646,8 +1659,15 @@ MapWidget.prototype.handleGenerateWidget = function(event) {
 };
 
 MapWidget.prototype.handleStorePositions = function(withNotify) {
-    
-  this.view.saveNodeData(this.network.getPositions());
+
+  var data = this.view.getNodeData();
+  var positions = this.network.getPositions();
+  for(var id in positions) {
+    data[id] = data[id] || {};
+    data[id].x = positions[id].x;
+    data[id].y = positions[id].y;
+  }
+  this.view.saveNodeData(data);
   this.ignoreNextViewModification = true;
       
   if(withNotify) {
@@ -1942,8 +1962,9 @@ MapWidget.prototype.handleEditNode = function(node) {
  * system.
  */
 MapWidget.prototype.handleVisSingleClickEvent = function(properties) {
-    
-  if(utils.isTrue(this.opt.config.sys.singleClickMode)) {
+  
+  var isActivated = utils.isTrue(this.opt.config.sys.singleClickMode);
+  if(isActivated && !this.editorMode) {
     this.handleOpenMapElementEvent(properties);
   }
   
@@ -1962,14 +1983,18 @@ MapWidget.prototype.handleVisSingleClickEvent = function(properties) {
  */
 MapWidget.prototype.handleVisDoubleClickEvent = function(properties) {
   
-  if(!properties.nodes.length && !properties.edges.length) { // clicked on an empty spot
+  if(properties.nodes.length || properties.edges.length) {
+  
+    if(this.editorMode
+       || !utils.isTrue(this.opt.config.sys.singleClickMode)) {
+      this.handleOpenMapElementEvent(properties);
+    }
+
     
+  } else { // = clicked on an empty spot
     if(this.editorMode) {
       this.handleInsertNode(properties.pointer.canvas);
     }
-    
-  } else if(!utils.isTrue(this.opt.config.sys.singleClickMode)) {
-    this.handleOpenMapElementEvent(properties);
   }
   
 };
@@ -2189,6 +2214,7 @@ MapWidget.prototype.destruct = function() {
   
   if(this.network) {
     this.network.destroy();
+    this.network = null;
   }
   
 };
@@ -2499,6 +2525,8 @@ MapWidget.prototype.setNodesMoveable = function(nodeIds, isMoveable) {
   // = no ids passed or in floating mode
     return;
   }
+  
+  //~ this.network.storePositions();
   
   var updates = [];
   var isFixed = !isMoveable;

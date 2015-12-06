@@ -11,6 +11,29 @@ subtitle: {{$:/core/images/options-button}} Configuration of TiddlyMap
    for more information about the following options.
 </div>
 
+<fieldset><legend>Statistics</legend>
+  <table class="tmap-key-value-table">
+    <tr>
+      <th align="left">Plugin version</th>
+      <td><<pluginVersion>></td>
+    </tr>
+<!--
+    <tr>
+      <th align="left">Datastructure version</th>
+      <td><<dataStructureVersion>></td>
+    </tr>
+-->
+    <tr>
+      <th align="left">Nodes in system</th>
+      <td><<numberOfNodes>></td>
+    </tr>
+    <tr>
+      <th align="left">Edges in system</th>
+      <td><<numberOfEdges>></td>
+    </tr>
+  </table>
+</fieldset>
+
 <fieldset>
   <legend>Field settings</legend>
   <table class="tmap-config-table">

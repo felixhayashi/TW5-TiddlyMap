@@ -71,61 +71,6 @@ html {
     max-height: 70px; }
   html .tc-tiddler-controls button.tmap-active-button svg {
     fill: #888888; }
-  html .tmap-quick-connect {
-    font-size: 0.7em; }
-    html .tmap-quick-connect .tc-drop-down {
-      padding: 5px;
-      width: 250px;
-      white-space: normal;
-      line-height: 1em;
-      position: absolute;
-      z-index: 1000;
-      right: 50px;
-      background: linear-gradient(45deg, #f5f5f5 0%, #ffffff 50%, #f5f5f5 100%); }
-      html .tmap-quick-connect .tc-drop-down select {
-        width: 80px;
-        word-wrap: initial; }
-      html .tmap-quick-connect .tc-drop-down table {
-        width: 100%;
-        border: none;
-        margin-bottom: 0px; }
-        html .tmap-quick-connect .tc-drop-down table td {
-          padding: 3px;
-          border: none;
-          vertical-align: top; }
-      html .tmap-quick-connect .tc-drop-down .tmap-scroll-table {
-        height: 120px;
-        overflow: auto;
-        display: block; }
-      html .tmap-quick-connect .tc-drop-down hr {
-        border: 0;
-        height: 0;
-        border-top: 1px solid rgba(0, 0, 0, 0.1);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
-      html .tmap-quick-connect .tc-drop-down a {
-        display: inline;
-        padding: 0;
-        color: #5778d8;
-        background: transparent; }
-        html .tmap-quick-connect .tc-drop-down a:hover {
-          background: transparent;
-          color: #5778d8;
-          text-decoration: underline; }
-      html .tmap-quick-connect .tc-drop-down span.tmap-hide-links {
-        float: right; }
-      html .tmap-quick-connect .tc-drop-down button {
-        display: inline-block;
-        padding: 0px 3px;
-        width: auto;
-        text-align: left;
-        color: #333333;
-        line-height: 1; }
-        html .tmap-quick-connect .tc-drop-down button:hover {
-          color: #ffffff; }
-        html .tmap-quick-connect .tc-drop-down button svg {
-          fill: inherit; }
-          html .tmap-quick-connect .tc-drop-down button svg:hover {
-            fill: #ffffff; }
   html #tmap-node-filter-dialog #tmap-filter-tips {
     font-size: 0.8em; }
   html #tmap-node-filter-dialog textarea {
@@ -154,6 +99,78 @@ html {
       z-index: 1000; }
       html .tc-sidebar-scrollable .tmap-widget.tmap-halfscreen .tmap-fullscreen-button {
         display: none; }
+
+/**** Quick connect ************************************************/
+.tmap-quick-connect {
+  font-size: 0.7em; }
+  .tmap-quick-connect p {
+    padding-left: 0;
+    padding-right: 0; }
+  .tmap-quick-connect .tc-drop-down {
+    padding: 5px;
+    width: 250px;
+    white-space: normal;
+    line-height: 1em;
+    position: absolute;
+    z-index: 1000;
+    right: 50px;
+    background: linear-gradient(45deg, #f5f5f5 0%, #ffffff 50%, #f5f5f5 100%); }
+    .tmap-quick-connect .tc-drop-down:first-child {
+      padding-top: 0;
+      margin-top: 0; }
+    .tmap-quick-connect .tc-drop-down .title {
+      border-bottom: 1px solid #D5D5D5;
+      margin: 1.5em 0 1em 0; }
+    .tmap-quick-connect .tc-drop-down select {
+      width: 80px;
+      word-wrap: initial; }
+    .tmap-quick-connect .tc-drop-down table {
+      width: 100%;
+      border: none;
+      margin-bottom: 0px; }
+      .tmap-quick-connect .tc-drop-down table td, .tmap-quick-connect .tc-drop-down table th {
+        padding: 3px 3px 3px 0;
+        vertical-align: top;
+        font-weight: normal;
+        border: none; }
+    .tmap-quick-connect .tc-drop-down .tmap-connection-table th, .tmap-quick-connect .tc-drop-down .tmap-connection-table td {
+      text-align: left;
+      padding: 1px 1px 1px 0; }
+    .tmap-quick-connect .tc-drop-down .tmap-connection-table button {
+      width: 20px;
+      padding: 0px; }
+    .tmap-quick-connect .tc-drop-down .tmap-scroll-table {
+      height: 120px;
+      overflow: auto;
+      display: block; }
+    .tmap-quick-connect .tc-drop-down hr {
+      border: 0;
+      height: 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+    .tmap-quick-connect .tc-drop-down a {
+      display: inline;
+      padding: 0;
+      color: #5778d8;
+      background: transparent; }
+      .tmap-quick-connect .tc-drop-down a:hover {
+        background: transparent;
+        color: #5778d8;
+        text-decoration: underline; }
+    .tmap-quick-connect .tc-drop-down span.tmap-hide-links {
+      float: right; }
+    .tmap-quick-connect .tc-drop-down button {
+      display: inline-block;
+      padding: 0px 3px;
+      text-align: center;
+      color: #333333;
+      line-height: 1; }
+      .tmap-quick-connect .tc-drop-down button:hover {
+        color: #ffffff; }
+      .tmap-quick-connect .tc-drop-down button svg {
+        fill: inherit; }
+        .tmap-quick-connect .tc-drop-down button svg:hover {
+          fill: #ffffff; }
 
 /**** Modal related ************************************************/
 .tc-modal-wrapper {
@@ -297,7 +314,7 @@ html {
       padding: 5px;
       pointer-events: none; }
   .tmap-widget .tmap-loading-bar {
-    display: block;
+    display: none;
     position: absolute;
     text-align: center;
     font-size: 2em;

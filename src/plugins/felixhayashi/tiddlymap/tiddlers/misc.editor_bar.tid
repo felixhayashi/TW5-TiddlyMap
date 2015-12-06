@@ -83,30 +83,33 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
   
   <$reveal type="popup" position="below" state=<<qualify "$:/temp/neighScope">> >
     <div class="tc-drop-down">
-    <$button class="tc-btn-invisible">Hide neighbourhood
-      <$action-setfield
-          $tiddler=<<viewRoot>>
-          config.neighbourhood_scope="" />
-    </$button>
-    <hr />
-    <$list filter="[[1|1 step distance]]
-                   [[2|2 step distance]]
-                   [[3|3 step distance]]
-                   [[4|4 step distance]]
-                   [[5|5 step distance]]">
-      <$button class="tc-btn-invisible">
-        <<tmap "splitAndSelect" "|" "1">>
+      <div class="tmap-list-separator">Neighbourhood scope</div>
+      <$button class="tc-btn-invisible">None
         <$action-setfield
             $tiddler=<<viewRoot>>
-            config.neighbourhood_scope=<<tmap "splitAndSelect" "|" "0">> />
+            config.neighbourhood_scope="" />
       </$button>
-    </$list>
-    <hr />
-    <$button class="tc-btn-invisible">No limit
-      <$action-setfield
-          $tiddler=<<viewRoot>>
-          config.neighbourhood_scope="100" />
-    </$button>
+      <$list filter="[[1|1 step distance]]
+                     [[2|2 step distance]]
+                     [[3|3 step distance]]
+                     [[4|4 step distance]]
+                     [[5|5 step distance]]">
+        <$button class="tc-btn-invisible">
+          <<tmap "splitAndSelect" "|" "1">>
+          <$action-setfield
+              $tiddler=<<viewRoot>>
+              config.neighbourhood_scope=<<tmap "splitAndSelect" "|" "0">> />
+        </$button>
+      </$list>
+      <$button class="tc-btn-invisible">No limit
+        <$action-setfield
+            $tiddler=<<viewRoot>>
+            config.neighbourhood_scope="100" />
+      </$button>
+      <div class="tmap-list-separator">Neighbourhood traversal</div>
+      <$radio field="config.neighbourhood_directions" value="in"> Incoming</$radio><br />
+      <$radio field="config.neighbourhood_directions" value="out"> Outgoing</$radio><br />
+      <$radio field="config.neighbourhood_directions" value=""> Both</$radio>
     </div>
   </$reveal>
   

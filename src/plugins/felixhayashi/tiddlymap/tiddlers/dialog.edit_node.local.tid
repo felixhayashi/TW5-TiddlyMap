@@ -1,5 +1,6 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/editNode/local
 caption: Local node style
+classes: tmap-remove-top-space
 
 \rules except wikilink
     

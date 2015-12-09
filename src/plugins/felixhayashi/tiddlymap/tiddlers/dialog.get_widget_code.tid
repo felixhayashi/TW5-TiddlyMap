@@ -4,9 +4,9 @@ buttons: close
 
 \rules except wikilink
 
-The following wizard will assist you in creating the widget code you can use (copy'n'paste) to embed this view in a tiddler. Please visit the [[online demo|http://tiddlymap.org]] for some examples on how the attributes below affect the displayed graph.
-
 ''Widget-code''
+
+Use the code below to embed a view in a tiddler.
 
 <pre style="white-space: normal;">
 &lt;$tiddlymap

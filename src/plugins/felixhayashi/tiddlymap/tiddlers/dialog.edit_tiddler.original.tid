@@ -3,7 +3,13 @@ caption: Preview
 
 \rules except wikilink
 
-<$transclude tiddler=<<draftTRef>> mode="block" />
+<div class="tmap-modal-editor">
+  <$importvariables filter="[all[tiddlers+shadows]prefix[$:/core/macros/]]">
+    <$set name="currentTiddler" value=<<draftTRef>> >
+      <$transclude tiddler="$:/core/ui/ViewTemplate" field="text" mode="block" />
+    </$set>
+  </$importvariables>
+</div>
 
 <!--
 <$set name="currentTiddler" value=<<draftTRef>> >

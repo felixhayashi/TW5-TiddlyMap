@@ -47,6 +47,8 @@ var GlobalListener = function() {
     "tmap:tm-manage-edge-types": this.handleOpenTypeManager,
     "tmap:tm-manage-node-types": this.handleOpenTypeManager,
     "tmap:tm-cancel-dialog": this.handleCancelDialog,
+    "tmap:tm-clear-tiddler": this.handleClearTiddler,
+    "tmap:tm-merge-tiddlers": this.handleMixTiddlers,
     "tmap:tm-confirm-dialog": this.handleConfirmDialog
   }, $tw.rootWidget, this);
   
@@ -56,8 +58,45 @@ GlobalListener.prototype.handleCancelDialog = function(event) {
   utils.setField(event.param, "text", "");
 };
 
+GlobalListener.prototype.handleClearTiddler = function(event) {
+  
+  var params = event.paramObject;
+  if(!params || !params.title) return;
+  
+  var tObj = utils.getTiddler(params.title);
+  var originalFields = tObj ? tObj.fields : {};
+  var fieldsToKeep = params.keep ? params.keep.split() : [];
+  var cloneFields = {
+    title: params.title,
+    text: "" // see https://github.com/Jermolene/TiddlyWiki5/issues/2025
+  };
+  
+  for(var i = fieldsToKeep.length; i--;) {
+    var fieldName = fieldsToKeep[i];
+    cloneFields[fieldName] = originalFields[fieldName];
+  }
+  
+  $tw.wiki.deleteTiddler(params.title);
+  $tw.wiki.addTiddler(new $tw.Tiddler(cloneFields));
+  
+};
+
+GlobalListener.prototype.handleMixTiddlers = function(event) {
+  
+  var params = event.paramObject;
+  if(!params || !params.tiddlers) return;
+  
+  var tiddlers = $tw.utils.parseStringArray(params.tiddlers);
+  var tObj = utils.getMergedTiddlers(tiddlers, params.output);
+                                     
+  $tw.wiki.addTiddler(tObj);
+  
+};
+
 GlobalListener.prototype.handleConfirmDialog = function(event) {
+  
   utils.setField(event.param, "text", "1");
+  
 };
   
 GlobalListener.prototype.handleSuppressDialog = function(event) {

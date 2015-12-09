@@ -196,27 +196,34 @@ html {
     .tc-modal-wrapper .tc-modal-footer .tmap-hidden-close-button {
       display: none; }
 
-.tmap-modal-content .tc-tab-set .tc-tab-content {
-  margin-top: 5px;
-  overflow: auto;
-  height: 50vh; }
-.tmap-modal-content .tc-image-button {
-  font-size: 14px; }
-.tmap-modal-content fieldset {
-  margin: 0px; }
-  .tmap-modal-content fieldset legend {
-    font-weight: bold; }
-.tmap-modal-content ul {
-  padding-left: 30px; }
-  .tmap-modal-content ul li {
-    list-style: none; }
+.tmap-modal-content {
+  position: relative;
+  padding: 1em 0; }
+  .tmap-modal-content.tmap-remove-top-space {
+    padding-top: 0; }
+  .tmap-modal-content .tc-tab-set .tc-tab-content {
+    margin-top: 0.5em; }
+  .tmap-modal-content .tc-image-button {
+    font-size: 14px; }
+  .tmap-modal-content fieldset {
+    margin: 0px; }
+    .tmap-modal-content fieldset legend {
+      font-weight: bold; }
+  .tmap-modal-content ul {
+    padding-left: 30px; }
+    .tmap-modal-content ul li {
+      list-style: none; }
 
-.tmap-modal-editor .tc-tiddler-frame {
-  padding: 0px;
-  width: auto;
-  margin: 0px;
-  border: none; }
-  .tmap-modal-editor .tc-tiddler-frame .tc-tiddler-title {
+.tc-modal-body .tmap-modal-editor > p {
+  margin: 0px; }
+.tc-modal-body .tmap-modal-editor .tmap-template-select select {
+  width: 50%; }
+.tc-modal-body .tmap-modal-editor .tc-tiddler-frame {
+  margin: auto;
+  width: auto; }
+  .tc-modal-body .tmap-modal-editor .tc-tiddler-frame .tc-tiddler-controls {
+    display: none; }
+  .tc-modal-body .tmap-modal-editor .tc-tiddler-frame .tc-tiddler-title {
     display: none; }
 
 .tc-modal-body table {
@@ -249,23 +256,24 @@ html {
     .tc-modal-body table.tmap-config-table tr td .tmap-description {
       font-style: italic; }
 
-#tmap-element-type-manager .tc-tab-buttons {
-  padding-top: 0px; }
 #tmap-element-type-manager > div:first-child {
   height: 50vh;
   float: left;
-  width: 20%;
+  width: 21%;
   background: linear-gradient(90deg, #f5f5f5 0%, #ffffff 50%); }
-  #tmap-element-type-manager > div:first-child .searchbar {
-    padding: 1em 15px 0 0; }
-    #tmap-element-type-manager > div:first-child .searchbar input {
-      width: 100%; }
+  #tmap-element-type-manager > div:first-child .tmap-searchbar {
+    padding: 1em 0 0 0; }
+    #tmap-element-type-manager > div:first-child .tmap-searchbar input {
+      width: calc(100% - 36px); }
+    #tmap-element-type-manager > div:first-child .tmap-searchbar button {
+      width: 30px;
+      float: right; }
   #tmap-element-type-manager > div:first-child ul {
     height: calc(100% - 65px);
     overflow: auto;
     padding: 0;
     list-style: none;
-    margin-top: 15px; }
+    margin-top: 1em; }
     #tmap-element-type-manager > div:first-child ul li {
       white-space: nowrap; }
       #tmap-element-type-manager > div:first-child ul li .tmap-ranking {
@@ -273,14 +281,44 @@ html {
         display: inline-block; }
 #tmap-element-type-manager > div:last-child {
   height: 100%;
-  width: calc(80% - 15px);
+  width: calc(79% - 15px);
   float: right; }
+  #tmap-element-type-manager > div:last-child .tc-tab-set .tc-tab-content {
+    overflow: auto;
+    height: 50vh; }
 
 .tmap-manage-node-types .tmap-edge-type-specific {
   display: none !important; }
 
 .tmap-manage-edge-types .tmap-node-type-specific {
   display: none !important; }
+
+.tmap-modal-fullscreen-editor .tc-tab-content p {
+  margin: 1em 0; }
+
+.tmap-has-pending-template {
+  background-color: #C1EDC4; }
+
+#tmap-search-table td {
+  border: none;
+  padding-left: 0px; }
+  #tmap-search-table td:first-child {
+    width: 30px; }
+#tmap-search-table b {
+  display: inline-block;
+  width: 40px;
+  text-align: right; }
+#tmap-search-table ul {
+  padding-left: 20px;
+  margin: 1em 0 0 0; }
+  #tmap-search-table ul li {
+    list-style: inherit; }
+  #tmap-search-table ul button {
+    text-align: left; }
+
+button.tmap-go-back {
+  margin-bottom: 1em;
+  font-weight: bold; }
 
 /**** TMap Widget **************************************************/
 .tmap-widget {
@@ -532,12 +570,16 @@ html {
     display: block; }
 
 /**** Other ********************************************************/
-table.tmap-table tr:nth-child(odd), .tc-modal-body table.tmap-config-table tr:nth-child(odd) {
-  background-color: #F0F0F0; }
-table.tmap-table tr:nth-child(even), .tc-modal-body table.tmap-config-table tr:nth-child(even) {
-  background-color: #FFFFFF; }
-table.tmap-table tr:hover, .tc-modal-body table.tmap-config-table tr:hover {
-  background-color: #FFFFF3; }
+table.tmap-table tr, .tc-modal-body table.tmap-config-table tr {
+  /*
+    &:hover {
+      background-color: #FFFFF3;
+    }
+*/ }
+  table.tmap-table tr:nth-child(odd), .tc-modal-body table.tmap-config-table tr:nth-child(odd) {
+    background-color: #F0F0F0; }
+  table.tmap-table tr:nth-child(even), .tc-modal-body table.tmap-config-table tr:nth-child(even) {
+    background-color: #FFFFFF; }
 
 /**** Fullscreen ***************************************************/
 html:fullscreen body {

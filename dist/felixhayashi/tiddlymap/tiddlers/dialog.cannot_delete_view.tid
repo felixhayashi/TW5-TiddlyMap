@@ -1,5 +1,6 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/cannotDeleteViewDialog
 subtitle: {{$:/core/images/locked-padlock}} You cannot delete this view!
+buttons: ok
 
 \rules except wikilink
 

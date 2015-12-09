@@ -1,6 +1,7 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager
 subtitle: {{$:/core/images/tag-button}} <<topic>>
 buttons: element_type_manager
+classes: tmap-remove-top-space
 
 \rules except wikilink
 
@@ -29,13 +30,27 @@ $(searchSelector)$
 
 <div id="tmap-element-type-manager" class=<<managerClass>>>
   <div>
-    <div class="searchbar">
+    <div class="tmap-searchbar">
       <$edit-text
           focus="true"
           tiddler="$:/temp/tmap/MapElementTypeSearch"
           type="text"
           tag="input"
           default="" />
+      <$list filter="[{$:/temp/tmap/MapElementTypeSearch}regexp[.+]]
+                     +[addprefix[/]]
+                     +[addprefix<typeRootPath>]
+                     +[!is[tiddler]!is[shadow]]">
+      <$button tooltip="Create a new type of this name">
+      {{$:/core/images/new-button}}
+        <$action-setfield $tiddler="$:/temp/tmap/MapElementTypeSearch" text="" />
+        <$action-sendmessage
+            $message="tmap:tm-create-type"
+            mode=<<mode>> id={{$:/temp/tmap/MapElementTypeSearch}}
+            output=<<output>> />
+      </$button>
+      </$list>
+          
     </div>
     <ul>
       <$list
@@ -56,19 +71,6 @@ $(searchSelector)$
               mode=<<mode>>
               output=<<output>> />
         </$button>
-      </li>
-      </$list>
-      <$list filter="[{$:/temp/tmap/MapElementTypeSearch}regexp[.+]]">
-      <li>
-      <$button tooltip="Create a new type">
-        {{$:/core/images/new-button}}
-        Create "{{$:/temp/tmap/MapElementTypeSearch}}"
-        <$action-setfield $tiddler="$:/temp/tmap/MapElementTypeSearch" text="" />
-        <$action-sendmessage
-            $message="tmap:tm-create-type"
-            mode=<<mode>> id={{$:/temp/tmap/MapElementTypeSearch}}
-            output=<<output>> />
-      </$button>
       </li>
       </$list>
     </ul>

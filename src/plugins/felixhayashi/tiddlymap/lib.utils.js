@@ -981,6 +981,39 @@ utils.isSystemOrDraft = function(tiddler) {
 };
 
 /**
+ * Function to merge an array of tiddlers into a single tiddler.
+ * 
+ * @param {Array<TiddlerReference|TiddlerObject>} tiddlers - The
+ *     tiddlers to merge.
+ * @param {string} [title=null] - The title where the result is
+ *     written to. If not specified, the first array item is used
+ *     as output title.
+ */
+utils.getMergedTiddlers = function(tiddlers, title) {
+  
+  if(!Array.isArray(tiddlers)) return;
+  
+  // turn all array elements into tiddler objects
+  for(var i = tiddlers.length; i--;) {
+    tiddlers[i] = utils.getTiddler(tiddlers[i]);
+  }
+  
+  if(!tiddlers.length) return;
+  
+  tiddlers.push(
+    { title: (title || tiddlers[0].fields.title) },
+    $tw.wiki.getModificationFields(),
+    $tw.wiki.getCreationFields()
+  );
+  
+  // add context for `apply()` function
+  tiddlers.unshift(null);
+
+  return new (Function.prototype.bind.apply($tw.Tiddler, tiddlers));
+  
+};
+
+/**
  * Renames all tiddler titles that are prefixed with `oldPrefix`
  * into titles that are prefixed with `newPrefix` by replacing
  * `oldPrefix` with `newPrefix`.

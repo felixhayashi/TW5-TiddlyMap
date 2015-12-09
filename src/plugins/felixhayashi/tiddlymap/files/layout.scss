@@ -314,16 +314,17 @@ html { // used to increase css importance
 }
 
 .tmap-modal-content {
+  position: relative;
+  padding: 1em 0;
+  
+  &.tmap-remove-top-space {
+    padding-top: 0;
+  }
 
   .tc-tab-set {
-    .tc-tab-buttons {
-    
-    }
 
     .tc-tab-content {
-      margin-top: 5px; // tw 14px
-      overflow: auto;
-      height: 50vh;
+      margin-top: 0.5em; // tw 14px
     }
   }
                  
@@ -350,13 +351,25 @@ html { // used to increase css importance
   }
 }
 
-.tmap-modal-editor {
+.tc-modal-body .tmap-modal-editor {
+
+  > p {
+    margin: 0px;
+  }
+
+  .tmap-template-select {
+    select {
+      width: 50%;
+    }
+  }
 
   .tc-tiddler-frame {
-    padding: 0px;
+    margin: auto;
     width: auto;
-    margin: 0px;
-    border: none;
+    
+    .tc-tiddler-controls {
+      display: none;
+    }
     
     .tc-tiddler-title {
       display: none;
@@ -431,21 +444,21 @@ html { // used to increase css importance
 }
 
 #tmap-element-type-manager {
-
-  .tc-tab-buttons {
-    padding-top: 0px;
-  }
         
   >div:first-child {
     height: 50vh;
     float: left;
-    width: 20%;
+    width: 21%;
     background: linear-gradient(90deg, rgba(245,245,245,1) 0%, rgba(255,255,255,1) 50%);
     
-    .searchbar {
-      padding: 1em 15px 0 0;
+    .tmap-searchbar {
+      padding: 1em 0 0 0;
       input {
-        width: 100%;
+        width: calc(100% - 36px);
+      }
+      button {
+        width: 30px;
+        float: right;
       }
     }
 
@@ -454,7 +467,7 @@ html { // used to increase css importance
       overflow: auto;
       padding: 0;
       list-style: none;
-      margin-top: 15px;
+      margin-top: 1em;
       
       li {
         white-space: nowrap;
@@ -469,25 +482,78 @@ html { // used to increase css importance
   }
   >div:last-child {
     height: 100%;
-    width: calc(80% - 15px); // minus distance to left div
+    width: calc(79% - 15px); // minus distance to left div
     float: right;
+    
+    .tc-tab-set {
+
+      .tc-tab-content {
+        overflow: auto;
+        height: 50vh;
+      }
+    }
   }
 }
 
 .tmap-manage-node-types {
-
   .tmap-edge-type-specific {
     display: none !important;
   }
-  
 }
 
 .tmap-manage-edge-types {
-
   .tmap-node-type-specific {
     display: none !important;
   }
-  
+}
+
+.tmap-modal-fullscreen-editor {
+
+  .tc-tab-content {
+    p {
+      margin: 1em 0;
+    }
+  }
+}
+
+.tmap-has-pending-template {
+  background-color: #C1EDC4;
+}
+
+#tmap-search-table {
+
+  td {
+    border: none;
+    padding-left: 0px;
+    
+    &:first-child {
+      width: 30px;
+    }
+  }
+
+  b {
+    display: inline-block;
+    width: 40px;
+    text-align: right;
+  }
+
+  ul {
+    padding-left: 20px;
+    margin: 1em 0 0 0;
+    
+    li {
+      list-style: inherit;
+    }
+    
+    button {
+      text-align: left;
+    }
+  }
+}
+
+button.tmap-go-back {
+  margin-bottom: 1em;
+  font-weight: bold;
 }
 
 /**** TMap Widget **************************************************/
@@ -890,9 +956,11 @@ table.tmap-table {
     &:nth-child(even) {
       background-color: #FFFFFF;
     }
+/*
     &:hover {
       background-color: #FFFFF3;
     }
+*/
   }
 }
 

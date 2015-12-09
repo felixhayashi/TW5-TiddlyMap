@@ -7,7 +7,7 @@ subtitle: {{$:/core/images/new-button}} Creating a new view
 
 Please specify a view name.
 
-Name:
+''Name:''
 <$edit-text
     focus="true"
     tiddler=<<output>>

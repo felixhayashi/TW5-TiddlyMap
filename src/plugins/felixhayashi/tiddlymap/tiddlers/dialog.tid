@@ -2,7 +2,7 @@ title: $:/plugins/felixhayashi/tiddlymap/dialog
 
 \rules except wikilink
 
-<div class="tmap-modal-content">
+<div class=<<classes>>>
 <$importvariables
     filter="[[$:/plugins/felixhayashi/tiddlymap/misc/macros]]
             [[$:/core/macros/tabs]]">

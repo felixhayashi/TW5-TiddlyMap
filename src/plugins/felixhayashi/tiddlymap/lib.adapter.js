@@ -934,7 +934,7 @@ Adapter.prototype.makeNode = function(tiddler, protoNode) {
   
   var node = utils.merge({}, protoNode);
   
-  // assignId() will not assign an id if it already exists!  
+  // assignId() will not assign an id if the tiddler already has one
   node.id = this.assignId(tObj);
    
   // add label
@@ -1185,7 +1185,7 @@ Adapter.prototype.deleteNode = function(node) {
   // -------------------------------------------
   // NEVER DELETE AN INDEX THAT ALREADY EXISTED!
   // -------------------------------------------
-  // Some threads may have cached the index and get confused!
+  // Some instances may have cached the index and get confused!
   // It does not do harm to leave indeces as is since we do not
   // iterate over them(!) and when a tiddler has the same title or
   // id as a deleted tiddler, which is highly unlikely, then it will
@@ -1292,6 +1292,8 @@ Adapter.prototype.assignId = function(tiddler, isForce) {
  * the node is also inserted directly into the graph at the given
  * position.
  * 
+ * @TODO: Description is obsolete!
+ * 
  * @param {object} node A node object to be inserted
  * @param {object|null} options An optional options object.
  *     Options include:
@@ -1300,37 +1302,35 @@ Adapter.prototype.assignId = function(tiddler, isForce) {
  *         global default
  *       - view: a viewname used to set positions and register the node to
  */
-Adapter.prototype.insertNode = function(node, options) {
+Adapter.prototype.insertNode = function(node, view, options) {
   
-  if(!options || typeof options !== "object") options = {};
+  options = options || {}
+  node = node || {};
   
-  if(!node || typeof node !== "object") {
-    node = utils.getDataMap();
-  }
+  var fields = {
+    "text": "", // https://github.com/Jermolene/TiddlyWiki5/issues/2025
+    "tmap.id": null // generated later
+  };
   
-  var fields = utils.getDataMap();
-  fields.title = $tw.wiki.generateNewTitle((node.label ? node.label : "New node"));
-  
-  // guard against https://github.com/Jermolene/TiddlyWiki5/issues/2025
-  fields.text = "";
-  
+  var title = $tw.wiki.generateNewTitle(node.label || "New node");
+
   // title might has changed after generateNewTitle()
-  node.label = fields.title;
+  node.label = fields.title = title;
   
-  // add to tiddler store    
-  $tw.wiki.addTiddler(new $tw.Tiddler(
+  // add to tiddler store
+  var tObj = new $tw.Tiddler(
+    options.fields,
     fields,
     $tw.wiki.getModificationFields(),
     $tw.wiki.getCreationFields()
-  ));
+  );
+   
+  $tw.wiki.addTiddler(tObj);
   
-  // generates a new unique id and adds it to the node index
-  node.id = $tw.tmap.adapter.assignId(fields.title);
+  node = this.makeNode(tObj, node);
   
-  if(options.view) {
-    var view = new ViewAbstraction(options.view);
-    view.addNodeToView(node);
-  }
+  var view = new ViewAbstraction(view);
+  view.addNodeToView(node);
           
   return node;
   

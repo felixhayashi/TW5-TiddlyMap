@@ -1,5 +1,6 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/editNode
 subtitle: {{$:/core/images/edit-button}} Editing style of node "<<tiddler>>"
+classes: tmap-remove-top-space
 
 \rules except wikilink
 
@@ -58,6 +59,5 @@ subtitle: {{$:/core/images/edit-button}} Editing style of node "<<tiddler>>"
 <$macrocall
   $name="tabs"
   default=<<tab "default">>
-  state="$:/state/tabs/MapElementTypeManager"
   tabsList="[all[shadows]prefix<template>] -[<template>]"
 />

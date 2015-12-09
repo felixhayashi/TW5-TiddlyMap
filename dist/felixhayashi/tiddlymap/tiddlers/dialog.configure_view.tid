@@ -1,5 +1,6 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/configureView
 subtitle: {{$:/core/images/options-button}} View configuration -- <<view>>
+classes: tmap-remove-top-space
 
 \rules except wikilink
 

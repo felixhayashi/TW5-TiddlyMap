@@ -110,13 +110,14 @@ DialogManager.prototype.open = function(templateId, param, callback) {
   var dialog = {
     title: dialogTRef,
     buttons: skeleton.fields["buttons"] || "ok_cancel",
+    classes: "tmap-modal-content " + skeleton.fields["classes"],
     output: dialogTRef + "/output",
     result: dialogTRef + "/result",
     temp: dialogTRef + "/temp",
     template: skeleton.fields.title,
     templateId: templateId,
     currentTiddler: dialogTRef + "/output",
-    text: utils.getTiddler(this.opt.path.dialogs).fields.text
+    text: utils.getText(this.opt.path.dialogs)
   };
       
   if(param.dialog) {

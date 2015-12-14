@@ -6,24 +6,30 @@ TiddlyMap
 <img src="https://cloud.githubusercontent.com/assets/4307137/9981524/386d61b0-5fc0-11e5-9485-94f75be5e049.png" width="24%" />
 <img src="https://cloud.githubusercontent.com/assets/4307137/9981523/386d00a8-5fc0-11e5-9006-11ed7abce725.png" width="24%" />
 
-TiddlyMap is a TiddlyWiki plugin that allows you to link your wiki-topics (tiddlers) in order to create *clickable graphs*. By creating relations between your topics you can easily do the following:
+TiddlyMap is a TiddlyWiki plugin that turns your favourite personal note taking software in a *wiki-concept-map hybrid*! Yes, you will be able to do both: drawing maps and putting down knowledge in a wiki way.
 
-* **Create mindmaps** and quickly manifest your ideas in tiddlers (wiki entries).
-* **Create task-dependency graphs** to organize and describe your tasks.
+TiddlyMap will allow you to visually link and create wiki topics in order to create *clickable graphs*.
+
+* **Create concept maps** to visually express and structure your knowledge.
+* **Create dependency graphs** to e.g. organize and describe your tasks.
 * **Visualize your topic structures** to get an immediate grasp of topics and relations.
-
-In general you may create, visualize and describe any network-structure you have in mind.
 
 Demo
 ---------------------------------------------------------------------
 
-A demo with several examples and explanations can be found at the project's website http://tiddlymap.org. While TiddlyMap also works with mobile devices, it is written for larger screens, which is due to the fact that concept mapping requires space. Therefore, the demo should be viewed on a screen with more than 1440px width.
+A demo with several examples and explanations can be found at the project's website http://tiddlymap.org. While TiddlyMap also works with mobile devices, it is written for larger screens (>= 1440px width), since concept mapping requires space.
 
+Motivation
+---------------------------------------------------------------------
+
+The motivation behind TiddlyMap is to combine the strengths of wikis and concept maps in the realms of personal knowledge management in a single application.
+
+Have you ever created mind- or concept maps and later wished you could turn them into a wiki because they became too complex and too hard to maintain? On the contrary, have you ever worked with a wiki and felt that it is lacking visual means express your thoughts and to relate your content? – If yes, then TiddlyMap is certainly what you are looking for.
 
 How it works
 ---------------------------------------------------------------------
 
-TiddlyMap combines the strength of two open-source projects.
+TiddlyMap is based on two open-source projects.
 
 ### The TiddlyWiki Project
 
@@ -49,14 +55,26 @@ For graph visualization and manipulation, TiddlyMap draws upon the popular open-
 > The library is designed to be easy to use, handle large amounts of dynamic data, and enable manipulation of the data
 > – [visjs.org](|http://visjs.org/)
 
-Installation
+License
 ---------------------------------------------------------------------
 
 By using this plugin you agree to the product's [License Terms](https://github.com/felixhayashi/TW5-TiddlyMap/blob/master/LICENSE) (TiddlyMap is distributed under the [BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)).
 
-### When running TiddlyWiki in Nodejs
+Installation
+---------------------------------------------------------------------
 
-For general information on how to set up TiddlyWiki5 with Nodejs visit [tiddlywiki.com](http://tiddlywiki.com). The instructions here are for installing plugins on the node.js server.  This way, the same plugin can be served to many TiddlyWikis.  Multiple wikis will all use the same plugin instance.  You can also install via the standard drag-and-drop method (see below) in a single wiki being served on node.js, but the plugin will only be installed for that wiki.  The process, including all updates, will have to be repeated for all other wikis if you plan on serving more than one.
+There are two ways to install TiddlyMap and TiddlyWiki. If you are a
+beginner or not a techie person, you should probably go with the
+standalone installation.
+
+### Installation when using TiddlyWiki in standalone
+
+Please follow the instructions given [here](http://tiddlymap.org/#Installation).
+Maybe this [introductory video](https://youtu.be/dmeIxuN0L5w) also helps.
+
+### Installation when running TiddlyWiki in Nodejs
+
+For general information on how to set up TiddlyWiki5 with Nodejs visit [tiddlywiki.com](http://tiddlywiki.com). The instructions here are for installing plugins on the node.js server.  This way, the same plugin can be served to many TiddlyWikis.  Multiple wikis will all use the same plugin instance.  You can also install via the standard drag-and-drop method (see below) in a single wiki being served on node.js, but the plugin will only be installed for that wiki. The process, including all updates, will have to be repeated for all other wikis if you plan on serving more than one.
 
 1. Download a copy of the plugins below by either cloning each repository or by clicking "Download ZIP" and unzipping it:
 
@@ -80,9 +98,8 @@ For general information on how to set up TiddlyWiki5 with Nodejs visit [tiddlywi
             
           ]
         }
+        
 4. The TW5-TopStoryView may not be needed in some cases (please see: [Live View plugin dependencies](http://tiddlymap.org/#Working%20with%20the%20live%20view))
 5. Restart your wiki server via the command line.
 
-### Drag'n'drop installation / Standalone installation
 
-Please follow the instructions given [here](http://tiddlymap.org/#Installation)

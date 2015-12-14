@@ -35,6 +35,11 @@ Major enhancements
 Important Bugfixes
 ----------------------------
 
+### v0.10.5
+
+* Fixes that entered text is saved when adding a newly created node
+  to the map.
+  
 ### v0.10.4
 
 * Fixes #195: Hitting delete key in graph triggers multiple dialogs

@@ -24,7 +24,7 @@ Motivation
 
 The motivation behind TiddlyMap is to combine the strengths of wikis and concept maps in the realms of personal knowledge management in a single application.
 
-Have you ever created mind- or concept maps and later wished you could turn them into a wiki because they became too complex and too hard to maintain? On the contrary, have you ever worked with a wiki and felt that it is lacking visual means express your thoughts and to relate your content? – If yes, then TiddlyMap is certainly what you are looking for.
+Have you ever created mind- or concept maps and later wished you could turn them into a wiki because they became too complex and too hard to maintain? On the contrary, have you ever worked with a wiki and felt that it is lacking visual means to express your thoughts and to relate your content? – If yes, then TiddlyMap is certainly what you are looking for.
 
 How it works
 ---------------------------------------------------------------------

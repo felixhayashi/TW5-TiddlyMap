@@ -1306,11 +1306,15 @@ Adapter.prototype.insertNode = function(node, view, options) {
   
   options = options || {}
   node = node || {};
-  
+    
   var fields = {
-    "text": "", // https://github.com/Jermolene/TiddlyWiki5/issues/2025
     "tmap.id": null // generated later
   };
+  
+  // https://github.com/Jermolene/TiddlyWiki5/issues/2025
+  if(!options.fields || !options.fields.text) {
+    fields.text = "";
+  }
   
   var title = $tw.wiki.generateNewTitle(node.label || "New node");
 

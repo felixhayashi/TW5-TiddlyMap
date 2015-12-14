@@ -29,9 +29,9 @@ Have you ever created mind- or concept maps and later wished you could turn them
 How it works
 ---------------------------------------------------------------------
 
-TiddlyMap is based on two open-source projects.
+TiddlyMap is based on two popular open-source projects.
 
-### The TiddlyWiki Project
+##### The TiddlyWiki project
 
 > [TiddlyWiki](http://tiddlywiki.com/) has bought unprecedented freedom to people to keep their precious information under their own control.
 > – [tiddlywiki.com]([http://tiddlywiki.com]/#TiddlyWiki)
@@ -48,7 +48,7 @@ The building blocks of TiddlyWiki are small pieces of information called "tiddle
 > –  Adapted from [Philosophy of Tiddlers](http://tiddlywiki.com/#Philosophy%20of%20Tiddlers) and [Tiddlers](http://tiddlywiki.com/#
 Tiddlers)
 
-### The Vis.js Project
+##### The Vis.js project
 
 For graph visualization and manipulation, TiddlyMap draws upon the popular open-source [vis.js](http://visjs.org/) library - *a dynamic, browser based visualization library* actively developed and maintained by a team of enthusiastic developers working at [Almende B.V](|http://almende.com).
 
@@ -58,7 +58,8 @@ For graph visualization and manipulation, TiddlyMap draws upon the popular open-
 License
 ---------------------------------------------------------------------
 
-By using this plugin you agree to the product's [License Terms](https://github.com/felixhayashi/TW5-TiddlyMap/blob/master/LICENSE) (TiddlyMap is distributed under the [BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)).
+TiddlyMap is distributed under the [BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause).
+By using this plugin you agree to the product's [License Terms](https://github.com/felixhayashi/TW5-TiddlyMap/blob/master/LICENSE).
 
 Installation
 ---------------------------------------------------------------------

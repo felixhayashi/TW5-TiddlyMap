@@ -37,8 +37,8 @@ Important Bugfixes
 
 ### v0.10.5
 
-* Fixes that entered text is saved when adding a newly created node
-  to the map.
+* Fixes that entered text is not saved when adding a newly created
+  node to the map.
   
 ### v0.10.4
 

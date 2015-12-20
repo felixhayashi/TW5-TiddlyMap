@@ -1,11 +1,13 @@
 created: 20150119191256190
 list: Installation [[Best Practices]] [[Common Pitfalls]] [[Basic concepts]] Interface Configuration [[Public API]] Examples Insight
-modified: 20151106174115316
+modified: 20151220143920310
 tags: Docs Help Guide Manual
 title: Documentation
 tmap.edges: {}
 tmap.id: 847d7896-9174-48f9-9509-6c89c1498335
 type: text/vnd.tiddlywiki
+
+\rules except wikilink
 
 \define toc-body(rootTag,tag,sort:"",itemClassFilter)
 <ol class="tc-toc">
@@ -23,5 +25,14 @@ type: text/vnd.tiddlywiki
 </$list>
 </ol>
 \end
+
+
+! Introduction
+
+In the sections below I tried to put down everything that is characteristic of TiddlyMap and that I consider important to develop an understanding of the tool. If some content is outdated, missing or confusing, please tell me. Thanks ;)
+
+If you are a beginner and need a more visual introduction to TiddlyMap, I recommend you have a look at the videos of the [[TiddlyMap basics series|https://www.youtube.com/playlist?list=PL1Jnk3P6K3KO4EEIlFpzqIWgJOcyN7i61]].
+
+! Table of contents
 
 <<toc "Documentation" >>

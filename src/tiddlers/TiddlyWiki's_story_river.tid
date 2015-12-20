@@ -1,0 +1,10 @@
+created: 20151220133957701
+modified: 20151220134450910
+tags: 
+title: TiddlyWiki's story river
+tmap.id: c62ac07a-0d4c-4cb9-9476-d361ca4faa49
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+In TiddlyWiki, open tiddlers are usually displayed in a vertical column called the "story river".

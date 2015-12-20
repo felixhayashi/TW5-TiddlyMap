@@ -1,5 +1,5 @@
 created: 20141218163905294
-modified: 20151106171114683
+modified: 20151220143804494
 tags: Documentation
 title: Installation
 tmap.edges: {}
@@ -8,9 +8,7 @@ type: text/vnd.tiddlywiki
 
 \rules except wikilink
 
-<div class="tmap-flash-message tmap-info">
-   <i class="fa fa-exclamation-circle"></i> Always be safe and backup your wiki before installation!
-</div>
+{{Always be safe and backup your wiki before installation!||$:/me/info}}
 
 !! Disclaimer
 
@@ -20,9 +18,9 @@ By using this plugin you agree to the product's [[License Terms|$:/plugins/felix
 
 <i class="fa fa-exclamation-circle"></i>  Before installing, I highly recommend you have a quick look at [[Common Pitfalls]] and [[Best Practices]].
 
-# Create a backup of your current TiddlyWiki (just in case).
+# Get yourself an empty copy of TiddlyWiki at [[tiddlywiki.com|http://tiddlywiki.com]].
 # Open your TiddlyWiki in a browser.
-# Drag all <sup>[1]</sup> the links below to the browser window containing your TiddlyWiki:
+# Drag all the links below to the browser window containing your TiddlyWiki: <sup>[1]</sup>
 #; [[TW5-TiddlyMap|$:/plugins/felixhayashi/tiddlymap]]
 #: This is the core TiddlyMap plugin.
 #; [[TW5-Vis.js|$:/plugins/felixhayashi/vis]]
@@ -40,9 +38,9 @@ By using this plugin you agree to the product's [[License Terms|$:/plugins/felix
 
 Also make sure to always check back to this site to see whether your version is up-to-date as updates and bugfixes come quick! For any bug you discover, please create an issue at [[github.com|https://github.com/felixhayashi/TW5-TiddlyMap/issues]].
 
-For more Information visit: http://tiddlywiki.com/#Plugins
+For more Information see [[TiddlyWiki plugins]].
 
 ---
 
 <sup>[1]</sup>
-<small>Maybe not all plugins are required depending on your story view configuration and whether you want to use TiddlyMap in live mode or not. See [[Live view]] and [[Live tab]] for more info.
+<small>Maybe not all plugins are required depending on your story view configuration and whether you want to use TiddlyMap in live mode or not. See [[Live view]] and [[Live tab]] for more info. If you are unsure, just drag & drop all plugins into your wiki.

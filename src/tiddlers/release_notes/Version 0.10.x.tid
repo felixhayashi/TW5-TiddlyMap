@@ -9,6 +9,15 @@ type: text/x-markdown
 Major enhancements
 ----------------------------
 
+### v0.10.7
+
+* Improved Fullscreen and halfscreen. Fullscreen doesn't trigger
+  the browser's fullscreen (F11) anymore but simply fills the page's
+  body. This is nicer to work with and also fixes #96.
+  Moreover, halfscreen and fullscreen may be switched immediately,
+  which is a true fix for #157.
+
+
 ### v0.10.6
 
 * Resolves #197: Add more keyboard shortcuts

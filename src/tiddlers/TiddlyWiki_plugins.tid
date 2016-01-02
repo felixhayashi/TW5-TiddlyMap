@@ -1,5 +1,5 @@
 created: 20151220135851567
-modified: 20151220143728518
+modified: 20151229123753831
 tags: 
 title: TiddlyWiki plugins
 tmap.id: d8068796-0d30-48ae-b4a7-30332581eb68
@@ -9,31 +9,29 @@ type: text/vnd.tiddlywiki
 
 A universe of plugins exists for TiddlyWiki.
 
+! Find more plugins
+
+* http://erwanm.github.io/tw-community-search/#CommunityPlugins
+* http://tobibeer.github.io/tb5/#Plugins
+* http://tiddlywiki.com/#Plugins
+
+
 ! Some plugins used at tiddlymap.org
 
 Below I listed some of the plugins used at tiddlymap.org that may be useful for your wiki as well.
 
-https://github.com/Spangenhelm/TW5-EnhancedSearchResults 
+* https://github.com/Spangenhelm/TW5-EnhancedSearchResults 
+**  //Shows search results in a tab //
+** By Florent V.
 
-*  //Shows search results in a tab //
-* By Florent V.
+*https://github.com/danielo515/TW5-KeyboardSnippets
+** //Extends the default text editor capabilities with keyboard shortcuts//
+** By Danielo Rodrigez
 
-https://github.com/danielo515/TW5-KeyboardSnippets
+*https://github.com/danielo515/TW5-contextPlugin
+** //Context search - provides visual highlighting of search results//
+** By Danielo Rodrigez
 
-* //Extends the default text editor capabilities with keyboard shortcuts//
-* By Danielo Rodrigez
-
-https://github.com/danielo515/TW5-contextPlugin
-
-* //Context search - provides visual highlighting of search results//
-* By Danielo Rodrigez
-
-[[Highlight.js|https://github.com/Jermolene/TiddlyWiki5/blob/master/plugins/tiddlywiki/highlight]]
-
-* //This plugin provides syntax highlighting of code blocks using highlight.js from Ivan Sagalaev.//
-* By JoaoBolila
-
-! More plugins
-
-* http://erwanm.github.io/tw-community-search/#CommunityPlugins
-* http://tiddlywiki.com/#Plugins
+*[[Highlight.js|https://github.com/Jermolene/TiddlyWiki5/blob/master/plugins/tiddlywiki/highlight]]
+** //This plugin provides syntax highlighting of code blocks using highlight.js from Ivan Sagalaev.//
+** By JoaoBolila

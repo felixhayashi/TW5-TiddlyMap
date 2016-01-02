@@ -1,5 +1,5 @@
 created: 20150206104625292
-modified: 20150712130147453
+modified: 20160102231109789
 tags: $:/tags/Stylesheet
 title: $:/me/layout.css
 type: text/css
@@ -31,20 +31,19 @@ code {
   animation-iteration-count: 1;
   
 }
-
 @-moz-keyframes flash {  
-  50% { background: #FFFFF5; }
-  100% { background: white; }
+  50% { border-color: firebrick; }
+  100% { border-color: white; }
 }
 
 @-webkit-keyframes flash {  
-  50% { background: #FFFFF5; }
-  100% { background: white; }
+  50% { border-color: firebrick; }
+  100% { border-color: white; }
 }
 
 @keyframes flash {  
-  50% { background: #FFFFF5; }
-  100% { background: white; }
+  50% { border-color: firebrick; }
+  100% { border-color: white; }
 }
 
 .h {

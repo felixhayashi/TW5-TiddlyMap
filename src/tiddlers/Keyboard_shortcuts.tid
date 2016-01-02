@@ -1,6 +1,6 @@
 created: 20160102145822661
-modified: 20160102160040307
-tags: Interface
+modified: 20160102223447069
+tags: Interface Hotkeys
 title: Keyboard shortcuts
 tmap.id: c28a3675-747f-4f7c-a5c1-2f67df152226
 type: text/vnd.tiddlywiki
@@ -39,8 +39,8 @@ When the widget has focus
 
 For more details see: [[Fullscreen and halfscreen]].
 
-* <kbd>F11</kbd> will toggle fullscreen mode
-* <kbd>F10</kbd> will toggle fullscreen halfscreen mode (if possible)
+* <kbd>F10</kbd> will toggle fullscreen mode
+* <kbd>F9</kbd> will toggle fullscreen halfscreen mode (if possible)
 
 ! Selecting nodes
 

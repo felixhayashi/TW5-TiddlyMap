@@ -1,5 +1,7 @@
 title: $:/plugins/felixhayashi/tiddlymap/misc/macros
 
+\define concat(str) $str$
+
 \define input-text(field, index, default, readonly)
   <$reveal type="match" text="" default="$readonly$">
     <$edit-text tiddler=<<output>> field="$field$" index="$index$" type="text" tag="input" default="$default$" />

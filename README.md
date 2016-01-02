@@ -50,7 +50,7 @@ Tiddlers)
 
 ##### The Vis.js project
 
-For graph visualization and manipulation, TiddlyMap draws upon the popular open-source [vis.js](http://visjs.org/) library - *a dynamic, browser based visualization library* actively developed and maintained by a team of enthusiastic developers working at [Almende B.V](|http://almende.com).
+For graph visualization and manipulation, TiddlyMap draws upon the popular open-source [Vis.js](http://visjs.org/) library - *a dynamic, browser based visualization library* actively developed and maintained by a team of enthusiastic developers working at [Almende B.V](|http://almende.com).
 
 > The library is designed to be easy to use, handle large amounts of dynamic data, and enable manipulation of the data
 > – [visjs.org](|http://visjs.org/)

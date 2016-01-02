@@ -3,7 +3,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
 \rules except wikilink
 \define showEdgeField() show-$(curEdgeId)$
 
-<!-- ===== View Switcher ======================================== -->
+<!-- === View Switcher ========================================== -->
 
 <div class="tmap-menu-bar">
   View:
@@ -22,6 +22,8 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
   <$reveal type="match" text="true" default=<<isViewBound>> >
     <b><<viewLabel>></b>
   </$reveal>
+
+<!-- === Menu =================================================== -->
 
   <$button
       popup=<<qualify "$:/temp/menu">>
@@ -70,10 +72,13 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
     </div>
   </$reveal>
   
+<!-- === Neighbourhood menu ===================================== -->
+
   <$reveal
       type="match"
       text="true"
-      default=<<tmap "option" "config.sys.editorMenuBar.showNeighScopeButton">>>
+      default=<<tmap "option"
+                     "config.sys.editorMenuBar.showNeighScopeButton">>>
     <$button
         class=<<neighScopeBtnClass>>
         tooltip="Change the neighbourhood scope"
@@ -112,6 +117,8 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
       <$radio field="config.neighbourhood_directions" value=""> Both</$radio>
     </div>
   </$reveal>
+  
+<!-- === Export menu ============================================ -->
   
   <$reveal
       type="match"

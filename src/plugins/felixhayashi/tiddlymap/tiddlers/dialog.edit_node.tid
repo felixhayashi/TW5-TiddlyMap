@@ -4,7 +4,6 @@ classes: tmap-remove-top-space
 
 \rules except wikilink
 
-\define tab(name) $(template)$/$name$
 \define vis-refresh-trigger() $(temp)$/vis-refresh
 
 \define maybeShowTidColorWarning()
@@ -58,6 +57,6 @@ classes: tmap-remove-top-space
 
 <$macrocall
   $name="tabs"
-  default=<<tab "default">>
+  default=<<concat "$(template)$/default">>
   tabsList="[all[shadows]prefix<template>] -[<template>]"
 />

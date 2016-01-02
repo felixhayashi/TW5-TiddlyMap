@@ -1,21 +1,24 @@
 title: $:/plugins/felixhayashi/tiddlymap/misc/focusButton
 
 \define filter() [list[$:/temp/tmap/nodes/$(viewLabel)$]search:title{$:/temp/tmap/bar/search}]
+\define concat(str) $str$
+
+\define state() $(widgetPopupsPath)$/focus
 
 <div class="tmap-focus-button">
-  <$reveal type="nomatch" state="$:/temp/tmap/state/focus" text=<<qualify>>>
+  <$reveal type="match" state=<<state>> text="">
     <$button
         tooltip="Zoom on a specific node"
         class=<<tv-config-toolbar-class>>>{{$:/core/images/advanced-search-button}}
      <$action-setfield $tiddler="$:/temp/tmap/bar/search" text="" />
-     <$action-setfield $tiddler="$:/temp/tmap/state/focus" text=<<qualify>> />
+     <$action-setfield $tiddler=<<state>> text="1" />
     </$button>
   </$reveal>
-  <$reveal type="match" state="$:/temp/tmap/state/focus" text=<<qualify>>>
+  <$reveal type="nomatch" state=<<state>> text="">
     <$button
         tooltip="Close zoom popup"
         class=<<tv-config-toolbar-class>>>{{$:/core/images/advanced-search-button}}
-     <$action-setfield $tiddler="$:/temp/tmap/state/focus" text="" />
+     <$action-setfield $tiddler=<<state>> text="" />
     </$button>
     <div class="tmap-popup">
       <div class="tc-drop-down">

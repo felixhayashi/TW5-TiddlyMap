@@ -16,7 +16,7 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 \end
 
 \define showButton(state)
-<$button set="$:/temp/tiddlymap/quickConnectButton"
+<$button set="$:/temp/tmap/state/popup/quickConnect"
          setTo="$state$" tooltip={{$:/language/Buttons/TiddlyMap/Hint}} 
          aria-label={{$:/language/Buttons/TiddlyMap/Caption}}
          class=<<buttonClass>>>
@@ -150,4 +150,4 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 </div>
 \end
 
-<$list filter="[all[current]is[tiddler]]"><$list filter="[{$:/temp/tiddlymap/quickConnectButton}prefix<qualify>]" variable="item" emptyMessage=<<hidePopup>>><<showPopup>></$list></$list>
+<$list filter="[all[current]is[tiddler]]"><$list filter="[{$:/temp/tmap/state/popup/quickConnect}prefix<qualify>]" variable="item" emptyMessage=<<hidePopup>>><<showPopup>></$list></$list>

@@ -64,6 +64,8 @@ var attachStaticConfig = function(parent) {
     dialogs:        "$:/plugins/felixhayashi/tiddlymap/dialog",
     footers:        "$:/plugins/felixhayashi/tiddlymap/dialogFooter",
     tempRoot:       "$:/temp/tmap",
+    tempStates:     "$:/temp/tmap/state",
+    tempPopups:     "$:/temp/tmap/state/popup",
     localHolders:   "$:/temp/tmap/holders"
   };
   
@@ -514,17 +516,15 @@ var printChanges = function(changedTiddlers) {
 
 };
 
-var popupStates = [
-  "$:/temp/tiddlymap/quickConnectButton",
-  "$:/temp/tmap/state/focus"
-];
-
 /**
  * @TODO: suggest this to Jeremy for TW popup handling
  */
 var registerClickListener = function() {
 
+  var tempPopups = $tw.tmap.opt.path.tempPopups;
   window.addEventListener("click", function(evt) {
+    
+    var popupStates = utils.getTiddlersByPrefix(tempPopups);
     
     for(var i = popupStates.length; i--;) {
       if(utils.getText(popupStates[i])) break;

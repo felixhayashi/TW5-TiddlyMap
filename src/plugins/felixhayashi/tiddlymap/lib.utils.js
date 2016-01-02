@@ -1014,6 +1014,26 @@ utils.getMergedTiddlers = function(tiddlers, title) {
 };
 
 /**
+ * Depth first search
+ */
+utils.getChildWidgetByProperty = function(widget, prop, val) {
+  
+  var children = widget.children;
+  for(var i = children.length; i--;) {
+    var child = children[i];
+    if(child[prop] === val) {
+      return child;
+    } else {
+      child = utils.getChildWidgetByProperty(child, prop, val);
+      if(child) {
+        return child;
+      }
+    }
+  }
+    
+};
+
+/**
  * Renames all tiddler titles that are prefixed with `oldPrefix`
  * into titles that are prefixed with `newPrefix` by replacing
  * `oldPrefix` with `newPrefix`.

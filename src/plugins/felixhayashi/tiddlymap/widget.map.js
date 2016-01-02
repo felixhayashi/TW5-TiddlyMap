@@ -48,6 +48,10 @@ var MapWidget = function(parseTreeNode, options) {
   this.fsapi = utils.getFullScreenApis();
   this.getAttr = this.getAttribute;
   this.isDebug = utils.isTrue(this.opt.config.sys.debug, false);
+  this.widgetTempStatePath = this.opt.path.tempStates
+                             + "/" + this.getStateQualifier();
+  this.widgetPopupsPath = this.opt.path.tempPopups
+                          + "/" + this.getStateQualifier();
   
   // instanciate managers
   this.callbackManager = new CallbackManager();
@@ -113,7 +117,7 @@ MapWidget.prototype = Object.create(Widget.prototype);
  * Once the user confirmed the dialog, the edge is persisted.
  * 
  * @param {Edge} edge - A javascript object that contains at least
- *    the properties "from", "to" and "label"
+ *    the properties "from" and "to"
  * @param {function} [callback] - A function with the signature
  *    function(isConfirmed);
  */
@@ -296,7 +300,7 @@ MapWidget.prototype.render = function(parent, nextSibling) {
    
     // add a loading bar
     this.addLoadingBar(this.domNode);
-    this.renderFullWidget(this.graphBarDomNode, this.graphDomNode);
+    this.renderFullWidget(this.domNode, this.graphBarDomNode, this.graphDomNode);
     
   }
       
@@ -341,7 +345,7 @@ MapWidget.prototype.renderPreview = function(header, body) {
  * The standard way of rendering.
  * Attention: BE CAREFUL WITH THE ORDER OF FUNCTION CALLS IN THIS FUNCTION.
  */
-MapWidget.prototype.renderFullWidget = function(header, body) {
+MapWidget.prototype.renderFullWidget = function(wrapper, header, body) {
   
   // register 
   this.sidebar = utils.getFirstElementByClassName("tc-sidebar-scrollable");
@@ -447,6 +451,9 @@ MapWidget.prototype.rebuildEditorBar = function() {
   
   var view = this.view;
   var variables = {
+    widgetQualifier: this.getStateQualifier(),
+    widgetTempPath: this.widgetTempPath,
+    widgetPopupsPath: this.widgetPopupsPath,
     isViewBound: String(this.isViewBound()),
     viewRoot: view.getRoot(),
     viewLabel: view.getLabel(),
@@ -972,7 +979,7 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
   
   this.visNetworkDomNode = this.graphDomNode.firstElementChild;
 
-  this.addGraphKeyBindings(this.graphDomNode);
+  this.addKeyBindings();
   
   for(var event in this.visHandlers) {
     this.network.on(event, this.visHandlers[event].bind(this));
@@ -995,49 +1002,126 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
 
 };
 
-MapWidget.prototype.addGraphKeyBindings = function(container) {
+MapWidget.prototype.addKeyBindings = function() {
   
-  // asign a tabindex to make it focussable
-  this.visNetworkDomNode.tabIndex = 0;
+  var conVector = { from: null, to: null };
   
-  this.graphKeydownHandler = function(event) {
+  this.graphKeydownHandler = function(ev) {
     
-    if(event.ctrlKey) { // ctrl key is hold down
-      event.preventDefault();
+    var nodeIds = this.network.getSelectedNodes();
+        
+    if(ev.ctrlKey) { // ctrl key is hold down
+      ev.preventDefault();
       
-      if(event.keyCode === 88) { // x
+      if(ev.keyCode === 88) { // x
         if(this.editorMode) {
           this.handleAddNodesToClipboard("move");
         } else {
           this.notify("Map is read only!");
         }
         
-      } else if(event.keyCode === 67) { // c
+      } else if(ev.keyCode === 67) { // c
         this.handleAddNodesToClipboard("copy");
         
-      } else if(event.keyCode === 86) { // v
+      } else if(ev.keyCode === 86) { // v
         this.handlePasteNodesFromClipboard();
       
-      } else if(event.keyCode === 65) { // a
+      } else if(ev.keyCode === 65) { // a
         var allNodes = Object.keys(this.graphData.nodesById);
         this.network.selectNodes(allNodes);
+        
+      } else if(ev.keyCode === 49 || ev.keyCode === 50) { // 1 || 2
+        if(nodeIds.length !== 1) return;
+        
+        conVector[ev.keyCode === 49 ? "from" : "to"] = nodeIds[0];
+        if(conVector.from && conVector.to) {
+          // create the edge
+          this.handleConnectionEvent(conVector, function(isConfirmed) {
+            if(isConfirmed) {
+              // reset both properties
+              conVector = { from: null, to: null };
+            }
+          });
+        }
+        
       }
+      
+    } else if(ev.keyCode === 13) { // ENTER
+      
+      if(nodeIds.length !== 1) return;
+      
+      this.openTiddlerWithId(nodeIds[0]);
+      
     }
+    
   }.bind(this);
   
-  this.graphKeyupHandler = function(event) {
+  this.graphKeyupHandler = function(ev) {
     
-    if(event.keyCode === 46) { // delete
-      event.preventDefault();
+    if(ev.keyCode === 46) { // delete
+      ev.preventDefault();
       this.handleRemoveElements(this.network.getSelection());
+      
     }
 
   }.bind(this);
   
-  container.addEventListener('keydown', this.graphKeydownHandler, true);
-  container.addEventListener('keyup', this.graphKeyupHandler, true);
+  this.widgetKeydownHandler = function(ev) {
+    
+    if(ev.ctrlKey) { // ctrl key is hold down
+      ev.preventDefault();
+      
+      if(ev.keyCode === 70) { // f
+        ev.preventDefault(); 
+              
+        var focusButtonStateTRef = this.widgetPopupsPath + "/focus";
+        var cls = "tmap-focus-button-reveal-widget";
+
+        utils.setText(focusButtonStateTRef,
+                      utils.getText(focusButtonStateTRef) ? "" : "1");
+        // in any way focus the graph, if the focus button is activated
+        // it will steal the focus anyway
+        this.graphDomNode.focus();
+
+      }
+    
+    } else if(ev.keyCode === 121) { // F10
+      ev.preventDefault();
+      // halfscreen
+      if(this.isContainedInSidebar) {
+        this.handleToggleFullscreen(true);
+      }
+
+    } else if(ev.keyCode === 122) { // F11
+      ev.preventDefault();
+      this.handleToggleFullscreen(false);
+
+    } else if(ev.keyCode === 27) { // ESC
+      ev.preventDefault();
+      
+      utils.deleteByPrefix(this.widgetPopupsPath);
+      this.graphDomNode.focus();
+      
+    }
+    
+  }.bind(this);
+  
+  this.widgetKeyupHandler = function(ev) {
+    
+  }.bind(this);
+  
+  // asign a tabindex to make it focussable
+  this.graphDomNode.tabIndex = 0;
+  this.domNode.tabIndex = 0;
+  
+  this.graphDomNode.addEventListener('keydown', this.graphKeydownHandler, true);
+  this.graphDomNode.addEventListener('keyup', this.graphKeyupHandler, true);
+  this.domNode.addEventListener('keyup', this.widgetKeyupHandler, true);
+  this.domNode.addEventListener('keydown', this.widgetKeydownHandler, true);
   
 };
+
+
 
 MapWidget.prototype.handlePasteNodesFromClipboard = function() {
   
@@ -2188,6 +2272,10 @@ MapWidget.prototype.destruct = function() {
   window.removeEventListener("click", this.handleClickEvent);
   window.removeEventListener("click", this.handleFullScreenChange);
   
+  // listeners bound to the whole widget
+  this.domNode.removeEventListener('keyup', this.widgetKeyupHandler, true);
+  this.domNode.removeEventListener('keydown', this.widgetKeydownHandler, true);
+  
   // while the container should be destroyed and the listeners
   // garbage collected, we remove them manually just to be save
   this.graphDomNode.removeEventListener('keydown', this.graphKeydownHandler, true);
@@ -2251,7 +2339,7 @@ MapWidget.prototype.openTiddlerWithId = function(id) {
     
   } else {
     
-    var bounds = this.parentDomNode.getBoundingClientRect();
+    var bounds = this.domNode.getBoundingClientRect();
     
     this.dispatchEvent({
       type: "tm-navigate",

@@ -3,8 +3,6 @@ subtitle: {{$:/core/images/new-button}} Creating a new view
 
 \rules except wikilink
 
-\define nodeFilter() [list[$:/temp/tmap/nodes/$(view)$]]
-
 Please specify a view name.
 
 ''Name:''

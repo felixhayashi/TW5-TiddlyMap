@@ -134,26 +134,6 @@ html { // used to increase css importance
     .tmap-widget {
       position: relative;
       min-height: 350px;
-            
-      &.tmap-halfscreen {
-        position: absolute;
-        right: 0px;
-        top: 0;
-        left: 0px;
-        bottom: 0;
-        padding: 0px;
-        width: 100% !important;
-        border: none;
-        border-left: 1px solid lightgray;
-        height: 100% !important;
-        margin: 0;
-        background: #ececec;
-        z-index: 1000;
-        
-        .tmap-fullscreen-button {
-          display: none;
-        }
-      }
     }
   }
 }
@@ -566,13 +546,7 @@ button.tmap-go-back {
   width: 100%;
   color: $color;
   display: block; // sometimes tw puts us into a span
-      
-  &.tmap-fullscreen {
-   .vis-network .tmap-halfscreen-button {
-      display: none;
-    }
-  }
-  
+        
   &.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) {
     cursor: pointer;
     
@@ -660,8 +634,8 @@ button.tmap-go-back {
             position: relative;
             border: 1px solid lightgray;
             width: 80px;
-            left: -70px;
-            top: -30px;
+            left: -100px;
+            top: -50px;
             z-index: 1000;
             text-align: center;
           }
@@ -966,48 +940,48 @@ table.tmap-table {
 
 /**** Fullscreen ***************************************************/
 
-@mixin fullscreen() {
+@mixin fillSpace() {
+  background: white !important;
+  height: 100% !important;
+  width: 100% !important;
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  z-index: 999 !important;
+  border: none !important;
+  margin: 0 !important;  
+}
 
-  body { // hide scrollbar
-    overflow: hidden;
+body.tmap-has-fullscreen-widget {
+
+  overflow: hidden; // hide scrollbar
+
+  .tmap-widget.tmap-fullscreen {
+    @include fillSpace();
   }
 
-  .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
-    z-index: 0;
-  }
-
-  .tmap-has-fullscreen-child {
-    z-index: 1 !important;
-    left: 0px !important;
-    top: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    position: fixed !important;
-    
-
-    .tmap-widget.tmap-fullscreen {
-      background: white !important;
-      height: 100% !important;
-      width: 100% !important;
-      position: fixed !important;
-      top: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      left: 0 !important;
-      z-index: 999 !important;
-      border: none !important;
-      margin: 0 !important;
+  .tc-dropzone > * {
+    &.tmap-has-fullscreen-widget {
+      @include fillSpace();
     }
-    
+    &:not(.tmap-has-fullscreen-widget) {
+      display: none;
+    }
+  }
+
+}
+
+body.tmap-has-halfscreen-widget {
+  
+  .tmap-widget.tmap-halfscreen {
+    @include fillSpace();
+    position: absolute !important;
+    border-left: 1px solid lightgray !important;
   }
   
 }
-
-html:fullscreen { @include fullscreen(); }
-html:-moz-full-screen { @include fullscreen(); }
-html:-webkit-full-screen { @include fullscreen(); }
-html:-ms-fullscreen { @include fullscreen(); }
-
 
 /**** Media queries ************************************************/
 

@@ -1023,7 +1023,6 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
   // see http://stackoverflow.com/a/22870717
   this.handleResizeEvent = this.handleResizeEvent.bind(this);
   this.handleClickEvent = this.handleClickEvent.bind(this);
-  this.handleFullScreenChange = this.handleFullScreenChange.bind(this);
   
   window.addEventListener("resize", this.handleResizeEvent, false);
   
@@ -1032,13 +1031,7 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
   }
   
   window.addEventListener("click", this.handleClickEvent, false);
-  
-  if(this.fsapi) {
-    window.addEventListener(this.fsapi["_fullscreenChange"],
-                            this.handleFullScreenChange,
-                            false);
-  }
-  
+    
   this.handleResizeEvent();
 
   this.graphOptions = this.getGraphOptions();
@@ -1065,12 +1058,16 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
   }
   
   this.addGraphButtons({
-    "fullscreen-button": function() { this.handleToggleFullscreen(false); }
+    "fullscreen-button": function() {
+      this.toggleEnlargedMode("fullscreen");
+    }
   });
   
   if(this.isContainedInSidebar) {
     this.addGraphButtons({
-      "halfscreen-button": function() { this.handleToggleFullscreen(true); }
+      "halfscreen-button": function() {
+        this.toggleEnlargedMode("halfscreen");
+      }
     });
   }
   
@@ -1112,14 +1109,15 @@ MapWidget.prototype.addKeyBindings = function() {
       } else if(ev.keyCode === 49 || ev.keyCode === 50) { // 1 || 2
         if(nodeIds.length !== 1) return;
         
-        conVector[ev.keyCode === 49 ? "from" : "to"] = nodeIds[0];
+        var role = ev.keyCode === 49 ? "from" : "to";
+        this.notify(utils.ucFirst(role) + "-part selected");
+        
+        conVector[role] = nodeIds[0];
         if(conVector.from &amp;&amp; conVector.to) {
           // create the edge
-          this.handleConnectionEvent(conVector, function(isConfirmed) {
-            if(isConfirmed) {
-              // reset both properties
-              conVector = { from: null, to: null };
-            }
+          this.handleConnectionEvent(conVector, function() {
+            // reset both properties, regardless whether confirmed
+            conVector = { from: null, to: null };
           });
         }
         
@@ -1164,16 +1162,13 @@ MapWidget.prototype.addKeyBindings = function() {
 
       }
     
+    } else if(ev.keyCode === 120) { // F9
+      ev.preventDefault();
+      this.toggleEnlargedMode("halfscreen");
+
     } else if(ev.keyCode === 121) { // F10
       ev.preventDefault();
-      // halfscreen
-      if(this.isContainedInSidebar) {
-        this.handleToggleFullscreen(true);
-      }
-
-    } else if(ev.keyCode === 122) { // F11
-      ev.preventDefault();
-      this.handleToggleFullscreen(false);
+      this.toggleEnlargedMode("fullscreen");
 
     } else if(ev.keyCode === 27) { // ESC
       ev.preventDefault();
@@ -1715,77 +1710,59 @@ MapWidget.prototype.handleRemoveNodes = function(nodeIds) {
 };
 
 /**
- * Called by browser when a fullscreen change occurs (entering or
- * exiting). Its purpose is to call the toggle fullscreen function
- * once the exit fullscreen event has occured.
- */
-MapWidget.prototype.handleFullScreenChange = function() {
-  
-  if(this.fsapi
-     &amp;&amp; this.enlargedMode === "fullscreen"
-     &amp;&amp; !document[this.fsapi["_fullscreenElement"]]) {
-    this.handleToggleFullscreen();
-  }
-  
-};
-
-/**
  * Calling this function will toggle the enlargement of the map
- * instance. We cannot set the element itself to native fullscreen as
- * as this would cause modals to be hidden. Therefore markers need to
- * be added at various places to ensure the map stretches properly.
- * This includes marking ancestor dom nodes to be able to shift the
- * stacking context.
+ * instance. Markers need to be added at various places to ensure the
+ * map stretches properly. This includes marking ancestor dom nodes
+ * to be able to shift the stacking context.
+ * 
+ * @param {string} type - either "halfscreen" or "fullscreen".
  */
-MapWidget.prototype.handleToggleFullscreen = function(useHalfscreen) {
+MapWidget.prototype.toggleEnlargedMode = function(type) {
   
   this.logger("log", "Toggled graph enlargement");
-      
-  if(this.enlargedMode) {
+          
+  var enlargedMode = this.enlargedMode;
+  
+  // in any case, exit enlarged mode if active
+  if(enlargedMode) {
     
+    // reset click to use
     this.network.setOptions({ clickToUse: this.clickToUse });
-    
     // remove markers
     utils.findAndRemoveClassNames([
-      "tmap-" + this.enlargedMode,
-      "tmap-has-" + this.enlargedMode + "-child"
+      "tmap-has-" + enlargedMode + "-widget",
+      "tmap-" + enlargedMode
     ]);
-    
-    if(this.enlargedMode === "fullscreen") {
-      document[this.fsapi["_exitFullscreen"]]();
-    }
-    
-    // reset
+    // reset flag
     this.enlargedMode = null;
     
-  } else {
+  }
+  
+  if(!enlargedMode || enlargedMode !== type) {
+  // either not active or we switched from one mode to another
     
-    if(!useHalfscreen &amp;&amp; !this.fsapi) {
-      this.dialogManager.open("fullscreenNotSupported");
+    if(!this.isContainedInSidebar &amp;&amp; type === "halfscreen") {
+      // not allowed
       return;
     }
-
-    this.enlargedMode = (this.isContainedInSidebar &amp;&amp; useHalfscreen
-                         ? "halfscreen"
-                         : "fullscreen");
-                         
-    $tw.utils.addClass(this.domNode, "tmap-" + this.enlargedMode);
-      
+    
+    this.enlargedMode = type;
+  
+  
     var pContainer = (this.isContainedInSidebar
                       ? this.sidebar
                       : utils.getFirstElementByClassName("tc-story-river"));
             
-    $tw.utils.addClass(pContainer, "tmap-has-" + this.enlargedMode + "-child");        
-    
-    if(this.enlargedMode === "fullscreen") {
-      this.document.documentElement[this.fsapi["_requestFullscreen"]](Element.ALLOW_KEYBOARD_INPUT);
-    }
-        
-    this.notify("Activated " + this.enlargedMode + " mode");
-    
+    $tw.utils.addClass(this.document.body, "tmap-has-" + type + "-widget");
+    $tw.utils.addClass(pContainer, "tmap-has-" + type + "-widget");
+    $tw.utils.addClass(this.domNode, "tmap-" + type);  
+            
+    // disable click to use by force
     this.network.setOptions({ clickToUse: false });
 
   }
+  
+  this.notify("Toggled " + type + " mode");
   
   this.handleResizeEvent();
 
@@ -2349,7 +2326,6 @@ MapWidget.prototype.destruct = function() {
   
   window.removeEventListener("resize", this.handleResizeEvent);
   window.removeEventListener("click", this.handleClickEvent);
-  window.removeEventListener("click", this.handleFullScreenChange);
   
   // listeners bound to the whole widget
   this.domNode.removeEventListener('keyup', this.widgetKeyupHandler, true);
@@ -2638,7 +2614,8 @@ MapWidget.prototype.getRefreshedDataSet = function(ltNew, ltOld, ds) {
  */
 MapWidget.prototype.repaintGraph = function() {
   
-  var isInFS = this.fsapi &amp;&amp; document[this.fsapi["_fullscreenElement"]];
+  var isInFS = $tw.utils.hasClass(this.document.body,
+                                  "tmap-has-fullscreen-widget");
   if(this.network &amp;&amp; (!isInFS || (isInFS &amp;&amp; this.enlargedMode))) {
   
     this.logger("info", "Repainting the whole graph");
@@ -2793,7 +2770,7 @@ exports.tiddlymap = MapWidget;
 
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-beta3</a>
-	on 2016-01-02T17:01:51+01:00 using the <a
+	on 2016-01-03T00:12:12+01:00 using the <a
 	href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
 </span>
 </footer>

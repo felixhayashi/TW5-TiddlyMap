@@ -83,22 +83,6 @@ html {
   html .tc-sidebar-scrollable .tmap-widget {
     position: relative;
     min-height: 350px; }
-    html .tc-sidebar-scrollable .tmap-widget.tmap-halfscreen {
-      position: absolute;
-      right: 0px;
-      top: 0;
-      left: 0px;
-      bottom: 0;
-      padding: 0px;
-      width: 100% !important;
-      border: none;
-      border-left: 1px solid lightgray;
-      height: 100% !important;
-      margin: 0;
-      background: #ececec;
-      z-index: 1000; }
-      html .tc-sidebar-scrollable .tmap-widget.tmap-halfscreen .tmap-fullscreen-button {
-        display: none; }
 
 /**** Quick connect ************************************************/
 .tmap-quick-connect {
@@ -329,8 +313,6 @@ button.tmap-go-back {
   width: 100%;
   color: #666666;
   display: block; }
-  .tmap-widget.tmap-fullscreen .vis-network .tmap-halfscreen-button {
-    display: none; }
   .tmap-widget.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) {
     cursor: pointer; }
     .tmap-widget.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) .vis-navigation {
@@ -393,8 +375,8 @@ button.tmap-go-back {
         position: relative;
         border: 1px solid lightgray;
         width: 80px;
-        left: -70px;
-        top: -30px;
+        left: -100px;
+        top: -50px;
         z-index: 1000;
         text-align: center; }
       .tmap-widget .tmap-vis-graph .vis-network .vis-navigation .vis-button:hover.vis-up:before {
@@ -582,18 +564,9 @@ table.tmap-table tr, .tc-modal-body table.tmap-config-table tr {
     background-color: #FFFFFF; }
 
 /**** Fullscreen ***************************************************/
-html:fullscreen body {
+body.tmap-has-fullscreen-widget {
   overflow: hidden; }
-html:fullscreen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
-  z-index: 0; }
-html:fullscreen .tmap-has-fullscreen-child {
-  z-index: 1 !important;
-  left: 0px !important;
-  top: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  position: fixed !important; }
-  html:fullscreen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
+  body.tmap-has-fullscreen-widget .tmap-widget.tmap-fullscreen {
     background: white !important;
     height: 100% !important;
     width: 100% !important;
@@ -605,78 +578,35 @@ html:fullscreen .tmap-has-fullscreen-child {
     z-index: 999 !important;
     border: none !important;
     margin: 0 !important; }
+  body.tmap-has-fullscreen-widget .tc-dropzone > *.tmap-has-fullscreen-widget {
+    background: white !important;
+    height: 100% !important;
+    width: 100% !important;
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    z-index: 999 !important;
+    border: none !important;
+    margin: 0 !important; }
+  body.tmap-has-fullscreen-widget .tc-dropzone > *:not(.tmap-has-fullscreen-widget) {
+    display: none; }
 
-html:-moz-full-screen body {
-  overflow: hidden; }
-html:-moz-full-screen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
-  z-index: 0; }
-html:-moz-full-screen .tmap-has-fullscreen-child {
-  z-index: 1 !important;
-  left: 0px !important;
+body.tmap-has-halfscreen-widget .tmap-widget.tmap-halfscreen {
+  background: white !important;
+  height: 100% !important;
+  width: 100% !important;
+  position: fixed !important;
   top: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  position: fixed !important; }
-  html:-moz-full-screen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
-    background: white !important;
-    height: 100% !important;
-    width: 100% !important;
-    position: fixed !important;
-    top: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    z-index: 999 !important;
-    border: none !important;
-    margin: 0 !important; }
-
-html:-webkit-full-screen body {
-  overflow: hidden; }
-html:-webkit-full-screen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
-  z-index: 0; }
-html:-webkit-full-screen .tmap-has-fullscreen-child {
-  z-index: 1 !important;
-  left: 0px !important;
-  top: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  position: fixed !important; }
-  html:-webkit-full-screen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
-    background: white !important;
-    height: 100% !important;
-    width: 100% !important;
-    position: fixed !important;
-    top: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    z-index: 999 !important;
-    border: none !important;
-    margin: 0 !important; }
-
-html:-ms-fullscreen body {
-  overflow: hidden; }
-html:-ms-fullscreen .tc-dropzone > *:not(.tmap-has-fullscreen-child) {
-  z-index: 0; }
-html:-ms-fullscreen .tmap-has-fullscreen-child {
-  z-index: 1 !important;
-  left: 0px !important;
-  top: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  position: fixed !important; }
-  html:-ms-fullscreen .tmap-has-fullscreen-child .tmap-widget.tmap-fullscreen {
-    background: white !important;
-    height: 100% !important;
-    width: 100% !important;
-    position: fixed !important;
-    top: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    z-index: 999 !important;
-    border: none !important;
-    margin: 0 !important; }
+  left: 0 !important;
+  z-index: 999 !important;
+  border: none !important;
+  margin: 0 !important;
+  position: absolute !important;
+  border-left: 1px solid lightgray !important; }
 
 /**** Media queries ************************************************/
 @media (max-width: {{$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint}}) {

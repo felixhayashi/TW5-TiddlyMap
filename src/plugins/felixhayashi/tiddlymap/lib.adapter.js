@@ -52,6 +52,11 @@ var Adapter = function() {
       "ellipse", "circle", "database", "box", "text"
   ]);
   
+  // hack to support
+  // https://github.com/felixhayashi/TW5-TiddlyMap/issues/198
+  this.isTransTypeEnabled = (typeof $tw.wiki.getTiddlerTranscludes
+                             === "function");
+  
 };
 
 /**
@@ -589,6 +594,12 @@ Adapter.prototype._addBodyAndFieldEdges = function(edges, tObj, toWL, typeWL) {
   
   if(!typeWL || typeWL["tw-body:link"]) {
     refsByType["tw-body:link"] = $tw.wiki.getTiddlerLinks(fromTRef);
+  }
+  
+  // hack to support
+  // https://github.com/felixhayashi/TW5-TiddlyMap/issues/198
+  if(this.isTransTypeEnabled && (!typeWL || typeWL["tw-body:transclude"])) {
+    refsByType["tw-body:transclude"] = $tw.wiki.getTiddlerTranscludes(fromTRef);
   }
 
   for(var f in fromTObjFields) {

@@ -17,7 +17,6 @@ Major enhancements
   Moreover, halfscreen and fullscreen may be switched immediately,
   which is a true fix for #157.
 
-
 ### v0.10.6
 
 * Resolves #197: Add more keyboard shortcuts

@@ -59,6 +59,7 @@ var attachStaticConfig = function(parent) {
     nodeTypes:      "$:/plugins/felixhayashi/tiddlymap/graph/nodeTypes",
     listEdgeTypes:  "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-list:",
     fieldEdgeTypes: "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-field:",
+    filterEdgeTypes: "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-filter:",
     views:          "$:/plugins/felixhayashi/tiddlymap/graph/views",
     options:        "$:/plugins/felixhayashi/tiddlymap/config",
     dialogs:        "$:/plugins/felixhayashi/tiddlymap/dialog",
@@ -122,6 +123,7 @@ var attachStaticConfig = function(parent) {
     edgeTypes: "[prefix[" + o.path.edgeTypes + "]]",
     listEdgeTypes: "[prefix[" + o.path.listEdgeTypes + "]]",
     fieldEdgeTypes: "[prefix[" + o.path.fieldEdgeTypes + "]]",
+    filterEdgeTypes: "[prefix[" + o.path.filterEdgeTypes + "]]",
     views: "[" + o.config.sys.field.viewMarker + "[true]]"
   };
     
@@ -162,6 +164,11 @@ var attachStaticConfig = function(parent) {
                          + " +" + o.filter.fieldEdgeTypes
                          + " +[removeprefix[" + p.fieldEdgeTypes + "]]";
   
+  // all names of fields that store edges
+  s.allFilterEdgeStores = allSelector
+                         + " +" + o.filter.filterEdgeTypes
+                         + " +[removeprefix[" + p.filterEdgeTypes + "]]";
+
 };
 
 /**
@@ -324,9 +331,11 @@ var updateEdgeTypesIndeces = function(parent) {
   var typePath = $tw.tmap.opt.path.edgeTypes;
   var listEdgeTypes = $tw.tmap.opt.path.listEdgeTypes;
   var fieldEdgeTypes = $tw.tmap.opt.path.fieldEdgeTypes;
+  var filterEdgeTypes = $tw.tmap.opt.path.filterEdgeTypes;
   var allETy = parent.allETy = utils.getDataMap();
   var liETy = parent.liETy = utils.getDataMap();
   var fiETy = parent.fiETy = utils.getDataMap();
+  var ftETy = parent.ftETy = utils.getDataMap();
   // magic edge-type field name
   var maETyFiNa = parent.maETyFiNa = utils.getDataMap();
   
@@ -339,6 +348,9 @@ var updateEdgeTypesIndeces = function(parent) {
         maETyFiNa[et.getId(true)] = true;
       } else if(utils.startsWith(tRef, fieldEdgeTypes)) {
         fiETy[et.id] = et;
+        maETyFiNa[et.getId(true)] = true;
+      } else if(utils.startsWith(tRef, filterEdgeTypes)) {
+        ftETy[et.id] = et;
         maETyFiNa[et.getId(true)] = true;
       }
     }

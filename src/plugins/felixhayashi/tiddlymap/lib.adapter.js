@@ -586,6 +586,7 @@ Adapter.prototype._addBodyAndFieldEdges = function(edges, tObj, toWL, typeWL) {
   var fromTRef = utils.getTiddlerRef(tObj);
   var indeces = this.indeces;
   var fiETy = indeces.fiETy;
+  var ftETy = indeces.ftETy;
   var liETy = indeces.liETy;
   var maETyFiNa = indeces.maETyFiNa; // magic edge-type field names
   var refsByType = utils.getDataMap();
@@ -606,13 +607,15 @@ Adapter.prototype._addBodyAndFieldEdges = function(edges, tObj, toWL, typeWL) {
     
     if(!maETyFiNa[f]) continue;
     
-    var type = fiETy["tw-field:" + f] || liETy["tw-list:" + f];
+    var type = fiETy["tw-field:" + f] || liETy["tw-list:" + f] || ftETy["tw-filter:" + f];
     if(typeWL && !typeWL[type.id]) continue;
     
     if(fiETy[type.id]) {
       refsByType[type.id] = [ fromTObjFields[f] ];
     } else if(liETy[type.id]) {
       refsByType[type.id] = $tw.utils.parseStringArray(fromTObjFields[f]);
+    } else if(ftETy[type.id]) {
+      refsByType[type.id] = $tw.wiki.filterTiddlers(fromTObjFields[f]);
     }
   }
   

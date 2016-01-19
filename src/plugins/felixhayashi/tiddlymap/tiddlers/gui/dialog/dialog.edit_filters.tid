@@ -1,0 +1,34 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/editFilters
+subtitle: {{$:/core/images/edit-button}} Filter editor -- <<view>>
+classes: tmap-remove-top-space
+
+\rules except wikilink
+
+<div class="tmap-flash-message tmap-warning">
+  {{$:/core/images/info-button}} Completely new to filters?
+  Please read [[Introduction to filter notation|http://tiddlywiki.com/#Introduction%20to%20filter%20notation]] first.
+</div>
+
+<fieldset>
+  <legend>Filters <sup>[1]</sup></legend>
+  <table class="tmap-config-table">
+    <<tmap-row type:"input-textarea"
+        title:"Node filter"
+        field:"prettyNodeFilter"
+        descr:"Show tiddlers in the graph that match this filter.
+               Drafts and system tiddlers are automatically
+               excluded.">>
+    <<tmap-row type:"input-textarea"
+        title:"Edge filter"
+        field:"prettyEdgeTypeFilter" 
+        descr:"Show edges that match this filter.">>
+  </table>   
+</fieldset>
+
+---
+
+<sup>[1]</sup> In the editors above, a new line is equivalent to a space symbol.<br />
+<sup>[2]</sup> It is suggested to read
+[[Node and edge-type filters|http://tiddlymap.org#Node%20and%20edge-type%20filters]]
+and [[Edge-type namespaces|http://tiddlymap.org#Node%20and%20edge-type%20filters]]
+before using Tiddlymap's filter editor.

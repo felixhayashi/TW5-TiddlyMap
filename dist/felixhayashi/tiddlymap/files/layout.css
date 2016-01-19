@@ -1,3 +1,65 @@
+/********************************************************************
+ * README                                                           
+ ********************************************************************
+ * 
+ * If you add some non-valid css string that won't compile and 
+ * unquote also doesn't help, do the following: in this stylesheet,
+ * add a placeholder of the form __yourVariable__ at the point where
+ * you need the string to be inserted. Then visit the gulpfile.js
+ * file and add a replace instruction for your variable so it will
+ * be replaced after the sass compiler has finished.
+ * 
+ *******************************************************************/
+/**** Variables and mixins *****************************************/
+/**** Keyframes for animations *************************************/
+@-o-keyframes fadein-keyframes {
+  0% {
+    opacity: 0; }
+  100% {
+    opacity: 1; } }
+
+@-moz-keyframes fadein-keyframes {
+  0% {
+    opacity: 0; }
+  100% {
+    opacity: 1; } }
+
+@-webkit-keyframes fadein-keyframes {
+  0% {
+    opacity: 0; }
+  100% {
+    opacity: 1; } }
+
+@keyframes flash fadein-keyframes {
+  0% {
+    opacity: 0; }
+  100% {
+    opacity: 1; } }
+
+@-o-keyframes fadeout-keyframes {
+  0% {
+    opacity: 1; }
+  100% {
+    opacity: 0; } }
+
+@-moz-keyframes fadeout-keyframes {
+  0% {
+    opacity: 1; }
+  100% {
+    opacity: 0; } }
+
+@-webkit-keyframes fadeout-keyframes {
+  0% {
+    opacity: 1; }
+  100% {
+    opacity: 0; } }
+
+@keyframes flash fadeout-keyframes {
+  0% {
+    opacity: 1; }
+  100% {
+    opacity: 0; } }
+
 /**** TiddlyWiki ***************************************************/
 /**
  * Do not allow blurred background for dialogs
@@ -27,6 +89,34 @@
   .tmap-flash-message.tmap-malformed, .tmap-flash-message.tmap-invalid, .tmap-flash-message.tmap-danger {
     background: #EED5D1; }
 
+/**** Graph element tooltip ****************************************/
+.tmap-popup {
+  position: absolute;
+  opacity: 0;
+  cursor: auto;
+  min-width: 100px;
+  min-height: 50px;
+  max-width: 400px;
+  max-height: 300px;
+  padding: 5px;
+  resize: both;
+  overflow: auto;
+  font-family: verdana;
+  font-size: 14px;
+  background-color: #f5f4ed;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  border: 1px solid #808074;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease; }
+  .tmap-popup[style*="height"] {
+    max-height: none; }
+  .tmap-popup[style*="width"] {
+    max-width: none; }
+  .tmap-popup.tmap-popup-active {
+    opacity: 1; }
+
 /*******************************************************************/
 .tmap-save-canvas-preview {
   text-align: center; }
@@ -51,38 +141,38 @@
   text-align: center;
   color: black; }
 
-html {
-  /*
-  body {
-    background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/tiddlymap/media/surface.png!!type}} text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}}/>'));
-  }
-  */ }
-  html .tmap-link {
-    color: #5778D8; }
-    html .tmap-link:hover {
-      color: white;
-      background: #5778D8; }
-  html .tmap-small-list, html .tmap-very-small-list {
-    overflow: auto;
-    min-height: 20px;
-    max-height: 150px;
-    display: block; }
-  html .tmap-very-small-list {
-    max-height: 70px; }
-  html .tc-tiddler-controls button.tmap-active-button svg {
-    fill: #888888; }
-  html #tmap-node-filter-dialog #tmap-filter-tips {
-    font-size: 0.8em; }
-  html #tmap-node-filter-dialog textarea {
-    height: 100px;
-    max-height: 300px;
-    overflow: auto;
-    width: 100%;
-    font-size: 11px;
-    font-family: "Courier New", Courier, monospace; }
-  html .tc-sidebar-scrollable .tmap-widget {
-    position: relative;
-    min-height: 350px; }
+html .tmap-link {
+  color: #5778D8; }
+  html .tmap-link:hover {
+    color: white;
+    background: #5778D8; }
+
+html .tmap-small-list, html .tmap-very-small-list {
+  overflow: auto;
+  min-height: 20px;
+  max-height: 150px;
+  display: block; }
+
+html .tmap-very-small-list {
+  max-height: 70px; }
+
+html .tc-tiddler-controls button.tmap-active-button svg {
+  fill: #888888; }
+
+html #tmap-node-filter-dialog #tmap-filter-tips {
+  font-size: 0.8em; }
+
+html #tmap-node-filter-dialog textarea {
+  height: 100px;
+  max-height: 300px;
+  overflow: auto;
+  width: 100%;
+  font-size: 11px;
+  font-family: "Courier New", Courier, monospace; }
+
+html .tc-sidebar-scrollable .tmap-widget {
+  position: relative;
+  min-height: 350px; }
 
 /**** Quick connect ************************************************/
 .tmap-quick-connect {
@@ -98,7 +188,7 @@ html {
     position: absolute;
     z-index: 1000;
     right: 50px;
-    background: linear-gradient(45deg, #f5f5f5 0%, #ffffff 50%, #f5f5f5 100%); }
+    background: linear-gradient(45deg, whitesmoke 0%, white 50%, whitesmoke 100%); }
     .tmap-quick-connect .tc-drop-down:first-child {
       padding-top: 0;
       margin-top: 0; }
@@ -148,7 +238,7 @@ html {
       padding: 0px 3px;
       text-align: center;
       color: #333333;
-      line-height: 1; }
+      line-height: 1.0; }
       .tmap-quick-connect .tc-drop-down button:hover {
         color: #ffffff; }
       .tmap-quick-connect .tc-drop-down button svg {
@@ -200,8 +290,10 @@ html {
 
 .tc-modal-body .tmap-modal-editor > p {
   margin: 0px; }
+
 .tc-modal-body .tmap-modal-editor .tmap-template-select select {
   width: 50%; }
+
 .tc-modal-body .tmap-modal-editor .tc-tiddler-frame {
   margin: auto;
   width: auto; }
@@ -244,7 +336,7 @@ html {
   height: 50vh;
   float: left;
   width: 21%;
-  background: linear-gradient(90deg, #f5f5f5 0%, #ffffff 50%); }
+  background: linear-gradient(90deg, whitesmoke 0%, white 50%); }
   #tmap-element-type-manager > div:first-child .tmap-searchbar {
     padding: 1em 0 0 0; }
     #tmap-element-type-manager > div:first-child .tmap-searchbar input {
@@ -263,6 +355,7 @@ html {
       #tmap-element-type-manager > div:first-child ul li .tmap-ranking {
         width: 30px;
         display: inline-block; }
+
 #tmap-element-type-manager > div:last-child {
   height: 100%;
   width: calc(79% - 15px);
@@ -288,10 +381,12 @@ html {
   padding-left: 0px; }
   #tmap-search-table td:first-child {
     width: 30px; }
+
 #tmap-search-table b {
   display: inline-block;
   width: 40px;
   text-align: right; }
+
 #tmap-search-table ul {
   padding-left: 20px;
   margin: 1em 0 0 0; }
@@ -310,6 +405,7 @@ button.tmap-go-back {
   position: relative;
   border: 1px dotted lightgray;
   padding: 2px;
+  overflow: hidden;
   width: 100%;
   color: #666666;
   display: block; }
@@ -318,21 +414,20 @@ button.tmap-go-back {
     .tmap-widget.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) .vis-navigation {
       display: none; }
     .tmap-widget.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active):hover:before {
-      box-shadow: 10px 10px 5px lightgray;
       color: gray;
       background: white;
       content: "Click to use";
-      font-size: 18px;
+      font-size: 14px;
       font-weight: bold;
-      left: 50%;
-      margin-left: -100px;
+      right: calc(50% - 65px - 5px);
       position: absolute;
       text-align: center;
-      top: 50px;
-      width: 200px;
+      top: calc(50% - 14px - 5px);
+      width: 130px;
       z-index: 2000;
       padding: 5px;
-      pointer-events: none; }
+      pointer-events: none;
+      background-color: rgba(255, 255, 255, 0.3); }
   .tmap-widget .tmap-loading-bar {
     display: none;
     position: absolute;
@@ -348,9 +443,6 @@ button.tmap-go-back {
     right: 0px; }
   .tmap-widget .tmap-vis-graph {
     height: calc(100% - 35px); }
-    .tmap-widget .tmap-vis-graph .vis-network .vis-network-tooltip {
-      max-width: 250px;
-      white-space: normal; }
     .tmap-widget .tmap-vis-graph .vis-network .vis-edit-mode {
       height: 26px; }
     .tmap-widget .tmap-vis-graph .vis-network .vis-manipulation {
@@ -430,9 +522,9 @@ button.tmap-go-back {
       right: 10px; }
       .tmap-widget .tmap-topbar .tmap-focus-button input {
         width: 140px; }
-    .tmap-widget .tmap-topbar .tmap-popup {
+    .tmap-widget .tmap-topbar .tmap-search-dropdown {
       position: relative; }
-      .tmap-widget .tmap-topbar .tmap-popup .tc-drop-down {
+      .tmap-widget .tmap-topbar .tmap-search-dropdown .tc-drop-down {
         position: absolute;
         z-index: 999;
         right: 0px; }
@@ -484,6 +576,7 @@ button.tmap-go-back {
 
 .tmap-widget.tmap-static-mode .tmap-topbar {
   height: initial; }
+
 .tmap-widget.tmap-static-mode .tmap-vis-graph {
   text-align: center;
   cursor: not-allowed; }
@@ -521,7 +614,15 @@ button.tmap-go-back {
   padding: 5px;
   margin: 5px 0;
   box-sizing: border-box;
-  display: block; }
+  display: block;
+  /*
+  .vis-color-picker {
+    width: 310px;
+    left: 20px !important;
+    top: 20px !important;
+    height: 444px;
+  }
+*/ }
   .tmap-config-widget .vis-network {
     display: none; }
   .tmap-config-widget .vis-configuration-wrapper {
@@ -539,17 +640,23 @@ button.tmap-go-back {
           width: 150px !important; }
       .tmap-config-widget .vis-configuration-wrapper .vis-config-item .vis-config-label {
         width: 120px; }
-  .tmap-config-widget .vis-color-picker {
-    width: 310px;
-    left: 20px !important;
-    top: 20px !important;
-    margin-top: 0px;
-    margin-left: 0px;
-    height: 444px; }
   .tmap-config-widget::after {
     clear: both;
     content: "";
     display: block; }
+
+/**** vis buttons **************************************************/
+.tc-dropzone > *:not(.tc-sidebar-scrollable) .tmap-widget .vis-button .tmap-halfscreen {
+  display: none; }
+
+.tc-dropzone > *:not(.tc-sidebar-scrollable) .tmap-widget:not(.tmap-fullscreen) .vis-button {
+  display: none; }
+
+.tc-dropzone > *:not(.tc-sidebar-scrollable) .tmap-widget:hover .vis-button.tmap-fullscreen-button {
+  display: block; }
+
+.tc-dropzone > *:not(.tc-sidebar-scrollable) .tmap-widget:hover .vis-button.vis-zoomExtends {
+  display: block; }
 
 /**** Other ********************************************************/
 table.tmap-table tr, .tc-modal-body table.tmap-config-table tr {
@@ -611,13 +718,11 @@ body.tmap-has-halfscreen-widget .tmap-widget.tmap-halfscreen {
 /**** Media queries ************************************************/
 @media (max-width: {{$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint}}) {
   .tc-sidebar-scrollable .tmap-desktop-editor {
-    display: none; }
- }
+    display: none; } }
 
 @media (min-width: {{$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint}}) {
   .tc-sidebar-scrollable .tmap-mobile-editor {
     display: none; }
-
   .tc-modal-wrapper {
     z-index: 1010; }
     .tc-modal-wrapper .tc-modal {
@@ -626,5 +731,4 @@ body.tmap-has-halfscreen-widget .tmap-widget.tmap-halfscreen {
       width: 802px; }
     .tc-modal-wrapper .tc-modal-body {
       left: calc(50% - 400px);
-      width: 800px; }
- }
+      width: 800px; } }

@@ -1,7 +1,48 @@
+/********************************************************************
+ * README                                                           
+ ********************************************************************
+ * 
+ * If you add some non-valid css string that won't compile and 
+ * unquote also doesn't help, do the following: in this stylesheet,
+ * add a placeholder of the form __yourVariable__ at the point where
+ * you need the string to be inserted. Then visit the gulpfile.js
+ * file and add a replace instruction for your variable so it will
+ * be replaced after the sass compiler has finished.
+ * 
+ *******************************************************************/
+
+/**** Variables and mixins *****************************************/
+
 $filterbar-height: 35px;
 $default-input-width: 140px;
 $padding : 5px;
 $color: #666666;
+
+@mixin keyframes($name) {
+  @-o-keyframes #{$name} { @content }
+  @-moz-keyframes #{$name} { @content }
+  @-webkit-keyframes #{$name} { @content }
+  @keyframes flash #{$name} { @content }
+}
+
+// see https://developer.mozilla.org/en/docs/Web/CSS/animation
+@mixin animation($name-and-params) {
+  -o-animation: unquote($name-and-params);
+  -moz-animation: unquote($name-and-params);
+  -webkit-animation: unquote($name-and-params);
+  animation: unquote($name-and-params);
+}
+
+/**** Keyframes for animations *************************************/
+
+@include keyframes("fadein-keyframes") {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@include keyframes("fadeout-keyframes") {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
 
 /**** TiddlyWiki ***************************************************/
 
@@ -43,6 +84,44 @@ $color: #666666;
   &.tmap-malformed, &.tmap-invalid, &.tmap-danger {
     background: #EED5D1;
   }
+}
+
+/**** Graph element tooltip ****************************************/
+
+// See http://stackoverflow.com/questions/3331353/transitions-on-the-display-property
+.tmap-popup {
+  position: absolute;
+  opacity: 0;
+  cursor: auto;
+  min-width: 100px;
+  min-height: 50px;
+  max-width: 400px;
+  max-height: 300px;
+  padding: 5px;
+  resize: both;
+  overflow: auto;
+  font-family: verdana;
+  font-size:14px;
+  background-color: #f5f4ed;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  border: 1px solid #808074;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease;
+  
+  &[style*="height"] {
+    max-height: none;
+  };
+  
+  &[style*="width"] {
+    max-width: none;
+  };
+
+  &.tmap-popup-active {
+    opacity: 1;
+  }
+  
 }
 
 /*******************************************************************/
@@ -105,12 +184,6 @@ html { // used to increase css importance
       }
     }
   }
-  
-  /*
-  body {
-    background: url(unquote('<$macrocall $name="makedatauri" type={{$:/plugins/felixhayashi/tiddlymap/media/surface.png!!type}} text={{$:/plugins/felixhayashi/tiddlymap/media/surface.png}}/>'));
-  }
-  */
 
   #tmap-node-filter-dialog {
 
@@ -543,6 +616,7 @@ button.tmap-go-back {
   position: relative;
   border: 1px dotted lightgray;
   padding: 2px;
+  overflow: hidden;
   width: 100%;
   color: $color;
   display: block; // sometimes tw puts us into a span
@@ -555,21 +629,20 @@ button.tmap-go-back {
     }
     
     &:hover:before {
-      box-shadow: 10px 10px 5px lightgray;
       color: gray;
       background: white;
       content: "Click to use";
-      font-size: 18px;
+      font-size: 14px;
       font-weight: bold;
-      left: 50%;
-      margin-left: -100px;
+      right: calc(50% - 65px - 5px);
       position: absolute;
       text-align: center;
-      top: 50px;
-      width: 200px;
+      top: calc(50% - 14px - 5px);
+      width: 130px;
       z-index: 2000;
       padding: 5px;
       pointer-events: none;
+      background-color: rgba(255,255,255,0.3);
     }
   }
   
@@ -592,12 +665,7 @@ button.tmap-go-back {
     height: calc(100% - 35px);
   
     .vis-network {
-    
-      .vis-network-tooltip {
-        max-width: 250px;
-        white-space: normal;
-      }
-    
+        
       .vis-edit-mode {
         height: 26px;
       }
@@ -732,7 +800,7 @@ button.tmap-go-back {
       }
     }
     
-    .tmap-popup {
+    .tmap-search-dropdown {
       position: relative;
     
       .tc-drop-down {
@@ -904,19 +972,49 @@ button.tmap-go-back {
     
   }
   
+/*
   .vis-color-picker {
     width: 310px;
     left: 20px !important;
     top: 20px !important;
-    margin-top: 0px;
-    margin-left: 0px;
     height: 444px;
   }
+*/
 
   &::after {
     clear: both;
     content: "";
     display: block;
+  }
+}
+
+
+
+
+
+/**** vis buttons **************************************************/
+
+.tc-dropzone > *:not(.tc-sidebar-scrollable) .tmap-widget {
+
+  // in any case hide the halfscreen button
+  .vis-button .tmap-halfscreen {
+    display: none
+  }
+  
+  // hide all buttons per default
+  &:not(.tmap-fullscreen) .vis-button {
+    display: none;    
+  }
+  
+  &:hover .vis-button {
+ 
+    &.tmap-fullscreen-button {
+      display: block;
+    }
+    &.vis-zoomExtends {
+      display: block;
+    }
+    
   }
 }
 
@@ -985,7 +1083,7 @@ body.tmap-has-halfscreen-widget {
 
 /**** Media queries ************************************************/
 
-@media (max-width: unquote("{{$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint}}")) {
+@media (max-width: __breakpoint__) {
   .tc-sidebar-scrollable {
     .tmap-desktop-editor {
       display: none;
@@ -993,7 +1091,7 @@ body.tmap-has-halfscreen-widget {
   }
 }
 
-@media (min-width: unquote("{{$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint}}")) {
+@media (min-width: __breakpoint__) {
   .tc-sidebar-scrollable {
     .tmap-mobile-editor {
       display: none;

@@ -55,19 +55,20 @@ function run(parent) {
   
   // **ATTENTION: NO TRAILING SLASHES IN PATHS EVER**
   o.path = {
-    pluginRoot:     "$:/plugins/felixhayashi/tiddlymap",
-    edgeTypes:      "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes",
-    nodeTypes:      "$:/plugins/felixhayashi/tiddlymap/graph/nodeTypes",
-    listEdgeTypes:  "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-list:",
-    fieldEdgeTypes: "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-field:",
-    views:          "$:/plugins/felixhayashi/tiddlymap/graph/views",
-    options:        "$:/plugins/felixhayashi/tiddlymap/config",
-    dialogs:        "$:/plugins/felixhayashi/tiddlymap/dialog",
-    footers:        "$:/plugins/felixhayashi/tiddlymap/dialogFooter",
-    tempRoot:       "$:/temp/tmap",
-    tempStates:     "$:/temp/tmap/state",
-    tempPopups:     "$:/temp/tmap/state/popup",
-    localHolders:   "$:/temp/tmap/holders"
+    pluginRoot:      "$:/plugins/felixhayashi/tiddlymap",
+    edgeTypes:       "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes",
+    nodeTypes:       "$:/plugins/felixhayashi/tiddlymap/graph/nodeTypes",
+    listEdgeTypes:   "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-list:",
+    fieldEdgeTypes:  "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-field:",
+    filterEdgeTypes: "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-filter:",
+    views:           "$:/plugins/felixhayashi/tiddlymap/graph/views",
+    options:         "$:/plugins/felixhayashi/tiddlymap/config",
+    dialogs:         "$:/plugins/felixhayashi/tiddlymap/dialog",
+    footers:         "$:/plugins/felixhayashi/tiddlymap/dialogFooter",
+    tempRoot:        "$:/temp/tmap",
+    tempStates:      "$:/temp/tmap/state",
+    tempPopups:      "$:/temp/tmap/state/popup",
+    localHolders:    "$:/temp/tmap/holders"
   };
   
   var p = o.path;
@@ -128,6 +129,7 @@ function run(parent) {
     edgeTypes: "[prefix[" + o.path.edgeTypes + "]]",
     listEdgeTypes: "[prefix[" + o.path.listEdgeTypes + "]]",
     fieldEdgeTypes: "[prefix[" + o.path.fieldEdgeTypes + "]]",
+    filterEdgeTypes: "[prefix[" + o.path.filterEdgeTypes + "]]",
     views: "[" + o.config.sys.field.viewMarker + "[true]]"
   };
     
@@ -167,6 +169,11 @@ function run(parent) {
                          + " +" + o.filter.fieldEdgeTypes
                          + " +[removeprefix[" + p.fieldEdgeTypes + "]]";
   
+  // all names of fields that store edges
+  s.allFilterEdgeStores = allSelector
+                         + " +" + o.filter.filterEdgeTypes
+                         + " +[removeprefix[" + p.filterEdgeTypes + "]]";
+
 };
 
 

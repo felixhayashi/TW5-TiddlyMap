@@ -206,9 +206,11 @@ var updateEdgeTypesIndeces = function(parent) {
   var typePath = $tw.tmap.path.edgeTypes;
   var listEdgeTypes = $tw.tmap.path.listEdgeTypes;
   var fieldEdgeTypes = $tw.tmap.path.fieldEdgeTypes;
+  var filterEdgeTypes = $tw.tmap.path.filterEdgeTypes;
   var allETy = parent.allETy = utils.makeHashMap();
   var liETy = parent.liETy = utils.makeHashMap();
   var fiETy = parent.fiETy = utils.makeHashMap();
+  var ftETy = parent.ftETy = utils.makeHashMap();
   // magic edge-type field name
   var maETyFiNa = parent.maETyFiNa = utils.makeHashMap();
   
@@ -221,6 +223,9 @@ var updateEdgeTypesIndeces = function(parent) {
         maETyFiNa[et.getId(true)] = true;
       } else if(utils.startsWith(tRef, fieldEdgeTypes)) {
         fiETy[et.id] = et;
+        maETyFiNa[et.getId(true)] = true;
+      } else if(utils.startsWith(tRef, filterEdgeTypes)) {
+        ftETy[et.id] = et;
         maETyFiNa[et.getId(true)] = true;
       }
     }

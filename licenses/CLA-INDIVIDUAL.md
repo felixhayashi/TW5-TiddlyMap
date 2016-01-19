@@ -99,5 +99,6 @@ The below-signed are contributors to a code repository that is part of the proje
 Contributors
 ------------
 
-Felix Küppers, @felixhayashi, 2014-11-20
-Rich Rath @rcrath 2014-04-12
+Felix Küppers, @felixhayashi, 2014-11-20  
+Rich Rath @rcrath 2014-04-12  
+Cameron Fischer @flibbles 2016-01-19  

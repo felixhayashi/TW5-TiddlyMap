@@ -12,6 +12,7 @@
  * 
  * Options:
  *   --production    Run in production mode
+ *   --mode          The mode of the version, e.g. "dev"
  * 
  * ------------------------------------------------------------------
  * 
@@ -36,7 +37,7 @@
  *         ├── plugin.info
  *         └── * // compiled plugin files
  * 
- * bundled
+ * bundle
  * └── <pluginname>_<version>.json // bundled plugin for drag & drop
  * 
  * docs
@@ -55,13 +56,6 @@ var version="0.11.0"
 
 // whether or not to create/increment the build number automatically
 var isIncrBuild = true
-
-// build paths where we output our results
-var outPath = {
-  bundle: "./bundle/",
-  dist: "./dist/",
-  docs: "./docs/"
-};
 
 /**** Imports ******************************************************/
 
@@ -96,6 +90,13 @@ var pluginNamespace = authorName + "/" + pluginName; // no trailing slash!
 var pluginTiddler = "$:/plugins/" + pluginNamespace;
 var pluginInfoPath = path.resolve(pluginSrc, pluginNamespace, "plugin.info");
 var pluginInfo = JSON.parse(fs.readFileSync(pluginInfoPath, "utf8"));
+
+// build paths where we output our results
+var outPath = {
+  bundle: "./bundle/",
+  dist: "./dist/",
+  docs: "./docs/"
+};
 
 // a quick sanity check
 if(pluginTiddler !== pluginInfo.title) {
@@ -133,8 +134,9 @@ gulp.task("perform cleanup", function() {
 gulp.task("bump version", function(cb) {
 
   var v = new SemVer(pluginInfo.version);
-  var buildStr = "+" + (parseInt(v.build[0] || 0) + 1);  
-  pluginInfo.version = v.toString() + (isIncrBuild ? buildStr : "");
+  var build = (isIncrBuild ? "+" + (parseInt(v.build[0] || 0) + 1) : "");  
+  var mode = (argv.mode ? "-" + argv.mode : "");  
+  pluginInfo.version = v.major + "." + v.minor + "." + v.patch + mode + build;
   pluginInfo.released = new Date().toUTCString();
   
   fs.writeFileSync(pluginInfoPath, JSON.stringify(pluginInfo, null, 2));

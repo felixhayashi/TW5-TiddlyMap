@@ -612,7 +612,10 @@ Adapter.prototype._addBodyAndFieldEdges = function(edges, tObj, toWL, typeWL) {
     
     if(!maETyFiNa[f]) continue;
     
-    var type = fiETy["tw-field:" + f] || liETy["tw-list:" + f] || ftETy["tw-filter:" + f];
+    var type = fiETy["tw-field:" + f]
+               || liETy["tw-list:" + f]
+               || ftETy["tw-filter:" + f];
+               
     if(typeWL && !typeWL[type.id]) continue;
     
     if(fiETy[type.id]) {
@@ -620,7 +623,8 @@ Adapter.prototype._addBodyAndFieldEdges = function(edges, tObj, toWL, typeWL) {
     } else if(liETy[type.id]) {
       refsByType[type.id] = $tw.utils.parseStringArray(fromTObjFields[f]);
     } else if(ftETy[type.id]) {
-      refsByType[type.id] = $tw.wiki.filterTiddlers(fromTObjFields[f]);
+      var filter = fromTObjFields[f];
+      refsByType[type.id] = utils.getMatches(filter, toWL);
     }
   }
   

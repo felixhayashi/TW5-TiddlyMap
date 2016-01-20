@@ -2282,7 +2282,7 @@ MapWidget.prototype.handleVisHoverElement = function(ev) {
     
   if($tw.tmap.mouse.buttons) return;
   
-  this.graphDomNode.style.cursor = "pointer";
+  //~ this.graphDomNode.style.cursor = "pointer";
         
   var id = ev.node || ev.edge;
   var signature = JSON.stringify(ev);
@@ -2306,7 +2306,7 @@ MapWidget.prototype.handleVisHoverElement = function(ev) {
 MapWidget.prototype.handleVisBlurElement = function(ev) {
   
   console.log("vis blur fired");
-  this.graphDomNode.style.cursor = "auto";
+  //~ this.graphDomNode.style.cursor = "auto";
   this.visTooltip.hide(this.tooltipDelay);
 
 };

@@ -1,0 +1,37 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/globalConfig/interaction
+caption: Interaction & behaviour
+
+\rules except wikilink
+
+<table class="tmap-config-table">
+  <<tmap-row type:"input-checkbox"
+      title:"Allow single click mode"
+      field:"config.sys.singleClickMode" 
+      descr:"A single click on a node is sufficient to open the
+             corresponding tiddler."
+      note:"Drag and drop will still work and does not cause a
+            tiddler to be opened. Single click is never active in
+            the map editor.">>
+<!--
+  <<tmap-row type:"input-select"
+      title:"Default node tooltip"
+      field:"config.sys.defaultNodeTooltip" 
+      descr:"What to show when hovering over a node."
+      nochoice:"No"
+      selectFilter:"[[nothing|Nothing]]
+                    [[manager|Open edge-type manager]]">>
+-->
+  <<tmap-row type:"input-select"
+      title:"Edge click behaviour"
+      field:"config.sys.edgeClickBehaviour" 
+      selectFilter:"[[nothing|Nothing]]
+                    [[manager|Open edge-type manager]]"
+      descr:"What should happen when you click on an edge?">>
+  <$macrocall type="input-select"
+        $name="tmap-row"
+        title="Default startup view"
+        field="config.sys.defaultView"
+        nochoice="Last view used at startup"
+        selectFilter=<<tmap "option" "selector.allViewsByLabel">>
+        descr="The view to display at startup" />
+</table>

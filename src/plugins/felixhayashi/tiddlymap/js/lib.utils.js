@@ -4,48 +4,44 @@ title: $:/plugins/felixhayashi/tiddlymap/js/utils
 type: application/javascript
 module-type: library
 
-Utils module for shared TiddlyMap utils.
-
-ATTENTION: This module must not require any other tiddlymap file in
-order to avoid cyclic dependencies. For the same reason, it must also
-not access the `$tw.tmap.*` object.
-
-Exceptions to this restriction:
-
-  * The utils module may access all `$tw.tmap.*` properties defined
-    in startup.environment.
-  * The utils module may require vendor libs or tiddlymap libs that
-    only require vendor libs themselves.
-
-@module TiddlyMap
 @preserve
 
 \*/
 
-(/** @lends module:TiddlyMap*/function() {
-
 /*jslint node: true, browser: true */
 /*global $tw: false */
-
 "use strict";
 
-/**************************** IMPORTS ****************************/
- 
-var vis = require("$:/plugins/felixhayashi/vis/vis.js");
-var exception = require("$:/plugins/felixhayashi/tiddlymap/js/exception").exception;
-var URL = require("$:/plugins/felixhayashi/tiddlymap/js/URL").URL;
+/*** Exports *******************************************************/
 
-/***************************** CODE ******************************/
+exports.utils = {};
+
+/*** Imports *******************************************************/
+ 
+var vis       = require("$:/plugins/felixhayashi/vis/vis.js");
+var exception = require("$:/plugins/felixhayashi/tiddlymap/js/exception").exception;
+var URL       = require("$:/plugins/felixhayashi/tiddlymap/js/URL").URL;
+
+/*** Code **********************************************************/
 
 /**
  * A utilities class that contains universally used helper functions
  * to abbreviate code and make my life easier.
  * 
- * @see Dom utilities {@link https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/utils/*}
+ * ATTENTION: This module must not require any other tiddlymap file
+ * in order to avoid cyclic dependencies. For the same reason,
+ * it must also not access the `$tm.*` object.
  * 
- * @namespace
+ * Exceptions to this restriction:
+ *   - The utils module may access all `$tm.*` properties
+ *     defined in startup.environment.
+ *   - The utils module may require vendor libs or tiddlymap libs
+ *     that only require vendor libs themselves.
+ * 
+ * @see Dom utilities {@link https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/utils/*}
+ * @namespace utils
  */
-var utils = {};
+var utils = exports.utils;
 
 /**
  * Pendant to tw native {@code addTiddlers()}.
@@ -294,36 +290,30 @@ utils.getMatches = function(filter, tiddlers) {
         
 };
 
-utils.getEdgeTypeMatches = function(filter, tiddlers) {
-    
-  filter = (typeof filter === "string") ? filter : "";
-  
-  if(!tiddlers) {
-    var prefix = $tw.tmap.path.edgeTypes + "/";
-    tiddlers = utils.getTiddlersByPrefix(prefix, {
+// @todo move this to environment
+var eTyFiltAutoPrefix = "[all[]] ";
+
+utils.getEdgeTypeMatches = function(filter, titles) {
+      
+  if(!titles) {
+    var prefix = $tm.path.edgeTypes + "/";
+    titles = utils.getTiddlersByPrefix(prefix, {
       iterator: "eachTiddlerPlusShadows",
       removePrefix: true
     })
   }
   
-  if(tiddlers != null && !Array.isArray(tiddlers)) {
-    tiddlers = Object.keys(tiddlers);
+  if(titles != null && !Array.isArray(titles)) {
+    titles = Object.keys(titles);
   }
   
-  if(filter) {
-    // remove any occurences of the egde type path prefix
-    var edgeTypePath = $tw.tmap.path.edgeTypes;
-    filter = utils.globallyReplace(filter, "", [
-      edgeTypePath,
-      edgeTypePath + "/",
-      "[prefix[" + edgeTypePath + "]]",
-      "[prefix[" + edgeTypePath + "/]]"
-    ]);
-  }
+  return utils.getMatches(eTyFiltAutoPrefix + (filter || ""), titles);
+  
+};
 
-  return (filter
-          ? utils.getMatches("[!prefix[_]]" + filter, tiddlers)
-          : tiddlers);
+utils.isEdgeTypeMatch = function(title, filter) {
+    
+  return utils.isMatch(title, eTyFiltAutoPrefix + (filter || ""));
   
 };
 
@@ -366,13 +356,21 @@ utils.escapeRegex = function(str) {
   
 };
 
-utils.globallyReplace = function(str, replacement, strings) {
+utils.replaceAll = function(str, defaultReplacement, subStrings) {
   
-  replacement = replacement || "";
+  defaultReplacement = defaultReplacement || "";
   
-  for(var i = strings.length; i--;) {
-    var re = new RegExp($tw.utils.escapeRegExp(strings[i]), "g");
-    str = str.replace(re, replacement);
+  for(var i = subStrings.length; i--;) {
+    
+    var subString = subStrings[i];
+    var replacement = defaultReplacement;
+    
+    if(Array.isArray(subString)) {
+      replacement = subString[1];
+      subString = subString[0];
+    }
+    
+    str = str.replace(subString, replacement);
   }
   
   return str;
@@ -863,15 +861,11 @@ utils.isLeftVersionGreater = function(v1, v2) {
  * string.
  */
 utils.getField = function(tiddler, field, defValue) {
-  
-  //~ var tObj = utils.getTiddler(tiddler);
-  //~ return (tObj ? tObj.fields[field] : (defValue || ""));
-  
-  defValue = defValue || "";
+    
   var tObj = utils.getTiddler(tiddler);
-  return !tObj
-         ? defValue
-         : tObj.fields[field] || defValue;
+  return (!tObj
+          ? defValue || ""
+          : tObj.fields[field] || defValue || "");
   
 };
 
@@ -923,6 +917,38 @@ utils.isDraft = function(tiddler) {
   var tObj = utils.getTiddler(tiddler);
   return (tObj && tObj.isDraft());
 
+};
+
+utils.getRandomInt = function(min, max) {
+  
+  return Math.floor(Math.random() * (max - min) + min);
+  
+};
+
+utils.pickRandom = function(arr) {
+  
+  return arr[utils.getRandomInt(0, arr.length-1)];
+  
+};
+
+utils.getRandomLabel = function(options) {
+  
+  options = options || {};
+  
+  var adjective = [
+    "exciting", "notable", "epic", "new", "fancy",
+    "great", "cool", "fresh", "funky", "clever"
+  ];
+  
+  var noun = [
+    "concept", "idea", "thought", "topic", "subject"
+  ];
+  
+  return "My" 
+         + " " + utils.pickRandom(adjective) + " "
+         + (options.object || utils.pickRandom(noun))
+         + (options.plural ? "s" : "");
+  
 };
 
 /**
@@ -1793,10 +1819,4 @@ utils.genUUID = (function() {
     return uuid.join('');
   };
 
-})();
-
-// !! EXPORT !!
-exports.utils = utils;
-// !! EXPORT !!
-  
 })();

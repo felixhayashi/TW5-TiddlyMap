@@ -4,29 +4,32 @@ title: $:/plugins/felixhayashi/tiddlymap/js/EdgeType
 type: application/javascript
 module-type: library
 
-@module TiddlyMap
 @preserve
 
 \*/
 
-(/** @lends module:TiddlyMap*/function() {
-
 /*jslint node: true, browser: true */
 /*global $tw: false */
-
 "use strict";
 
-/**************************** IMPORTS ****************************/
+/*** Exports *******************************************************/
+
+exports.EdgeType = EdgeType;
+
+/*** Imports *******************************************************/
 
 var MapElementType = require("$:/plugins/felixhayashi/tiddlymap/js/MapElementType").MapElementType;
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var utils          = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
   
-/***************************** CODE ******************************/
+/*** Code **********************************************************/
 
 /**
  * This class is used to abstract edge types. It facilitates inter
  * alia the parsing of style information, the translation of type
  * names into actual type data or the persistance of edge type data.
+ * 
+ * @todo Make certain properties immutable, especially
+ *     the id attribute and its parts!
  * 
  * @class
  * @extends MapElementType
@@ -37,21 +40,38 @@ var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
  *     id can be translated into a tiddler object that resides in
  *     the edge type path, then its data is retrieved automatically.
  */
-var EdgeType = function(id, data) {
+function EdgeType(id, data, options) {
   
-  if(id instanceof EdgeType) {
-    return id; // bounce back!
+  if(id instanceof EdgeType) return id; // bounce back!
+  
+  options = options || {};
+  
+  this.root = $tm.path.edgeTypes;
+  
+  var parts = EdgeType._getIdParts(id, this.root);
+  if(!parts.name) return new EdgeType("tmap:unknown");
+  
+  this.marker = parts.marker;
+  this.name = parts.name;
+  this.namespace = parts.namespace;
+  this.id = EdgeType._getId(this.marker, this.namespace, this.name);
+  
+  // if the id contains no namespace itself and a namespace has
+  // been provided, moreover, a type without the namespace
+  // doesn't exist, then we apply the provided namespace and
+  // recreate the id.
+  // Attention: the namespace is really a prefix and can have a
+  // marker, which needs to be considered!
+  if(!this.namespace && options.namespace) {
+    
+    if(!(new EdgeType(this.id)).exists()) {
+      return new EdgeType(options.namespace + ":" + this.name);
+    }  
   }
-        
-  // call the parent constructor
-  MapElementType.call(
-    this,
-    id || "tmap:unknown",
-    $tw.tmap.path.edgeTypes,
-    EdgeType._fieldMeta,
-    data
-  );
   
+  // call the parent constructor
+  MapElementType.call(this, this.id, this.root, EdgeType._fieldMeta, data);
+    
   var ar = this.style && this.style.arrows;
   
   if(ar) {
@@ -64,29 +84,52 @@ var EdgeType = function(id, data) {
     this.toArrow = true;
   }
 
-  this.namespace = this._getNamespace();
-
 };
 
 // !! EXTENSION !!
 EdgeType.prototype = Object.create(MapElementType.prototype);
 // !! EXTENSION !!
 
-EdgeType._fieldMeta = $tw.utils.extend({}, MapElementType._fieldMeta, {
-  "label": {},
-  "show-label": {}
-});
+EdgeType._fieldMeta = $tw.utils.extend(
+  {},
+  MapElementType._fieldMeta,
+  {
+    "label": {},
+    "show-label": {}
+  }
+);
 
-EdgeType.prototype.getLabel = function() {
+/**
+ * An edge-type id consists of the following parts of which the
+ * first two are optional: `[marker][namespace:]name`
+ * 
+ * The colon is not considered to be part of the namespace.
+ */
+EdgeType.edgeTypeRegexStr = "^(_?)([^:_][^:]*):?([^:]*)";
+EdgeType.edgeTypeRegex = new RegExp(EdgeType.edgeTypeRegexStr);
+  
+EdgeType._getIdParts = function(str, rootPath) {
 
-  return this.label || this.getId(true);
+  str = utils.getWithoutPrefix(str || "", rootPath + "/");
+  var match = str.match(EdgeType.edgeTypeRegex) || [];
+    
+  return {
+    marker: match[1] || "",
+    namespace: (match[3] && match[2]) || "",
+    name: (match[3] || match[2]) || ""
+  };
+  
+};
+
+EdgeType._getId = function(marker, namespace, name) {
+
+  return marker + namespace + (namespace ? ":" : "") + name;
 
 };
 
-EdgeType.prototype._getNamespace = function() {
+EdgeType.prototype.getLabel = function() {
 
-  var match = this.id.match("^(.*):");
-  return (match ? match[1] : "");
+  return this.label || this.name;
 
 };
 
@@ -95,23 +138,6 @@ EdgeType.prototype._isArrow = function(arrowObj, pos) {
   var type = arrowObj[pos];
   return (pos === "to" && type == null
           || type === true
-          || (typeof type === "object" && type.enabled !== false));
+          || typeof type === "object" && type.enabled !== false);
   
 };
-
-/**
- * @override
- */
-EdgeType.prototype.getId = function(stripNamespace) {
-  
-  return stripNamespace
-         ? this.id.substring(this.id.indexOf(":") + 1)
-         : this.id;
-
-};
-  
-// !! EXPORT !!
-exports.EdgeType = EdgeType;
-// !! EXPORT !!#
-  
-})();

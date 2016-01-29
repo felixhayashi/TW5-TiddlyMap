@@ -16,7 +16,7 @@
 $filterbar-height: 35px;
 $default-input-width: 140px;
 $padding : 5px;
-$color: #666666;
+$tw-text-color: #666666;
 
 @mixin keyframes($name) {
   @-o-keyframes #{$name} { @content }
@@ -95,8 +95,8 @@ $color: #666666;
   cursor: auto;
   min-width: 100px;
   min-height: 50px;
-  max-width: 400px;
-  max-height: 300px;
+  max-width: unquote("<<tmap option config.sys.popups.width>>");
+  max-height: unquote("<<tmap option config.sys.popups.height>>");
   padding: 5px;
   resize: both;
   overflow: auto;
@@ -111,11 +111,11 @@ $color: #666666;
   transition: opacity 0.3s ease;
   
   &[style*="height"] {
-    max-height: none;
+    max-height: none !important;
   };
   
   &[style*="width"] {
-    max-width: none;
+    max-width: none !important;
   };
 
   &.tmap-popup-active {
@@ -166,14 +166,19 @@ html { // used to increase css importance
 
   .tmap-small-list {
     overflow: auto;
-    min-height: 20px;
-    max-height: 150px;
+    min-height: 2em;
+    max-height: 9em;
     display: block;
+  }
+  
+  .tmap-smaller-list {
+    @extend .tmap-small-list;
+    max-height: 7em;
   }
   
   .tmap-very-small-list {
     @extend .tmap-small-list;
-    max-height: 70px;
+    max-height: 5empx;
   }
   
   .tc-tiddler-controls {
@@ -237,8 +242,9 @@ html { // used to increase css importance
     }
     
     .title {
-      border-bottom: 1px solid #D5D5D5;
-      margin: 1.5em 0 1em 0;
+      margin: 1.5em 0 0.5em 0;
+      font-weight: bold;
+      color: gray;
     }
     
     select {
@@ -249,18 +255,39 @@ html { // used to increase css importance
     table {        
       width: 100%;
       border: none;
-      margin-bottom: 0px;
+      margin: 0.5em 0;
       
       td, th {
         padding: 3px 3px 3px 0;
         vertical-align: top;
         font-weight: normal;
         border: none;
+        
+        table {
+          margin: 0;
+        }
       }
     }
     
-    .tmap-create-connection-table {
 
+    
+    .tmap-quick-connect-search-bar, .tmap-quick-connect-existing-bar {
+      background: #F1F1F1;
+      margin-top: 0;
+      border-bottom: 1px solid #D5D5D5;
+      border-top: 1px solid #D5D5D5;
+    }
+    
+    table.tmap-quick-connect-search-bar td, th {
+      padding: 5px;
+    }
+    
+    .tmap-quick-connect-search-bar {
+      
+    }
+    
+    .tmap-quick-connect-existing-bar {
+      padding: 5px;
     }
     
     .tmap-connection-table {
@@ -301,10 +328,6 @@ html { // used to increase css importance
       }
     }
     
-    span.tmap-hide-links {
-      float: right;
-    }
-    
     button {
       display: inline-block;
       padding: 0px 3px;
@@ -331,12 +354,16 @@ html { // used to increase css importance
 .tc-modal-wrapper {
   z-index: 1010;
   
+/*
   p:first-child {
     margin-top: 0px;
   }
+*/
+/*
   p:last-child {
     margin-bottom: 0px;
   }
+*/
   
   .tc-modal-header {
     svg {
@@ -369,9 +396,27 @@ html { // used to increase css importance
 .tmap-modal-content {
   position: relative;
   padding: 1em 0;
+  padding-top: 0;
   
+/*
   &.tmap-remove-top-space {
     padding-top: 0;
+  }
+*/
+
+  table tr td {
+    vertical-align: top;
+  }
+  
+  :not(pre) > code {
+    padding: 1px;
+    font-size: 0.9em;
+    position: relative;
+    top: -1px;
+  }
+  
+  :not(pre) > code {
+    color: $tw-text-color;
   }
 
   .tc-tab-set {
@@ -393,15 +438,6 @@ html { // used to increase css importance
   
   }
     
-  ul {
-    
-    padding-left: 30px;
-    
-    li {
-      list-style: none;
-    }
-    
-  }
 }
 
 .tc-modal-body .tmap-modal-editor {
@@ -451,48 +487,61 @@ html { // used to increase css importance
   &.tmap-config-table {
     @extend .tmap-table;
     
-    tr {
+    &.tmap-large-input {
+      tr td:last-child {
+        width: 20%;
+      }
+    }
+    
+    &.tmap-small-input {
+      tr td:last-child {
+        width: 60%;
+      }
+    }
+
+    tr td {
+      border: none;
+      vertical-align: top;
+      padding: 5px;
       
-      td {
-        border: none;
-        vertical-align: top;
-        padding: 5px;
-        
-        &:first-child {
-          width: 15%;
+      &:first-child {
+        width: 15%;
+      }
+      
+      &:last-child {
+        width: 40%;
+      }
+      
+      input:not([type=radio]), textarea, select {
+        width: 100%;
+        /* prevents bad looking select boxes and wrapping in textareas */
+        word-wrap: normal;
+      }
+      
+      textarea {
+        height: 100%;
+      }
+      
+      .tmap-no-stretch {
+        input, textarea, select {
+          width: auto;
         }
-        
-        &:last-child {
-          width: 40%;
-        }
-        
-        input:not([type=radio]), textarea, select {
-          width: 100%;
-          /* prevents bad looking select boxes and wrapping in textareas */
-          word-wrap: normal;
-        }
-        
-        .tmap-no-stretch {
-          input, textarea, select {
-            width: auto;
-          }
-        }
-        
-        div.tmap-button-wrapper {
-          text-align: center;
-        }
-        
-        .tmap-note {
-          margin-top: 0.5em;
-        }
-        
-        .tmap-description {
-          font-style: italic;
-        }
+      }
+      
+      div.tmap-button-wrapper {
+        text-align: center;
+      }
+      
+      .tmap-note {
+        margin-top: 0.5em;
+      }
+      
+      .tmap-description {
+        font-style: italic;
+      }
 
-      } // td
+    } // td
 
-    } // tr
   } // config-table
 }
 
@@ -518,9 +567,14 @@ html { // used to increase css importance
     ul {
       height: calc(100% - 65px); // minus searchbar height (roughly)
       overflow: auto;
-      padding: 0;
-      list-style: none;
       margin-top: 1em;
+      padding: 0;
+      
+      &.no-bullets {       
+        li {
+          list-style: none;
+        }
+      }
       
       li {
         white-space: nowrap;
@@ -609,6 +663,24 @@ button.tmap-go-back {
   font-weight: bold;
 }
 
+.tmap-badges > span, .tmap-badge {
+
+  background: gray;
+  font-size: 11px;
+  color: white;
+  padding: 3px 4px;
+  display: inline-block;
+  font-weight: bold;
+  border-radius: 2px;
+  line-height: 1em;
+  cursor: help;
+  
+  &.tmap-red-flag {
+    background: red;
+  }
+
+}
+
 /**** TMap Widget **************************************************/
 
 .tmap-widget {
@@ -616,9 +688,8 @@ button.tmap-go-back {
   position: relative;
   border: 1px dotted lightgray;
   padding: 2px;
-  overflow: hidden;
   width: 100%;
-  color: $color;
+  color: $tw-text-color;
   display: block; // sometimes tw puts us into a span
         
   &.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) {
@@ -857,7 +928,7 @@ button.tmap-go-back {
     
     button {
       line-height: inherit;
-      color: $color;
+      color: $tw-text-color;
     }
   
      > * {
@@ -994,19 +1065,19 @@ button.tmap-go-back {
 
 /**** vis buttons **************************************************/
 
-.tc-dropzone > *:not(.tc-sidebar-scrollable) .tmap-widget {
+.tc-dropzone > .tc-story-river .tmap-widget {
 
   // in any case hide the halfscreen button
-  .vis-button .tmap-halfscreen {
-    display: none
+  .vis-navigation .tmap-halfscreen-button {
+    display: none;
   }
   
   // hide all buttons per default
-  &:not(.tmap-fullscreen) .vis-button {
+  &:not(.tmap-fullscreen) .vis-navigation .vis-button {
     display: none;    
   }
   
-  &:hover .vis-button {
+  &:hover .vis-navigation .vis-button {
  
     &.tmap-fullscreen-button {
       display: block;
@@ -1085,7 +1156,7 @@ body.tmap-has-halfscreen-widget {
 
 @media (max-width: __breakpoint__) {
   .tc-sidebar-scrollable {
-    .tmap-desktop-editor {
+    .tmap-desktop-editor .tmap-widget:not(.tmap-fullscreen) {
       display: none;
     }
   }

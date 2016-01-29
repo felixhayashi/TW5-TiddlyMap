@@ -4,26 +4,26 @@ title: $:/plugins/felixhayashi/tiddlymap/js/Adapter
 type: application/javascript
 module-type: library
 
-@module TiddlyMap
 @preserve
 
 \*/
 
-(/** @lends module:TiddlyMap*/function(){
-
 /*jslint node: true, browser: true */
 /*global $tw: false */
-
 "use strict";
 
-/**************************** IMPORTS ******************************/
+/*** Exports *******************************************************/
 
-var ViewAbstraction =   require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction").ViewAbstraction;
-var EdgeType =          require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
-var NodeType =          require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;
-var utils =             require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+exports.Adapter = Adapter;
+
+/*** Imports *******************************************************/
+
+var ViewAbstraction   = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction").ViewAbstraction;
+var EdgeType          = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
+var NodeType          = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;
+var utils             = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
 var getContrastColour = require("$:/core/modules/macros/contrastcolour.js").run;
-var vis =               require("$:/plugins/felixhayashi/vis/vis.js");
+var vis               = require("$:/plugins/felixhayashi/vis/vis.js");
   
 /***************************** CODE ********************************/
 
@@ -37,16 +37,12 @@ var vis =               require("$:/plugins/felixhayashi/vis/vis.js");
  * 
  * You don't need to create your own instance of this class.
  * The adapter service may be accessed from anywhere using
- * `$tw.tmap.apapter`.
+ * `$tm.apapter`.
  * 
  * @constructor
- * @param {object} wiki - An optional wiki object
  */
-var Adapter = function() {
+function Adapter() {
   
-  // create shortcuts for services and frequently used vars
-  this.logger = $tw.tmap.logger;
-  this.indeces = $tw.tmap.indeces;
   this.visShapesWithTextInside = utils.getLookupTable([
       "ellipse", "circle", "database", "box", "text"
   ]);
@@ -55,7 +51,7 @@ var Adapter = function() {
   // https://github.com/felixhayashi/TW5-TiddlyMap/issues/198
   this.isTransTypeEnabled = (typeof $tw.wiki.getTiddlerTranscludes
                              === "function");
-  
+                              
 };
 
 /**
@@ -111,13 +107,13 @@ Adapter.prototype.insertEdge = function(edge) {
  */
 Adapter.prototype._processEdge = function(edge, action) {
   
-  this.logger("debug", "Edge", action, edge);
+  $tm.logger("debug", "Edge", action, edge);
 
   if(typeof edge !== "object" || !action || !edge.from) return;
   if(action === "insert" && !edge.to) return;
   
   // get from-node and corresponding tiddler
-  var fromTRef = this.indeces.tById[edge.from];
+  var fromTRef = $tm.indeces.tById[edge.from];
   if(!fromTRef || !utils.tiddlerExists(fromTRef)) return;
 
   var type = new EdgeType(edge.type);
@@ -200,8 +196,8 @@ Adapter.prototype._processTmapEdge = function(tiddler, edge, type, action) {
  */
 Adapter.prototype._processListEdge = function(tiddler, edge, type, action) {
       
-  // the name shall not contain the magic namespace
-  var name = type.getId(true);
+  // get the name without the private marker or the namespace
+  var name = type.name;
   
   var tObj = utils.getTiddler(tiddler);
   var list = $tw.utils.parseStringArray(tiddler.fields[name]);
@@ -211,7 +207,7 @@ Adapter.prototype._processListEdge = function(tiddler, edge, type, action) {
   list = (list || []).slice()
   
   // transform
-  var toTRef = this.indeces.tById[edge.to];
+  var toTRef = $tm.indeces.tById[edge.to];
       
   if(action === "insert") {
     list.push(toTRef);
@@ -245,13 +241,13 @@ Adapter.prototype._processListEdge = function(tiddler, edge, type, action) {
  */
 Adapter.prototype._processFieldEdge = function(tiddler, edge, type, action) {
 
-  var toTRef = this.indeces.tById[edge.to];
+  var toTRef = $tm.indeces.tById[edge.to];
   if(toTRef == null) return; // null or undefined
   
   var val = (action === "insert" ? toTRef : "");
   
-  // the shall not contain the magic namespace
-  utils.setField(tiddler, type.getId(true), val);
+  // only use the name without the private marker or the namespace
+  utils.setField(tiddler, type.name, val);
 
   if(!type.exists()) {
     type.save();
@@ -280,18 +276,18 @@ Adapter.prototype._processFieldEdge = function(tiddler, edge, type, action) {
  */
 Adapter.prototype.getAdjacencyList = function(groupBy, opts) {
   
-  $tw.tmap.start("Creating adjacency list");
+  $tm.start("Creating adjacency list");
   
   opts = opts || {};
   
   if(!opts.edges) {
-    var tRefs = utils.getMatches($tw.tmap.selector.allPotentialNodes);
+    var tRefs = utils.getMatches($tm.selector.allPotentialNodes);
     opts.edges = this.getEdgesForSet(tRefs, opts.toWL, opts.typeWL);
   }
   
   var adjList = utils.groupByProperty(opts.edges, groupBy || "to");
   
-  $tw.tmap.stop("Creating adjacency list");
+  $tm.stop("Creating adjacency list");
   
   return adjList;
   
@@ -331,7 +327,7 @@ Adapter.prototype.getAdjacencyList = function(groupBy, opts) {
  */
 Adapter.prototype.getNeighbours = function(matches, opts) {
   
-  $tw.tmap.start("Get neighbours");
+  $tm.start("Get neighbours");
   
   opts = opts || {};
     
@@ -342,12 +338,12 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
   var view = new ViewAbstraction(opts.view);
   var protoNode = opts.addProperties;
   var allEdgesLeadingToNeighbours = utils.makeHashMap();
-  var allETy = this.indeces.allETy;
+  var allETy = $tm.indeces.allETy;
   var allNeighbours = utils.makeHashMap();
   var toWL = opts.toWL;
   var typeWL = opts.typeWL;
-  var tById = this.indeces.tById;
-  var idByT = this.indeces.idByT;
+  var tById = $tm.indeces.tById;
+  var idByT = $tm.indeces.idByT;
   var maxSteps = (parseInt(opts.steps) > 0 ? opts.steps : 1);
   var direction = (opts.direction
                    || (view.exists()
@@ -424,9 +420,9 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
     edges: allEdgesLeadingToNeighbours
   };
   
-  this.logger("debug", "Retrieved neighbourhood", neighbourhood, "steps", step);
+  $tm.logger("debug", "Retrieved neighbourhood", neighbourhood, "steps", step);
   
-  $tw.tmap.stop("Get neighbours");
+  $tm.stop("Get neighbours");
   
   return neighbourhood;
   
@@ -458,7 +454,7 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
  */
 Adapter.prototype.getGraph = function(opts) {
   
-  $tw.tmap.start("Assembling Graph");
+  $tm.start("Assembling Graph");
   
   opts = opts || {};
 
@@ -508,9 +504,9 @@ Adapter.prototype.getGraph = function(opts) {
   // add styles to nodes
   this.attachStylesToNodes(graph.nodes, view);
   
-  $tw.tmap.stop("Assembling Graph");
+  $tm.stop("Assembling Graph");
   
-  this.logger("debug", "Assembled graph:", graph);
+  $tm.logger("debug", "Assembled graph:", graph);
   
   return graph;
   
@@ -589,10 +585,7 @@ Adapter.prototype._addBodyAndFieldEdges = function(edges, tObj, toWL, typeWL) {
     
   var fromTObjFields = tObj.fields;
   var fromTRef = utils.getTiddlerRef(tObj);
-  var indeces = this.indeces;
-  var fiETy = indeces.fiETy;
-  var ftETy = indeces.ftETy;
-  var liETy = indeces.liETy;
+  var indeces = $tm.indeces;
   var maETyFiNa = indeces.maETyFiNa; // magic edge-type field names
   var refsByType = utils.makeHashMap();
   
@@ -610,19 +603,15 @@ Adapter.prototype._addBodyAndFieldEdges = function(edges, tObj, toWL, typeWL) {
 
   for(var f in fromTObjFields) {
     
-    if(!maETyFiNa[f]) continue;
+    var type = maETyFiNa[f];
+      
+    if(!type || (typeWL && !typeWL[type.id])) continue;
     
-    var type = fiETy["tw-field:" + f]
-               || liETy["tw-list:" + f]
-               || ftETy["tw-filter:" + f];
-               
-    if(typeWL && !typeWL[type.id]) continue;
-    
-    if(fiETy[type.id]) {
+    if(type.namespace === "tw-field") {
       refsByType[type.id] = [ fromTObjFields[f] ];
-    } else if(liETy[type.id]) {
+    } else if(type.namespace === "tw-list") {
       refsByType[type.id] = $tw.utils.parseStringArray(fromTObjFields[f]);
-    } else if(ftETy[type.id]) {
+    } else if(type.namespace === "tw-filter") {
       var filter = fromTObjFields[f];
       refsByType[type.id] = utils.getMatches(filter, toWL);
     }
@@ -686,7 +675,7 @@ Adapter.prototype._addTmapEdges = function(edges, tObj, toWL, typeWL) {
   var connections = utils.parseFieldData(tObj, "tmap.edges");
   if(!connections) return;
   
-  var tById = this.indeces.tById;
+  var tById = $tm.indeces.tById;
   var fromId = tObj.fields["tmap.id"];
   
   for(var conId in connections) {
@@ -732,7 +721,7 @@ Adapter.prototype.selectEdgesByType = function(type) {
 
 Adapter.prototype.getAllPotentialNodes = function() {
   
-  return utils.getMatches($tw.tmap.selector.allPotentialNodes);
+  return utils.getMatches($tm.selector.allPotentialNodes);
   
 };
 
@@ -744,7 +733,7 @@ Adapter.prototype._processEdgesWithType = function(type, task) {
 
   type = new EdgeType(type);
   
-  this.logger("debug", "Processing edges", type, task);
+  $tm.logger("debug", "Processing edges", type, task);
   
   // get edges
   var edges = this.selectEdgesByType(type);
@@ -878,7 +867,7 @@ Adapter.prototype.makeEdge = function(from, to, type, id) {
     from = from.id;
   } // else use from value as id
   
-  type = this.indeces.allETy[type] || new EdgeType(type);
+  type = $tm.indeces.allETy[type] || new EdgeType(type);
   var label = type.getLabel();
       
   var edge = {
@@ -911,7 +900,7 @@ Adapter.prototype.makeNode = function(tiddler, protoNode) {
 
   var tObj = utils.getTiddler(tiddler);
     
-  if(!tObj || utils.isSystemOrDraft(tiddler)) return;
+  if(!tObj || utils.isSystemOrDraft(tObj)) return;
   
   var node = utils.merge({}, protoNode);
   
@@ -919,8 +908,8 @@ Adapter.prototype.makeNode = function(tiddler, protoNode) {
   node.id = this.assignId(tObj);
    
   // add label
-  var label = tObj.fields[$tw.tmap.field.nodeLabel];
-  node.label = (label && $tw.tmap.field.nodeLabel !== "title"
+  var label = tObj.fields[$tm.field.nodeLabel];
+  node.label = (label && $tm.field.nodeLabel !== "title"
                 ? $tw.wiki.renderText("text/plain", "text/vnd-tiddlywiki", label)
                 : tObj.fields.title);
         
@@ -932,13 +921,13 @@ Adapter.prototype.getInheritedNodeStyles = function(nodes) {
   
   var src = this.getTiddlersById(nodes);
   var protoByTRef = {};
-  var glNTy = this.indeces.glNTy;
+  var glNTy = $tm.indeces.glNTy;
   
   for(var i = glNTy.length; i--;) {
     var type = glNTy[i];
     
     if(type.id === "tmap:neighbour") { // special case
-      var tById = $tw.tmap.indeces.tById;
+      var tById = $tm.indeces.tById;
       var inheritors = [];
       for(var id in nodes) {
         if(nodes[id].group === "tmap:neighbour") {
@@ -1000,7 +989,7 @@ Adapter.prototype._removeObsoleteViewData = function(nodes, view) {
   }
   
   if(obsoleteDataItems) {
-    this.logger("debug", "[Cleanup]",
+    $tm.logger("debug", "[Cleanup]",
                 "Removed obsolete node data:",
                 view.getLabel(), obsoleteDataItems);
     view.saveNodeData(data);
@@ -1019,8 +1008,8 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
 
   
   // shortcuts (for performance and readability)
-  var nodeIconField = $tw.tmap.field.nodeIcon;
-  var tById = this.indeces.tById;
+  var nodeIconField = $tm.field.nodeIcon;
+  var tById = $tm.indeces.tById;
   
   for(var id in nodes) {
     var tRef = tById[id];
@@ -1123,7 +1112,7 @@ Adapter.prototype.deleteNode = function(node) {
   if(!node) return;
   
   var id = (typeof node === "object" ? node.id : node);
-  var tRef = this.indeces.tById[id];
+  var tRef = $tm.indeces.tById[id];
   
   // delete tiddler and remove it from the river; this will
   // automatically remove the global node style and the outgoing edges
@@ -1136,7 +1125,7 @@ Adapter.prototype.deleteNode = function(node) {
     
   // delete local node-data in views containing the node
   
-  var viewRefs = utils.getMatches($tw.tmap.selector.allViews);
+  var viewRefs = utils.getMatches($tm.selector.allViews);
   for(var i = viewRefs.length; i--;) {
     var view = new ViewAbstraction(viewRefs[i]);
     view.removeNode(id);
@@ -1162,8 +1151,8 @@ Adapter.prototype.deleteNode = function(node) {
   // 
   // THEREFORE:
   //
-  // DO NOT DO delete this.indeces.tById[id];
-  // DO NOT DO delete this.indeces.idByT[tRef];
+  // DO NOT DO delete $tm.indeces.tById[id];
+  // DO NOT DO delete $tm.indeces.idByT[tRef];
   
 };
 
@@ -1196,6 +1185,9 @@ Adapter.prototype.storePositions = function(positions, view) {
  * not already possess and id. Any assigned id will be registered
  * at the id->tiddler index.
  * 
+ * @todo Optimize this. It is a bottleneck that the tiddler
+ *       is always reloaded from the db.
+ * 
  * @param {Tiddler} tiddler - The tiddler to assign the id to.
  * @param {boolean} isForce - True if the id should be overridden,
  *     false otherwise. Only works if the id field is not set to title.
@@ -1215,13 +1207,13 @@ Adapter.prototype.assignId = function(tiddler, isForce) {
   if(!id || isForce) {
     id = utils.genUUID();
     utils.setField(tObj, "tmap.id", id);
-    this.logger("info", "Assigning new id to", tObj.fields.title);
+    $tm.logger("info", "Assigning new id to", tObj.fields.title);
   }
   
   // blindly update the index IN ANY CASE because tiddler may have
   // an id but it is not indexed yet (e.g. because of renaming operation)
-  this.indeces.tById[id] = tObj.fields.title;
-  this.indeces.idByT[tObj.fields.title] = id;
+  $tm.indeces.tById[id] = tObj.fields.title;
+  $tm.indeces.idByT[tObj.fields.title] = id;
   
   return id;
   
@@ -1258,7 +1250,7 @@ Adapter.prototype.insertNode = function(node, view, options) {
     fields.text = "";
   }
   
-  var title = $tw.wiki.generateNewTitle(node.label || "New node");
+  var title = $tw.wiki.generateNewTitle(node.label || utils.getRandomLabel());
 
   // title might has changed after generateNewTitle()
   node.label = fields.title = title;
@@ -1310,7 +1302,7 @@ Adapter.prototype.getTiddlersById = function(nodeIds) {
   }
   
   var result = [];
-  var tById = this.indeces.tById;
+  var tById = $tm.indeces.tById;
   for(var id in nodeIds) {
     if(tById[id]) result.push(tById[id]);
   }
@@ -1321,7 +1313,7 @@ Adapter.prototype.getTiddlersById = function(nodeIds) {
 
 Adapter.prototype.getId = function(tiddler) {
   
-  return this.indeces.idByT[utils.getTiddlerRef(tiddler)];
+  return $tm.indeces.idByT[utils.getTiddlerRef(tiddler)];
   // works too: return utils.getField(tiddler, "tmap.id");
   
 };
@@ -1380,9 +1372,3 @@ Adapter.prototype._addNodeIcon = function(node, faIcon, twIcon) {
   }
     
 };
-
-/**** Export *******************************************************/
-
-exports.Adapter = Adapter;
-
-})();

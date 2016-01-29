@@ -4,24 +4,24 @@ title: $:/plugins/felixhayashi/tiddlymap/js/DialogManager
 type: application/javascript
 module-type: library
 
-@module TiddlyMap
 @preserve
 
 \*/
 
-(/** @lends module:TiddlyMap*/function(){
-
 /*jslint node: true, browser: true */
 /*global $tw: false */
-
 "use strict";
 
-/**************************** IMPORTS ****************************/
+/*** Exports *******************************************************/
+
+exports.DialogManager = DialogManager;
+
+/*** Imports *******************************************************/
  
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
 var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager").CallbackManager;
 
-/***************************** CODE ******************************/
+/*** Code **********************************************************/
       
 /**
  * The DialogManager is responsible for preparing, displaying and
@@ -35,11 +35,7 @@ var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackMana
  *     each dialog has to be bound manually to the callback if required.
  * @constructor
  */
-var DialogManager = function(callbackManager, context) {
-  
-  // create shortcuts for services and frequently used vars
-  this.logger = $tw.tmap.logger;
-  this.adapter = $tw.tmap.adapter;
+function DialogManager(callbackManager, context) {
   
   // create callback registry
   this.callbackManager = callbackManager;
@@ -86,24 +82,24 @@ var DialogManager = function(callbackManager, context) {
 */
 DialogManager.prototype.open = function(templateId, param, callback) {
   
-  if(utils.isTrue($tw.tmap.config.sys.suppressedDialogs[templateId], false)) {
-    this.logger("warning", "Suppressed dialog", templateId);
+  if(utils.isTrue($tm.config.sys.suppressedDialogs[templateId], false)) {
+    $tm.logger("warning", "Suppressed dialog", templateId);
     return;
   }
   
   param = param || {}
   
-  this.logger("debug", "Dialog param object", param);
+  $tm.logger("debug", "Dialog param object", param);
 
   if(typeof callback === "function" && this.context) {
     callback = callback.bind(this.context);
   }
   
   // create a temporary tiddler reference for the dialog
-  var dialogTRef = $tw.tmap.path.tempRoot + "/dialog-" + utils.genUUID();
+  var dialogTRef = $tm.path.tempRoot + "/dialog-" + utils.genUUID();
   
   // get the dialog template
-  var skeleton = utils.getTiddler($tw.tmap.path.dialogs + "/" + templateId);
+  var skeleton = utils.getTiddler($tm.path.dialogs + "/" + templateId);
   
   // fields used to handle the dialog process
   var dialog = {
@@ -116,7 +112,7 @@ DialogManager.prototype.open = function(templateId, param, callback) {
     template: skeleton.fields.title,
     templateId: templateId,
     currentTiddler: dialogTRef + "/output",
-    text: utils.getText($tw.tmap.path.dialogs)
+    text: utils.getText($tm.path.dialogs)
   };
       
   if(param.dialog) {
@@ -142,7 +138,7 @@ DialogManager.prototype.open = function(templateId, param, callback) {
   // force the footer to be set to the wrapper
   // the footer wrapper will determine the footer from the
   // buttons field/variable
-  dialog.footer = utils.getText($tw.tmap.path.footers);
+  dialog.footer = utils.getText($tm.path.footers);
   
   // flatten dialog and param object
   dialog = utils.flatten(dialog);
@@ -159,7 +155,7 @@ DialogManager.prototype.open = function(templateId, param, callback) {
       var outputTObj = $tw.wiki.getTiddler(dialog.output);
     } else {
       var outputTObj = null;
-      $tw.tmap.notify("operation cancelled");
+      $tm.notify("operation cancelled");
     }
     
     if(typeof callback === "function") {
@@ -179,7 +175,7 @@ DialogManager.prototype.open = function(templateId, param, callback) {
   var dialogTiddler = new $tw.Tiddler(skeleton, param, dialog);
   $tw.wiki.addTiddler(dialogTiddler);
   
-  this.logger("debug", "Opening dialog", dialogTiddler);
+  $tm.logger("debug", "Opening dialog", dialogTiddler);
   
   $tw.rootWidget.dispatchEvent({
     type: "tm-modal",
@@ -208,7 +204,7 @@ DialogManager.prototype.getElement = function(name) {
  */
 DialogManager.prototype.addKeyBindings = function() {
   
-  var keys = $tw.tmap.keycharm({
+  var keys = $tm.keycharm({
     container: utils.getFirstElementByClassName("tc-modal")
   });
   
@@ -231,10 +227,3 @@ DialogManager.prototype.addKeyBindings = function() {
   }
   
 };
-
-
-// !! EXPORT !!
-exports.DialogManager = DialogManager;
-// !! EXPORT !!
-  
-})();

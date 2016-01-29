@@ -4,24 +4,24 @@ title: $:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction
 type: application/javascript
 module-type: library
 
-@module TiddlyMap
 @preserve
 
 \*/
 
-(/** @lends module:TiddlyMap*/function() {
-
 /*jslint node: true, browser: true */
 /*global $tw: false */
-
 "use strict";
 
-/**************************** IMPORTS ****************************/
+/*** Exports *******************************************************/
+
+exports.ViewAbstraction = ViewAbstraction;
+
+/*** Imports *******************************************************/
 
 var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var utils    = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
   
-/***************************** CODE ******************************/
+/*** Code **********************************************************/
 
 /**
  * This class abstracts the various pieces that together make up the
@@ -34,13 +34,12 @@ var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
  *     any existing view, false otherwise.
  * @constructor
  */
-var ViewAbstraction = function(view, options) {
+function ViewAbstraction(view, options) {
   
   options = options || {};
 
   // register shortcuts and aliases
-  this.logger = $tw.tmap.logger;
-  this._edgeTypePath = $tw.tmap.path.edgeTypes;
+  this._edgeTypePath = $tm.path.edgeTypes;
 
   if(view instanceof ViewAbstraction) {
     // bounce back the object we received
@@ -121,16 +120,17 @@ ViewAbstraction.prototype._getConfigPath = function(view, isCreate) {
   if(typeof view === "string") {
       
     // remove prefix and slash
-    view = utils.getWithoutPrefix(view, $tw.tmap.path.views + "/");
+    view = utils.getWithoutPrefix(view, $tm.path.views + "/");
 
     if(view && !utils.hasSubString(view, "/")) {
       // a valid label must not contain any slashes
-      return $tw.tmap.path.views + "/" + view; // add prefix (again)
+      return $tm.path.views + "/" + view; // add prefix (again)
     }
   }
   
   if(isCreate) {
-    return $tw.wiki.generateNewTitle($tw.tmap.path.views + "/My view");
+    var t = $tm.path.views + "/" + utils.getRandomLabel({ plural: true });
+    return $tw.wiki.generateNewTitle(t);
   }
   
 };
@@ -171,7 +171,9 @@ ViewAbstraction.prototype._createView = function(options) {
   var fields = {};
   fields.title = this.comp.config;
   
-  if(!options.isHidden) fields[$tw.tmap.field.viewMarker] = true;
+  if(!options.isHidden) {
+    fields[$tm.field.viewMarker] = true;
+  }
   
   // an id is actually not used for view in TM, I just reserve it…
   fields.id = utils.genUUID();
@@ -181,6 +183,8 @@ ViewAbstraction.prototype._createView = function(options) {
     fields
   ));
   
+  this.setEdgeTypeFilter($tm.filter.defaultEdgeTypeFilter);
+    
 };
 
 ViewAbstraction.prototype.isLocked = function() {
@@ -199,7 +203,7 @@ ViewAbstraction.prototype.update = function(updates) {
   
   var changedTiddlers = updates.changedTiddlers;
   
-  if(updates[$tw.tmap.path.edgeTypes]
+  if(updates[$tm.path.edgeTypes]
      || utils.hasKeyWithPrefix(changedTiddlers, this.comp.config)) {
     
     this.rebuildCache();
@@ -211,13 +215,11 @@ ViewAbstraction.prototype.update = function(updates) {
 };
 
 /**
- * This method will rebuild the cache based on the references provided
- * via `components`. If a part (component) of the cache is marked as
- * being already up-to-date, then it is skipped.
+ * This method will rebuild the cache.
  */
-ViewAbstraction.prototype.rebuildCache = function(components) {
+ViewAbstraction.prototype.rebuildCache = function(isForce) {
   
-  if(this._noNeedToRebuildCache) {
+  if(!isForce && this._noNeedToRebuildCache) {
     this._noNeedToRebuildCache = false;
     return;
   }
@@ -296,19 +298,16 @@ ViewAbstraction.prototype.getLabel = function() {
 /**
  * Method to remove all tiddlers prefixed with the views root. This
  * will make the view non-existent.
+ * 
+ * ATTENTION: Do not use the object anymore after you called
+ * this function!
  */
 ViewAbstraction.prototype.destroy = function() {
   
   // delete the view and all tiddlers stored in its path (map, edge-filter etc.)
   var filter = "[prefix[" + this.getRoot() + "]]";
   utils.deleteTiddlers(utils.getMatches(filter));
-  
-  this.comp = utils.makeHashMap();
-  
-  // rebuild all components to make sure no data remains in this
-  // abstraction instance
-  this.rebuildCache();
-  
+    
 };
 
 /**
@@ -328,7 +327,7 @@ ViewAbstraction.prototype.rename = function(newLabel) {
   if(typeof newLabel !== "string") return false;
     
   if(utils.inArray("/", newLabel)) {
-    $tw.tmap.notify("A view name must not contain any \"/\"");
+    $tm.notify("A view name must not contain any \"/\"");
     return false;
   }
   
@@ -336,20 +335,20 @@ ViewAbstraction.prototype.rename = function(newLabel) {
   var oldLabel = this.getLabel();
   
   // start the renaming
-  var newRoot = $tw.tmap.path.views + "/" + newLabel;
+  var newRoot = $tm.path.views + "/" + newLabel;
   var oldRoot = this.getRoot();
   var results = utils.mv(oldRoot, newRoot, true);
   
   // update references
   
-  if($tw.tmap.config.sys.defaultView === oldLabel) {
-     utils.setEntry($tw.tmap.ref.sysUserConf,
+  if($tm.config.sys.defaultView === oldLabel) {
+     utils.setEntry($tm.ref.sysUserConf,
                     "defaultView",
                     newLabel);
   }
   
-  if($tw.tmap.config.sys.liveTab.fallbackView === oldLabel) {
-     utils.setEntry($tw.tmap.ref.sysUserConf,
+  if($tm.config.sys.liveTab.fallbackView === oldLabel) {
+     utils.setEntry($tm.ref.sysUserConf,
                     "liveTab.fallbackView",
                     newLabel);
   }
@@ -361,7 +360,7 @@ ViewAbstraction.prototype.rename = function(newLabel) {
       // update global node data fields referencing this view
       utils.setField(tRef, "tmap.open-view", newLabel);
       
-    } else if(utils.startsWith(tRef, $tw.tmap.path.views)) {
+    } else if(utils.startsWith(tRef, $tm.path.views)) {
       
       // update all local node data referencing this view
       var view = new ViewAbstraction(tRef);
@@ -444,7 +443,7 @@ ViewAbstraction.prototype.getHierarchyEdgeTypes = function() {
   var labels = utils.makeHashMap();
   for(var id in orderByEdges) {
     if(orderByEdges[id] === "true") {
-      var tObj = utils.getTiddler($tw.tmap.indeces.tById[id]);
+      var tObj = utils.getTiddler($tm.indeces.tById[id]);
       if(tObj) {
         labels[utils.getBasename(tObj.fields.title)] = true;
       }
@@ -460,34 +459,38 @@ ViewAbstraction.prototype.getHierarchyEdgeTypes = function() {
  */
 ViewAbstraction.prototype.setConfig = function() {
   
-  if(arguments[0] == null) return; // null or undefined
+  var args = arguments;
   
-  if(arguments.length === 1 && typeof arguments[0] === "object") {
+  if(args[0] == null) return; // null or undefined
+  
+  if(args.length === 1 && typeof args[0] === "object") {
     
-    for(var prop in arguments[0]) {
-      this.setConfig(prop, arguments[0][prop]);
+    for(var prop in args[0]) {
+      this.setConfig(prop, args[0][prop]);
     }
     
-  } else if(arguments.length === 2 && typeof arguments[0] === "string") {
+  } else if(args.length === 2 && typeof args[0] === "string") {
     
-    var prop = utils.getWithoutPrefix(arguments[0], "config.");
-    var val = arguments[1];
+    var prop = utils.getWithoutPrefix(args[0], "config.");
+    var val = args[1];
     
-    if(val === undefined) {
-      return;
-    }
+    if(val === undefined) return;
     
     if(val === null) {
-      this.logger("debug", "Removing config", prop);
-      delete this.config["config."+prop];
+      
+      $tm.logger("debug", "Removing config", prop);
+      delete this.config["config."+prop]; // todo set this to null
+      
     } else {
-      if(prop === "edge_type_namespace" && typeof val === "string" && val.length) {
-        // if the user left out the colon, we will add it!
-        val = val.replace(/([^:])$/, "$1:");
+      
+      if(prop === "edge_type_namespace") {
+        var match = val.match(/[^:]+/);
+        val = (match ? match[0] : "");
       }
+      
     }
     
-    this.logger("log", "Setting config", prop, val);
+    $tm.logger("log", "Setting config", prop, val);
     this.config["config."+prop] = val;
 
     
@@ -522,7 +525,7 @@ ViewAbstraction.prototype.isExplicitNode = function(node) {
 
 ViewAbstraction.prototype.isLiveView = function() {
   
-  return (this.getLabel() === $tw.tmap.misc.liveViewLabel);
+  return (this.getLabel() === $tm.misc.liveViewLabel);
   
 };
 
@@ -552,13 +555,13 @@ ViewAbstraction.prototype.setNodeFilter = function(expr, force) {
   
   if(this.isLiveView() && !force) {
     var text = "You must not change the live view's node filter!";
-    $tw.tmap.notify(text);
+    $tm.notify(text);
     return;
   }
       
   utils.setField(this.comp.nodeFilter, "filter", expr);
   
-  this.logger("debug","Node filter set to", expr);
+  $tm.logger("debug","Node filter set to", expr);
 
   // rebuild filter now and prevent another rebuild at refresh
   this.nodeFilter = this.getNodeFilter(null, true);
@@ -578,7 +581,7 @@ ViewAbstraction.prototype.setEdgeTypeFilter = function(expr) {
   
   utils.setField(this.comp.edgeTypeFilter, "filter", expr);
   
-  this.logger("debug","Edge filter set to", expr);
+  $tm.logger("debug","Edge filter set to", expr);
 
   // rebuild filter now 
   this.edgeTypeFilter = this.getEdgeTypeFilter(null, true);
@@ -648,7 +651,7 @@ ViewAbstraction.prototype.getEdgeTypeFilter = function(type, isRebuild) {
   } else {
     
     var f = utils.makeHashMap();
-    var allETy = $tw.tmap.indeces.allETy;
+    var allETy = $tm.indeces.allETy;
     var src = Object.keys(allETy);    
     var tObj = $tw.wiki.getTiddler(this.comp.edgeTypeFilter);
     
@@ -660,6 +663,18 @@ ViewAbstraction.prototype.getEdgeTypeFilter = function(type, isRebuild) {
   }
     
   return (type ? f[type] : f);
+  
+};
+
+ViewAbstraction.prototype.isEdgeTypeVisible = function(type) {
+  
+  var options = {
+    namespace: this.getConfig("edge_type_namespace")
+  };
+  
+  var type = new EdgeType(type, null, options);
+            
+  return utils.isEdgeTypeMatch(type.id, this.edgeTypeFilter.raw);
   
 };
 
@@ -759,7 +774,7 @@ ViewAbstraction.prototype.saveNodeData = function() {
     
   } else if(args.length === 1 && typeof args[0] === "object") {
     
-    $tw.tmap.logger("log", "Storing data in", this.comp.map);
+    $tm.logger("log", "Storing data in", this.comp.map);
     
     $tw.utils.extend(data, args[0]);
         
@@ -800,9 +815,3 @@ ViewAbstraction.prototype.saveNodeStyle = function(id, style) {
   this.saveNodeData(id, style);
  
 };
-
-// !! EXPORT !!
-exports.ViewAbstraction = ViewAbstraction;
-// !! EXPORT !!#
-  
-})();

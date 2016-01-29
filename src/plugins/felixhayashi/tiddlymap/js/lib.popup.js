@@ -4,19 +4,19 @@ title: $:/plugins/felixhayashi/tiddlymap/js/Popup
 type: application/javascript
 module-type: library
 
-@module TiddlyMap
 @preserve
 
 \*/
 
-(/** @lends module:TiddlyMap*/function(){
-
 /*jslint node: true, browser: true */
 /*global $tw: false */
-
 "use strict";
 
-/**** Imports ******************************************************/
+/*** Exports *******************************************************/
+
+exports.Popup = Popup;
+
+/*** Imports *******************************************************/
 
 var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
   
@@ -36,15 +36,10 @@ var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
  * @param {int} [options.delay] - The default delay for the popup
  *    show and hide.
  */
-var Popup = function(parentDomNode, options) {
+function Popup(parentDomNode, options) {
   
   options = options || {};
-  
-  // create shortcuts for services and frequently used vars
-  this._opt = $tw.tmap;
-  this._logger = $tw.tmap.logger;
-  this._indeces = $tw.tmap.indeces;
-  
+    
   this._parentDomNode = parentDomNode;
   this._domNode = document.createElement("div");
   this._domNode.style.display = "none";
@@ -58,9 +53,16 @@ var Popup = function(parentDomNode, options) {
   this._timeoutShow = null;
   this._timeoutHide = null;
   this._signature = null;
-  this._hideDelayAfterLeavingPopup = 500;
   this._isDisplayNoneAfterAnimation = true;
-  this._delay = (utils.isInteger(options.delay) ? delay : 0);
+    
+  // delays
+  this._hideDelayLeavingPopup = 200;
+  this._hideDelay = utils.isInteger(parseInt(options.hideDelay))
+                    ? parseInt(options.hideDelay)
+                    : 200;
+  this._showDelay = utils.isInteger(parseInt(options.showDelay))
+                    ? parseInt(options.showDelay)
+                    : 200;
 
   // force early binding of functions to this context
   utils.bind(this, [
@@ -92,7 +94,7 @@ var Popup = function(parentDomNode, options) {
  */
 Popup.prototype._handleEnter = function(ev) {
   
-  console.log("_handleEnter");
+  //~ console.log("_handleEnter");
     
   this._isPreventShowOrHide = true;
   
@@ -103,14 +105,14 @@ Popup.prototype._handleEnter = function(ev) {
  */
 Popup.prototype._handleLeave = function(ev) {
   
-  console.log("_handleLeave");
+  //~ console.log("_handleLeave");
   
   this._isPreventShowOrHide = false;
   
   // we need some delay because resizing may cause the mouse to
   // exit the popup for some miliseconds
   
-  this.hide(this._hideDelayAfterLeavingPopup);
+  this.hide(this._hideDelayLeavingPopup);
   
 };
 
@@ -120,7 +122,7 @@ Popup.prototype._handleLeave = function(ev) {
 Popup.prototype._handleAnimationEnd = function() {
   
   if(this._isDisplayNoneAfterAnimation) {
-    console.log("display: none");
+    //~ console.log("display: none");
     this._domNode.style.display = "none";
   }
   
@@ -129,13 +131,13 @@ Popup.prototype._handleAnimationEnd = function() {
 /**
  * Immediately hides the popup.
  */
-Popup.prototype._hide = function() {
+Popup.prototype._hide = function(isForce) {
   
-  console.log("_hide");
+  //~ console.log("_hide");
   
-  if(this._isPreventShowOrHide) return;
+  if(!isForce && this._isPreventShowOrHide) return;
     
-  console.log("_hide SUCCESS");
+  //~ console.log("_hide SUCCESS");
   
   this._signature = null;
   this._isDisplayNoneAfterAnimation = true;
@@ -155,9 +157,9 @@ Popup.prototype._hide = function() {
  */
 Popup.prototype._show = function(signature, text) {
   
-  console.log("_show");
+  //~ console.log("_show");
   
-  if(this._isPreventShowOrHide || $tw.tmap.mouse.ctrlKey || !this._isEnabled) {
+  if(this._isPreventShowOrHide || $tm.mouse.ctrlKey || !this._isEnabled) {
     return;
   }
   
@@ -179,22 +181,27 @@ Popup.prototype._show = function(signature, text) {
   
   if(!div.childNodes.length) return;
   
-  console.log("_show SUCCESS");
+  var parRect = this._parentDomNode.getBoundingClientRect();
+  var x = $tm.mouse.clientX;
+  var y = $tm.mouse.clientY;
+  
+  var isClickedInside = (parRect.left < x && x < parRect.right
+                         && parRect.top < y && y < parRect.bottom);
+
+  if(!isClickedInside) return;
+
+  //~ console.log("_show SUCCESS");
   
   this._signature = signature;
   
   // ATTENTION: display needs to be true before we can get the bounds!
-  
+    
   // make sure that display is block so the animation is executed
   // and we can retrieve the size of the div.
   this._domNode.style.display = "block";
 
-  var parRect = this._parentDomNode.getBoundingClientRect();
   var popRect = this._domNode.getBoundingClientRect();
-  
-  var x = $tw.tmap.mouse.clientX;
-  var y = $tw.tmap.mouse.clientY;
-  
+    
   var availSpaceRight = parRect.right - (x + popRect.width);
   var availSpaceLeft = (x - popRect.width) - parRect.left;
   var spawnRight = availSpaceRight > availSpaceLeft;
@@ -233,11 +240,11 @@ Popup.prototype._show = function(signature, text) {
  */
 Popup.prototype.show = function(signature, text, delay) {
   
-  console.log("show", delay);
+  //~ console.log("show", delay);
   
   this._clearTimeouts();
   
-  delay = (utils.isInteger(delay) ? delay : this._delay);
+  delay = (utils.isInteger(delay) ? delay : this._showDelay);
     
   // start a new timeout
   this._timeoutShow = window.setTimeout(this._show, delay, signature, text);
@@ -249,16 +256,19 @@ Popup.prototype.show = function(signature, text, delay) {
  * 
  * @param {int} delay - Delays the hide operation.
  */
-Popup.prototype.hide = function(delay) {
+Popup.prototype.hide = function(delay, isForce) {
   
-  console.log("hide", delay);
+  //~ console.log("hide", delay);
     
   this._clearTimeouts();
     
-  delay = (utils.isInteger(delay) ? delay : this._delay);
+  delay = (utils.isInteger(delay) ? delay : this._hideDelay);
   
-  // clear any previous timeout and start a new one.
-  this._timeoutHide = window.setTimeout(this._hide, delay);
+  if(isForce || delay === 0) {
+    this._hide(isForce);
+  } else {
+    this._timeoutHide = window.setTimeout(this._hide, delay, isForce);
+  }
       
 };
 
@@ -271,7 +281,7 @@ Popup.prototype.setEnabled = function(isEnabled) {
   
 Popup.prototype._clearTimeouts = function() {
   
-  console.log("_clearTimeouts", this._timeoutShow, this._timeoutHide);
+  //~ console.log("_clearTimeouts", this._timeoutShow, this._timeoutHide);
   
   window.clearTimeout(this._timeoutShow);
   window.clearTimeout(this._timeoutHide);
@@ -280,9 +290,3 @@ Popup.prototype._clearTimeouts = function() {
   this._timeoutHide = undefined;
       
 };
-
-/**** Export *******************************************************/
-
-exports.Popup = Popup;
-
-})();

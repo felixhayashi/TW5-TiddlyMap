@@ -4,24 +4,24 @@ title: $:/plugins/felixhayashi/tiddlymap/js/NodeType
 type: application/javascript
 module-type: library
 
-@module TiddlyMap
 @preserve
 
 \*/
 
-(/** @lends module:TiddlyMap*/function() {
-
 /*jslint node: true, browser: true */
 /*global $tw: false */
-
 "use strict";
 
-/**************************** IMPORTS ****************************/
+/*** Exports *******************************************************/
+
+exports.NodeType = NodeType;
+
+/*** Imports *******************************************************/
 
 var MapElementType = require("$:/plugins/felixhayashi/tiddlymap/js/MapElementType").MapElementType;
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var utils          = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
   
-/***************************** CODE ******************************/
+/*** Code **********************************************************/
 
 /**
  * Used to define the type of a node.
@@ -30,17 +30,21 @@ var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
  * @extends MapElementType
  *
  */
-var NodeType = function(id, data) {
+function NodeType(id, data) {
 
   if(id instanceof NodeType) {
     return id; // bounce back!
   }
  
+  id = (typeof id === "string"
+        ? utils.getWithoutPrefix(id, $tm.path.nodeTypes + "/")
+        : "tmap:unknown");
+ 
   // call the parent constructor
   MapElementType.call(
     this,
-    id || "tmap:unknown",
-    $tw.tmap.path.nodeTypes,
+    id,
+    $tm.path.nodeTypes,
     NodeType._fieldMeta,
     data
   );
@@ -81,9 +85,3 @@ NodeType.prototype.getInheritors = function(src) {
   return (s ? utils.getMatches(s, src || $tw.wiki.allTitles()) : []);
   
 };
-      
-// !! EXPORT !!
-exports.NodeType = NodeType;
-// !! EXPORT !!#
-  
-})();

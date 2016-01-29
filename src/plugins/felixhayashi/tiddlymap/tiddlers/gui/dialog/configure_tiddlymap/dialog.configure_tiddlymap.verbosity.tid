@@ -1,0 +1,43 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/globalConfig/verbosity
+caption: Verbosity
+
+\rules except wikilink
+
+Here you can restrict the system's talkativeness.
+
+<table class="tmap-config-table">
+  <<tmap-row type:"input-checkbox"
+      title:"Debug output"
+      field:"config.sys.debug" 
+      descr:"Set this to true if you want debug information to be
+             displayed in the browser console.">>
+  <<tmap-row type:"input-checkbox"
+      title:"Show notifications"
+      field:"config.sys.notifications" 
+      descr:"Set this to true if you want to receive fade-out
+             notifications for important events.">>
+  <<tmap-row type:"input-checkbox"
+      title:"Show popups"
+      field:"config.sys.popups.enabled" 
+      descr:"Set this to true if you want to see automatic
+             popups in the map.">>
+  <$list filter="[config.sys.popups.enabled[true]]">
+  <<tmap-row type:"input-text"
+      title:"Popup delay"
+      field:"config.sys.popups.delay"
+      descr:"The time in miliseconds that needs to pass after
+             a tooltip is triggered.">>
+  <<tmap-row type:"input-text"
+      title:"Popup width"
+      field:"config.sys.popups.width"
+      descr:"The default max-width of the popup."
+      note:"Make sure you added the desired unit (e.g. `px`).
+            Requires a wiki refresh.">>
+  <<tmap-row type:"input-text"
+      title:"Popup height"
+      field:"config.sys.popups.height"
+      descr:"The default max-height of the popup."
+      note:"Make sure you added desired the unit (e.g.  `px`).
+            Requires a wiki refresh.">>
+  </$list>
+</table> 

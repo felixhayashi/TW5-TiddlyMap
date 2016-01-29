@@ -4,26 +4,26 @@ title: $:/plugins/felixhayashi/tiddlymap/js/widget/MapConfigWidget
 type: application/javascript
 module-type: widget
 
-@module TiddlyMap
 @preserve
 
 \*/
 
-(/** @lends module:TiddlyMap*/function(){
-
 /*jslint node: true, browser: true */
 /*global $tw: false */
-
 "use strict";
 
-/**************************** IMPORTS ****************************/
- 
-var Widget =          require("$:/core/modules/widgets/widget.js").widget;
-var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction").ViewAbstraction;
-var vis =             require("$:/plugins/felixhayashi/vis/vis.js");
-var utils =           require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+/*** Exports *******************************************************/
 
-/***************************** CODE ******************************/
+exports["tmap-config"] = MapConfigWidget;
+
+/*** Imports *******************************************************/
+ 
+var Widget          = require("$:/core/modules/widgets/widget.js").widget;
+var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction").ViewAbstraction;
+var vis             = require("$:/plugins/felixhayashi/vis/vis.js");
+var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+
+/*** Code **********************************************************/
 
 /**
  * Wrapper for the Visjs configurator.
@@ -39,19 +39,14 @@ var utils =           require("$:/plugins/felixhayashi/tiddlymap/js/utils").util
  * ```
  * 
  * @constructor
- * 
  */
-var MapConfigWidget = function(parseTreeNode, options) {
+function MapConfigWidget(parseTreeNode, options) {
   
   // call the parent constructor
   Widget.call(this);
   
   // call initialise on prototype
   this.initialise(parseTreeNode, options);
-  
-  // create shortcuts for services and frequently used vars
-  this.adapter = $tw.tmap.adapter;
-  this.notify = $tw.tmap.notify;
       
   // make the html attributes available to this widget
   this.computeAttributes();
@@ -162,7 +157,7 @@ MapConfigWidget.prototype.render = function(parent, nextSibling) {
   this.parentDomNode.style["height"] = height + "px";
   
   // register this graph at the caretaker's graph registry
-  $tw.tmap.registry.push(this);
+  $tm.registry.push(this);
 
 };
 
@@ -347,10 +342,3 @@ MapConfigWidget.prototype.setNull = function(obj) {
   }
   
 };
-
-/**************************** EXPORTS ****************************/
-
-exports["tmap-config"] = MapConfigWidget;
-
-})();
-

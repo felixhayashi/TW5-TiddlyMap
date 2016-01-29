@@ -12,7 +12,11 @@
  * 
  * Options:
  *   --production    Run in production mode
- *   --mode          The mode of the version, e.g. "dev"
+ *   --mode          The mode of the compilation, e.g. "develop" or
+ *                   "testing". The mode will be inserted into
+ *                   the version string (e.g. "1.2.5-develop+371").
+ *                   Exception: If mode is "master", then it will
+ *                   be ignored and not added to the version string.
  * 
  * ------------------------------------------------------------------
  * 
@@ -75,6 +79,7 @@ var exists = require("is-there");
 var SemVer = require("semver");
 // once gulp 4.0 is out: remove runSequence and update
 var runSequence = require('run-sequence');
+var beep = require('beepbeep')
 var gulp = require("gulp");
 var gulpif = require("gulp-if");
 var gutil = require("gulp-util");
@@ -82,6 +87,9 @@ var sass = require("gulp-sass");
 var replace = require('gulp-replace');
 var uglify = require("gulp-uglify");
 var jsdoc = require('gulp-jsdoc3');
+var esprima = require('gulp-esprima');
+var debug = require('gulp-debug');
+var jsValidate = require('gulp-jsvalidate');
 
 /**** Preprocessing ************************************************/
 
@@ -107,7 +115,7 @@ if(pluginTiddler !== pluginInfo.title) {
 /**** Replacements *************************************************/
 
 var replaceAfterSass = {
-  "__breakpoint__": "{{$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint}}",
+  "__breakpoint__": "{{$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint}}"
 };
 
 /**** Tasks ********************************************************/
@@ -135,7 +143,7 @@ gulp.task("bump version", function(cb) {
 
   var v = new SemVer(pluginInfo.version);
   var build = (isIncrBuild ? "+" + (parseInt(v.build[0] || 0) + 1) : "");  
-  var mode = (argv.mode ? "-" + argv.mode : "");  
+  var mode = (argv.mode && argv.mode !== "master" ? "-" + argv.mode : "");  
   pluginInfo.version = v.major + "." + v.minor + "." + v.patch + mode + build;
   pluginInfo.released = new Date().toUTCString();
   
@@ -201,6 +209,17 @@ gulp.task("compile and move scripts", function() {
 });
 
 /**
+ * Syntax validation.
+ */
+gulp.task("Javascript validation", function() {
+  
+  return gulp.src(pluginSrc + "/**/*.js")
+             .pipe(debug())
+             .pipe(esprima());
+   
+});
+
+/**
  * Create the docs if in production mode.
  */
 gulp.task("create docs", function(cb) {
@@ -253,7 +272,10 @@ gulp.task("bundle the plugin", function(cb) {
   var outName = pluginName + "_" + pluginInfo.version + ".json"
   fs.writeFileSync(path.resolve(outPath.bundle, outName),
                    JSON.stringify([ plugin ], null, 2));
-                   
+          
+  beep()
+  console.log('\007');
+                     
   cb();
 
 });
@@ -263,6 +285,7 @@ gulp.task("bundle the plugin", function(cb) {
  */
 gulp.task("default", function(cb) {
   runSequence(
+    "Javascript validation",
     "perform cleanup",
     "bump version",
     [

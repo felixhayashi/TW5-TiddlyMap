@@ -4,20 +4,9 @@ title: $:/plugins/felixhayashi/tiddlymap/js/startup/environment
 type: application/javascript
 module-type: startup
 
-@module TiddlyMap
 @preserve
 
 \*/
-
-(
-/**
- * 
- * This module is responsible for registering a global namespace
- * under $tw and registering fundamental path variables.
- * 
- * @lends module:TiddlyMap
- */ 
-function(){
   
 /*jslint node: true, browser: true */
 /*global $tw: false */
@@ -40,6 +29,9 @@ exports.startup = run;
 /*** Code **********************************************************/
 
 /**
+ * This module is responsible for registering a global namespace
+ * under $tw and registering fundamental path variables.
+ * 
  * Everything that doesn't change when the global config object is
  * updated. This includes prefixes (paths) and tiddler titles.
  * 
@@ -49,18 +41,13 @@ exports.startup = run;
 
 function run(parent) {
   
-  $tw.tmap = {};
-    
-  var o = $tw.tmap;
+  window.$tm = {};
   
   // **ATTENTION: NO TRAILING SLASHES IN PATHS EVER**
-  o.path = {
+  $tm.path = {
     pluginRoot:      "$:/plugins/felixhayashi/tiddlymap",
     edgeTypes:       "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes",
     nodeTypes:       "$:/plugins/felixhayashi/tiddlymap/graph/nodeTypes",
-    listEdgeTypes:   "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-list:",
-    fieldEdgeTypes:  "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-field:",
-    filterEdgeTypes: "$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-filter:",
     views:           "$:/plugins/felixhayashi/tiddlymap/graph/views",
     options:         "$:/plugins/felixhayashi/tiddlymap/config",
     dialogs:         "$:/plugins/felixhayashi/tiddlymap/dialog",
@@ -71,10 +58,8 @@ function run(parent) {
     localHolders:    "$:/temp/tmap/holders"
   };
   
-  var p = o.path;
-
   // static references to important tiddlers
-  o.ref = {
+  $tm.ref = {
     defaultViewHolder:  "$:/plugins/felixhayashi/tiddlymap/misc/defaultViewHolder",
     graphBar:           "$:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar",
     sysUserConf:        "$:/plugins/felixhayashi/tiddlymap/config/sys/user",
@@ -88,17 +73,21 @@ function run(parent) {
   };
   
   // some other options
-  o.misc = {
+  $tm.misc = {
     // if no edge label is specified, this is used as label
     unknownEdgeLabel: "tmap:undefined",
     liveViewLabel: "Live View",
     defaultViewLabel: "Default",
     mainEditorId: "main_editor",
-    arrows: { "in": "⇦", "out": "➡", "bi": "⇄" }
-    
+    arrows: { "in": "⇦", "out": "➡", "bi": "⇄" },
+    magicETyNamespaces: [
+      "tw-list",
+      "tw-field",
+      "tw-filter"
+    ]
   };
 
-  o.config = {
+  $tm.config = {
     sys: {
       field: {
         nodeLabel: "caption",
@@ -107,13 +96,18 @@ function run(parent) {
         viewMarker: "isview"
       },
       liveTab: {
-        fallbackView: o.misc.liveViewLabel
+        fallbackView: $tm.misc.liveViewLabel
       },
       suppressedDialogs: {},
       edgeClickBehaviour: "manager",
       debug: "false",
       notifications: "true",
-      popups: "true",
+      popups: {
+        enabled: "true",
+        delay: "600",
+        width: "240px",
+        height: "140px"
+      },
       editNodeOnCreate: "false",
       singleClickMode: "false",
       editorMenuBar: {
@@ -124,58 +118,37 @@ function run(parent) {
   };
   
   // some popular filters
-  o.filter = {
-    nodeTypes: "[prefix[" + o.path.nodeTypes + "]]",
-    edgeTypes: "[prefix[" + o.path.edgeTypes + "]]",
-    listEdgeTypes: "[prefix[" + o.path.listEdgeTypes + "]]",
-    fieldEdgeTypes: "[prefix[" + o.path.fieldEdgeTypes + "]]",
-    filterEdgeTypes: "[prefix[" + o.path.filterEdgeTypes + "]]",
-    views: "[" + o.config.sys.field.viewMarker + "[true]]"
+  $tm.filter = {
+    nodeTypes: "[prefix[" + $tm.path.nodeTypes + "]]",
+    edgeTypes: "[prefix[" + $tm.path.edgeTypes + "]]",
+    views: "[" + $tm.config.sys.field.viewMarker + "[true]]"
   };
     
-  o.filter.defaultEdgeTypeFilter = " -[[tw-body:link]]" +
+  $tm.filter.defaultEdgeTypeFilter = " -[prefix[_]]" +
+                                   " -[[tw-body:link]]" +
                                    " -[[tw-list:tags]]" +
                                    " -[[tw-list:list]]";
   
   // some popular selectors
   // usually used from within tiddlers via the tmap macro
-  var s = o.selector = {};
+  var s = $tm.selector = {};
   var allSelector = "[all[tiddlers+shadows]!has[draft.of]]";
 
   // all edge-types (by label)
-  s.allEdgeTypes = allSelector + " +" + o.filter.edgeTypes;
+  s.allEdgeTypes = allSelector + " +" + $tm.filter.edgeTypes;
   s.allEdgeTypesById = s.allEdgeTypes
-                          + " +[removeprefix[" + p.edgeTypes + "/]]";
+                          + " +[removeprefix[" + $tm.path.edgeTypes + "/]]";
 
   // all node-types (by label)
-  s.allNodeTypes = allSelector + " +" + o.filter.nodeTypes;
+  s.allNodeTypes = allSelector + " +" + $tm.filter.nodeTypes;
   s.allNodeTypesById = s.allNodeTypes
-                          + " +[removeprefix[" + p.nodeTypes + "/]]";
+                          + " +[removeprefix[" + $tm.path.nodeTypes + "/]]";
 
   // all views (by label)
-  s.allViews = allSelector + " +" + o.filter.views;
-  s.allViewsByLabel = s.allViews + "+[removeprefix[" + p.views + "/]]";
+  s.allViews = allSelector + " +" + $tm.filter.views;
+  s.allViewsByLabel = s.allViews + "+[removeprefix[" + $tm.path.views + "/]]";
 
   // all non-draft non-system tiddlers
   s.allPotentialNodes = "[all[tiddlers]!is[system]!has[draft.of]]";
 
-  // all names of fields that contain multiple references edges
-  s.allListEdgeStores = allSelector
-                        + " +" + o.filter.listEdgeTypes
-                        + " +[removeprefix[" + p.listEdgeTypes + "]]";
-                                   
-  // all names of fields that store edges
-  s.allFieldEdgeStores = allSelector
-                         + " +" + o.filter.fieldEdgeTypes
-                         + " +[removeprefix[" + p.fieldEdgeTypes + "]]";
-  
-  // all names of fields that store edges
-  s.allFilterEdgeStores = allSelector
-                         + " +" + o.filter.filterEdgeTypes
-                         + " +[removeprefix[" + p.filterEdgeTypes + "]]";
-
 };
-
-
-
-})();

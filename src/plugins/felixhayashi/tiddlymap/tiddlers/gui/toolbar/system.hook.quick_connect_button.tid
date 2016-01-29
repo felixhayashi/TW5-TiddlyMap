@@ -5,11 +5,15 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 
 \define buttonClass() $(tv-config-toolbar-class)$ $(additional-classes)$
 
-\define defConFiltr() [!suffix[tw-body:link]]
-
 \define nonExistentItem()
 <<item>> <span style="color: #9E9E9E">(will be created)</span>
 \end
+
+\define noConnectionsMsg()
+<tr><td colspan="4">//No connections found!//</td></tr>
+\end
+
+
 
 \define tiddlerSearchFilter()
 [!is[system]!has[draft.of]search:title{$:/temp/quickConnectSearch}sort[title]]
@@ -67,8 +71,8 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 <$set name="additional-classes" value="tmap-active-button"><$macrocall $name="showButton" state="" /></$set>
 <div class="tmap-quick-connect tc-reveal tc-popup">
   <div class="tc-drop-down">
-    <div class="title">{{$:/core/images/new-button}} ''Create connection''</div>
-    <table class="tmap-create-connection-table">
+    <div class="title">Create connection</div>
+    <table class="tmap-quick-connect-search-bar">
       <tr>
         <td>Type:</td>
         <td>
@@ -93,6 +97,8 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
           <small><$count filter=<<tiddlerSearchFilter>> /> results</small>
         </td>
       </tr>
+      </table>
+      <table class="tmap-create-connection-table">
       <tr>
         <td colspan="2">
           <table class="tmap-very-small-list">
@@ -110,16 +116,23 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
         </td>
       </tr>
     </table>
-    <div class="title">{{$:/plugins/felixhayashi/tiddlymap/icon}} ''Existing Connections''
-      <span class="tmap-hide-links">
-        <$checkbox
-            tiddler="$:/state/tmap/qc"
-            field="filter"
-            checked=<<defConFiltr>>
-            unchecked=""
-            default=""> hide links
-        </$checkbox>
-      </span>
+    <div class="title">Existing Connections</div>
+    <div class="tmap-quick-connect-existing-bar">
+      <$select
+          tiddler="$:/state/tmap/tid-toolbar"
+          field="direction"
+          default="both">
+          <option value="both">both</option>
+          <option value="in">incoming</option>
+          <option value="out">outgoing</option>
+      </$select>
+      <$checkbox
+          tiddler="$:/state/tmap/tid-toolbar"
+          field="filter.links"
+          checked="-[[tw-body:link]]"
+          unchecked=""
+          default=""> hide links
+      </$checkbox>
     </div>
     <table class="tmap-connection-table">
 <!--
@@ -130,7 +143,11 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
       <th></th>
     </tr>
 -->
-    <$tmap-connections filter={{$:/state/tmap/qc!!filter}} emptyMessage="–">
+    
+    <$tmap-connections
+        filter=<<tmap mergeFields "$:/state/tmap/tid-toolbar" "filter.">>
+        direction={{$:/state/tmap/tid-toolbar!!direction}}
+        emptyMessage=<<noConnectionsMsg>>>
       <tr>
         <td title=<<direction>>><<directionSymbol>></td>
         <td><$link to=<<neighbour>>><$view field="title" /></$link></td>

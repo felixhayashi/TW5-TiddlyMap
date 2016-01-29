@@ -1,6 +1,5 @@
-title: $:/plugins/felixhayashi/tiddlymap/dialog/editFilters
-subtitle: {{$:/core/images/edit-button}} Filter editor -- <<view>>
-classes: tmap-remove-top-space
+title: $:/plugins/felixhayashi/tiddlymap/dialog/configureView/editFilters
+caption: Edit filters
 
 \rules except wikilink
 
@@ -11,17 +10,17 @@ classes: tmap-remove-top-space
 
 <fieldset>
   <legend>Filters <sup>[1]</sup></legend>
-  <table class="tmap-config-table">
+  <table class="tmap-config-table tmap-large-input">
     <<tmap-row type:"input-textarea"
         title:"Node filter"
-        field:"prettyNodeFilter"
-        descr:"Show tiddlers in the graph that match this filter.
-               Drafts and system tiddlers are automatically
+        field:"filter.prettyNodeFltr"
+        descr:"In the map, only those tiddlers that match this filter
+               are shown. Drafts and system tiddlers are automatically
                excluded.">>
     <<tmap-row type:"input-textarea"
-        title:"Edge filter"
-        field:"prettyEdgeTypeFilter" 
-        descr:"Show edges that match this filter.">>
+        title:"Edge-type filter"
+        field:"filter.prettyEdgeFltr" 
+        descr:"Only edges with a type that matches the filter are shown.">>
   </table>   
 </fieldset>
 

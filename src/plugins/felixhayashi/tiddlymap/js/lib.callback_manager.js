@@ -4,30 +4,29 @@ title: $:/plugins/felixhayashi/tiddlymap/js/CallbackManager
 type: application/javascript
 module-type: library
 
-@module TiddlyMap
 @preserve
 
 \*/
 
-(/** @lends module:TiddlyMap*/function(){
-
 /*jslint node: true, browser: true */
 /*global $tw: false */
-
 "use strict";
 
-/**************************** IMPORTS ****************************/
+/*** Exports *******************************************************/
+
+exports.CallbackManager = CallbackManager;
+
+/*** Imports *******************************************************/
  
 var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
 
-/***************************** CODE ******************************/
+/*** Code **********************************************************/
       
 /**
  * @constructor
  */
-var CallbackManager = function() {
+function CallbackManager() {
   
-  this.logger = $tw.tmap.logger;
   this.callbacks = utils.makeHashMap();
 
 };
@@ -46,7 +45,7 @@ var CallbackManager = function() {
  */
 CallbackManager.prototype.add = function(tRef, callback, isDeleteOnCall) {
   
-  this.logger("debug", "A callback was registered for changes of \"" + tRef + "\"");
+  $tm.logger("debug", "A callback was registered for changes of \"" + tRef + "\"");
   this.callbacks[tRef] = {
     execute : callback,
     isDeleteOnCall : (typeof isDeleteOnCall === "boolean" ? isDeleteOnCall : true)
@@ -70,7 +69,7 @@ CallbackManager.prototype.remove = function(refOrRefList) {
   for(var i = refOrRefList.length; i--;) {
     var tRef = refOrRefList[i];
     if(this.callbacks[tRef]) {
-      this.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
+      $tm.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
       delete this.callbacks[tRef];
     }
   }
@@ -95,7 +94,7 @@ CallbackManager.prototype.handleChanges = function(changedTiddlers) {
     
     if($tw.wiki.getTiddler(tRef)) {
       
-      this.logger("debug", "Executing a callback for: " + tRef);
+      $tm.logger("debug", "Executing a callback for: " + tRef);
       this.callbacks[tRef].execute(tRef);
       
       // a continue prevents deleting the callback
@@ -107,10 +106,3 @@ CallbackManager.prototype.handleChanges = function(changedTiddlers) {
   }
   
 };
-
-// !! EXPORT !!
-exports.CallbackManager = CallbackManager;
-// !! EXPORT !!
-  
-})();
-

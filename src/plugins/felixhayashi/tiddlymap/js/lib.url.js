@@ -4,35 +4,86 @@ title: $:/plugins/felixhayashi/tiddlymap/js/URL
 type: application/javascript
 module-type: library
 
-<<<
-
-Lightweight URL manipulation with JavaScript. This library is 
-independent of any other libraries and has pretty simple interface
-and lightweight code-base. Some ideas of query string parsing 
-had been taken from Jan Wolter."
-
-@see http://unixpapa.com/js/querystring.html
-@license MIT
-@author Mykhailo Stadnyk <mikhus@gmail.com>
-
-<<< https://github.com/Mikhus/jsurl
-
-@module TiddlyMap
 @preserve
 
 \*/
 
-(/** @lends module:TiddlyMap*/function() {
-
 /*jslint node: true, browser: true */
 /*global $tw: false */
-
 "use strict";
-  
 
-var Url = (function() {
+/*** Exports *******************************************************/
 
-  var
+exports.URL = Url;
+
+/*** Code **********************************************************/
+
+/**
+ * <<<
+ * Lightweight URL manipulation with JavaScript. This library is 
+ * independent of any other libraries and has pretty simple interface
+ * and lightweight code-base. Some ideas of query string parsing 
+ * had been taken from Jan Wolter."
+ * 
+ * @see http://unixpapa.com/js/querystring.html
+ * @license MIT
+ * @author Mykhailo Stadnyk <mikhus@gmail.com>
+ * <<< https://github.com/Mikhus/jsurl
+ * 
+ * @class
+ * @param {string} url
+ */
+function Url( url) {
+  this.paths = function( paths) {
+    var prefix = '', i = 0, s;
+
+    if (paths && paths.length && paths + '' !== paths) {
+      if (this.isAbsolute()) {
+        prefix = '/';
+      }
+
+      for (s = paths.length; i < s; i++) {
+        paths[i] = encode(paths[i]);
+      }
+
+      this.path = prefix + paths.join('/');
+    }
+
+    paths = (this.path.charAt(0) === '/' ?
+      this.path.slice(1) : this.path).split('/');
+
+    for (i = 0, s = paths.length; i < s; i++) {
+      paths[i] = decode(paths[i]);
+    }
+
+    return paths;
+  };
+
+  this.encode = encode;
+  this.decode = decode;
+
+  this.isAbsolute = function() {
+    return this.protocol || this.path.charAt(0) === '/';
+  };
+
+  this.toString = function() {
+    return (
+      (this.protocol && (this.protocol + '://')) +
+      (this.user && (
+        encode(this.user) + (this.pass && (':' + encode(this.pass))
+      ) + '@')) +
+      (this.host && this.host) +
+      (this.port && (':' + this.port)) +
+      (this.path && this.path) +
+      (this.query.toString() && ('?' + this.query)) +
+      (this.hash && ('#' + encode(this.hash)))
+    );
+  };
+
+  parse( this, url);
+};
+
+var
     // mapping between what we want and <a> element properties
     map = {
       protocol : 'protocol',
@@ -43,10 +94,6 @@ var Url = (function() {
       hash     : 'hash'
     },
 
-    /**
-     * default ports as defined by http://url.spec.whatwg.org/#default-port
-     * We need them to fix IE behavior, @see https://github.com/Mikhus/jsurl/issues/2
-     */
     defaultPorts = {
       "ftp"    : 21,
       "gopher" : 70,
@@ -257,60 +304,3 @@ var Url = (function() {
       })( qs);
     }
   ;
-
-  return function( url) {
-    this.paths = function( paths) {
-      var prefix = '', i = 0, s;
-
-      if (paths && paths.length && paths + '' !== paths) {
-        if (this.isAbsolute()) {
-          prefix = '/';
-        }
-
-        for (s = paths.length; i < s; i++) {
-          paths[i] = encode(paths[i]);
-        }
-
-        this.path = prefix + paths.join('/');
-      }
-
-      paths = (this.path.charAt(0) === '/' ?
-        this.path.slice(1) : this.path).split('/');
-
-      for (i = 0, s = paths.length; i < s; i++) {
-        paths[i] = decode(paths[i]);
-      }
-
-      return paths;
-    };
-
-    this.encode = encode;
-    this.decode = decode;
-
-    this.isAbsolute = function() {
-      return this.protocol || this.path.charAt(0) === '/';
-    };
-
-    this.toString = function() {
-      return (
-        (this.protocol && (this.protocol + '://')) +
-        (this.user && (
-          encode(this.user) + (this.pass && (':' + encode(this.pass))
-        ) + '@')) +
-        (this.host && this.host) +
-        (this.port && (':' + this.port)) +
-        (this.path && this.path) +
-        (this.query.toString() && ('?' + this.query)) +
-        (this.hash && ('#' + encode(this.hash)))
-      );
-    };
-
-    parse( this, url);
-  };
-}());
-
-exports.URL = Url
-  
-})();
-
-

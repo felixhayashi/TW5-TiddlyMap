@@ -7,14 +7,12 @@ module-type: library
 @preserve
 
 \*/
-
-(function(){
     
 /* jslint node: true, browser: true */
 /* global $tw: false */
 "use strict";
 
-/***************************** CODE ******************************/
+/*** Code **********************************************************/
 
 exports.config = {
   locale: "en_EN",
@@ -76,9 +74,9 @@ exports.config = {
       // <- more repulsion between nodes - 0 - more attraction between nodes ->
       gravitationalConstant: -300, // default: -50
       // edge length
-      springLength: 100, // default: 100
-      // stiffness of the edges
-      springConstant: 0.095, // default: 0.08
+      springLength: 0, // default: 100
+      // <- less stiff edges - 0 - stiffer edges ->
+      springConstant: 0.2, // default: 0.08
       // pulls the entire network back to the center.
       centralGravity: 0.015, // default: 0.01
       // kinetic energy reduction
@@ -94,5 +92,3 @@ exports.config = {
     }
   }
 };
-
-})();

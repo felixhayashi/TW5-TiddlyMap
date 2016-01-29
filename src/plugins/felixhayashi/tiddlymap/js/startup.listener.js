@@ -4,33 +4,42 @@ title: $:/plugins/felixhayashi/tiddlymap/js/startup/listener
 type: application/javascript
 module-type: startup
 
-@module TiddlyMap
 @preserve
 
 \*/
-
-(/** @lends module:TiddlyMap*/function(){
   
 /*jslint node: true, browser: true */
 /*global $tw: false */
 "use strict";
 
-/**************************** IMPORTS ****************************/
+/*** Exports *******************************************************/
 
-var NodeType =   require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;
-var EdgeType =   require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
-var utils =      require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+exports.name = "tmap.listener";
+exports.platforms = [ "browser" ];
+exports.after = [ "rootwidget", "tmap.caretaker" ];
+exports.before = [ "story" ];
+exports.synchronous = true;
+exports.startup = function() {
+  // will register its lister functions to the root widget
+  new GlobalListener();
+};
+
+/*** Imports *******************************************************/
+
+var NodeType   = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;
+var EdgeType   = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
+var utils      = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
 var visDefConf = require("$:/plugins/felixhayashi/tiddlymap/js/config/vis").config;
 
-/***************************** CODE ******************************/
+/*** Code **********************************************************/
 
-var GlobalListener = function() {
+/**
+ * @class
+ */
+function GlobalListener() {
     
-  //shortcuts
-  this.adapter = $tw.tmap.adapter;
+  // alias
   this.wiki = $tw.wiki;
-  this.logger = $tw.tmap.logger;
-  this.dialogManager = $tw.tmap.dialogManager;
     
   // add handlers to the root widget to make them available from everywhere
   utils.addTWlisteners({ 
@@ -102,7 +111,7 @@ GlobalListener.prototype.handleSuppressDialog = function(event) {
 
   if(utils.isTrue(event.paramObject.suppress, false)) {
     utils.setEntry(
-        $tw.tmap.ref.sysUserConf,
+        $tm.ref.sysUserConf,
         "suppressedDialogs." + event.paramObject.dialog,
         true
     );
@@ -112,7 +121,7 @@ GlobalListener.prototype.handleSuppressDialog = function(event) {
 
 GlobalListener.prototype.handleDownloadGraph = function(event) {
 
-  var graph = this.adapter.getGraph({ view: event.paramObject.view });  
+  var graph = $tm.adapter.getGraph({ view: event.paramObject.view });  
   
   graph.nodes = utils.convert(graph.nodes, "array");
   graph.edges = utils.convert(graph.edges, "array");
@@ -133,11 +142,11 @@ GlobalListener.prototype.handleDownloadGraph = function(event) {
 
 GlobalListener.prototype.handleConfigureSystem = function() {
 
-  var allTiddlers = this.adapter.getAllPotentialNodes();
-  var allEdges = this.adapter.getEdgesForSet(allTiddlers);
-  var plugin = $tw.wiki.getTiddler($tw.tmap.path.pluginRoot).fields;
-  var meta = $tw.wiki.getTiddlerData($tw.tmap.ref.sysMeta);
-  var hasLiveTab = utils.getTiddler($tw.tmap.ref.liveTab)
+  var allTiddlers = $tm.adapter.getAllPotentialNodes();
+  var allEdges = $tm.adapter.getEdgesForSet(allTiddlers);
+  var plugin = $tw.wiki.getTiddler($tm.path.pluginRoot).fields;
+  var meta = $tw.wiki.getTiddlerData($tm.ref.sysMeta);
+  var hasLiveTab = utils.getTiddler($tm.ref.liveTab)
                         .hasTag("$:/tags/SideBar");
                         
   var args = {
@@ -149,14 +158,14 @@ GlobalListener.prototype.handleConfigureSystem = function() {
       preselects: {
         "liveTab": "" + hasLiveTab,
         "vis-inherited": JSON.stringify(visDefConf),
-        "config.vis": utils.getText($tw.tmap.ref.visUserConf),
-        "config.sys": $tw.tmap.config.sys
+        "config.vis": utils.getText($tm.ref.visUserConf),
+        "config.sys": $tm.config.sys
       }
     }
   };
 
-  var name = "configureTiddlyMap";
-  this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
+  var name = "globalConfig";
+  $tm.dialogManager.open(name, args, function(isConfirmed, outTObj) {
     
     if(!isConfirmed) return;
       
@@ -165,19 +174,19 @@ GlobalListener.prototype.handleConfigureSystem = function() {
                                              true);
                                              
     // CAREFUL: this is a data tiddler!
-    $tw.wiki.setTiddlerData($tw.tmap.ref.sysUserConf, config);
+    $tw.wiki.setTiddlerData($tm.ref.sysUserConf, config);
 
     // show or hide the live tab; to hide the live tab, we override
     // the shadow tiddler; to show it, we remove the overlay again.
     if(utils.isTrue(outTObj.fields.liveTab, false)) {
-      utils.setField($tw.tmap.ref.liveTab, "tags", "$:/tags/SideBar");
+      utils.setField($tm.ref.liveTab, "tags", "$:/tags/SideBar");
     } else {
-      $tw.wiki.deleteTiddler($tw.tmap.ref.liveTab);
+      $tw.wiki.deleteTiddler($tm.ref.liveTab);
     }
     
     // tw doesn't translate the json to an object so this is
     // already a string
-    utils.setField($tw.tmap.ref.visUserConf,
+    utils.setField($tm.ref.visUserConf,
                    "text",
                    outTObj.fields["config.vis"]);
             
@@ -194,17 +203,17 @@ GlobalListener.prototype.handleGenerateWidget = function(event) {
   var options = {
     dialog: {
       preselects: {
-        view: (event.paramObject.view || $tw.tmap.misc.defaultViewLabel)
+        view: (event.paramObject.view || $tm.misc.defaultViewLabel)
       }
     }
   };
-  this.dialogManager.open("getWidgetCode", options);
+  $tm.dialogManager.open("widgetCodeGenerator", options);
   
 };
 
 GlobalListener.prototype.handleRemoveEdge = function(event) {
   
-  this.adapter.deleteEdge(event.paramObject);
+  $tm.adapter.deleteEdge(event.paramObject);
   
 };
 
@@ -223,14 +232,14 @@ GlobalListener.prototype.handleCreateEdge = function(event) {
     utils.addTiddler(from);
 
     var edge = {
-      from: this.adapter.makeNode(from).id,
-      to: this.adapter.makeNode(to).id,
+      from: $tm.adapter.makeNode(from).id,
+      to: $tm.adapter.makeNode(to).id,
       type: event.paramObject.label,
       id: event.paramObject.id
     }
     
-    this.adapter.insertEdge(edge);
-    $tw.tmap.notify("Edge inserted");
+    $tm.adapter.insertEdge(edge);
+    $tm.notify("Edge inserted");
     
   }
    
@@ -245,12 +254,12 @@ GlobalListener.prototype.handleOpenTypeManager = function(event) {
   
   if(mode === "manage-edge-types") {
     var topic = "Edge-Type Manager";
-    var allTypesSelector = $tw.tmap.selector.allEdgeTypes;
-    var typeRootPath = $tw.tmap.path.edgeTypes;
+    var allTypesSelector = $tm.selector.allEdgeTypes;
+    var typeRootPath = $tm.path.edgeTypes;
   } else {
     var topic = "Node-Type Manager";
-    var allTypesSelector = $tw.tmap.selector.allNodeTypes;
-    var typeRootPath = $tw.tmap.path.nodeTypes;
+    var allTypesSelector = $tm.selector.allNodeTypes;
+    var typeRootPath = $tm.path.nodeTypes;
   }
                           
   var args = {
@@ -260,7 +269,7 @@ GlobalListener.prototype.handleOpenTypeManager = function(event) {
     typeRootPath: typeRootPath
   };
   
-  var dialogTObj = this.dialogManager.open("MapElementTypeManager", args);
+  var dialogTObj = $tm.dialogManager.open("MapElementTypeManager", args);
   
   if(event.paramObject.type) {
     this.handleLoadTypeForm({
@@ -288,7 +297,7 @@ GlobalListener.prototype.handleLoadTypeForm = function(event) {
   // fields that need preprocessing
   
   if(event.paramObject.mode === "manage-edge-types") {
-    var usage = this.adapter.selectEdgesByType(type);
+    var usage = $tm.adapter.selectEdgesByType(type);
     var count = Object.keys(usage).length;
     utils.setField(outTRef, "temp.usageCount", count);
   }
@@ -299,7 +308,7 @@ GlobalListener.prototype.handleLoadTypeForm = function(event) {
       "typeTRef": type.fullPath,
       "temp.idImmutable": (type.isShipped ? "true" : ""),
       "temp.newId": type.id,
-      "vis-inherited": JSON.stringify($tw.tmap.config.vis)
+      "vis-inherited": JSON.stringify($tm.config.vis)
     }
   ));
 
@@ -328,19 +337,19 @@ GlobalListener.prototype.handleSaveTypeForm = function(event) {
 
 GlobalListener.prototype.deleteType = function(mode, type, dialogOutput) {
   
-  this.logger("debug", "Deleting type", type);
+  $tm.logger("debug", "Deleting type", type);
       
   if(mode === "manage-edge-types") {
-    this.adapter._processEdgesWithType(type, { action: "delete" });
+    $tm.adapter._processEdgesWithType(type, { action: "delete" });
   } else {
-    this.adapter.removeNodeType(type);
+    $tm.adapter.removeNodeType(type);
   }
   
   this.wiki.addTiddler(new $tw.Tiddler({
     title: utils.getTiddlerRef(dialogOutput)
   }));
   
-  $tw.tmap.notify("Deleted type");
+  $tm.notify("Deleted type");
   
 };
 
@@ -358,7 +367,7 @@ GlobalListener.prototype.saveType = function(mode, type, dialogOutput) {
     
     if(mode === "manage-edge-types") {
       
-      this.adapter._processEdgesWithType(type, {
+      $tm.adapter._processEdgesWithType(type, {
         action: "rename",
         newName: newId
       });
@@ -376,7 +385,7 @@ GlobalListener.prototype.saveType = function(mode, type, dialogOutput) {
     
   }
     
-  $tw.tmap.notify("Saved type data");
+  $tm.notify("Saved type data");
   
 };
 
@@ -408,17 +417,3 @@ GlobalListener.prototype.getTypeFromEvent = function(event) {
           : new NodeType(event.paramObject.id));
           
 };
-
-/**************************** EXPORTS ****************************/
-
-exports.name = "tmap.listener";
-exports.platforms = [ "browser" ];
-exports.after = [ "rootwidget", "tmap.caretaker" ];
-exports.before = [ "story" ];
-exports.synchronous = true;
-exports.startup = function() {
-  // will register its lister functions to the root widget
-  new GlobalListener();
-};
-
-})();

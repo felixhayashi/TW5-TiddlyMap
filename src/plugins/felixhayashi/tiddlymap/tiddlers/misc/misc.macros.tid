@@ -89,7 +89,6 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
   <tr>
     <td class="tmap-title">$title$:</td>
     <td>
-      <div>
         <<$type$
           field:"$field$"
           index:"$index$"
@@ -104,7 +103,6 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
             <$action-setfield $tiddler=<<output>> $field="$field$" $index="$index$" $value="$default$" />
           </$button>
         </$reveal>
-      </div>
     </td>
     <td>
       <span class="tmap-description">$descr$</span>

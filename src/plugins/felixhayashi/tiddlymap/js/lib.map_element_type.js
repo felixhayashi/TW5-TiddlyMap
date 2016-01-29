@@ -4,37 +4,35 @@ title: $:/plugins/felixhayashi/tiddlymap/js/MapElementType
 type: application/javascript
 module-type: library
 
-@module TiddlyMap
 @preserve
 
 \*/
 
-(/** @lends module:TiddlyMap*/function() {
-
 /*jslint node: true, browser: true */
 /*global $tw: false */
-
 "use strict";
 
-/**************************** IMPORTS ****************************/
+/*** Exports *******************************************************/
+
+exports.MapElementType = MapElementType;
+
+/*** Imports *******************************************************/
 
 var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
   
-/***************************** CODE ******************************/
+/*** Code **********************************************************/
 
 /**
- * 
+ * @constructor
+ * @abstract
  */
-var MapElementType = function(id, root, fieldMeta, data) {
+function MapElementType(id, root, fieldMeta, data) {
 
-  // create shortcuts for services and frequently used vars
-  this.logger = $tw.tmap.logger;
-  
+  this.id = id;
   this.root = root;
-  this.id = utils.getWithoutPrefix(id, this.root + "/");
   this._fieldMeta = fieldMeta;
   this.fullPath = this.root + "/" + this.id;
-  this.isShipped = $tw.wiki.getSubTiddler($tw.tmap.path.pluginRoot,
+  this.isShipped = $tw.wiki.getSubTiddler($tm.path.pluginRoot,
                                           this.fullPath)
   // finally get the data
   this.load(data || this.fullPath);
@@ -68,10 +66,9 @@ MapElementType.prototype.load = function(data) {
   if(!data) return;
   
   if(typeof data === "string") { // assume id or full path
-    // assume id
-    var tRef = (!utils.startsWith(data, this.root)
-                ? this.root + "/" + type
-                : data);
+    
+    var isFullPath = utils.startsWith(data, this.root)
+    var tRef = (isFullPath ? data : this.root + "/" + data);
     this.loadFromTiddler(tRef);
     
   } else if(data instanceof $tw.Tiddler) {
@@ -96,7 +93,7 @@ MapElementType.prototype.loadFromTiddler = function(tiddler) {
   var tObj = utils.getTiddler(tiddler);
   if(!tObj) return;
   
-  var shadowTObj = $tw.wiki.getSubTiddler($tw.tmap.path.pluginRoot,
+  var shadowTObj = $tw.wiki.getSubTiddler($tm.path.pluginRoot,
                                           this.fullPath) || {};
   
   // copy object to allow manipulation of the data
@@ -198,9 +195,3 @@ MapElementType.prototype.save = function(tRef, silently) {
     
 
 };
-
-// !! EXPORT !!
-exports.MapElementType = MapElementType;
-// !! EXPORT !!#
-  
-})();

@@ -4,19 +4,21 @@ title: $:/plugins/felixhayashi/tiddlymap/js/exception
 type: application/javascript
 module-type: library
 
-@module TiddlyMap
 @preserve
 
 \*/
 
-(/** @lends module:TiddlyMap*/function() {
-
 /*jslint node: true, browser: true */
 /*global $tw: false */
-
 "use strict";
+
+/*** Exports *******************************************************/
+
+exports.exception = {};
+
+/*** Code **********************************************************/
   
-var exception = {};
+var exception = exports.exception;
 
 exception.EnvironmentError = function(aspect) {
   this.name = "EnvironmentError";
@@ -32,11 +34,3 @@ for(var ex in exception) {
   exception[ex].prototype = Object.create(Error.prototype);
   exception[ex].constructor = exception[ex];
 }
-
-// !! EXPORT !!
-exports.exception = exception;
-// !! EXPORT !!
-  
-})();
-
-

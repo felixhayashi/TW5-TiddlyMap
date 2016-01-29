@@ -4,26 +4,31 @@ title: $:/plugins/felixhayashi/tiddlymap/js/widget/connections
 type: application/javascript
 module-type: widget
 
-@module TiddlyMap
 @preserve
 
 \*/
-
-(/** @lends module:TiddlyMap*/function(){
 
 /*jslint node: true, browser: true */
 /*global $tw: false */
 "use strict";
 
-// import classes
-var Widget =   require("$:/core/modules/widgets/widget.js").widget;
+/*** Exports *******************************************************/
+
+exports["tmap-edgelistitem"] = EdgeListItemWidget;
+exports["tmap-connections"] = EdgeListWidget;
+
+/*** Imports *******************************************************/
+
+var Widget   = require("$:/core/modules/widgets/widget.js").widget;
 var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
-var utils =    require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var utils    = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+
+/*** Code **********************************************************/
 
 /**
  * @constructor
  */
-var EdgeListWidget = function(parseTreeNode,options) {
+function EdgeListWidget(parseTreeNode,options) {
   
   // call the parent constructor  
   Widget.call(this, parseTreeNode, options);
@@ -47,15 +52,17 @@ EdgeListWidget.prototype.execute = function() {
   
   var nodes = [ this.getVariable("currentTiddler") ]; 
   var filter = this.getAttribute("filter", "");
-  var allETy = $tw.tmap.indeces.allETy;  
+  var direction = this.getAttribute("direction", "both");
+  var allETy = $tm.indeces.allETy;  
   
   var matches = utils.getEdgeTypeMatches(filter, allETy);
   
   var options = {
-    typeWL: utils.getLookupTable(matches)
+    typeWL: utils.getLookupTable(matches),
+    direction: direction
   };
 
-  var neighbourhood = $tw.tmap.adapter.getNeighbours(nodes, options);
+  var neighbourhood = $tm.adapter.getNeighbours(nodes, options);
 
   // retrieve nodes and edges
   var neighbours = neighbourhood.nodes;
@@ -106,8 +113,8 @@ EdgeListWidget.prototype.getEmptyMessage = function() {
 EdgeListWidget.prototype.refresh = function(changedTiddlers) {
   
   var changedAttributes = this.computeAttributes();
-
-  if(changedAttributes.filter || changedAttributes.emptyMessage) {
+  var hasChangedAttributes = Object.keys(changedAttributes).length;
+  if(hasChangedAttributes) {
     this.refreshSelf();
     return true;
   }
@@ -124,18 +131,14 @@ EdgeListWidget.prototype.refresh = function(changedTiddlers) {
 
 };
 
-// !! EXPORT !!
-exports["tmap-connections"] = EdgeListWidget;
-// !! EXPORT !!
-
 /**
  * @constructor
  */
-var EdgeListItemWidget = function(parseTreeNode, options) {
+function EdgeListItemWidget(parseTreeNode, options) {
   
   Widget.call(this, parseTreeNode, options);
   
-  this.arrows = $tw.tmap.misc.arrows;
+  this.arrows = $tm.misc.arrows;
     
 };
 
@@ -146,7 +149,7 @@ EdgeListItemWidget.prototype = Object.create(Widget.prototype);
 EdgeListItemWidget.prototype.execute = function() {
   
   var item = this.parseTreeNode;
-  var tRef = $tw.tmap.indeces.tById[item.neighbour.id];
+  var tRef = $tm.indeces.tById[item.neighbour.id];
   
   // make edge properties available as variables
   var edge = utils.flatten(item.edge);
@@ -160,7 +163,7 @@ EdgeListItemWidget.prototype.execute = function() {
   this.setVariable("currentTiddler", tRef);
   this.setVariable("neighbour", tRef);
   
-  var type = $tw.tmap.indeces.allETy[edge.type];
+  var type = $tm.indeces.allETy[edge.type];
   
   var indexedAs = (edge.to === item.neighbour.id ? "to" : "from");
   var arrow = indexedAs;
@@ -192,9 +195,3 @@ EdgeListItemWidget.prototype.refresh = function(changedTiddlers) {
   return this.refreshChildren(changedTiddlers);
   
 };
-
-// !! EXPORT !!
-exports["tmap-edgelistitem"] = EdgeListItemWidget;
-// !! EXPORT !!
-
-})();

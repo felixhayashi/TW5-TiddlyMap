@@ -1,0 +1,35 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/configureView/vis
+caption: Graph
+
+\rules except wikilink
+
+\define vis-refresh-trigger() $(temp)$/vis-refresh
+
+<div class="tmap-flash-message tmap-info">
+   {{$:/core/images/info-button}}
+   The local vis configurations will affect all
+   elements (nodes and edges) of this view, unless they are
+   overridden on a lower level. All options below are documented at
+   [[vis.js.org|http://visjs.org/docs/network]].
+</div>
+<table class="tmap-config-table">
+  <tr>
+    <td>Reset config:</td>
+    <td>
+      <div class="tmap-button-wrapper">
+        <$button>Reset vis configuration
+          <$action-setfield config.vis="" />
+          <$action-setfield $tiddler=<<vis-refresh-trigger>> text="" />
+        </$button>
+     </div>
+   </td>
+   <td>
+     Press the reset button to clear this view's vis configurations.
+   </td>
+  </tr>
+</table>
+<$tmap-config
+    mode="manage-config"
+    inherited="vis-inherited"
+    extension="config.vis"
+    refresh-trigger=<<vis-refresh-trigger>> />

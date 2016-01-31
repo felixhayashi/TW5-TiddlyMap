@@ -1027,6 +1027,22 @@ button.tmap-go-back {
       height: inherit;
       background: none !important;
       
+      &.tmap-vis-config-item-active::before {
+        content: "✔";
+        position: absolute;
+        left: -10px;
+        color: green;
+        font-weight: bold;
+        font-size: 15px;
+        @include animation("fadein-keyframes 1s");
+      }
+      
+/*
+      &:not(.tmap-vis-config-item-active) {
+        opacity: 0.5;
+      }
+*/
+      
       .vis-config-range {
         width: 150px;
         

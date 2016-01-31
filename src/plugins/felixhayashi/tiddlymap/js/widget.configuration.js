@@ -88,8 +88,8 @@ MapConfigWidget.prototype.render = function(parent, nextSibling) {
   }
   
   // create container for vis configurator; destroyed when vis is destroyed
-  var networkContainer = document.createElement("div");
-  this.wrapper.appendChild(networkContainer);
+  this.networkContainer = document.createElement("div");
+  this.wrapper.appendChild(this.networkContainer);
       
   // get environment
   this.refreshTrigger = this.getAttribute("refresh-trigger");
@@ -145,7 +145,7 @@ MapConfigWidget.prototype.render = function(parent, nextSibling) {
     edges: new vis.DataSet([])
   };
   
-  this.network = new vis.Network(networkContainer, data, {});
+  this.network = new vis.Network(this.networkContainer, data, {});
   this.reloadVisOptions();
   this.network.on("configChange", this.handleConfigChange.bind(this));
   
@@ -158,6 +158,8 @@ MapConfigWidget.prototype.render = function(parent, nextSibling) {
   
   // register this graph at the caretaker's graph registry
   $tm.registry.push(this);
+  
+  this.iterate();
 
 };
 
@@ -165,7 +167,7 @@ MapConfigWidget.prototype.reloadVisOptions = function() {
   
   // merge the inherited config with the extension and store it in a new var
   var options = utils.merge({}, this.inherited, this.extension);
-  
+
   // finally add configuration interface option
   $tw.utils.extend(options, {
     configure: {
@@ -195,7 +197,67 @@ MapConfigWidget.prototype.handleConfigChange = function(change) {
   // save changes
   utils.writeFieldData(this.pipeTRef, this.extensionTField, options);
   
+  window.setTimeout(this.iterate.bind(this), 50);
+  
 };
+
+/**
+ * Iterate over all config items and add an indicator.
+ */
+MapConfigWidget.prototype.iterate = function() {
+  
+  var cls = "vis-configuration-wrapper";
+  var elements = this.networkContainer
+                     .getElementsByClassName(cls)[0].children;
+  var list = [];
+  var extension = utils.flatten(this.extension);
+  for(var i = 0; i < elements.length; i++) {
+    if(!elements[i].classList.contains("vis-config-item")) continue;
+    
+    var confEl = new VisConfElement(elements[i], list, i);
+    list.push(confEl);
+    
+    if(extension[confEl.path]) {
+      $tw.utils.addClass(confEl.el, "tmap-vis-config-item-active");
+    }
+  }
+}
+
+/**
+ * 
+ * @param {DOMElement} The config item element.
+ * @param {Array<VisConfElement>} a list of VisConfElements of which
+ *     this element is also part of.
+ * @param {number} the position in the list
+ */
+function VisConfElement(el, list, pos) {
+   
+  var getByCls = "getElementsByClassName";
+  var getByTag = "getElementsByTagName";
+  
+  this.pos = pos;
+  this.el = el;
+  this.inputEl = el[getByCls]("vis-config-colorBlock")[0]
+                 || el[getByTag]("input")[0];
+  this.labelEl = el[getByCls]("vis-config-label")[0]
+                 || el[getByCls]("vis-config-header")[0]
+                 || el;
+  var labelText = (this.labelEl.innerText || this.labelEl.textContent);
+  this.label = labelText && labelText.match(/([a-zA-Z]+)/)[1];
+  this.level = parseInt(el.className.match(/.*vis-config-s(.).*/)[1]) || 0;
+  
+  this.path = this.label;
+  
+  if(this.level > 0) {
+    for(var i = pos; i--;) {
+      var prev = list[i];
+      if(prev.level < this.level) {
+        this.path = prev.path + "." + this.path;
+        break;
+      }
+    }
+  }
+}
 
 /**
  * 

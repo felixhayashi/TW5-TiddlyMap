@@ -119,6 +119,9 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
                          styleName:"style")
                          
   <fieldset><legend>Visjs configurations ($styleName$)</legend>
+    <p>All configurations that you change will be indicated with a
+    checkmark in front of the config item.
+    </p>
     <table class="tmap-config-table">
       <tr>
         <td>Reset:</td>

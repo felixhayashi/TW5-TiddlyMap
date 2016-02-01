@@ -284,6 +284,7 @@ gulp.task("bundle the plugin", function(cb) {
  * Execute the default task.
  */
 gulp.task("default", function(cb) {
+  
   runSequence(
     "Javascript validation",
     "perform cleanup",
@@ -297,4 +298,5 @@ gulp.task("default", function(cb) {
     "bundle the plugin",
     cb
   );
+  
 });

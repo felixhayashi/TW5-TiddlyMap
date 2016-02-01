@@ -1,0 +1,27 @@
+.tmap-flash-message {
+  
+  border: 1px solid lightgray;
+  padding: 5px;
+  margin: 6px 0;
+  display: block;
+  color: #333333;
+  
+  svg {
+    color: inherit;
+    vertical-align: text-top;
+    width: 1em;
+    height: 1em;
+  }
+
+  &.tmap-valid, &.tmap-info {
+    background: #D1EED4;
+  }
+  
+  &.tmap-neutral, &.tmap-warning {
+    background: #FFF6D1;
+  }
+  
+  &.tmap-malformed, &.tmap-invalid, &.tmap-danger {
+    background: #EED5D1;
+  }
+}

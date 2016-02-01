@@ -1,0 +1,394 @@
+.tmap-widget {
+  background: #FFFFFF;
+  width: auto;
+  position: relative;
+  border: 1px dotted lightgray;
+  padding: 2px;
+  color: $tw-text-color;
+  display: block; // sometimes tw puts us into a span
+        
+  &.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) {
+    cursor: pointer;
+    
+    .vis-navigation {
+      display: none;
+    }
+    
+    &:hover:before {
+      color: gray;
+      background: white;
+      content: "Click to use";
+      font-size: 14px;
+      font-weight: bold;
+      right: calc(50% - 65px - 5px);
+      position: absolute;
+      text-align: center;
+      top: calc(50% - 14px - 5px);
+      width: 130px;
+      z-index: 2000;
+      padding: 5px;
+      pointer-events: none;
+      background-color: rgba(255,255,255,0.3);
+    }
+  }
+  
+  .tmap-loading-bar {
+    display: none; //hidden per default
+    position: absolute;
+    text-align: center;
+    font-size: 2em;
+    padding: 10px;
+    top: 50%;
+    background: rgba(245, 245, 245, 0.5);
+    z-index: 1;
+    width: 250px;
+    margin: auto;
+    left: 0px;
+    right: 0px;
+  }
+
+  .tmap-vis-graph {
+    height: calc(100% - 35px); // - topbar
+  }
+  
+  &.tmap-no-buttons {
+    .vis-navigation {
+      display: none;
+    }
+  }
+  
+  &.tmap-advanced-editor {
+    
+    .tmap-topbar {
+      background: #d6d9d8;
+      
+      .tmap-active-button {
+        color: #488DCD;
+        
+        svg {
+          fill: #488DCD;
+        }
+      }
+      
+      .tmap-neigh-scope-button {
+        font-size: 1.5em;
+        vertical-align: bottom;
+      }
+      
+    }
+  }
+  
+  .tmap-menu-bar {
+    width: 100%;
+  }
+  
+  .tmap-topbar {
+    background: #F5F5F5;
+    border-bottom: 1px solid lightgray;
+    padding: 3px $padding;
+    height: $filterbar-height;
+    position: relative;
+    
+    .tmap-view-label {
+      width: 100%;
+      text-align: center;
+      font-weight: bold;
+      padding-top: 3px;
+    }
+    
+    .tmap-focus-button {
+      position: absolute;
+      right: 10px;
+      
+      input {
+        width: $default-input-width;
+      }
+    }
+    
+    .tmap-search-dropdown {
+      position: relative;
+    
+      .tc-drop-down {
+        position: absolute;
+        z-index: 999;
+        right: 0px;
+      }
+    }
+    
+    .tc-drop-down {
+        background-color: #F3F3F3;
+        min-width: 170px;
+        max-width: 210px;
+        padding: $padding;
+        margin: 5px 0;
+                 
+        button, a {
+          padding : 0px;
+          text-decoration: none;
+          
+          &:hover {
+            color: #ffffff;
+          }
+    
+          svg {
+            vertical-align: middle;
+          }
+        }
+    }
+    
+    [hidden] {
+      display: none;
+    }
+    
+    .tc-block-dropdown {
+      width: 370px;
+      min-width: 370px;
+      padding: $padding;
+      margin: 15px 0 0 -370px;
+              
+        a {
+          display: inline;
+          padding : 0px;
+        }
+      
+    }
+    
+    select {
+      width: 30%;
+      max-width: 200px;
+      word-wrap: initial;
+      padding: 0px;
+    }
+    
+    button {
+      line-height: inherit;
+      color: $tw-text-color;
+    }
+  
+     > * {
+      display: inline-block; // TODO: this is too rigorous
+    }
+    
+    .tmap-separator:after {
+      color: #bdbdbd;
+      margin: 3px;
+      content: " | ";
+    }
+    
+    .tc-edit-add-tag .tc-add-tag-name input {
+      width: 70%;
+    }
+    
+    .tc-sidebar-header {
+      text-shadow: none;
+    }
+    
+    .tc-edit-tags {
+      border: none;
+      padding: inherit;
+      box-shadow: none;
+    }
+  }
+}
+
+.tmap-widget.tmap-static-mode {
+  .tmap-topbar {
+    height: initial;
+  }
+  .tmap-vis-graph {
+    text-align: center;
+    cursor: not-allowed;
+    
+    &:not(.tmap-graph-placeholder):hover::before {
+      box-shadow: 10px 10px 5px lightgray;
+      color: gray;
+      background: white;
+      content: "Static";
+      font-size: 18px;
+      font-weight: bold;
+      left: 50%;
+      margin-left: -100px;
+      position: absolute;
+      text-align: center;
+      top: 50px;
+      width: 200px;
+      z-index: 2000;
+      padding: 5px;
+      pointer-events: none;
+    }
+    
+    &.tmap-graph-placeholder::before {
+      content: "No Preview";
+      display: block;
+      text-align: center;
+      padding: 20px;
+    }
+  }
+}
+
+.tmap-widget.tmap-plain-design {
+  border: none;
+  padding: 0px;
+
+  .tmap-topbar {
+    display: none;
+  }
+}
+
+.tc-sidebar-scrollable .tmap-widget {
+  position: absolute;
+  min-height: 350px;
+}
+
+/*** vis ***********************************************************/
+
+.vis-network {
+        
+  .vis-edit-mode {
+    height: 26px;
+  }
+  
+  .vis-manipulation {
+    height: 34px;
+    border-top: 1px solid #d6d9d8;
+    background: rgba(245, 245, 245, 0.7);
+    
+  }
+
+  .vis-navigation .vis-button {
+  
+    &.tmap-button-enabled {
+      right: 15px;
+      
+      &.tmap-fullscreen-button {
+        bottom: 90px;
+        background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />'));
+      }
+      &.tmap-halfscreen-button {
+        bottom: 130px;
+        background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/halfscreen.png}} />'));
+      }
+    }
+    
+    &:hover {
+      box-shadow: 0 0 3px 3px rgba(75, 75, 75, 0.3);
+      
+      &:before {
+        background: beige;
+        display: block;
+        color: black;
+        padding: 3px;
+        position: relative;
+        border: 1px solid lightgray;
+        width: 80px;
+        left: -100px;
+        top: -50px;
+        z-index: 1000;
+        text-align: center;
+      }
+      
+      &.vis-up:before {
+        left: 30px;
+        content: "Scroll up";              
+      }
+      &.vis-down:before {
+        left: 30px;
+        content: "Scroll down";              
+      }
+      &.vis-right:before {
+        left: 30px;
+        content: "Scroll right";              
+      }
+      &.vis-left:before {
+        left: 30px;
+        content: "Scroll left";              
+      }
+      &.vis-zoomOut:before {
+        content: "Zoom out";              
+      }
+      &.vis-zoomIn:before {
+        content: "Zoom in";              
+      }
+      &.vis-zoomExtends:before {
+        content: "Fit whole graph";              
+      }
+      &.tmap-fullscreen-button:before {
+        content: "Toggle Fullscreen";              
+      }
+      &.tmap-halfscreen-button:before {
+        content: "Toggle Halfscreen";              
+      }
+      
+    }
+    
+  }
+}
+
+.tc-dropzone > .tc-story-river .tmap-widget {
+
+  // in any case hide the halfscreen button
+  .vis-navigation .tmap-halfscreen-button {
+    display: none;
+  }
+  
+  // hide all buttons per default
+  &:not(.tmap-fullscreen) .vis-navigation .vis-button {
+    display: none;    
+  }
+  
+  &:hover .vis-navigation .vis-button {
+ 
+    &.tmap-fullscreen-button {
+      display: block;
+    }
+    &.vis-zoomExtends {
+      display: block;
+    }
+    
+  }
+}
+
+/*** Fullscreen ****************************************************/
+
+@mixin fillSpace() {
+  background: white !important;
+  height: 100% !important;
+  width: 100% !important;
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  z-index: 999 !important;
+  border: none !important;
+  margin: 0 !important;  
+}
+
+body.tmap-has-fullscreen-widget {
+
+  overflow: hidden; // hide scrollbar
+
+  .tmap-widget.tmap-fullscreen {
+    @include fillSpace();
+  }
+
+  .tc-dropzone > * {
+    &.tmap-has-fullscreen-widget {
+      @include fillSpace();
+    }
+    &:not(.tmap-has-fullscreen-widget) {
+      display: none;
+    }
+  }
+
+}
+
+body.tmap-has-halfscreen-widget {
+  
+  .tmap-widget.tmap-halfscreen {
+    @include fillSpace();
+    position: absolute !important;
+    border-left: 1px solid lightgray !important;
+  }
+  
+}

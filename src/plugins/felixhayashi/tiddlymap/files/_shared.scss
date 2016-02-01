@@ -1,0 +1,130 @@
+table.tmap-table {
+  tr {
+    &:nth-child(odd) {
+      background-color: #F0F0F0;
+    }
+    &:nth-child(even) {
+      background-color: #FFFFFF;
+    }
+/*
+    &:hover {
+      background-color: #FFFFF3;
+    }
+*/
+  }
+}
+
+.tmap-save-canvas-preview {
+  text-align: center;
+  img {
+    background-color: white;
+    border: 1px solid lightgray;
+    max-width: 100%;
+    max-height: 100px;
+  }
+}
+
+.tmap-list-separator {
+  display: block;
+  background-color: rgb(239, 239, 239);
+  margin: 10px 0 5px 0;
+  cursor: default;
+  border-bottom: 1px dotted gray;
+  font-weight: bold;
+  font-size: 0.8em,
+}
+
+.tmap-unicode-icon {
+  width: 1em;
+  display: inline-block;
+  text-align: center;
+  color: black;
+}
+
+html { // used to increase css importance
+
+  .tmap-link { // for buttons and links
+    color: #5778D8;
+    
+    &:hover {
+      color: white;
+      background: #5778D8;
+    }
+  }
+
+  .tmap-small-list {
+    overflow: auto;
+    min-height: 2em;
+    max-height: 9em;
+    display: block;
+  }
+  
+  .tmap-smaller-list {
+    @extend .tmap-small-list;
+    max-height: 7em;
+  }
+  
+  .tmap-very-small-list {
+    @extend .tmap-small-list;
+    max-height: 5empx;
+  }
+  
+  .tc-tiddler-controls {
+  
+    button.tmap-active-button {
+      svg {
+        fill: #888888;
+      }
+    }
+  }
+
+  #tmap-node-filter-dialog {
+
+    #tmap-filter-tips {
+      font-size: 0.8em;
+    }
+
+    textarea {
+      height: 100px;
+      max-height: 300px;
+      overflow: auto;
+      width: 100%;
+      font-size: 11px;
+      font-family: "Courier New", Courier, monospace;
+    }
+          
+  }
+  
+}
+
+@media (max-width: __breakpoint__) {
+  .tc-sidebar-scrollable {
+    .tmap-desktop-editor .tmap-widget:not(.tmap-fullscreen) {
+      display: none;
+    }
+  }
+}
+
+@media (min-width: __breakpoint__) {
+  .tc-sidebar-scrollable {
+    .tmap-mobile-editor {
+      display: none;
+    }
+  }
+
+  .tc-modal-wrapper {
+    z-index: 1010; // fix this in core?
+      
+    .tc-modal {
+      boder: 1px solid #999999;
+      left: calc(50% - 400px);
+      width: 802px;
+    }
+        
+    .tc-modal-body { // add this to tw
+      left: calc(50% - 400px);
+      width: 800px;
+    }
+  }
+  
+}

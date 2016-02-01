@@ -1,0 +1,27 @@
+@mixin keyframes($name) {
+  @-o-keyframes #{$name} { @content }
+  @-moz-keyframes #{$name} { @content }
+  @-webkit-keyframes #{$name} { @content }
+  @keyframes flash #{$name} { @content }
+}
+
+/**
+ * see https://developer.mozilla.org/en/docs/Web/CSS/animation
+ */
+@mixin animation($name-and-params) {
+  -o-animation: unquote($name-and-params);
+  -moz-animation: unquote($name-and-params);
+  -webkit-animation: unquote($name-and-params);
+  animation: unquote($name-and-params);
+}
+
+/*** Keyframes for animations *************************************/
+
+@include keyframes("fadein-keyframes") {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@include keyframes("fadeout-keyframes") {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}

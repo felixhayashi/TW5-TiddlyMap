@@ -1,0 +1,130 @@
+.tmap-quick-connect {
+  font-size: 0.7em;
+  
+  p {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  
+  .tc-drop-down {
+    padding: 5px;
+    width: 250px;
+    white-space: normal;
+    line-height: 1em;
+    position: absolute;
+    z-index: 1000;
+    right: 50px;
+    background: linear-gradient(45deg, rgba(245,245,245,1) 0%,rgba(255,255,255,1) 50%,rgba(245,245,245,1) 100%);
+    
+    &:first-child {
+      padding-top: 0;
+      margin-top: 0;
+    }
+    
+    .title {
+      margin: 1.5em 0 0.5em 0;
+      font-weight: bold;
+      color: gray;
+    }
+    
+    select {
+      width: 80px;
+      word-wrap: initial;
+    }
+    
+    table {        
+      width: 100%;
+      border: none;
+      margin: 0.5em 0;
+      
+      td, th {
+        padding: 3px 3px 3px 0;
+        vertical-align: top;
+        font-weight: normal;
+        border: none;
+        
+        table {
+          margin: 0;
+        }
+      }
+    }
+    
+
+    
+    .tmap-quick-connect-search-bar, .tmap-quick-connect-existing-bar {
+      background: #F1F1F1;
+      margin-top: 0;
+      border-bottom: 1px solid #D5D5D5;
+      border-top: 1px solid #D5D5D5;
+    }
+    
+    table.tmap-quick-connect-search-bar td, th {
+      padding: 5px;
+    }
+    
+    .tmap-quick-connect-search-bar {
+      
+    }
+    
+    .tmap-quick-connect-existing-bar {
+      padding: 5px;
+    }
+    
+    .tmap-connection-table {
+      th, td {
+        text-align: left;
+        padding: 1px 1px 1px 0;
+      }
+        
+      button {
+        width: 20px;
+        padding: 0px;
+      }
+    }
+    
+    .tmap-scroll-table {
+      height: 120px;
+      overflow: auto;
+      display: block;
+    }
+    
+    hr {
+      border: 0;
+      height: 0;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+          
+    a {
+      display: inline;
+      padding: 0;
+      color: #5778d8;
+      background: transparent;
+      
+      &:hover {
+        background: transparent;
+        color: #5778d8;
+        text-decoration: underline;
+      }
+    }
+    
+    button {
+      display: inline-block;
+      padding: 0px 3px;
+      text-align: center;
+      color: #333333;
+      line-height: 1.0;
+      
+      &:hover {
+        color: #ffffff;
+      }
+      svg {
+        fill: inherit;
+        
+        &:hover {
+          fill: #ffffff;
+        }
+      }
+    }
+  }
+}

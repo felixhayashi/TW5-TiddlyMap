@@ -1,0 +1,39 @@
+/**
+ * See http://stackoverflow.com/questions/3331353/transitions-on-the-display-property
+ */
+.tmap-popup {
+
+  display: none;
+  position: absolute;
+  opacity: 0;
+  cursor: auto;
+  min-width: 100px;
+  min-height: 50px;
+  max-width: unquote("<<tmap option config.sys.popups.width>>");
+  max-height: unquote("<<tmap option config.sys.popups.height>>");
+  padding: 5px;
+  resize: both;
+  overflow: auto;
+  font-family: verdana;
+  font-size:14px;
+  background-color: #f5f4ed;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  border: 1px solid #808074;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease;
+  
+  &[style*="height"] {
+    max-height: none !important;
+  };
+  
+  &[style*="width"] {
+    max-width: none !important;
+  };
+
+  &.tmap-popup-active {
+    opacity: 1;
+  }
+  
+}

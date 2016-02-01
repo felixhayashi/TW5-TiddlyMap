@@ -1,0 +1,288 @@
+.tc-modal-footer {
+  .tmap-hidden-close-button {
+    display: none;
+  }
+}
+
+
+.tmap-modal-content {
+  position: relative;
+  padding: 1em 0;
+  padding-top: 0;
+
+  table tr td {
+    vertical-align: top;
+  }
+  
+  :not(pre) > code {
+    padding: 1px;
+    font-size: 0.9em;
+    position: relative;
+    top: -1px;
+  }
+  
+  :not(pre) > code {
+    color: $tw-text-color;
+  }
+
+  .tc-tab-set {
+
+    .tc-tab-content {
+      margin-top: 0.5em; // tw 14px
+    }
+  }
+                 
+  .tc-image-button {
+    font-size: 14px;
+  }
+      
+  fieldset {
+    margin: 0px;
+    legend {
+      font-weight: bold;
+    }
+  
+  }
+    
+}
+
+.tc-modal-body .tmap-modal-editor {
+
+  > p {
+    margin: 0px;
+  }
+
+  .tmap-template-select {
+    select {
+      width: 50%;
+    }
+  }
+
+  .tc-tiddler-frame {
+    margin: auto;
+    width: auto;
+    
+    .tc-tiddler-controls {
+      display: none;
+    }
+    
+    .tc-tiddler-title {
+      display: none;
+    }
+  }
+  
+}
+
+.tc-modal-body table {
+  
+  margin: 6px 0;
+  border: none;
+  width: 100%;
+  
+  td, th {
+    border: 1px solid lightgray;
+  }
+  
+  &.tmap-key-value-table {
+    th {
+      width: 30%;
+      background-color: #F0F0F0;
+    }
+  }
+        
+  &.tmap-config-table {
+    @extend .tmap-table;
+    
+    &.tmap-large-input {
+      tr td:last-child {
+        width: 20%;
+      }
+    }
+    
+    &.tmap-small-input {
+      tr td:last-child {
+        width: 60%;
+      }
+    }
+
+    tr td {
+      border: none;
+      vertical-align: top;
+      padding: 5px;
+      
+      &:first-child {
+        width: 15%;
+      }
+      
+      &:last-child {
+        width: 40%;
+      }
+      
+      input:not([type=radio]), textarea, select {
+        width: 100%;
+        /* prevents bad looking select boxes and wrapping in textareas */
+        word-wrap: normal;
+      }
+      
+      textarea {
+        height: 100%;
+      }
+      
+      .tmap-no-stretch {
+        input, textarea, select {
+          width: auto;
+        }
+      }
+      
+      div.tmap-button-wrapper {
+        text-align: center;
+      }
+      
+      .tmap-note {
+        margin-top: 0.5em;
+      }
+      
+      .tmap-description {
+        font-style: italic;
+      }
+
+    } // td
+
+  } // config-table
+}
+
+#tmap-element-type-manager {
+        
+  >div:first-child {
+    height: 50vh;
+    float: left;
+    width: 21%;
+    background: linear-gradient(90deg, rgba(245,245,245,1) 0%, rgba(255,255,255,1) 50%);
+    
+    .tmap-searchbar {
+      padding: 1em 0 0 0;
+      input {
+        width: calc(100% - 36px);
+      }
+      button {
+        width: 30px;
+        float: right;
+      }
+    }
+
+    ul {
+      height: calc(100% - 65px); // minus searchbar height (roughly)
+      overflow: auto;
+      margin-top: 1em;
+      padding: 0;
+      
+      &.no-bullets {       
+        li {
+          list-style: none;
+        }
+      }
+      
+      li {
+        white-space: nowrap;
+
+        .tmap-ranking {
+          width: 30px;
+          display: inline-block;
+        }
+      }
+    }
+
+  }
+  >div:last-child {
+    height: 100%;
+    width: calc(79% - 15px); // minus distance to left div
+    float: right;
+    
+    .tc-tab-set {
+
+      .tc-tab-content {
+        overflow: auto;
+        height: 50vh;
+      }
+    }
+  }
+}
+
+.tmap-manage-node-types {
+  .tmap-edge-type-specific {
+    display: none !important;
+  }
+}
+
+.tmap-manage-edge-types {
+  .tmap-node-type-specific {
+    display: none !important;
+  }
+}
+
+.tmap-modal-fullscreen-editor {
+
+  .tc-tab-content {
+    p {
+      margin: 1em 0;
+    }
+  }
+}
+
+.tmap-has-pending-template {
+  background-color: #C1EDC4;
+}
+
+#tmap-search-table {
+
+  td {
+    border: none;
+    padding-left: 0px;
+    
+    &:first-child {
+      width: 30px;
+    }
+  }
+
+  b {
+    display: inline-block;
+    width: 40px;
+    text-align: right;
+  }
+
+  ul {
+    padding-left: 20px;
+    margin: 1em 0 0 0;
+    
+    li {
+      list-style: inherit;
+    }
+    
+    button {
+      text-align: left;
+    }
+  }
+}
+
+button.tmap-go-back {
+  margin-bottom: 1em;
+  font-weight: bold;
+}
+
+.tmap-badges > span, .tmap-badge {
+
+  background: gray;
+  font-size: 11px;
+  color: white;
+  padding: 3px 4px;
+  display: inline-block;
+  font-weight: bold;
+  border-radius: 2px;
+  line-height: 1em;
+  cursor: help;
+  
+  &.tmap-red-flag {
+    background: red;
+  }
+
+}

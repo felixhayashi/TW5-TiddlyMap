@@ -1,0 +1,71 @@
+.tmap-config-widget {
+  background: #F0F0F0;
+  padding: 5px;
+  margin: 5px 0;
+  box-sizing: border-box;
+  display: block; // sometimes tw puts us into a span
+
+  .vis-network {
+    display: none;
+  }
+
+  .vis-configuration-wrapper {
+    width: 350px;
+  
+    .vis-config-rangeinput {
+      height: inherit;
+      margin-left: 4px;
+    }
+  
+    .vis-config-item {
+      width: 100%;
+      height: inherit;
+      background: none !important;
+      
+      &.tmap-vis-config-item-active::before {
+        content: "✔";
+        position: absolute;
+        left: -10px;
+        color: green;
+        font-weight: bold;
+        font-size: 15px;
+        @include animation("fadein-keyframes 1s");
+      }
+      
+/*
+      &:not(.tmap-vis-config-item-active) {
+        opacity: 0.5;
+      }
+*/
+      
+      .vis-config-range {
+        width: 150px;
+        
+        &::-moz-range-track {
+          width: 150px !important;
+        }
+        
+      }
+      
+      .vis-config-label {
+        width: 120px;
+      }
+    }
+    
+  }
+  
+/*
+  .vis-color-picker {
+    width: 310px;
+    left: 20px !important;
+    top: 20px !important;
+    height: 444px;
+  }
+*/
+
+  &::after {
+    clear: both;
+    content: "";
+    display: block;
+  }
+}

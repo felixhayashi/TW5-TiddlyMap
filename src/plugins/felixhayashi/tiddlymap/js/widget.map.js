@@ -298,11 +298,7 @@ MapWidget.prototype.render = function(parent, nextSibling) {
   
   this.domNode = this.document.createElement("div");
   parent.insertBefore(this.domNode, nextSibling);
-  
-  // in contrast to the graph height, which is assigned to the vis
-  // graph wrapper, the graph width needs to be assigned to the domNode
-  this.domNode.style["width"] = this.getAttr("width", "100%");
-  
+    
   // add widget classes
   this.registerClassNames(this.domNode);
   
@@ -1207,7 +1203,7 @@ MapWidget.prototype.isMobileMode = function() {
  * @todo: too much recomputation -> outsource
  */
 MapWidget.prototype.getVisOptions = function() {
-            
+  
   // merge options
   var globalOptions = $tm.config.vis;
   var localOptions = utils.parseJSON(this.view.getConfig("vis"));
@@ -1671,6 +1667,7 @@ MapWidget.prototype.handleRemoveNodes = function(nodeIds) {
  * 
  * @param {string} type - either "halfscreen" or "fullscreen".
  */
+
 MapWidget.prototype.toggleEnlargedMode = function(type) {
   
   if(!this.isInSidebar && type === "halfscreen") return;
@@ -1691,13 +1688,16 @@ MapWidget.prototype.toggleEnlargedMode = function(type) {
     ]);
     // reset flag
     this.enlargedMode = null;
-    
+    document.body.scrollTop = this.scrollTop;
   }
   
   if(!enlargedMode
      || (enlargedMode !== type
          && (type === "fullscreen"
              || (type === "halfscreen" && !this.isInSidebar)))) {
+    
+    var doc = document.documentElement;
+    this.scrollTop = document.body.scrollTop;
     
     this.enlargedMode = type;
   
@@ -2091,17 +2091,22 @@ MapWidget.prototype.handleResizeEvent = function(event) {
   if(this.isZombieWidget()) return;
   
   var height = this.getAttr("height");
+  var width = this.getAttr("width");
   
-  if(!height && this.isInSidebar) {
-  
-    var canvasOffset = this.domNode.getBoundingClientRect().top;
-    var distanceBottom = parseInt(this.getAttr("bottom-spacing", 25));
-    var calculatedHeight = window.innerHeight - canvasOffset;
-    height = (calculatedHeight - distanceBottom) + "px";
-  
+  if(this.isInSidebar) {
+    
+    var rect = this.domNode.getBoundingClientRect();
+    var distRight = 15;
+    width = (document.body.clientWidth - rect.left - distRight) + "px";
+    
+    var distBottom = parseInt(this.getAttr("bottom-spacing")) || 15;
+    var calculatedHeight = window.innerHeight - rect.top;
+    height = (calculatedHeight - distBottom) + "px";
+    
   }
   
-  this.domNode.style["height"] = height || "300px";
+  this.domNode.style.height = height || "300px";
+  this.domNode.style.width = width;
   
   this.repaintGraph(); // redraw graph
   

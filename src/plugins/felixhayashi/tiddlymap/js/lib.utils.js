@@ -14,13 +14,13 @@ module-type: library
 
 /*** Exports *******************************************************/
 
-exports.utils = {};
+module.exports = {};
 
 /*** Imports *******************************************************/
  
 var vis       = require("$:/plugins/felixhayashi/vis/vis.js");
-var exception = require("$:/plugins/felixhayashi/tiddlymap/js/exception").exception;
-var URL       = require("$:/plugins/felixhayashi/tiddlymap/js/URL").URL;
+var exception = require("$:/plugins/felixhayashi/tiddlymap/js/exception");
+var URL       = require("$:/plugins/felixhayashi/tiddlymap/js/URL");
 
 /*** Code **********************************************************/
 
@@ -41,7 +41,7 @@ var URL       = require("$:/plugins/felixhayashi/tiddlymap/js/URL").URL;
  * @see Dom utilities {@link https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/utils/*}
  * @namespace utils
  */
-var utils = exports.utils;
+var utils = module.exports;
 
 /**
  * Pendant to tw native {@code addTiddlers()}.
@@ -198,6 +198,36 @@ utils.getValues = function(col) {
   
 };
 
+
+utils.getDataUri = function(tiddler, type, isForceBase64) {
+  
+  var imgTObj = utils.getTiddler(tiddler);
+  var type = type || imgTObj.fields.type || "image/svg+xml";
+  var body = imgTObj.fields.text;
+  var encoding = $tw.config.contentTypeInfo[type].encoding;
+  
+  if(type === "image/svg+xml") {
+    
+    // see http://stackoverflow.com/questions/10768451/inline-svg-in-css
+    body = body.replace(/\r?\n|\r/g, " ");
+    
+    if(!utils.hasSubString("xmlns", body)) {
+      // @tiddlywiki it is bad to remove the xmlns attribute!
+      
+      body = body.replace(/<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+    }
+    
+  }
+
+  if(isForceBase64 && encoding !== "base64") {
+    encoding = "base64";
+    body = window.btoa(body);
+  }
+  
+  return "data:" + type + ";" + encoding + "," + body;
+  
+};
+
 /**
  * @deprecated Use $tw.utils.hop instead
  * 
@@ -328,7 +358,9 @@ utils.isEdgeTypeMatch = function(title, filter) {
 utils.isMatch = function(tiddler, filter) {
   
   var tRef = utils.getTiddlerRef(tiddler);
-  return (utils.getMatches(filter, [ tRef ]).length > 0);
+  var matches = utils.getMatches(filter, [ tRef ]);
+  
+  return tRef === matches[0];
   
 };
 
@@ -956,6 +988,8 @@ utils.getRandomLabel = function(options) {
  * the `dest` object itself. If src and dest both have the same
  * property path, src does only replace the primitive data type
  * at the end of the path.
+ * 
+ * @todo Should null really be skipped or treated as value?
  * 
  * @param {Object} dest - The destination object.
  * @param {...Object} src - At least one object to merge into `dest`.

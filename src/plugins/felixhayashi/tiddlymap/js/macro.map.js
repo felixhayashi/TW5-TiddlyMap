@@ -19,9 +19,9 @@ exports.run = run;
 
 /*** Imports *******************************************************/
 
-var EdgeType        = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
-var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
-var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction").ViewAbstraction;
+var EdgeType        = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
+var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
   
 /*** Code **********************************************************/
 
@@ -86,6 +86,17 @@ command.basename = function(path) {
   return utils.getBasename(str);
                            
 };
+
+/**
+ * TW messes with svg urls so we always use base64 encoding when
+ * a data uri is requested as macro call
+ */
+command.datauri = function(tiddler, type) {
+  
+  return utils.getDataUri(tiddler, type, true);
+  
+};
+
 
 command.testJSON = function(fieldName) {
   

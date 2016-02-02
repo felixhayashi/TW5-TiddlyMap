@@ -4,34 +4,17 @@ caption: Graph
 
 \rules except wikilink
 
-\define vis-refresh-trigger() $(temp)$/vis-refresh
-
 <div class="tmap-flash-message tmap-info">
-   {{$:/core/images/info-button}}
-   The global vis configurations will affect all views and their
-   elements (nodes and edges) unless they are overridden on a lower
-   level. All options below are documented at
-   [[vis.js.org|http://visjs.org/docs/network]].
+  The global vis configurations will affect all views and their
+  elements (nodes and edges) unless they are overridden on a lower
+  level. All options below are documented at
+  [[vis.js.org|http://visjs.org/docs/network]].
 </div>
-<table class="tmap-config-table">
-  <tr>
-    <td>Reset:</td>
-    <td>
-      <div class="tmap-button-wrapper">
-        <$button>Reset global configurations
-          <$action-setfield config.vis="" />
-          <$action-setfield $tiddler=<<vis-refresh-trigger>> text="" />
-        </$button>
-     </div>
-   </td>
-   <td>
-     Press the reset button to clear all global vis configurations
-     you did in the past.
-   </td>
-  </tr>
-</table>
+<div class="tmap-flash-message tmap-info">
+  Only config items that you actually changed have an effect on
+  the graph. Other options are visible, yet, inactive.
+</div>
 <$tmap-config
     mode="manage-config"
     inherited="vis-inherited"
-    extension="config.vis"
-    refresh-trigger=<<vis-refresh-trigger>> />
+    extension="config.vis" />

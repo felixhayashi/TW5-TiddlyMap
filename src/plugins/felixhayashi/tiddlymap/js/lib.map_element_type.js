@@ -14,11 +14,11 @@ module-type: library
 
 /*** Exports *******************************************************/
 
-exports.MapElementType = MapElementType;
+module.exports = MapElementType;
 
 /*** Imports *******************************************************/
 
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
   
 /*** Code **********************************************************/
 

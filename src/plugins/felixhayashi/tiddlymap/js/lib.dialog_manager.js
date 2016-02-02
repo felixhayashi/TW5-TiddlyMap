@@ -14,12 +14,12 @@ module-type: library
 
 /*** Exports *******************************************************/
 
-exports.DialogManager = DialogManager;
+module.exports = DialogManager;
 
 /*** Imports *******************************************************/
  
-var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
-var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager").CallbackManager;
+var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager");
 
 /*** Code **********************************************************/
       

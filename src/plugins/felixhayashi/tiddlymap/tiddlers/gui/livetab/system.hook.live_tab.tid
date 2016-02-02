@@ -5,7 +5,6 @@ caption: Live
 
 <div class="tmap-mobile-editor">
   <div class="tmap-flash-message tmap-warning">
-    {{$:/core/images/info-button}}
     The live tab is not displayed in mobile mode.
   </div>
 </div>

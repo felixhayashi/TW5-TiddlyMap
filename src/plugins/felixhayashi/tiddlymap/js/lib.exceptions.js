@@ -14,20 +14,20 @@ module-type: library
 
 /*** Exports *******************************************************/
 
-exports.exception = {};
+module.exports = {};
 
 /*** Code **********************************************************/
   
-var exception = exports.exception;
+var exception = module.exports;
 
 exception.EnvironmentError = function(aspect) {
   this.name = "EnvironmentError";
   this.message = "Critical parts of the underlying system changed: " + aspect;
 };
 
-exception.DependencyError = function(module) {
+exception.DependencyError = function(dep) {
   this.name = "DependencyError";
-  this.message = "TiddlyMap cannot run without: " + module;
+  this.message = "TiddlyMap cannot run without: " + dep;
 };
   
 for(var ex in exception) {

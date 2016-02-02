@@ -4,7 +4,9 @@ buttons: close
 
 \rules except wikilink
 
-Use the code below to embed a view in a tiddler.
+<div class="tmap-flash-message tmap-info">
+  Use the code below to embed a view in a tiddler.
+</div>
 
 <pre style="white-space: normal;">
 &lt;$tmap
@@ -26,8 +28,6 @@ Use the code below to embed a view in a tiddler.
 <$list filter="[<output>has[var.design]]">
   design="<$view field='var.design' />"</$list>&gt;&lt;/$tmap&gt;
 </pre>
-
-If you are unsure about a parameter, just leave everything as is and simply copy the widget code displayed above.
 
 <fieldset>
   <legend>Parameters</legend> 

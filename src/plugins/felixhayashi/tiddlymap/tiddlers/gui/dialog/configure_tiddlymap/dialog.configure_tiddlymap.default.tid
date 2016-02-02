@@ -3,9 +3,10 @@ caption: Overview
 
 \rules except wikilink
 
-Please visit the [[online docs|http://tiddlymap.org/Documentation]]
-for more information about the available global options.
-
+<div class="tmap-flash-message tmap-plain">
+  Please visit the [[online docs|http://tiddlymap.org/Documentation]]
+  for more information about the available global options.
+</div>
 <table class="tmap-key-value-table">
   <tr>
     <th align="left">Plugin version</th>

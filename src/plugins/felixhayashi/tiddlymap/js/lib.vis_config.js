@@ -7,14 +7,15 @@ module-type: library
 @preserve
 
 \*/
-    
-/* jslint node: true, browser: true */
-/* global $tw: false */
+
+/*jslint node: true, browser: true */
+/*global $tw: false */
 "use strict";
 
-/*** Code **********************************************************/
+/*** Exports *******************************************************/
 
-exports.config = {
+module.exports = {
+  
   locale: "en_EN",
   clickToUse: false,
   autoResize: false,
@@ -50,6 +51,9 @@ exports.config = {
   },
   nodes: {
     shape: "box",
+    shadow: {
+      enabled: false
+    },
     color: {
       border: "#2B7CE9",
       background: "#97C2FC"

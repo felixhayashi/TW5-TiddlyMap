@@ -4,7 +4,6 @@ caption: Overview
 \rules except wikilink
 
 <div class="tmap-flash-message tmap-info">
-   {{$:/core/images/info-button}}
    All configurations __only__ affect this view.
 </div>
 

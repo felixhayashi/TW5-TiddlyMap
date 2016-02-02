@@ -5,3 +5,12 @@ $padding : 5px;
 // defaults in TW5 v5.1.10
 $tw-text-color: #666666;
 $tw-story-river-padding-left: 42px;
+
+/**
+ * Returns a makedatauri macro
+ */
+@function datauri($tRef, $type: "") {
+
+  @return unquote('<<tmap "datauri" "#{$tRef}" "#{$type}">>');
+       
+}

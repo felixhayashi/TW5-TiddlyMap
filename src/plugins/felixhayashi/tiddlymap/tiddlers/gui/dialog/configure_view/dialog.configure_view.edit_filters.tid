@@ -3,9 +3,10 @@ caption: Edit filters
 
 \rules except wikilink
 
-<div class="tmap-flash-message tmap-warning">
-  {{$:/core/images/info-button}} Completely new to filters?
-  Please read [[Introduction to filter notation|http://tiddlywiki.com/#Introduction%20to%20filter%20notation]] first.
+<div class="tmap-flash-message tmap-info">
+  Completely new to filters? Please read
+  [[Introduction to filter notation|http://tiddlywiki.com/#Introduction%20to%20filter%20notation]]
+  first.
 </div>
 
 <fieldset>

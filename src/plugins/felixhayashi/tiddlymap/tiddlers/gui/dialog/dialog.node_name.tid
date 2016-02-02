@@ -19,9 +19,8 @@ classes: tmap-modal-add-node
   
   <$list filter="[<output>get[draft.title]is[tiddler]]">
   <div class="tmap-flash-message tmap-warning">
-   {{$:/core/images/info-button}}
-   Tiddler already exists!
-   Use another title or click "<<backButtonText>>" to cancel your edit.
+   Tiddler already exists! Use another title or click
+   "<<backButtonText>>" to cancel your edit.
   </div>
   </$list>
   

@@ -7,7 +7,7 @@
         "type": "text/vnd.tiddlywiki",
         "tags": [ "$:/tags/Stylesheet" ]
       },
-      "prefix": "\\rules except list\n"
+      "prefix": "\\rules only filteredtranscludeinline transcludeinline macrodef macrocallinline \n\n"
     }
   ]
 }

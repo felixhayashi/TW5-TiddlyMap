@@ -5,7 +5,7 @@ classes: tmap-remove-top-space
 \rules except wikilink
 
 <div class="tmap-flash-message tmap-info">
-  {{$:/core/images/info-button}} A node's ''global configuration''
+  A node's ''global configuration''
   (also referred to as //global individual config//) defines its
   individual appearance and behaviour in all views.
 </div>
@@ -19,7 +19,6 @@ classes: tmap-remove-top-space
 <$macrocall $name="visConfiguration"
     mode="manage-node-types"
     extensionField="global.tmap.style"
-    refreshTrigger=<<vis-refresh-trigger>>
     styleName="node's global style"
     inheritedList="[[inherited-global-default-style]]
                    [[inherited-local-default-style]]

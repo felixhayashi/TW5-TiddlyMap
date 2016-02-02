@@ -24,15 +24,15 @@ exports.startup = startup;
 
 /*** Imports *******************************************************/
 
-var visConfig       = require("$:/plugins/felixhayashi/tiddlymap/js/config/vis").config;
-var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
-var fixer           = require("$:/plugins/felixhayashi/tiddlymap/js/fixer").fixer;
-var Adapter         = require("$:/plugins/felixhayashi/tiddlymap/js/Adapter").Adapter;
-var DialogManager   = require("$:/plugins/felixhayashi/tiddlymap/js/DialogManager").DialogManager;
-var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager").CallbackManager;
-var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction").ViewAbstraction;
-var EdgeType        = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
-var NodeType        = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;
+var visConfig       = require("$:/plugins/felixhayashi/tiddlymap/js/config/vis");
+var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+var fixer           = require("$:/plugins/felixhayashi/tiddlymap/js/fixer");
+var Adapter         = require("$:/plugins/felixhayashi/tiddlymap/js/Adapter");
+var DialogManager   = require("$:/plugins/felixhayashi/tiddlymap/js/DialogManager");
+var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager");
+var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
+var EdgeType        = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
+var NodeType        = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType");
 var vis             = require("$:/plugins/felixhayashi/vis/vis.js");
 
 /*** Code **********************************************************/

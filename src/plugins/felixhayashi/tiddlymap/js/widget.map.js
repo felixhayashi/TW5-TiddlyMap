@@ -14,20 +14,20 @@ module-type: widget
 
 /*** Exports *******************************************************/
 
-exports.tiddlymap = MapWidget;
+exports.tiddlymap = MapWidget; // legacy
 exports.tmap = MapWidget;
 
 /*** Imports *******************************************************/
  
-var Widget          = require("$:/core/modules/widgets/widget.js").widget;
-var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
-var DialogManager   = require("$:/plugins/felixhayashi/tiddlymap/js/DialogManager").DialogManager;
-var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager").CallbackManager;
-var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction").ViewAbstraction;
-var EdgeType        = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
-var NodeType        = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;
-var Popup           = require("$:/plugins/felixhayashi/tiddlymap/js/Popup").Popup;
+var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+var DialogManager   = require("$:/plugins/felixhayashi/tiddlymap/js/DialogManager");
+var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager");
+var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
+var EdgeType        = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
+var NodeType        = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType");
+var Popup           = require("$:/plugins/felixhayashi/tiddlymap/js/Popup");
 var vis             = require("$:/plugins/felixhayashi/vis/vis.js");
+var Widget          = require("$:/core/modules/widgets/widget.js").widget;
 
 /*** Code **********************************************************/
       
@@ -61,7 +61,7 @@ function MapWidget(parseTreeNode, options) {
             
   // instanciate managers
   this.callbackManager = new CallbackManager();
-  $tm.dialogManager = new DialogManager(this.callbackManager, this);
+  this.dialogManager = new DialogManager(this.callbackManager, this);
       
   // make the html attributes available to this widget
   this.computeAttributes();
@@ -164,7 +164,7 @@ MapWidget.prototype.handleConnectionEvent = function(edge, callback) {
   };
   
   var name = "getEdgeType";
-  $tm.dialogManager.open(name, param, function(isConfirmed, outTObj) {
+  this.dialogManager.open(name, param, function(isConfirmed, outTObj) {
   
     if(isConfirmed) {
                   
@@ -191,7 +191,7 @@ MapWidget.prototype.handleConnectionEvent = function(edge, callback) {
           eTyFilter: eTyFilter.pretty
         };
         
-        $tm.dialogManager.open("edgeNotVisible", args);
+        this.dialogManager.open("edgeNotVisible", args);
         
       }
       
@@ -221,7 +221,7 @@ MapWidget.prototype.checkForFreshInstall = function() {
   
   var args = {};
   var name = "welcome";
-  $tm.dialogManager.open(name, args, function(isConfirmed, outTObj) {
+  this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
 
     if(utils.tiddlerExists("$:/plugins/felixhayashi/topstoryview")) {
       utils.setText("$:/view", "top");
@@ -257,13 +257,13 @@ MapWidget.prototype.checkForFreshInstall = function() {
 MapWidget.prototype.openStandardConfirmDialog = function(callback, message) {
 
   var param = { message : message };
-  $tm.dialogManager.open("getConfirmation", param, callback);
+  this.dialogManager.open("getConfirmation", param, callback);
   
 };
 
 /**
  * An extention of the default logger mechanism. It works like
- * `$tm.logger` but will include the object id of the widget
+ * `this.logger` but will include the object id of the widget
  * instance.
  * 
  * @param {string} type - The type of the message (debug, info, warning…)
@@ -625,7 +625,7 @@ MapWidget.prototype.update = function(updates) {
      || updates[$tm.path.nodeTypes]
      || changedTiddlers[this.view.getRoot()]) {
     
-    $tm.logger("warn", "View switched (or main config change)");
+    this.logger("warn", "View switched (or main config change)");
         
     this.view = this.getView(true);
     this.reloadRefreshTriggers();
@@ -640,7 +640,7 @@ MapWidget.prototype.update = function(updates) {
     
     if(isViewUpdated && !this.ignoreNextViewModification) {
 
-      $tm.logger("warn", "View components modified");
+      this.logger("warn", "View components modified");
       
       this.reloadBackgroundImage();
       rebuildEditorBar = true;
@@ -712,7 +712,7 @@ MapWidget.prototype.reloadRefreshTriggers = function() {
             || this.view.getConfig("refresh-triggers");
   this.refreshTriggers = $tw.utils.parseStringArray(str) || [];
   
-  $tm.logger("debug", "Registering refresh trigger", this.refreshTriggers);
+  this.logger("debug", "Registering refresh trigger", this.refreshTriggers);
   
   // TODO: not nice, if more than one trigger changed it
   // will cause multiple reassertments
@@ -752,7 +752,7 @@ MapWidget.prototype.rebuildGraph = function(options) {
   
   if(utils.isPreviewed(this)) return;
   
-  $tm.logger("debug", "Rebuilding graph");
+  this.logger("debug", "Rebuilding graph");
     
   options = options || {};
   
@@ -955,7 +955,7 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
   // make sure to destroy any previous instance
   if(this.network) this._destructVis();
   
-  $tm.logger("info", "Initializing and rendering the graph");
+  this.logger("info", "Initializing and rendering the graph");
           
   if(!this.isInSidebar) {
     this.callbackManager.add("$:/state/sidebar", this.handleResizeEvent);
@@ -1249,7 +1249,7 @@ MapWidget.prototype.getVisOptions = function() {
    
   physics.stabilization.iterations = 1000;
   
-  $tm.logger("debug", "Loaded graph options", options);
+  this.logger("debug", "Loaded graph options", options);
     
   return options;
   
@@ -1281,21 +1281,24 @@ MapWidget.prototype.handleCreateView = function() {
   };
   
   var name = "createView";
-  $tm.dialogManager.open(name, args, function(isConfirmed, outTObj) {
+  this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
   
     if(!isConfirmed) return;
       
     var label = utils.getField(outTObj, "name");
-
+    var isClone = utils.getField(outTObj, "clone", false);
     var view = new ViewAbstraction(label);
     
     if(view.exists()) {
       $tm.notify("Forbidden! View already exists!");
       return;
     }
-    
-    var isClone = utils.getField(outTObj, "clone", false);
 
+    if(isClone && this.view.isLiveView()) {
+      $tm.notify("Forbidden to clone the live view!");
+      return;
+    }
+    
     view = new ViewAbstraction(label, {
       isCreate: true,
       protoView: (isClone ? this.view : null)
@@ -1324,7 +1327,7 @@ MapWidget.prototype.handleRenameView = function() {
   };
 
   var name = "renameView";
-  $tm.dialogManager.open(name, args, function(isConfirmed, outTObj) {
+  this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
   
     if(isConfirmed) {
       
@@ -1372,7 +1375,7 @@ MapWidget.prototype.handleEditView = function() {
   };
   
   var name = "configureView";
-  $tm.dialogManager.open(name, args, function(isConfirmed, outTObj) {
+  this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
     
     if(!isConfirmed) return;
       
@@ -1426,7 +1429,7 @@ MapWidget.prototype.handleSaveCanvas = function() {
   };
 
   var name = "saveCanvas";
-  $tm.dialogManager.open(name, args, function(isConfirmed, outTObj) {
+  this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
     if(!isConfirmed) return;
     
     // allow the user to override the default name or if name is
@@ -1513,7 +1516,7 @@ MapWidget.prototype.handleDeleteView = function() {
       filter : utils.joinAndWrap(references, "[[", "]]")
     };
 
-    $tm.dialogManager.open("cannotDeleteViewDialog", fields);
+    this.dialogManager.open("cannotDeleteViewDialog", fields);
 
     return;
     
@@ -1528,7 +1531,7 @@ MapWidget.prototype.handleDeleteView = function() {
     if(isConfirmed) {
       this.view.destroy();
       this.setView($tm.misc.defaultViewLabel); 
-      $tm.logger("debug", "view \"" + viewname + "\" deleted ");
+      this.logger("debug", "view \"" + viewname + "\" deleted ");
       $tm.notify("view \"" + viewname + "\" deleted ");
     }
 
@@ -1545,7 +1548,7 @@ MapWidget.prototype.handleDeleteView = function() {
  */
 MapWidget.prototype.handleTriggeredRefresh = function(trigger) {
       
-  $tm.logger("log", trigger, "Triggered a refresh");
+  this.logger("log", trigger, "Triggered a refresh");
   
   // special case for the live tab
   if(this.id === "live_tab") {
@@ -1627,7 +1630,7 @@ MapWidget.prototype.handleRemoveNodes = function(nodeIds) {
   };
 
   var name = "deleteNodeDialog";
-  $tm.dialogManager.open(name, params, function(isConfirmed, outTObj) {
+  this.dialogManager.open(name, params, function(isConfirmed, outTObj) {
     
     if(!isConfirmed) return;
       
@@ -1672,7 +1675,7 @@ MapWidget.prototype.toggleEnlargedMode = function(type) {
   
   if(!this.isInSidebar && type === "halfscreen") return;
   
-  $tm.logger("log", "Toggled graph enlargement");
+  this.logger("log", "Toggled graph enlargement");
           
   var enlargedMode = this.enlargedMode;
   
@@ -1760,7 +1763,7 @@ MapWidget.prototype.handleVisStabilizedEvent = function(properties) {
   if(this.hasNetworkStabilized) return;
     
   this.hasNetworkStabilized = true;
-  $tm.logger("log", "Network stabilized after",
+  this.logger("log", "Network stabilized after",
                       properties.iterations,
                       "iterations");
     
@@ -1869,7 +1872,7 @@ MapWidget.prototype.fitGraph = function(delay, duration) {
 MapWidget.prototype.handleInsertNode = function(node) {
   
   var name = "addNodeToMap";
-  $tm.dialogManager.open(name, null, function(isConfirmed, outTObj) {
+  this.dialogManager.open(name, null, function(isConfirmed, outTObj) {
     if(!isConfirmed) return;
       
     var tRef = utils.getField(outTObj, "draft.title");
@@ -1969,7 +1972,7 @@ MapWidget.prototype.handleEditNode = function(node) {
     "tmap.open-view"
   ]);
 
-  $tm.dialogManager.open("editNode", args, function(isConfirmed, outTObj) {
+  this.dialogManager.open("editNode", args, function(isConfirmed, outTObj) {
     
     if(!isConfirmed) return;
     
@@ -2055,7 +2058,7 @@ MapWidget.prototype.handleOpenMapElementEvent = function(properties) {
     }
     
   } else if(properties.edges.length) { // clicked on an edge  
-    $tm.logger("debug", "Clicked on an Edge");
+    this.logger("debug", "Clicked on an Edge");
     var typeId = this.graphData.edgesById[properties.edges[0]].type;
     this.handleEditEdgeType(typeId);
   }
@@ -2126,7 +2129,7 @@ MapWidget.prototype.handleClickEvent = function(evt) {
   // = clicked outside the graph area
     var selected = this.network.getSelection();
     if(selected.nodes.length || selected.edges.length) {
-      $tm.logger("debug", "Clicked outside; deselecting nodes/edges");
+      this.logger("debug", "Clicked outside; deselecting nodes/edges");
       // upstream bug: this.network.unselectAll() doesn't work
       this.network.selectNodes([]); // deselect nodes and edges
       this.resetVisManipulationBar();
@@ -2399,7 +2402,7 @@ MapWidget.prototype.openTiddlerWithId = function(id) {
   
   var tRef = $tm.indeces.tById[id];
   
-  $tm.logger("debug", "Opening tiddler", tRef, "with id", id);
+  this.logger("debug", "Opening tiddler", tRef, "with id", id);
   
   if(this.enlargedMode === "fullscreen") {
     
@@ -2420,7 +2423,7 @@ MapWidget.prototype.openTiddlerWithId = function(id) {
     };
 
     var name = "fullscreenTiddlerEditor";
-    $tm.dialogManager.open(name, args, function(isConfirmed, outTObj) {
+    this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
     
       if(isConfirmed) {
         
@@ -2481,13 +2484,13 @@ MapWidget.prototype.getViewHolderRef = function() {
     return this.viewHolderRef;
   }
   
-  $tm.logger("info", "Retrieving or generating the view holder reference");
+  this.logger("info", "Retrieving or generating the view holder reference");
   
   // if given, try to retrieve the viewHolderRef by specified attribute
   var viewName = this.getAttr("view");
   if(viewName) {
     
-    $tm.logger("log", "User wants to bind view \"" + viewName + "\" to graph");
+    this.logger("log", "User wants to bind view \"" + viewName + "\" to graph");
           
     var viewRef = $tm.path.views + "/" + viewName;
     if(this.wiki.getTiddler(viewRef)) {
@@ -2495,21 +2498,21 @@ MapWidget.prototype.getViewHolderRef = function() {
       // create a view holder that is exclusive for this graph
       
       var holderRef = $tm.path.localHolders + "/" + utils.genUUID();
-      $tm.logger("log", "Created an independent temporary view holder \"" + holderRef + "\"");
+      this.logger("log", "Created an independent temporary view holder \"" + holderRef + "\"");
       
       // we do not use setView here because it would store and reload the view unnecessarily...
       utils.setText(holderRef, viewRef);
       
-      $tm.logger("log", "View \"" + viewRef + "\" inserted into independend holder");
+      this.logger("log", "View \"" + viewRef + "\" inserted into independend holder");
       
     } else {
-      $tm.logger("log", "View \"" + viewName + "\" does not exist");
+      this.logger("log", "View \"" + viewName + "\" does not exist");
     }
     
   }
   
   if(typeof holderRef === "undefined") {
-    $tm.logger("log", "Using default (global) view holder");
+    this.logger("log", "Using default (global) view holder");
     var holderRef =  $tm.ref.defaultViewHolder;
   }
   
@@ -2541,7 +2544,7 @@ MapWidget.prototype.setView = function(view, viewHolderRef) {
     
   var viewLabel = view.getLabel();
   viewHolderRef = viewHolderRef || this.viewHolderRef;
-  $tm.logger("info", "Inserting view '"
+  this.logger("info", "Inserting view '"
                       + viewLabel
                       + "' into holder '"
                       + viewHolderRef
@@ -2577,10 +2580,10 @@ MapWidget.prototype.getView = function(noCache) {
   var text = utils.getText(viewHolderRef);
   var view = new ViewAbstraction(text);
     
-  $tm.logger("debug", "Retrieved view from holder");
+  this.logger("debug", "Retrieved view from holder");
   
   if(!view.exists()) {
-    $tm.logger("debug", "Warning: View \"" + text
+    this.logger("debug", "Warning: View \"" + text
                 + "\" doesn't exist. Default is used instead.");
     view = new ViewAbstraction("Default");
   }
@@ -2670,7 +2673,7 @@ MapWidget.prototype.repaintGraph = function() {
                                   "tmap-has-fullscreen-widget");
   if(this.network && (!isInFS || (isInFS && this.enlargedMode))) {
   
-    $tm.logger("info", "Repainting the whole graph");
+    this.logger("info", "Repainting the whole graph");
   
     this.network.redraw();
     this.fitGraph(0, 1000);
@@ -2734,7 +2737,7 @@ MapWidget.prototype.setNodesMoveable = function(nodeIds, isMoveable) {
   
   if(isFixed) {
     
-    $tm.logger("debug", "Fixing", updates.length, "nodes");
+    this.logger("debug", "Fixing", updates.length, "nodes");
     
     // if we fix nodes in static mode then we also store the positions
     this.handleStorePositions();

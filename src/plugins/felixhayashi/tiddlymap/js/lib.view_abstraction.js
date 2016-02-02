@@ -14,12 +14,12 @@ module-type: library
 
 /*** Exports *******************************************************/
 
-exports.ViewAbstraction = ViewAbstraction;
+module.exports = ViewAbstraction;
 
 /*** Imports *******************************************************/
 
-var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
-var utils    = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
+var utils    = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
   
 /*** Code **********************************************************/
 
@@ -364,6 +364,8 @@ ViewAbstraction.prototype.rename = function(newLabel) {
       
       // update all local node data referencing this view
       var view = new ViewAbstraction(tRef);
+      if(!view.exists()) return;
+      
       var nodes = view.getNodeData();
       for(var id in nodes) {
         if(nodes[id]["open-view"] === oldLabel) {

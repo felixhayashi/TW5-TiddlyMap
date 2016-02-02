@@ -5,9 +5,9 @@ buttons: ok
 \rules except wikilink
 
 <$list filter="[[$:/plugins/felixhayashi/topstoryview]]">
-<div class="tmap-flash-message tmap-info">
-  {{$:/core/images/info-button}}
-  TiddlyMap configured your wiki for optimal use. Please save &amp; restart after closing this dialog.
+<div class="tmap-flash-message tmap-success">
+  TiddlyMap configured your wiki for optimal use. Please save &amp;
+  restart after closing this dialog.
 </div>
 </$list>
 

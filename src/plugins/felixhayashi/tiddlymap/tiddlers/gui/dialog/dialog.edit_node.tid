@@ -4,12 +4,10 @@ classes: tmap-remove-top-space
 
 \rules except wikilink
 
-\define vis-refresh-trigger() $(temp)$/vis-refresh
-
 \define maybeShowTidColorWarning()
   <$list filter="[<tidColor>regexp[.+]]">
   <div class="tmap-flash-message tmap-warning">
-    {{$:/core/images/info-button}} You have set the tiddler's color
+    You have set the tiddler's color
     field to "<<tidColor>>". This value will be completely ignored
     when you change node's color properties in the vis editor below.
   </div>

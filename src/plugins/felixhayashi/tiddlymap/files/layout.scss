@@ -9,6 +9,9 @@
  * file and add a replace instruction for your variable so it will
  * be replaced after the sass compiler has finished.
  * 
+ * Careful of the variable scope. Variables defined in partials
+ * are visible everywhere https://gist.github.com/matyus/4339721.
+ * 
  *******************************************************************/
 
 @import "variables";

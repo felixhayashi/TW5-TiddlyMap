@@ -85,12 +85,11 @@ $(searchSelector)$
     </$reveal>
     <$reveal type="match" text="" default={{!!id}} >
       <div class="tmap-flash-message tmap-info">
-        {{$:/core/images/info-button}} Please select a type from the
-        list or create a new one by entering the type name in the search field on the left.
+        Please select a type from the list or create a new one by
+        entering the type name in the search field on the left.
       </div>
       <div class="tmap-flash-message tmap-info tmap-node-type-specific">
-        {{$:/core/images/info-button}} The number next to the node-type
-        label represents it's priority.
+        The number next to the node-type label represents it's priority.
       </div>
     </$reveal>
   </div>

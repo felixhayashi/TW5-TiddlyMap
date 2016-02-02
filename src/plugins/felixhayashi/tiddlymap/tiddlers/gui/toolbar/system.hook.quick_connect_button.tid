@@ -16,7 +16,7 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 
 
 \define tiddlerSearchFilter()
-[!is[system]!has[draft.of]search:title{$:/temp/quickConnectSearch}sort[title]]
+[!is[system]!has[draft.of]limit[50]search:title{$:/temp/quickConnectSearch}sort[title]]
 \end
 
 \define showButton(state)

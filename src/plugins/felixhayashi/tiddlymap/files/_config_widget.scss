@@ -10,33 +10,49 @@
   }
 
   .vis-configuration-wrapper {
-    width: 350px;
-  
+    width: 100%;
+    
     .vis-config-rangeinput {
       height: inherit;
       margin-left: 4px;
     }
   
-    .vis-config-item {
+    .vis-configuration.vis-config-item {
       width: 100%;
       height: inherit;
-      background: none !important;
+      background: none;
+      padding-left: 0px;
+      left: 0;
       
-      &.tmap-vis-config-item-active::before {
-        content: "✔";
+      @mixin marker {
+        content: "(inherited)";
         position: absolute;
-        left: -10px;
+        display: inline-block;
+        margin-left: 10px;
+        @include animation("fadein-keyframes 1s");
+      }
+
+      &.tmap-vis-config-item-active .vis-config-label::after {
+        @include marker;
+        content: "✔";
         color: green;
         font-weight: bold;
         font-size: 15px;
-        @include animation("fadein-keyframes 1s");
       }
       
+      &.tmap-vis-config-item-inactive .vis-config-label::after {
 /*
-      &:not(.tmap-vis-config-item-active) {
-        opacity: 0.5;
-      }
+        @include marker;
+        content: "✔";
+        color: lightgray;
+        position: absolute;
 */
+      }
+      
+      button.tmap-config-item-reset {
+        vertical-align: top;
+        margin-left: 5px;
+      }
       
       .vis-config-range {
         width: 150px;
@@ -48,20 +64,11 @@
       }
       
       .vis-config-label {
-        width: 120px;
+        width: 150px;
       }
     }
     
   }
-  
-/*
-  .vis-color-picker {
-    width: 310px;
-    left: 20px !important;
-    top: 20px !important;
-    height: 444px;
-  }
-*/
 
   &::after {
     clear: both;
@@ -69,3 +76,38 @@
     display: block;
   }
 }
+
+/*
+$color-picker-height: 200;
+div div.vis-color-picker {
+  div.vis-color {
+    width: $color-picker-height + px;
+    height: $color-picker-height + px;
+  }
+  
+  div.vis-brightness {
+    top: ($color-picker-height + 30) + px;
+  }
+  
+  div.vis-label.vis-brightness {
+    top: ($color-picker-height + 43) + px;
+  }
+  
+  div.vis-label.vis-opacity {
+    top: 338px
+  }
+  
+  div.vis-opacity {
+    top: 351px;
+  }
+  div.vis-initial-color, vis-new-color {
+    top: 381px;
+  }
+  
+  div.vis-button {
+    top: 411px;
+  }
+
+}
+*/
+

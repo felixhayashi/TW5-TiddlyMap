@@ -4,14 +4,6 @@ caption: Interaction & behaviour
 \rules except wikilink
 
 <table class="tmap-config-table">
-  <<tmap-row type:"input-checkbox"
-      title:"Allow single click mode"
-      field:"config.sys.singleClickMode" 
-      descr:"A single click on a node is sufficient to open the
-             corresponding tiddler."
-      note:"Drag and drop will still work and does not cause a
-            tiddler to be opened. Single click is never active in
-            the map editor.">>
 <!--
   <<tmap-row type:"input-select"
       title:"Default node tooltip"
@@ -21,12 +13,6 @@ caption: Interaction & behaviour
       selectFilter:"[[nothing|Nothing]]
                     [[manager|Open edge-type manager]]">>
 -->
-  <<tmap-row type:"input-select"
-      title:"Edge click behaviour"
-      field:"config.sys.edgeClickBehaviour" 
-      selectFilter:"[[nothing|Nothing]]
-                    [[manager|Open edge-type manager]]"
-      descr:"What should happen when you click on an edge?">>
   <$macrocall type="input-select"
         $name="tmap-row"
         title="Default startup view"
@@ -34,4 +20,42 @@ caption: Interaction & behaviour
         nochoice="Last view used at startup"
         selectFilter=<<tmap "option" "selector.allViewsByLabel">>
         descr="The view to display at startup" />
+  <<tmap-row type:"input-checkbox"
+      title:"Show popups"
+      field:"config.sys.popups.enabled" 
+      descr:"Set this to true if you want to see automatic
+             popups in the map.">>
+  <$list filter="[config.sys.popups.enabled[true]]">
+  <<tmap-row type:"input-text"
+      title:"Popup delay"
+      field:"config.sys.popups.delay"
+      descr:"The time in miliseconds that needs to pass after
+             a tooltip is triggered.">>
+  <<tmap-row type:"input-text"
+      title:"Popup width"
+      field:"config.sys.popups.width"
+      descr:"The default max-width of the popup."
+      note:"Make sure you added the desired unit (e.g. `px`).
+            Requires a wiki refresh.">>
+  <<tmap-row type:"input-text"
+      title:"Popup height"
+      field:"config.sys.popups.height"
+      descr:"The default max-height of the popup."
+      note:"Make sure you added desired the unit (e.g.  `px`).
+            Requires a wiki refresh.">>
+  </$list>
+  <<tmap-row type:"input-checkbox"
+      title:"Allow single click mode"
+      field:"config.sys.singleClickMode" 
+      descr:"A single click on a node is sufficient to open the
+             corresponding tiddler."
+      note:"Drag and drop will still work and does not cause a
+            tiddler to be opened. Single click is never active in
+            the map editor.">>
+  <<tmap-row type:"input-select"
+      title:"Edge click behaviour"
+      field:"config.sys.edgeClickBehaviour" 
+      selectFilter:"[[nothing|Nothing]]
+                    [[manager|Open edge-type manager]]"
+      descr:"What should happen when you click on an edge?">>
 </table>

@@ -26,10 +26,10 @@ exports.startup = function() {
 
 /*** Imports *******************************************************/
 
-var NodeType   = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;
-var EdgeType   = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
-var utils      = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
-var visDefConf = require("$:/plugins/felixhayashi/tiddlymap/js/config/vis").config;
+var NodeType   = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType");
+var EdgeType   = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
+var utils      = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+var visDefConf = require("$:/plugins/felixhayashi/tiddlymap/js/config/vis");
 
 /*** Code **********************************************************/
 

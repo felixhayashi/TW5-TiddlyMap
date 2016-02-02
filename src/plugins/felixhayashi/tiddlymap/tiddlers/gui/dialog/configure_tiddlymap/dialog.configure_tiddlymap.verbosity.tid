@@ -3,7 +3,9 @@ caption: Verbosity
 
 \rules except wikilink
 
-Here you can restrict the system's talkativeness.
+<div class="tmap-flash-message tmap-plain">
+  Here you can restrict the system's talkativeness.
+</div>
 
 <table class="tmap-config-table">
   <<tmap-row type:"input-checkbox"
@@ -16,28 +18,4 @@ Here you can restrict the system's talkativeness.
       field:"config.sys.notifications" 
       descr:"Set this to true if you want to receive fade-out
              notifications for important events.">>
-  <<tmap-row type:"input-checkbox"
-      title:"Show popups"
-      field:"config.sys.popups.enabled" 
-      descr:"Set this to true if you want to see automatic
-             popups in the map.">>
-  <$list filter="[config.sys.popups.enabled[true]]">
-  <<tmap-row type:"input-text"
-      title:"Popup delay"
-      field:"config.sys.popups.delay"
-      descr:"The time in miliseconds that needs to pass after
-             a tooltip is triggered.">>
-  <<tmap-row type:"input-text"
-      title:"Popup width"
-      field:"config.sys.popups.width"
-      descr:"The default max-width of the popup."
-      note:"Make sure you added the desired unit (e.g. `px`).
-            Requires a wiki refresh.">>
-  <<tmap-row type:"input-text"
-      title:"Popup height"
-      field:"config.sys.popups.height"
-      descr:"The default max-height of the popup."
-      note:"Make sure you added desired the unit (e.g.  `px`).
-            Requires a wiki refresh.">>
-  </$list>
 </table> 

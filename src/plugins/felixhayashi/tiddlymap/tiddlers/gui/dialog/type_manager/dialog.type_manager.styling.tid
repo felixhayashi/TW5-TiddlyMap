@@ -3,8 +3,6 @@ caption: Styling
 
 \rules except wikilink
 
-\define vis-refresh-trigger() $(temp)$/vis-refresh
-
 \define url()
   <$set
       filter="[<mode>prefix[manage-edge-types]]"
@@ -32,27 +30,15 @@ caption: Styling
 </fieldset>
 
 <fieldset><legend>Visjs styles</legend>
-<div class="tmap-flash-message tmap-info">
-   {{$:/core/images/info-button}}
-   All visjs options below are documented at <<url>>.
-</div>
-<table class="tmap-config-table">
-  <tr>
-    <td>Reset:</td>
-    <td>
-      <div class="tmap-button-wrapper">
-        <$button>Reset style
-          <$action-setfield style="" />
-          <$action-setfield $tiddler=<<vis-refresh-trigger>> text="" />
-        </$button>
-     </div>
-   </td>
-   <td> Press the reset button to clear the style for this type.</td>
-  </tr>
-</table>
-<$tmap-config
-    mode=<<mode>>
-    inherited="vis-inherited"
-    extension="style"
-    refresh-trigger=<<vis-refresh-trigger>> />
+  <div class="tmap-flash-message tmap-info">
+     All visjs options below are documented at <<url>>.
+  </div>
+  <div class="tmap-flash-message tmap-info">
+     Only config items that you actually changed have an effect on
+     the graph. Other options are visible, yet, inactive.
+  </div>
+  <$tmap-config
+      mode=<<mode>>
+      inherited="vis-inherited"
+      extension="style" />
 </fieldset>

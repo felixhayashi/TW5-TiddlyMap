@@ -14,11 +14,11 @@ module-type: library
 
 /*** Exports *******************************************************/
 
-exports.Popup = Popup;
+module.exports = Popup;
 
 /*** Imports *******************************************************/
 
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
   
 /**** Code *********************************************************/
 

@@ -14,16 +14,16 @@ module-type: library
 
 /*** Exports *******************************************************/
 
-exports.Adapter = Adapter;
+module.exports = Adapter;
 
 /*** Imports *******************************************************/
 
-var ViewAbstraction   = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction").ViewAbstraction;
-var EdgeType          = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
-var NodeType          = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType").NodeType;
-var utils             = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
-var getContrastColour = require("$:/core/modules/macros/contrastcolour.js").run;
+var ViewAbstraction   = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
+var EdgeType          = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
+var NodeType          = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType");
+var utils             = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
 var vis               = require("$:/plugins/felixhayashi/vis/vis.js");
+var getContrastColour = require("$:/core/modules/macros/contrastcolour.js").run;
   
 /***************************** CODE ********************************/
 
@@ -1349,24 +1349,8 @@ Adapter.prototype._addNodeIcon = function(node, faIcon, twIcon) {
     return;
   }
   
-  if(imgTObj.fields.text) { // base64 uri
-    var type = imgTObj.fields.type || "image/svg+xml";
-    var body = imgTObj.fields.text;
-    if(type === "image/svg+xml") {
-      // see http://stackoverflow.com/questions/10768451/inline-svg-in-css
-      body = body.replace(/\r?\n|\r/g, " ");
-      if(!utils.inArray("xmlns", body)) {
-        // @tiddlywiki it is bad to remove xmlns attribute!
-        body = body.replace(/<svg/,
-                            '<svg xmlns="http://www.w3.org/2000/svg"');
-      }
-    }
-
-    var encBody = ($tw.config.contentTypeInfo[type].encoding === "base64"
-                   ? body
-                   : window.btoa(body));
-
-    node.image = "data:" + type + ";base64," + encBody;
+  if(imgTObj.fields.text) {
+    node.image = utils.getDataUri(imgTObj);
     node.shape = "image";
     return;
   }

@@ -3,8 +3,6 @@ subtitle: {{$:/core/images/options-button}} Save a snapshot image of view "<<vie
 
 \rules except wikilink
 
-\define vis-refresh-trigger() $(temp)$/vis-refresh
-
 \define preview()
 <div class="tmap-save-canvas-preview">
   <$transclude tiddler=<<snapshot>> /><br />

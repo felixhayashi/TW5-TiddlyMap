@@ -20,8 +20,8 @@ exports["tmap-connections"] = EdgeListWidget;
 /*** Imports *******************************************************/
 
 var Widget   = require("$:/core/modules/widgets/widget.js").widget;
-var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
-var utils    = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
+var utils    = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
 
 /*** Code **********************************************************/
 

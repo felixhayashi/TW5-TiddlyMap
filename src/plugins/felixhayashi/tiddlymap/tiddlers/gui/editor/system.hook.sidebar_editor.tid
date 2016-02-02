@@ -6,7 +6,6 @@ title: $:/plugins/felixhayashi/tiddlymap/hook/editor
 
 <div class="tmap-mobile-editor">
   <div class="tmap-flash-message tmap-warning">
-    {{$:/core/images/info-button}}
     The editor is not displayed in mobile mode.
   </div>
 </div>

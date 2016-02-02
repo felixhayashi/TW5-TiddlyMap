@@ -115,31 +115,17 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
 
 \define visConfiguration(inheritedList,
                          extensionField,
-                         refreshTrigger,
                          styleName:"style")
                          
   <fieldset><legend>Visjs configurations ($styleName$)</legend>
-    <p>All configurations that you change will be indicated with a
-    checkmark in front of the config item.
-    </p>
-    <table class="tmap-config-table">
-      <tr>
-        <td>Reset:</td>
-        <td>
-          <div class="tmap-button-wrapper">
-            <$button>Reset this style
-              <$action-setfield $field="$extensionField$" $value="" />
-              <$action-setfield $tiddler="$refreshTrigger$" text="" />
-            </$button>
-         </div>
-       </td>
-       <td>Press the reset button to clear the $styleName$</td>
-      </tr>
-    </table>
+    <div class="tmap-flash-message tmap-info">
+      Only config items that you actually changed have an effect on
+      the graph. Other options are visible, yet, inactive.
+    </div>
     <$tmap-config
         mode="manage-node-types"
         inherited="$inheritedList$"
         extension="$extensionField$"
-        refresh-trigger="$refreshTrigger$" />
+    />
   </fieldset>
 \end

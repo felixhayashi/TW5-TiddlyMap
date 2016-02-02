@@ -18,10 +18,10 @@ exports["tmap-config"] = MapConfigWidget;
 
 /*** Imports *******************************************************/
  
-var Widget          = require("$:/core/modules/widgets/widget.js").widget;
-var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction").ViewAbstraction;
+var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
+var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
 var vis             = require("$:/plugins/felixhayashi/vis/vis.js");
-var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
+var Widget          = require("$:/core/modules/widgets/widget.js").widget;
 
 /*** Code **********************************************************/
 
@@ -50,11 +50,7 @@ function MapConfigWidget(parseTreeNode, options) {
       
   // make the html attributes available to this widget
   this.computeAttributes();
-  
-  utils.addTWlisteners({
-    "tmap:tm-clear-config": function() { alert("nice"); }
-  }, this, this);
-     
+       
 };
 
 // !! EXTENSION !!
@@ -67,29 +63,26 @@ MapConfigWidget.prototype = Object.create(Widget.prototype);
  * @override
  */
 MapConfigWidget.prototype.render = function(parent, nextSibling) {
+    
+  // remember our place in the dom
+  this.parentDomNode = parent;
   
-  if(!this.parentDomNode) {
-  
-    // remember our place in the dom
-    this.parentDomNode = parent;
-      
-    // create this.wrapper
-    this.wrapper = document.createElement("div");
-    $tw.utils.addClass(this.wrapper, "tmap-config-widget");
-    parent.appendChild(this.wrapper);
-  
+  if(!this.domNode) {
+    this.domNode = this.document.createElement("div");
+    $tw.utils.addClass(this.domNode, "tmap-config-widget");
+    parent.insertBefore(this.domNode, nextSibling);
   }
-  
+
   if(this.network) {
         
-    // destroy the previous instance
+    // destroy any previous instance
     this.network.destroy();
     
   }
   
   // create container for vis configurator; destroyed when vis is destroyed
   this.networkContainer = document.createElement("div");
-  this.wrapper.appendChild(this.networkContainer);
+  this.domNode.appendChild(this.networkContainer);
       
   // get environment
   this.refreshTrigger = this.getAttribute("refresh-trigger");
@@ -113,13 +106,9 @@ MapConfigWidget.prototype.render = function(parent, nextSibling) {
     }
         
     this.inherited = utils.merge(this.inherited, style);
-    
-    //~ console.log("looking at", fieldName, "has style", style);
-    //~ console.log("merged this.inherited", this.inherited);
+
   }
-  
-  //~ console.log("inheritedFields", this.inheritedFields, "this.inherited", this.inherited);
-  
+    
   // load extension to the inherited options; since we store vis config
   // for nodes and edges without the top level property, we may need to
   // append it again, if not done so already.
@@ -136,17 +125,20 @@ MapConfigWidget.prototype.render = function(parent, nextSibling) {
   }
   
   // we record all changes in a separate variable
-  this.changes = utils.isTrue(this.getAttribute("save-only-changes"))
-                 ? {}
-                 : this.extension;
+  var isSaveOnlyChanges = utils.isTrue(this.getAttribute("save-only-changes"));
+  this.changes = (isSaveOnlyChanges ? {} : this.extension);
                    
-  var data = {
-    nodes: new vis.DataSet([]),
-    edges: new vis.DataSet([])
-  };
+  var data = { nodes: [], edges: [] };
+  var options = utils.merge({}, this.inherited, this.extension);
+  $tw.utils.extend(options, {
+    configure: {
+      enabled: true,
+      showButton: false,
+      filter: this.getOptionFilter(this.mode)
+    }
+  });
   
-  this.network = new vis.Network(this.networkContainer, data, {});
-  this.reloadVisOptions();
+  this.network = new vis.Network(this.networkContainer, data, options);
   this.network.on("configChange", this.handleConfigChange.bind(this));
   
   // giving the parent a css height will prevent it from jumping
@@ -156,38 +148,45 @@ MapConfigWidget.prototype.render = function(parent, nextSibling) {
   var height = this.parentDomNode.getBoundingClientRect().height;
   this.parentDomNode.style["height"] = height + "px";
   
+  var reset = this.handleResetEvent.bind(this);
+  this.networkContainer.addEventListener("reset", reset, false);
+  
   // register this graph at the caretaker's graph registry
   $tm.registry.push(this);
   
-  this.iterate();
+  
+  this.enhanceConfigurator();
 
 };
 
-MapConfigWidget.prototype.reloadVisOptions = function() {
-  
-  // merge the inherited config with the extension and store it in a new var
-  var options = utils.merge({}, this.inherited, this.extension);
-
-  // finally add configuration interface option
-  $tw.utils.extend(options, {
-    configure: {
-      enabled: true,
-      showButton: false,
-      filter: this.getOptionFilter(this.mode)
-    }
-  });
-  
-  this.network.setOptions(options);
-  
-}
-
+/**
+ * I only receive the option that has actually changed
+ */
+MapConfigWidget.prototype.handleResetEvent = function(ev) {
+  var change = {};
+  change[ev.detail.trigger.path] = null;
+  this.handleConfigChange(change);
+};
 
 /**
  * I only receive the option that has actually changed
  */
 MapConfigWidget.prototype.handleConfigChange = function(change) {
   
-  this.changes = utils.merge(this.changes, change);
+  var flatChanges = utils.flatten(this.changes);
+  var flatChange = utils.flatten(change);
+  var confPath = Object.keys(utils.flatten(change))[0];
+  var isReset = (flatChange[confPath] === null);
+    
+  if(isReset) { // we interpret this as delete
+    
+    flatChanges[confPath] = undefined;
+    this.changes = utils.unflatten(flatChanges);
+    
+  } else {
+    
+    this.changes = utils.merge(this.changes, change);
+  }
   
   // when storing edge- or node-styles we strip the root property
   var options = utils.merge({}, this.changes);
@@ -197,29 +196,46 @@ MapConfigWidget.prototype.handleConfigChange = function(change) {
   // save changes
   utils.writeFieldData(this.pipeTRef, this.extensionTField, options);
   
-  window.setTimeout(this.iterate.bind(this), 50);
+  // hack to ensure vis doesn't scroll
+  var cls = "vis-configuration-wrapper";
+  var div = this.networkContainer.getElementsByClassName(cls)[0];
+  div.style.height = div.getBoundingClientRect().height + "px";
+    
+  if(isReset) {
+    
+    // we need to use a timeout here, otherwise we cause a vis bug
+    // since it is in the middle of storing the value!
+    window.setTimeout(this.refresh.bind(this), 0);
+    
+  } else {
+    
+    // add active-config indicators
+    window.setTimeout(this.enhanceConfigurator.bind(this), 50);
+    
+  }
   
 };
 
 /**
- * Iterate over all config items and add an indicator.
+ * enhanceConfigurator over all config items and add an indicator.
  */
-MapConfigWidget.prototype.iterate = function() {
+MapConfigWidget.prototype.enhanceConfigurator = function() {
   
   var cls = "vis-configuration-wrapper";
   var elements = this.networkContainer
                      .getElementsByClassName(cls)[0].children;
   var list = [];
-  var extension = utils.flatten(this.extension);
+  var changes = utils.flatten(this.changes);
   for(var i = 0; i < elements.length; i++) {
     if(!elements[i].classList.contains("vis-config-item")) continue;
     
-    var confEl = new VisConfElement(elements[i], list, i);
-    list.push(confEl);
+    var conf = new VisConfElement(elements[i], list, i);
+    list.push(conf);
     
-    if(extension[confEl.path]) {
-      $tw.utils.addClass(confEl.el, "tmap-vis-config-item-active");
-    }
+    if(conf.level === 0) continue;
+    
+    conf.setActive(!!changes[conf.path]);
+
   }
 }
 
@@ -235,6 +251,7 @@ function VisConfElement(el, list, pos) {
   var getByCls = "getElementsByClassName";
   var getByTag = "getElementsByTagName";
   
+  this.isActive = false;
   this.pos = pos;
   this.el = el;
   this.inputEl = el[getByCls]("vis-config-colorBlock")[0]
@@ -243,7 +260,7 @@ function VisConfElement(el, list, pos) {
                  || el[getByCls]("vis-config-header")[0]
                  || el;
   var labelText = (this.labelEl.innerText || this.labelEl.textContent);
-  this.label = labelText && labelText.match(/([a-zA-Z]+)/)[1];
+  this.label = labelText && labelText.match(/([a-zA-Z0-9]+)/)[1];
   this.level = parseInt(el.className.match(/.*vis-config-s(.).*/)[1]) || 0;
   
   this.path = this.label;
@@ -258,6 +275,36 @@ function VisConfElement(el, list, pos) {
     }
   }
 }
+
+VisConfElement.prototype.setActive = function(isEnable) {
+  
+  if(!isEnable) return;
+  
+  // cannot use utils.hasKeyWithPrefix because some keys start with
+  // same value as others
+  var cls = "tmap-vis-config-item-" + (isEnable ? "active" : "inactive");
+  $tw.utils.addClass(this.el, cls);
+  
+  if(isEnable) {
+  
+    var button = document.createElement("button");
+    button.innerHTML = "reset";
+    button.className = "tmap-config-item-reset";
+    
+    var self = this;
+    
+    button.addEventListener("click", function(ev) {
+      ev.currentTarget.dispatchEvent(new CustomEvent("reset", {
+        detail: { trigger: self },
+        bubbles: true,
+        cancelable: true
+      }));
+    }, false);
+
+    this.el.appendChild(button);
+  }
+  
+};
 
 /**
  * 
@@ -370,7 +417,9 @@ MapConfigWidget.prototype.isZombieWidget = function() {
  */
 MapConfigWidget.prototype.destruct = function() {
     
-  if(this.network) { this.network.destroy(); }
+  if(this.network) {
+    this.network.destroy();
+  }
   
 };
 
@@ -384,11 +433,9 @@ MapConfigWidget.prototype.refresh = function(changedTiddlers) {
   
   if(this.isZombieWidget() || !this.network) return;
   
-  if(changedTiddlers[this.refreshTrigger]) {
-    
+  if(!changedTiddlers || changedTiddlers[this.refreshTrigger]) {
     this.refreshSelf();
     return true;
-  
   }
   
 };

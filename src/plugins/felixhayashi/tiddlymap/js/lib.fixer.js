@@ -4,23 +4,24 @@ title: $:/plugins/felixhayashi/tiddlymap/js/fixer
 type: application/javascript
 module-type: library
 
-@module TiddlyMap
 @preserve
 
 \*/
 
-(/** @lends module:TiddlyMap*/function(){
-  
 /*jslint node: true, browser: true */
 /*global $tw: false */
 "use strict";
 
+/*** Exports *******************************************************/
+
+module.exports = {};
+
 /*** Imports *******************************************************/
  
-var utils =           require("$:/plugins/felixhayashi/tiddlymap/js/utils").utils;
-var Adapter =         require("$:/plugins/felixhayashi/tiddlymap/js/Adapter").Adapter;
-var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction").ViewAbstraction;
-var EdgeType =        require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType").EdgeType;
+var utils =           require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+var Adapter =         require("$:/plugins/felixhayashi/tiddlymap/js/Adapter");
+var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
+var EdgeType =        require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
 
 /*** Code **********************************************************/
 
@@ -68,7 +69,7 @@ var executeUpgrade = function(toVersion, curVersion, upgrade) {
   
 };
 
-var fixer = {};
+var fixer = module.exports;
 
 /**
  * Special fix that is not invoked along with the other fixes but
@@ -256,7 +257,3 @@ fixer.fix = function() {
   });
                 
 };
-
-exports.fixer = fixer;
-
-})();

@@ -71,21 +71,21 @@ var fs = require('fs');
 
 // additional modules
 
-var tw = require("tiddlywiki"); // ./boot/boot.js
+var tw = require("tiddlywiki")
 var argv = require('yargs').argv;
-var del = require("del");
+var del = require("del")
 // why on earth is fs.exists depreciated anyway by node?
-var exists = require("is-there");
-var SemVer = require("semver");
+var exists = require("is-there")
+var SemVer = require("semver")
 // once gulp 4.0 is out: remove runSequence and update
 var runSequence = require('run-sequence');
 var beep = require('beepbeep')
-var gulp = require("gulp");
-var gulpif = require("gulp-if");
-var gutil = require("gulp-util");
-var sass = require("gulp-sass");
+var gulp = require("gulp")
+var gulpif = require("gulp-if")
+var gutil = require("gulp-util")
+var sass = require("gulp-sass")
 var replace = require('gulp-replace');
-var uglify = require("gulp-uglify");
+var uglify = require("gulp-uglify")
 var jsdoc = require('gulp-jsdoc3');
 var esprima = require('gulp-esprima');
 var debug = require('gulp-debug');
@@ -228,7 +228,7 @@ gulp.task("create docs", function(cb) {
 
   // use require to load the jsdoc config; 
   // note the extension is discarted when loading json with require!
-  var config = require("./src/jsdoc/config");
+  var config = require("./src/jsdoc/config")
   config.opts.destination = outPath.docs;
   
   gulp.src([ pluginSrc + "/**/*.js", "./src/jsdoc/README.md" ])

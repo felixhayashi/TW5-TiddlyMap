@@ -242,7 +242,7 @@
 
 /*** vis ***********************************************************/
 
-.vis-network {
+.tmap-widget div.vis-network {
         
   .vis-edit-mode {
     height: 26px;
@@ -261,12 +261,16 @@
       right: 15px;
       
       &.tmap-fullscreen-button {
+        $tRef: "$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png";
         bottom: 90px;
-        background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png}} />'));
+        background-image: url(datauri($tRef));
+        
       }
       &.tmap-halfscreen-button {
+        $tRef: "$:/plugins/felixhayashi/tiddlymap/media/halfscreen.png";
         bottom: 130px;
-        background-image: url(unquote('<$macrocall $name="makedatauri" type="image/png" text={{$:/plugins/felixhayashi/tiddlymap/media/halfscreen.png}} />'));
+        background-image: url(datauri($tRef));
+        
       }
     }
     

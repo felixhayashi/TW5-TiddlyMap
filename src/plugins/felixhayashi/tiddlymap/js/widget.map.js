@@ -665,9 +665,11 @@ MapWidget.prototype.update = function(updates) {
   
   if(reinitNetwork) {
     this.initAndRenderGraph(this.graphDomNode);
+    this.visTooltip.hide(0, true);
     
   } else if(rebuildGraph) {
     this.rebuildGraph(rebuildGraphOptions);
+    this.visTooltip.hide(0, true);
   }
   
   if(rebuildEditorBar) {
@@ -2045,23 +2047,29 @@ MapWidget.prototype.handleVisDoubleClickEvent = function(properties) {
 
 MapWidget.prototype.handleOpenMapElementEvent = function(properties) {
   
-  this.visTooltip.hide(0, true);
-  
   if(properties.nodes.length) { // clicked on a node
     
     var node = this.graphData.nodesById[properties.nodes[0]];
     if(node["open-view"]) {
-//      $tm.notify("Switching view");
+      $tm.notify("Switching view");
       this.setView(node["open-view"]);
     } else {
       this.openTiddlerWithId(properties.nodes[0]);
     }
     
   } else if(properties.edges.length) { // clicked on an edge  
+    
     this.logger("debug", "Clicked on an Edge");
     var typeId = this.graphData.edgesById[properties.edges[0]].type;
     this.handleEditEdgeType(typeId);
+    
+  } else {
+    
+    return;
+    
   }
+  
+  this.visTooltip.hide(0, true);
 
 };
 
@@ -2122,11 +2130,8 @@ MapWidget.prototype.handleClickEvent = function(evt) {
   
   if(this.isZombieWidget() || !this.network) return;
   
-  if(!this.graphDomNode.contains(evt.target)) {
-    
-  this.visTooltip.hide(0, true);
-    
-  // = clicked outside the graph area
+  if(!this.graphDomNode.contains(evt.target)) { // clicked outside
+  
     var selected = this.network.getSelection();
     if(selected.nodes.length || selected.edges.length) {
       this.logger("debug", "Clicked outside; deselecting nodes/edges");
@@ -2357,9 +2362,8 @@ MapWidget.prototype.handleVisLoadingDone = function(params) {
  */
 MapWidget.prototype.handleVisDragStart = function(properties) {
 
-  this.visTooltip.hide(0, true);
-
   if(properties.nodes.length) {
+    this.visTooltip.hide(0, true);
     this.assignActiveStyle(properties.nodes);
     this.setNodesMoveable(properties.nodes, true);
   }

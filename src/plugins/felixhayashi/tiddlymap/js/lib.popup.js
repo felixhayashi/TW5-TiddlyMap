@@ -94,7 +94,7 @@ function Popup(parentDomNode, options) {
  */
 Popup.prototype._handleEnter = function(ev) {
   
-  //~ console.log("_handleEnter");
+  console.log("_handleEnter");
     
   this._isPreventShowOrHide = true;
   
@@ -105,7 +105,7 @@ Popup.prototype._handleEnter = function(ev) {
  */
 Popup.prototype._handleLeave = function(ev) {
   
-  //~ console.log("_handleLeave");
+  console.log("_handleLeave");
   
   this._isPreventShowOrHide = false;
   
@@ -122,7 +122,7 @@ Popup.prototype._handleLeave = function(ev) {
 Popup.prototype._handleAnimationEnd = function() {
   
   if(this._isDisplayNoneAfterAnimation) {
-    //~ console.log("display: none");
+    console.log("display: none");
     this._domNode.style.display = "none";
   }
   
@@ -133,11 +133,11 @@ Popup.prototype._handleAnimationEnd = function() {
  */
 Popup.prototype._hide = function(isForce) {
   
-  //~ console.log("_hide");
+  console.log("_hide");
   
   if(!isForce && this._isPreventShowOrHide) return;
     
-  //~ console.log("_hide SUCCESS");
+  console.log("_hide SUCCESS");
   
   this._signature = null;
   this._isDisplayNoneAfterAnimation = true;
@@ -157,7 +157,7 @@ Popup.prototype._hide = function(isForce) {
  */
 Popup.prototype._show = function(signature, text) {
   
-  //~ console.log("_show");
+  console.log("_show");
   
   if(this._isPreventShowOrHide || $tm.mouse.ctrlKey || !this._isEnabled) {
     return;
@@ -190,7 +190,7 @@ Popup.prototype._show = function(signature, text) {
 
   if(!isClickedInside) return;
 
-  //~ console.log("_show SUCCESS");
+  console.log("_show SUCCESS");
   
   this._signature = signature;
   
@@ -240,7 +240,7 @@ Popup.prototype._show = function(signature, text) {
  */
 Popup.prototype.show = function(signature, text, delay) {
   
-  //~ console.log("show", delay);
+  console.log("show", delay);
   
   this._clearTimeouts();
   
@@ -258,7 +258,7 @@ Popup.prototype.show = function(signature, text, delay) {
  */
 Popup.prototype.hide = function(delay, isForce) {
   
-  //~ console.log("hide", delay);
+  console.log("hide", delay);
     
   this._clearTimeouts();
     
@@ -281,7 +281,7 @@ Popup.prototype.setEnabled = function(isEnabled) {
   
 Popup.prototype._clearTimeouts = function() {
   
-  //~ console.log("_clearTimeouts", this._timeoutShow, this._timeoutHide);
+  console.log("_clearTimeouts", this._timeoutShow, this._timeoutHide);
   
   window.clearTimeout(this._timeoutShow);
   window.clearTimeout(this._timeoutHide);

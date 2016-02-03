@@ -89,7 +89,6 @@ var uglify = require("gulp-uglify")
 var jsdoc = require('gulp-jsdoc3');
 var esprima = require('gulp-esprima');
 var debug = require('gulp-debug');
-var jsValidate = require('gulp-jsvalidate');
 
 /**** Preprocessing ************************************************/
 

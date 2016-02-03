@@ -1,0 +1,25 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/welcome
+subtitle: {{$:/core/images/info-button }} Welcome
+buttons: ok
+
+\rules except wikilink
+
+<$list filter="[[$:/plugins/felixhayashi/topstoryview]]">
+<div class="tmap-flash-message tmap-success">
+  TiddlyMap configured your wiki for optimal use. Please save &amp;
+  restart after closing this dialog.
+</div>
+</$list>
+
+It seems that you freshly installed TiddlyMap.
+
+* In case you need any help, please consult the [[online docs|http://tiddlymap.org#Documentation]] first.
+* You are welcome to create an [[issue|https://github.com/felixhayashi/TW5-TiddlyMap/issues]] at GitHub for any bug you discover.
+* Make sure to revisit the [[demo site|http://tiddlymap.org]] to see whether your version is up-to-date.
+* If you like TiddlyMap, please give it a star at [[GitHub|https://github.com/felixhayashi/TW5-TiddlyMap]] or tell your friends about it :)
+
+Have a great time.
+
+---
+
+''Please note:'' TiddlyMap is distributed under the [[BSD 2-Clause License|http://opensource.org/licenses/BSD-2-Clause]], which belongs to the same license family, as the license used by TiddlyWiki. By using this plugin you agree to the product's [[License Terms|https://github.com/felixhayashi/TW5-TiddlyMap/blob/master/LICENSE]].

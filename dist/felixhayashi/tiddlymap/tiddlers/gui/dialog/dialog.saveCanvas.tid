@@ -1,0 +1,42 @@
+title: $:/plugins/felixhayashi/tiddlymap/dialog/saveCanvas
+subtitle: {{$:/core/images/options-button}} Save a snapshot image of view "<<view>>"
+
+\rules except wikilink
+
+\define preview()
+<div class="tmap-save-canvas-preview">
+  <$transclude tiddler=<<snapshot>> /><br />
+  Measures: <<width>> × <<height>>
+</div>
+\end
+
+<table class="tmap-config-table">
+<!--
+  <<tmap-row type:"input-text"
+      title:"Name"
+      field:"name">
+-->
+<$macrocall $name="tmap-row"
+    type="input-text"
+    title="Name"
+    field="name"
+    descr=<<preview>> />
+</table>
+
+<fieldset><legend>Options</legend>
+  <table class="tmap-config-table">
+    <<tmap-row type:"input-radio"
+        title:"Action"
+        field:"action" 
+        selectFilter:"[[download|Download]]
+                      [[wiki|Save in wiki]]
+                      [[placeholder|Use as placeholder for this view]]"
+        descr:"Save the image by downloading it to your computer or
+               save it as a tiddler in your wiki.<br /><br />
+               A third option is to make TiddlyMap use this image as
+               placeholder for the current view. Placeholders are used
+               when tiddlers are exported in form of static html
+               or when editing a tiddler while having the preview
+               shown. In this case the title input is ignored.">>
+  </table>
+</fieldset>

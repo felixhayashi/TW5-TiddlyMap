@@ -55,9 +55,6 @@
 var authorName = "felixhayashi";
 var pluginName = "tiddlymap"
 
-// this version will be automatically written into plugin.info
-var version="0.11.1"
-
 // whether or not to create/increment the build number automatically
 var isIncrBuild = true
 

@@ -13,10 +13,12 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 <tr><td colspan="4">//No connections found!//</td></tr>
 \end
 
+\define normalSearchFilter()
+[!is[system]!has[draft.of]search:title{$:/temp/quickConnectSearch}sortcs[title]limit[50]]
+\end
 
-
-\define tiddlerSearchFilter()
-[!is[system]!has[draft.of]limit[50]search:title{$:/temp/quickConnectSearch}sort[title]]
+\define regexSearchFilter()
+[!is[system]!has[draft.of]regexp{$:/temp/quickConnectSearch}sortcs[title]limit[50]]
 \end
 
 \define showButton(state)
@@ -68,7 +70,14 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
 \end
 
 \define showPopup()
-<$set name="additional-classes" value="tmap-active-button"><$macrocall $name="showButton" state="" /></$set>
+<$set name="additional-classes" value="tmap-active-button">
+  <$macrocall $name="showButton" state="" />
+</$set>
+<$set
+    name="searchFilter"
+    filter="[field:title[$:/state/tmap/tid-toolbar]has[re-filter]]"
+    value=<<regexSearchFilter>>
+    emptyValue=<<normalSearchFilter>>>
 <div class="tmap-quick-connect tc-reveal tc-popup">
   <div class="tc-drop-down">
     <div class="title">Create connection</div>
@@ -94,7 +103,16 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
         <td>Search:</td>
         <td>
           <$edit-text tiddler="$:/temp/quickConnectSearch" type="text" tag="input" default=""></$edit-text>
-          <small><$count filter=<<tiddlerSearchFilter>> /> results</small>
+          <$checkbox
+              tiddler="$:/state/tmap/tid-toolbar"
+              field="re-filter"
+              checked="1"
+              unchecked=""
+              default=""> regexp
+          </$checkbox>
+<!--
+          <small>(<$count filter=<<searchFilter>> /> results)</small>
+-->
         </td>
       </tr>
       </table>
@@ -103,7 +121,7 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
         <td colspan="2">
           <table class="tmap-very-small-list">
             <$list
-                filter=<<tiddlerSearchFilter>>
+                filter=<<searchFilter>>
                 variable="item">
             <tr><<searchResults>></tr>
             </$list>
@@ -168,6 +186,7 @@ caption: {{$:/plugins/felixhayashi/tiddlymap/icon}} {{$:/language/Buttons/Tiddly
     </table>   
   </div>
 </div>
+</$set>
 \end
 
 <$list filter="[all[current]is[tiddler]]"><$list filter="[{$:/temp/tmap/state/popup/quickConnect}prefix<qualify>]" variable="item" emptyMessage=<<hidePopup>>><<showPopup>></$list></$list>

@@ -15,7 +15,7 @@ caption: General
       descr:"If unchecked, no edge label will be displayed.">>
 \end
 \define manage-node-types()
-  <$list filter="[<currentTiddler>!field:id[tmap:neighbour]]">
+  <$list filter="[<currentTiddler>regexp[tmap:]]">
   <<tmap-row type:"input-textarea"
       title:"Scope"
       field:"scope" 

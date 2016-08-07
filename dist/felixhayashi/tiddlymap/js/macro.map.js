@@ -6,4 +6,217 @@ module-type: macro
 @preserve
 
 \*/
-"use strict";exports.name="tmap";exports.params=getParamSlots(5);exports.run=run;var EdgeType=require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");var utils=require("$:/plugins/felixhayashi/tiddlymap/js/utils");var ViewAbstraction=require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");function run(){this.substVarRefs=this.substituteVariableReferences;var r=command[arguments[0]];var t=null;if(typeof r==="function"){var e=Array.prototype.slice.call(arguments,1);var t=r.apply(this,e)}return typeof t==="string"?t:""}function getParamSlots(r){var t=[];for(var e=0;e<r;e++){t.push({name:"arg"+e})}return t}var command=utils.makeHashMap();command.basename=function(r){var t=r||this.getVariable("currentTiddler");return utils.getBasename(t)};command.datauri=function(r,t){return utils.getDataUri(r,t,true)};command.testJSON=function(r){var t=$tw.wiki.getTiddler(this.getVariable("currentTiddler"));try{JSON.parse(t.fields[r]);return"valid"}catch(e){return"malformed"}};command.splitAndSelect=function(r,t){var e=this.getVariable("currentTiddler");var a=e.split(r)[t];return a!=null?a:e};command.concat=function(){var r="";for(var t=1,e=arguments.length;t<e;t++){r+=arguments[t]}return r};command.uuid=function(){return utils.genUUID()};command.regRepl=function(){var r=this.substVarRefs(arguments[0]);var t=arguments[1];var e=this.substVarRefs(arguments[2]);var a=this.substVarRefs(arguments[4]);return r.replace(new RegExp(t,a),e)};command.halfOfString=function(){var r=this.substVarRefs(arguments[0]);if(!r)return"";return r.substr(0,Math.ceil(r.length/2))};command.isETyVisible=function(r,t,e){e=command.getETyId.call(this,r,e);return""+utils.isEdgeTypeMatch(e,t)};command.getETyId=function(r,t){t=t||this.getVariable("currentTiddler");return new EdgeType(t,null,{namespace:r}).id};command.scale=function(){var r="";for(var t=1,e=parseInt(arguments[0]);t<e;t++){r+="[["+t+"]]"}return r};command.mergeFields=function(){var r=utils.getTiddler(arguments[0]);var t=arguments[1];var e=arguments[2]||" ";if(!r)return;var a=utils.getPropertiesByPrefix(r.fields,t);var n="";for(var i in a){if(typeof a[i]==="string"){n+=a[i]+e}}return n};command.option=function(r,t){var e=$tm;var a=r.split(".");for(var n=0;n<a.length;n++){if(typeof e=="object"&&e[a[n]]){e=e[a[n]]}}if(t&&typeof e==="string"&&utils.hasSubString(t)&&e.lastIndexOf(t)+t.length===e.length){e=e+t}return e};
+
+/*jslint node: true, browser: true */
+/*global $tw: false */
+"use strict";
+
+/*** Exports *******************************************************/
+
+exports.name = "tmap";
+exports.params = getParamSlots(5);
+exports.run = run;
+
+/*** Imports *******************************************************/
+
+var EdgeType        = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
+var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
+  
+/*** Code **********************************************************/
+
+/**
+ * @this MacroCallWidget
+ * @return {string} the result of the operation or an empty string.
+ * @private
+ */
+function run() {
+  
+  this.substVarRefs = this.substituteVariableReferences;
+  
+  var fn = command[arguments[0]];
+  var result = null;
+  
+  if(typeof fn === "function") {
+    var args = Array.prototype.slice.call(arguments,1);
+    var result = fn.apply(this, args);
+  }
+  
+  return (typeof result === "string" ? result : "");
+  
+};
+
+/** 
+ * unfortunately tw forces us to specify params in advance so I
+ * will reserve some argument slots here.
+ * @private
+ */
+function getParamSlots(maxArgs) {
+  
+  var arr = [];
+  
+  for(var i = 0; i < maxArgs; i++) {
+    arr.push({ name : ("arg" + i) });
+  };
+  
+  return arr;
+  
+};
+
+/**
+ * In connection with tiddlymap, this macro allows us to access
+ * system information from within tiddlers as well as to execute
+ * some util functions.
+ * 
+ * Every command will be called with `this` pointing to the current
+ * MacroCallWidget instance!
+ * 
+ * @private
+ */ 
+var command = utils.makeHashMap();
+
+/**
+ * Returns the basename of the string
+ * 
+ * @see {@link utils.basename}
+ */
+command.basename = function(path) {
+  
+  var str = path || this.getVariable("currentTiddler");
+  return utils.getBasename(str);
+                           
+};
+
+/**
+ * TW messes with svg urls so we always use base64 encoding when
+ * a data uri is requested as macro call
+ */
+command.datauri = function(tiddler, type) {
+  
+  return utils.getDataUri(tiddler, type, true);
+  
+};
+
+
+command.testJSON = function(fieldName) {
+  
+  var tObj = $tw.wiki.getTiddler(this.getVariable("currentTiddler"));
+  
+  try {
+    JSON.parse(tObj.fields[fieldName]);
+    return "valid";
+  } catch(SyntaxError) {
+    return "malformed";
+  }
+                           
+};
+
+command.splitAndSelect = function(separator, index) {
+  
+  var str = this.getVariable("currentTiddler");
+  var result = str.split(separator)[index];
+  
+  return (result != null ? result : str);
+                           
+};
+
+command.concat = function() {
+  
+  var str = "";
+  for(var i = 1, l = arguments.length; i < l; i++) {
+    str += arguments[i];
+  }
+  return str;
+                       
+};
+
+command.uuid = function() {
+  
+  return utils.genUUID();
+                       
+};
+
+command.regRepl = function() {
+  
+  var oldStr = this.substVarRefs(arguments[0]);
+  var regStr = arguments[1];
+  var newStr = this.substVarRefs(arguments[2]);
+  var regFlags = this.substVarRefs(arguments[4]);
+  
+  return oldStr.replace(new RegExp(regStr, regFlags), newStr);
+                       
+};
+
+command.halfOfString = function() {
+
+  var str = this.substVarRefs(arguments[0]);
+  if(!str) return "";
+  
+  return str.substr(0, Math.ceil(str.length / 2));
+                       
+};
+
+command.isETyVisible = function(viewNS, eTyFilter, id) {
+  
+  id = command.getETyId.call(this, viewNS, id);
+  return "" + utils.isEdgeTypeMatch(id, eTyFilter);
+
+};
+
+command.getETyId = function(viewNS, id) {
+  
+  id = id || this.getVariable("currentTiddler");
+  return (new EdgeType(id, null, { namespace: viewNS })).id;
+
+};
+
+command.scale = function() {
+  
+  var str = "";
+  for(var i = 1, l = parseInt(arguments[0]); i < l; i++) {
+    str += "[[" + i + "]]";
+  }
+  return str;
+                       
+};
+
+command.mergeFields = function() {
+  
+  var tObj = utils.getTiddler(arguments[0]);
+  var prefix = arguments[1];
+  var separator = arguments[2] || " ";
+
+  if(!tObj) return;
+
+  var fields = utils.getPropertiesByPrefix(tObj.fields, prefix);
+  var str = "";
+  for(var name in fields) {
+    if(typeof fields[name] === "string") {
+      str += fields[name] + separator;
+    }
+  }
+  return str;
+                       
+};
+
+command.option = function(path, unit) {
+  
+  var prop = $tm;
+  var propertyPath = path.split(".");
+
+  for(var i = 0; i < propertyPath.length; i++) {
+    if(typeof prop == "object" && prop[propertyPath[i]]) {
+      prop = prop[propertyPath[i]];
+    }        
+  }
+  
+  // TODO: ugly, use regex
+  if(unit && typeof prop === "string"
+     && utils.hasSubString(unit)
+     && (prop.lastIndexOf(unit) + unit.length) === prop.length) {
+    prop = prop + unit;
+  }
+    
+  return prop;
+                       
+};

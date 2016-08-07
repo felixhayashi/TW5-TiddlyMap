@@ -7,7 +7,18 @@ module-type: library
 @preserve
 
 \*/
-"use strict";module.exports=Url;/**
+
+/*jslint node: true, browser: true */
+/*global $tw: false */
+"use strict";
+
+/*** Exports *******************************************************/
+
+module.exports = Url;
+
+/*** Code **********************************************************/
+
+/**
  * <<<
  * Lightweight URL manipulation with JavaScript. This library is 
  * independent of any other libraries and has pretty simple interface
@@ -22,4 +33,274 @@ module-type: library
  * @class
  * @param {string} url
  */
-function Url(t){this.paths=function(t){var e="",r=0,o;if(t&&t.length&&t+""!==t){if(this.isAbsolute()){e="/"}for(o=t.length;r<o;r++){t[r]=encode(t[r])}this.path=e+t.join("/")}t=(this.path.charAt(0)==="/"?this.path.slice(1):this.path).split("/");for(r=0,o=t.length;r<o;r++){t[r]=decode(t[r])}return t};this.encode=encode;this.decode=decode;this.isAbsolute=function(){return this.protocol||this.path.charAt(0)==="/"};this.toString=function(){return(this.protocol&&this.protocol+"://")+(this.user&&encode(this.user)+(this.pass&&":"+encode(this.pass))+"@")+(this.host&&this.host)+(this.port&&":"+this.port)+(this.path&&this.path)+(this.query.toString()&&"?"+this.query)+(this.hash&&"#"+encode(this.hash))};parse(this,t)}var map={protocol:"protocol",host:"hostname",port:"port",path:"pathname",query:"search",hash:"hash"},defaultPorts={ftp:21,gopher:70,http:80,https:443,ws:80,wss:443},parse=function(t,e){var r=document,o=r.createElement("a"),e=e||r.location.href,s=e.match(/\/\/(.*?)(?::(.*?))?@/)||[],i;o.href=e;for(i in map){t[i]=o[map[i]]||""}t.protocol=t.protocol.replace(/:$/,"");t.query=t.query.replace(/^\?/,"");t.hash=decode(t.hash.replace(/^#/,""));t.user=decode(s[1]||"");t.pass=decode(s[2]||"");t.port=defaultPorts[t.protocol]==t.port||t.port==0?"":t.port;if(!t.protocol&&!/^([a-z]+:)?\/\//.test(e)){var h=new Url(r.location.href.match(/(.*\/)/)[0]),n=h.path.split("/"),a=t.path.split("/"),c=["protocol","user","pass","host","port"],p=c.length;n.pop();for(i=0;i<p;i++){t[c[i]]=h[c[i]]}while(a[0]==".."){n.pop();a.shift()}t.path=(e.charAt(0)!="/"?n.join("/"):"")+"/"+a.join("/")}else{t.path=t.path.replace(/^\/?/,"/")}t.paths((t.path.charAt(0)=="/"?t.path.slice(1):t.path).split("/"));parseQs(t)},encode=function(t){return encodeURIComponent(t).replace(/'/g,"%27")},decode=function(t){t=t.replace(/\+/g," ");t=t.replace(/%([ef][0-9a-f])%([89ab][0-9a-f])%([89ab][0-9a-f])/gi,function(t,e,r,o){var s=parseInt(e,16)-224,i=parseInt(r,16)-128;if(s==0&&i<32){return t}var h=parseInt(o,16)-128,n=(s<<12)+(i<<6)+h;if(n>65535){return t}return String.fromCharCode(n)});t=t.replace(/%([cd][0-9a-f])%([89ab][0-9a-f])/gi,function(t,e,r){var o=parseInt(e,16)-192;if(o<2){return t}var s=parseInt(r,16)-128;return String.fromCharCode((o<<6)+s)});t=t.replace(/%([0-7][0-9a-f])/gi,function(t,e){return String.fromCharCode(parseInt(e,16))});return t},parseQs=function(t){var e=t.query;t.query=new function(t){var e=/([^=&]+)(=([^&]*))?/g,r;while(r=e.exec(t)){var o=decodeURIComponent(r[1].replace(/\+/g," ")),s=r[3]?decode(r[3]):"";if(this[o]!=null){if(!(this[o]instanceof Array)){this[o]=[this[o]]}this[o].push(s)}else{this[o]=s}}this.clear=function(){for(var t in this){if(!(this[t]instanceof Function)){delete this[t]}}};this.count=function(){var t=0,e;for(e in this){if(!(this[e]instanceof Function)){t++}}return t};this.isEmpty=function(){return this.count()===0};this.toString=function(){var t="",e=encode,r,o;for(r in this){if(this[r]instanceof Function){continue}if(this[r]instanceof Array){var s=this[r].length;if(s){for(o=0;o<s;o++){t+=t?"&":"";t+=e(r)+"="+e(this[r][o])}}else{t+=(t?"&":"")+e(r)+"="}}else{t+=t?"&":"";t+=e(r)+"="+e(this[r])}}return t}}(e)};
+function Url( url) {
+  this.paths = function( paths) {
+    var prefix = '', i = 0, s;
+
+    if (paths && paths.length && paths + '' !== paths) {
+      if (this.isAbsolute()) {
+        prefix = '/';
+      }
+
+      for (s = paths.length; i < s; i++) {
+        paths[i] = encode(paths[i]);
+      }
+
+      this.path = prefix + paths.join('/');
+    }
+
+    paths = (this.path.charAt(0) === '/' ?
+      this.path.slice(1) : this.path).split('/');
+
+    for (i = 0, s = paths.length; i < s; i++) {
+      paths[i] = decode(paths[i]);
+    }
+
+    return paths;
+  };
+
+  this.encode = encode;
+  this.decode = decode;
+
+  this.isAbsolute = function() {
+    return this.protocol || this.path.charAt(0) === '/';
+  };
+
+  this.toString = function() {
+    return (
+      (this.protocol && (this.protocol + '://')) +
+      (this.user && (
+        encode(this.user) + (this.pass && (':' + encode(this.pass))
+      ) + '@')) +
+      (this.host && this.host) +
+      (this.port && (':' + this.port)) +
+      (this.path && this.path) +
+      (this.query.toString() && ('?' + this.query)) +
+      (this.hash && ('#' + encode(this.hash)))
+    );
+  };
+
+  parse( this, url);
+};
+
+var
+    // mapping between what we want and <a> element properties
+    map = {
+      protocol : 'protocol',
+      host     : 'hostname',
+      port     : 'port',
+      path     : 'pathname',
+      query    : 'search',
+      hash     : 'hash'
+    },
+
+    defaultPorts = {
+      "ftp"    : 21,
+      "gopher" : 70,
+      "http"   : 80,
+      "https"  : 443,
+      "ws"     : 80,
+      "wss"    : 443
+    },
+
+    parse = function( self, url) {
+      var
+        d      = document,
+        link   = d.createElement( 'a'),
+        url    = url || d.location.href,
+        auth   = url.match( /\/\/(.*?)(?::(.*?))?@/) || [],
+        i
+      ;
+
+      link.href = url;
+
+      for (i in map) {
+        self[i] = link[map[i]] || '';
+      }
+
+      // fix-up some parts
+      self.protocol = self.protocol.replace( /:$/, '');
+      self.query    = self.query.replace( /^\?/, '');
+      self.hash     = decode(self.hash.replace( /^#/, ''));
+      self.user     = decode(auth[1] || '');
+      self.pass     = decode(auth[2] || '');
+      self.port     = (
+        defaultPorts[self.protocol] == self.port || self.port == 0
+      ) ? '' : self.port; // IE fix, Android browser fix
+
+      if (!self.protocol && !/^([a-z]+:)?\/\//.test( url)) {
+        // is IE and path is relative
+        var
+          base     = new Url( d.location.href.match(/(.*\/)/)[0]),
+          basePath = base.path.split( '/'),
+          selfPath = self.path.split( '/'),
+          props = ['protocol','user','pass','host','port'],
+          s = props.length
+        ;
+
+        basePath.pop();
+
+        for (i = 0; i < s; i++) {
+          self[props[i]] = base[props[i]];
+        }
+
+        while (selfPath[0] == '..') { // skip all "../
+          basePath.pop();
+          selfPath.shift();
+        }
+
+        self.path =
+          (url.charAt(0) != '/' ? basePath.join( '/') : '') +
+          '/' + selfPath.join( '/')
+        ;
+      }
+
+      else {
+        // fix absolute URL's path in IE
+        self.path = self.path.replace( /^\/?/, '/');
+      }
+
+      self.paths((self.path.charAt(0) == '/' ?
+        self.path.slice(1) : self.path).split('/')
+      );
+
+      parseQs( self);
+    },
+
+    encode = function(s) {
+      return encodeURIComponent(s).replace(/'/g, '%27');
+    },
+
+    decode = function(s) {
+      s = s.replace( /\+/g, ' ');
+
+      s = s.replace(/%([ef][0-9a-f])%([89ab][0-9a-f])%([89ab][0-9a-f])/gi,
+        function( code, hex1, hex2, hex3) {
+          var
+            n1 = parseInt( hex1, 16) - 0xE0,
+            n2 = parseInt( hex2, 16) - 0x80
+          ;
+
+          if (n1 == 0 && n2 < 32) {
+            return code;
+          }
+
+          var
+            n3 = parseInt( hex3, 16) - 0x80,
+            n = (n1 << 12) + (n2 << 6) + n3
+          ;
+
+          if (n > 0xFFFF) {
+            return code;
+          }
+
+          return String.fromCharCode( n);
+        }
+      );
+
+      s = s.replace( /%([cd][0-9a-f])%([89ab][0-9a-f])/gi,
+        function( code, hex1, hex2) {
+          var n1 = parseInt(hex1, 16) - 0xC0;
+  
+          if (n1 < 2) {
+            return code;
+          }
+  
+          var n2 = parseInt(hex2, 16) - 0x80;
+  
+          return String.fromCharCode( (n1 << 6) + n2);
+        }
+      );
+
+      s = s.replace( /%([0-7][0-9a-f])/gi,
+        function( code, hex) {
+          return String.fromCharCode( parseInt(hex, 16));
+        }
+      );
+
+      return s;
+    },
+
+    parseQs = function( self) {
+      var qs = self.query;
+
+      self.query = new (function( qs) {
+        var re = /([^=&]+)(=([^&]*))?/g, match;
+
+        while ((match = re.exec( qs))) {
+          var
+            key = decodeURIComponent(match[1].replace(/\+/g, ' ')),
+            value = match[3] ? decode(match[3]) : ''
+          ;
+
+          if (this[key] != null) {
+            if (!(this[key] instanceof Array)) {
+              this[key] = [this[key]];
+            }
+
+            this[key].push( value);
+          }
+
+          else {
+            this[key] = value;
+          }
+        }
+
+        this.clear = function() {
+          for (var key in this) {
+            if (!(this[key] instanceof Function)) {
+              delete this[key];
+            }
+          }
+        };
+
+        this.count = function() {
+          var count = 0, key;
+          for (key in this) {
+            if (!(this[key] instanceof Function)) {
+              count++;
+            }
+          }
+          return count;
+        };
+
+        this.isEmpty = function() {
+          return this.count() === 0;  
+        };
+
+        this.toString = function() {
+          var s = '', e = encode, i, ii;
+
+          for (i in this) {
+            if (this[i] instanceof Function) {
+              continue;
+            }
+
+            if (this[i] instanceof Array) {
+              var len = this[i].length;
+
+              if (len) {
+                for (ii = 0; ii < len; ii++) {
+                  s += s ? '&' : '';
+                  s += e( i) + '=' + e( this[i][ii]);
+                }
+              }
+
+              else {
+                // parameter is an empty array, so treat as
+                // an empty argument
+                s += (s ? '&' : '') + e( i) + '=';
+              }
+            }
+
+            else {
+              s += s ? '&' : '';
+              s += e( i) + '=' + e( this[i]);
+            }
+          }
+
+          return s;
+        };
+      })( qs);
+    }
+  ;

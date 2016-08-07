@@ -7,4 +7,413 @@ module-type: startup
 @preserve
 
 \*/
-"use strict";exports.name="tmap.listener";exports.platforms=["browser"];exports.after=["rootwidget","tmap.caretaker"];exports.before=["story"];exports.synchronous=true;exports.startup=function(){new GlobalListener};var NodeType=require("$:/plugins/felixhayashi/tiddlymap/js/NodeType");var EdgeType=require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");var utils=require("$:/plugins/felixhayashi/tiddlymap/js/utils");var visDefConf=require("$:/plugins/felixhayashi/tiddlymap/js/config/vis");function GlobalListener(){this.wiki=$tw.wiki;utils.addTWlisteners({"tmap:tm-remove-edge":this.handleRemoveEdge,"tmap:tm-load-type-form":this.handleLoadTypeForm,"tmap:tm-save-type-form":this.handleSaveTypeForm,"tmap:tm-create-type":this.handleCreateType,"tmap:tm-create-edge":this.handleCreateEdge,"tmap:tm-suppress-dialog":this.handleSuppressDialog,"tmap:tm-generate-widget":this.handleGenerateWidget,"tmap:tm-download-graph":this.handleDownloadGraph,"tmap:tm-configure-system":this.handleConfigureSystem,"tmap:tm-manage-edge-types":this.handleOpenTypeManager,"tmap:tm-manage-node-types":this.handleOpenTypeManager,"tmap:tm-cancel-dialog":this.handleCancelDialog,"tmap:tm-clear-tiddler":this.handleClearTiddler,"tmap:tm-merge-tiddlers":this.handleMixTiddlers,"tmap:tm-confirm-dialog":this.handleConfirmDialog},$tw.rootWidget,this)}GlobalListener.prototype.handleCancelDialog=function(e){utils.setField(e.param,"text","")};GlobalListener.prototype.handleClearTiddler=function(e){var t=e.paramObject;if(!t||!t.title)return;var a=utils.getTiddler(t.title);var i=a?a.fields:{};var r=t.keep?t.keep.split():[];var d={title:t.title,text:""};for(var l=r.length;l--;){var s=r[l];d[s]=i[s]}$tw.wiki.deleteTiddler(t.title);$tw.wiki.addTiddler(new $tw.Tiddler(d))};GlobalListener.prototype.handleMixTiddlers=function(e){var t=e.paramObject;if(!t||!t.tiddlers)return;var a=$tw.utils.parseStringArray(t.tiddlers);var i=utils.getMergedTiddlers(a,t.output);$tw.wiki.addTiddler(i)};GlobalListener.prototype.handleConfirmDialog=function(e){utils.setField(e.param,"text","1")};GlobalListener.prototype.handleSuppressDialog=function(e){if(utils.isTrue(e.paramObject.suppress,false)){utils.setEntry($tm.ref.sysUserConf,"suppressedDialogs."+e.paramObject.dialog,true)}};GlobalListener.prototype.handleDownloadGraph=function(e){var t=$tm.adapter.getGraph({view:e.paramObject.view});t.nodes=utils.convert(t.nodes,"array");t.edges=utils.convert(t.edges,"array");var a="$:/temp/tmap/export";utils.setField(a,"text",JSON.stringify(t,null,2));$tw.rootWidget.dispatchEvent({type:"tm-download-file",param:a,paramObject:{filename:e.paramObject.view+".json"}})};GlobalListener.prototype.handleConfigureSystem=function(){var e=$tm.adapter.getAllPotentialNodes();var t=$tm.adapter.getEdgesForSet(e);var a=$tw.wiki.getTiddler($tm.path.pluginRoot).fields;var i=$tw.wiki.getTiddlerData($tm.ref.sysMeta);var r=utils.getTiddler($tm.ref.liveTab).hasTag("$:/tags/SideBar");var d={numberOfNodes:""+e.length,numberOfEdges:""+Object.keys(t).length,pluginVersion:"v"+a.version,dataStructureVersion:"v"+i.dataStructureState,dialog:{preselects:{liveTab:""+r,"vis-inherited":JSON.stringify(visDefConf),"config.vis":utils.getText($tm.ref.visUserConf),"config.sys":$tm.config.sys}}};var l="globalConfig";$tm.dialogManager.open(l,d,function(e,t){if(!e)return;var a=utils.getPropertiesByPrefix(t.fields,"config.sys.",true);$tw.wiki.setTiddlerData($tm.ref.sysUserConf,a);if(utils.isTrue(t.fields.liveTab,false)){utils.setField($tm.ref.liveTab,"tags","$:/tags/SideBar")}else{$tw.wiki.deleteTiddler($tm.ref.liveTab)}utils.setField($tm.ref.visUserConf,"text",t.fields["config.vis"])}.bind(this))};GlobalListener.prototype.handleGenerateWidget=function(e){if(!e.paramObject)e.paramObject={};var t={dialog:{preselects:{view:e.paramObject.view||$tm.misc.defaultViewLabel}}};$tm.dialogManager.open("widgetCodeGenerator",t)};GlobalListener.prototype.handleRemoveEdge=function(e){$tm.adapter.deleteEdge(e.paramObject)};GlobalListener.prototype.handleCreateEdge=function(e){var t=e.paramObject.from;var a=e.paramObject.to;var i=e.paramObject.force;if(!t||!a)return;if(utils.tiddlerExists(t)&&utils.tiddlerExists(a)||i){utils.addTiddler(a);utils.addTiddler(t);var r={from:$tm.adapter.makeNode(t).id,to:$tm.adapter.makeNode(a).id,type:e.paramObject.label,id:e.paramObject.id};$tm.adapter.insertEdge(r);$tm.notify("Edge inserted")}};GlobalListener.prototype.handleOpenTypeManager=function(e){if(!e.paramObject)e.paramObject={};var t=e.type.match(/tmap:tm-(.*)/)[1];if(t==="manage-edge-types"){var a="Edge-Type Manager";var i=$tm.selector.allEdgeTypes;var r=$tm.path.edgeTypes}else{var a="Node-Type Manager";var i=$tm.selector.allNodeTypes;var r=$tm.path.nodeTypes}var d={mode:t,topic:a,searchSelector:i,typeRootPath:r};var l=$tm.dialogManager.open("MapElementTypeManager",d);if(e.paramObject.type){this.handleLoadTypeForm({paramObject:{mode:t,id:e.paramObject.type,output:l.fields["output"]}})}};GlobalListener.prototype.handleLoadTypeForm=function(e){var t=e.paramObject.output;var a=e.paramObject.mode==="manage-edge-types"?new EdgeType(e.paramObject.id):new NodeType(e.paramObject.id);a.save(t);if(e.paramObject.mode==="manage-edge-types"){var i=$tm.adapter.selectEdgesByType(a);var r=Object.keys(i).length;utils.setField(t,"temp.usageCount",r)}$tw.wiki.addTiddler(new $tw.Tiddler(utils.getTiddler(t),{typeTRef:a.fullPath,"temp.idImmutable":a.isShipped?"true":"","temp.newId":a.id,"vis-inherited":JSON.stringify($tm.config.vis)}));utils.deleteByPrefix("$:/state/tabs/MapElementTypeManager")};GlobalListener.prototype.handleSaveTypeForm=function(e){var t=utils.getTiddler(e.paramObject.output);if(!t)return;var a=e.paramObject.mode;var i=a==="manage-edge-types"?new EdgeType(t.fields.id):new NodeType(t.fields.id);if(utils.isTrue(t.fields["temp.deleteType"],false)){this.deleteType(a,i,t)}else{this.saveType(a,i,t)}};GlobalListener.prototype.deleteType=function(e,t,a){$tm.logger("debug","Deleting type",t);if(e==="manage-edge-types"){$tm.adapter._processEdgesWithType(t,{action:"delete"})}else{$tm.adapter.removeNodeType(t)}this.wiki.addTiddler(new $tw.Tiddler({title:utils.getTiddlerRef(a)}));$tm.notify("Deleted type")};GlobalListener.prototype.saveType=function(e,t,a){var i=utils.getTiddler(a);t.loadFromTiddler(i);t.save();var r=i.fields["temp.newId"];if(r&&r!==i.fields["id"]){if(e==="manage-edge-types"){$tm.adapter._processEdgesWithType(t,{action:"rename",newName:r})}else{var d=new NodeType(r);d.load(t);d.save();$tw.wiki.deleteTiddler(t.fullPath)}utils.setField(i,"id",r)}$tm.notify("Saved type data")};GlobalListener.prototype.handleCreateType=function(e){var t=e.paramObject.id||"New type";var a=e.paramObject.mode==="manage-edge-types"?new EdgeType(t):new NodeType(t);a.save();this.handleLoadTypeForm({paramObject:{id:a.id,mode:e.paramObject.mode,output:e.paramObject.output}})};GlobalListener.prototype.getTypeFromEvent=function(e){return e.paramObject.mode==="manage-edge-types"?new EdgeType(e.paramObject.id):new NodeType(e.paramObject.id)};
+  
+/*jslint node: true, browser: true */
+/*global $tw: false */
+"use strict";
+
+/*** Exports *******************************************************/
+
+exports.name = "tmap.listener";
+exports.platforms = [ "browser" ];
+exports.after = [ "rootwidget", "tmap.caretaker" ];
+exports.before = [ "story" ];
+exports.synchronous = true;
+exports.startup = function() {
+  // will register its lister functions to the root widget
+  new GlobalListener();
+};
+
+/*** Imports *******************************************************/
+
+var NodeType   = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType");
+var EdgeType   = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
+var utils      = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+var visDefConf = require("$:/plugins/felixhayashi/tiddlymap/js/config/vis");
+
+/*** Code **********************************************************/
+
+/**
+ * @class
+ */
+function GlobalListener() {
+    
+  // alias
+  this.wiki = $tw.wiki;
+    
+  // add handlers to the root widget to make them available from everywhere
+  utils.addTWlisteners({ 
+    "tmap:tm-remove-edge": this.handleRemoveEdge,
+    "tmap:tm-load-type-form": this.handleLoadTypeForm,
+    "tmap:tm-save-type-form": this.handleSaveTypeForm,
+    "tmap:tm-create-type": this.handleCreateType,
+    "tmap:tm-create-edge": this.handleCreateEdge,
+    "tmap:tm-suppress-dialog": this.handleSuppressDialog,
+    "tmap:tm-generate-widget": this.handleGenerateWidget,
+    "tmap:tm-download-graph": this.handleDownloadGraph,
+    "tmap:tm-configure-system": this.handleConfigureSystem,
+    "tmap:tm-manage-edge-types": this.handleOpenTypeManager,
+    "tmap:tm-manage-node-types": this.handleOpenTypeManager,
+    "tmap:tm-cancel-dialog": this.handleCancelDialog,
+    "tmap:tm-clear-tiddler": this.handleClearTiddler,
+    "tmap:tm-merge-tiddlers": this.handleMixTiddlers,
+    "tmap:tm-confirm-dialog": this.handleConfirmDialog
+  }, $tw.rootWidget, this);
+  
+};
+
+GlobalListener.prototype.handleCancelDialog = function(event) {
+  utils.setField(event.param, "text", "");
+};
+
+GlobalListener.prototype.handleClearTiddler = function(event) {
+  
+  var params = event.paramObject;
+  if(!params || !params.title) return;
+  
+  var tObj = utils.getTiddler(params.title);
+  var originalFields = tObj ? tObj.fields : {};
+  var fieldsToKeep = params.keep ? params.keep.split() : [];
+  var cloneFields = {
+    title: params.title,
+    text: "" // see https://github.com/Jermolene/TiddlyWiki5/issues/2025
+  };
+  
+  for(var i = fieldsToKeep.length; i--;) {
+    var fieldName = fieldsToKeep[i];
+    cloneFields[fieldName] = originalFields[fieldName];
+  }
+  
+  $tw.wiki.deleteTiddler(params.title);
+  $tw.wiki.addTiddler(new $tw.Tiddler(cloneFields));
+  
+};
+
+GlobalListener.prototype.handleMixTiddlers = function(event) {
+  
+  var params = event.paramObject;
+  if(!params || !params.tiddlers) return;
+  
+  var tiddlers = $tw.utils.parseStringArray(params.tiddlers);
+  var tObj = utils.getMergedTiddlers(tiddlers, params.output);
+                                     
+  $tw.wiki.addTiddler(tObj);
+  
+};
+
+GlobalListener.prototype.handleConfirmDialog = function(event) {
+  
+  utils.setField(event.param, "text", "1");
+  
+};
+  
+GlobalListener.prototype.handleSuppressDialog = function(event) {
+
+  if(utils.isTrue(event.paramObject.suppress, false)) {
+    utils.setEntry(
+        $tm.ref.sysUserConf,
+        "suppressedDialogs." + event.paramObject.dialog,
+        true
+    );
+  }
+  
+};
+
+GlobalListener.prototype.handleDownloadGraph = function(event) {
+
+  var graph = $tm.adapter.getGraph({ view: event.paramObject.view });  
+  
+  graph.nodes = utils.convert(graph.nodes, "array");
+  graph.edges = utils.convert(graph.edges, "array");
+  
+  var tRef = "$:/temp/tmap/export";
+
+  utils.setField(tRef, "text", JSON.stringify(graph, null, 2));
+    
+  $tw.rootWidget.dispatchEvent({
+    type: "tm-download-file",
+    param: tRef,
+    paramObject: {
+      filename: event.paramObject.view + ".json"
+    }
+  });
+  
+};
+
+GlobalListener.prototype.handleConfigureSystem = function() {
+
+  var allTiddlers = $tm.adapter.getAllPotentialNodes();
+  var allEdges = $tm.adapter.getEdgesForSet(allTiddlers);
+  var plugin = $tw.wiki.getTiddler($tm.path.pluginRoot).fields;
+  var meta = $tw.wiki.getTiddlerData($tm.ref.sysMeta);
+  var hasLiveTab = utils.getTiddler($tm.ref.liveTab)
+                        .hasTag("$:/tags/SideBar");
+                        
+  var args = {
+    numberOfNodes: "" + allTiddlers.length,
+    numberOfEdges: "" + Object.keys(allEdges).length,
+    pluginVersion: "v" + plugin.version,
+    dataStructureVersion: "v" + meta.dataStructureState,
+    dialog: {
+      preselects: {
+        "liveTab": "" + hasLiveTab,
+        "vis-inherited": JSON.stringify(visDefConf),
+        "config.vis": utils.getText($tm.ref.visUserConf),
+        "config.sys": $tm.config.sys
+      }
+    }
+  };
+
+  var name = "globalConfig";
+  $tm.dialogManager.open(name, args, function(isConfirmed, outTObj) {
+    
+    if(!isConfirmed) return;
+      
+    var config = utils.getPropertiesByPrefix(outTObj.fields,
+                                             "config.sys.",
+                                             true);
+                                             
+    // CAREFUL: this is a data tiddler!
+    $tw.wiki.setTiddlerData($tm.ref.sysUserConf, config);
+
+    // show or hide the live tab; to hide the live tab, we override
+    // the shadow tiddler; to show it, we remove the overlay again.
+    if(utils.isTrue(outTObj.fields.liveTab, false)) {
+      utils.setField($tm.ref.liveTab, "tags", "$:/tags/SideBar");
+    } else {
+      $tw.wiki.deleteTiddler($tm.ref.liveTab);
+    }
+    
+    // tw doesn't translate the json to an object so this is
+    // already a string
+    utils.setField($tm.ref.visUserConf,
+                   "text",
+                   outTObj.fields["config.vis"]);
+            
+
+
+  }.bind(this));
+  
+};
+
+GlobalListener.prototype.handleGenerateWidget = function(event) {
+  
+  if(!event.paramObject) event.paramObject = {};
+  
+  var options = {
+    dialog: {
+      preselects: {
+        view: (event.paramObject.view || $tm.misc.defaultViewLabel)
+      }
+    }
+  };
+  $tm.dialogManager.open("widgetCodeGenerator", options);
+  
+};
+
+GlobalListener.prototype.handleRemoveEdge = function(event) {
+  
+  $tm.adapter.deleteEdge(event.paramObject);
+  
+};
+
+GlobalListener.prototype.handleCreateEdge = function(event) {
+
+  var from = event.paramObject.from;
+  var to = event.paramObject.to;
+  var isForce = event.paramObject.force;
+  
+  if(!from || !to) return;
+  
+  if((utils.tiddlerExists(from) && utils.tiddlerExists(to)) || isForce) {
+
+    // will not override any existing tiddlers…
+    utils.addTiddler(to);
+    utils.addTiddler(from);
+
+    var edge = {
+      from: $tm.adapter.makeNode(from).id,
+      to: $tm.adapter.makeNode(to).id,
+      type: event.paramObject.label,
+      id: event.paramObject.id
+    }
+    
+    $tm.adapter.insertEdge(edge);
+    $tm.notify("Edge inserted");
+    
+  }
+   
+};
+
+GlobalListener.prototype.handleOpenTypeManager = function(event) {
+    
+  if(!event.paramObject) event.paramObject = {};
+  
+  // either "manage-edge-types" or "manage-node-types"
+  var mode = event.type.match(/tmap:tm-(.*)/)[1];
+  
+  if(mode === "manage-edge-types") {
+    var topic = "Edge-Type Manager";
+    var allTypesSelector = $tm.selector.allEdgeTypes;
+    var typeRootPath = $tm.path.edgeTypes;
+  } else {
+    var topic = "Node-Type Manager";
+    var allTypesSelector = $tm.selector.allNodeTypes;
+    var typeRootPath = $tm.path.nodeTypes;
+  }
+                          
+  var args = {
+    mode: mode,
+    topic: topic,
+    searchSelector: allTypesSelector,
+    typeRootPath: typeRootPath
+  };
+  
+  var dialogTObj = $tm.dialogManager.open("MapElementTypeManager", args);
+  
+  if(event.paramObject.type) {
+    this.handleLoadTypeForm({
+      paramObject: {
+        mode: mode,
+        id: event.paramObject.type,
+        output: dialogTObj.fields["output"]
+      }
+    });
+  }
+  
+};
+
+GlobalListener.prototype.handleLoadTypeForm = function(event) {
+  
+  var outTRef = event.paramObject.output;
+    
+  var type = (event.paramObject.mode === "manage-edge-types"
+              ? new EdgeType(event.paramObject.id)
+              : new NodeType(event.paramObject.id));
+  
+  // inject all the type data as fields into the dialog output
+  type.save(outTRef);
+  
+  // fields that need preprocessing
+  
+  if(event.paramObject.mode === "manage-edge-types") {
+    var usage = $tm.adapter.selectEdgesByType(type);
+    var count = Object.keys(usage).length;
+    utils.setField(outTRef, "temp.usageCount", count);
+  }
+  
+  $tw.wiki.addTiddler(new $tw.Tiddler(
+    utils.getTiddler(outTRef),
+    {
+      "typeTRef": type.fullPath,
+      "temp.idImmutable": (type.isShipped ? "true" : ""),
+      "temp.newId": type.id,
+      "vis-inherited": JSON.stringify($tm.config.vis)
+    }
+  ));
+
+  // reset the tabs to default
+  utils.deleteByPrefix("$:/state/tabs/MapElementTypeManager");
+  
+};
+
+GlobalListener.prototype.handleSaveTypeForm = function(event) {
+  
+  var tObj = utils.getTiddler(event.paramObject.output);  
+  if(!tObj) return;
+  
+  var mode = event.paramObject.mode;
+  var type = (mode === "manage-edge-types"
+              ? new EdgeType(tObj.fields.id)
+              : new NodeType(tObj.fields.id));
+  
+  if(utils.isTrue(tObj.fields["temp.deleteType"], false)) {
+    this.deleteType(mode, type, tObj);
+  } else {
+    this.saveType(mode, type, tObj);
+  }
+  
+};
+
+GlobalListener.prototype.deleteType = function(mode, type, dialogOutput) {
+  
+  $tm.logger("debug", "Deleting type", type);
+      
+  if(mode === "manage-edge-types") {
+    $tm.adapter._processEdgesWithType(type, { action: "delete" });
+  } else {
+    $tm.adapter.removeNodeType(type);
+  }
+  
+  this.wiki.addTiddler(new $tw.Tiddler({
+    title: utils.getTiddlerRef(dialogOutput)
+  }));
+  
+  $tm.notify("Deleted type");
+  
+};
+
+GlobalListener.prototype.saveType = function(mode, type, dialogOutput) {
+  
+  var tObj = utils.getTiddler(dialogOutput);
+  
+  // update the type with the form data
+  type.loadFromTiddler(tObj);
+  type.save();
+    
+  var newId = tObj.fields["temp.newId"];
+  
+  if(newId && newId !== tObj.fields["id"]) { //renamed
+    
+    if(mode === "manage-edge-types") {
+      
+      $tm.adapter._processEdgesWithType(type, {
+        action: "rename",
+        newName: newId
+      });
+      
+    } else {
+      
+      var newType = new NodeType(newId);
+      newType.load(type);
+      newType.save();
+      $tw.wiki.deleteTiddler(type.fullPath);
+      
+    }
+    
+    utils.setField(tObj, "id", newId);
+    
+  }
+    
+  $tm.notify("Saved type data");
+  
+};
+
+GlobalListener.prototype.handleCreateType = function(event) {
+  
+  var id = event.paramObject.id || "New type";
+  var type = (event.paramObject.mode === "manage-edge-types"
+              ? new EdgeType(id)
+              : new NodeType(id));
+  type.save();
+
+  this.handleLoadTypeForm({
+    paramObject: {
+      id: type.id,
+      mode: event.paramObject.mode,
+      output: event.paramObject.output
+    }
+  });
+  
+};
+
+/**
+ * Helper
+ */
+GlobalListener.prototype.getTypeFromEvent = function(event) {
+    
+  return (event.paramObject.mode === "manage-edge-types"
+          ? new EdgeType(event.paramObject.id)
+          : new NodeType(event.paramObject.id));
+          
+};

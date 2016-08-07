@@ -7,4 +7,665 @@ module-type: startup
 @preserve
 
 \*/
-"use strict";exports.name="tmap.caretaker";exports.platforms=["browser"];exports.after=["startup","tmap.environment"];exports.before=["rootwidget"];exports.synchronous=true;exports.startup=startup;var visConfig=require("$:/plugins/felixhayashi/tiddlymap/js/config/vis");var utils=require("$:/plugins/felixhayashi/tiddlymap/js/utils");var fixer=require("$:/plugins/felixhayashi/tiddlymap/js/fixer");var Adapter=require("$:/plugins/felixhayashi/tiddlymap/js/Adapter");var DialogManager=require("$:/plugins/felixhayashi/tiddlymap/js/DialogManager");var CallbackManager=require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager");var ViewAbstraction=require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");var EdgeType=require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");var NodeType=require("$:/plugins/felixhayashi/tiddlymap/js/NodeType");var vis=require("$:/plugins/felixhayashi/vis/vis.js");function startup(){$tm.utils=utils;$tm.keycharm=vis.keycharm;$tm.NodeType=NodeType;$tm.EdgeType=EdgeType;$tm.ViewAbstraction=ViewAbstraction;$tm.url=new $tm.utils.URL(window.location.href);updateGlobals();createMetaFile();cleanup();attachIndeces($tm);$tm.updateTree=updateTree;setDefaults();$tm.adapter=new Adapter;fixer.fix();$tm.callbackManager=new CallbackManager;$tm.dialogManager=new DialogManager($tm.callbackManager);$tm.registry=[];window.setInterval(routineCheck,5e3);registerChangeListener($tm.callbackManager);registerMousemoveListener();registerClickListener();maybePrepareForFullscreenStart($tm.url);$tm.logger("warn","TiddlyMap's caretaker successfully started")}var attachOptions=function(e){var t=e;if(!t.config)t.config=utils.makeHashMap();t.config.sys=utils.merge(t.config.sys,utils.unflatten($tw.wiki.getTiddlerData(t.ref.sysUserConf)));t.config.vis=utils.merge({},visConfig,utils.parseFieldData(t.ref.visUserConf));if(!t.field)t.field=utils.makeHashMap();$tw.utils.extend(t.field,t.config.sys.field)};var attachIndeces=function(e){$tm.start("Attaching Indeces");if(!e.indeces){e.indeces={};var t=$tm.path.pluginRoot;e.indeces.tmapTiddlers=$tw.wiki.getPluginInfo(t).tiddlers}var i=$tw.wiki.allTitles();updateTiddlerVsIdIndeces(e.indeces,i);updateNodeTypesIndeces(e.indeces);updateEdgeTypesIndeces(e.indeces);$tm.stop("Attaching Indeces")};var updateTiddlerVsIdIndeces=function(e,t){e=e||$tm.indeces;t=t||$tw.wiki.allTitles();fixer.fixId();var i=e.tById={};var a=e.idByT={};$tw.wiki.each(function(e,t){if(utils.isSystemOrDraft(e))return;var r=e.fields["tmap.id"];if(!r){r=utils.genUUID();utils.setField(e,"tmap.id",r)}i[r]=t;a[t]=r})};var updateNodeTypesIndeces=function(e){e=e||$tm.indeces;var t=$tm.path.nodeTypes;var i=e.glNTy=[];$tw.wiki.eachTiddlerPlusShadows(function(e,a){if(utils.startsWith(a,t)){i.push(new NodeType(a))}});i.sort(function(e,t){return e.priority-t.priority})};var updateEdgeTypesIndeces=function(e){e=e||$tm.indeces;var t=$tm.path.edgeTypes;var i=e.allETy=utils.makeHashMap();var a=e.maETyFiNa=utils.makeHashMap();var r=utils.getLookupTable($tm.misc.magicETyNamespaces);$tw.wiki.eachTiddlerPlusShadows(function(e,s){if(utils.startsWith(s,t)){var n=new EdgeType(s);i[n.id]=n;if(r[n.namespace]){a[n.name]=n}}})};var updateAdjacencyList=function(e){};var attachFunctions=function(e){var t=e;var i=function(){};if(utils.isTrue($tm.config.sys.debug,false)&&console){t.logger=function(){if(arguments.length<2)return;var e=Array.prototype.slice.call(arguments);var t=e.shift(e);var i=console.hasOwnProperty(t)?t:"debug";console[i].apply(console,e)};t.start=function(e){console.time("[timer] "+e)};t.stop=function(e){console.timeEnd("[timer] "+e)}}else{t.logger=t.start=t.stop=i}t.notify=utils.isTrue($tm.config.sys.notifications)?utils.notify:i};var routineCheck=function(){for(var e=$tm.registry.length;e--;){var t=$tm.registry[e];if(!t.destruct||!t.isZombieWidget)return;if(t.isZombieWidget()){$tm.logger("warn","a widget will be removed");$tm.registry.splice(e,1);t.destruct()}}};var dispatchUpdates=function(e){var t=$tm.registry;for(var i=t.length;i--;){var a=t[i];if(!a.destruct||!a.isZombieWidget)return;if(a.update&&!a.isZombieWidget()){a.update(e)}}};var checkForDublicates=function(e){var t=e.fields["tmap.id"];if(!t)return;var i=$tm;var a=utils.getTiddlersWithField("tmap.id",t,{limit:2});delete a[e.fields.title];var r=Object.keys(a)[0];if(r){var s={param:{changedTiddler:e.fields.title,existingTiddler:r,id:t}};$tm.dialogManager.open("dublicateIdInfo",s)}if(r){utils.setField(e,"tmap.edges",undefined);$tm.adapter.assignId(e,true)}};var updateGlobals=function(e){attachOptions($tm);attachFunctions($tm);$tm.logger("warn","Rebuilt globals")};var lastCurrentTiddler=null;var updateLiveViewTrigger=function(e){if(e["$:/HistoryList"]){var t=utils.getField("$:/HistoryList","current-tiddler")}else if(e["$:/temp/focussedTiddler"]){var t=utils.getField("$:/temp/focussedTiddler","text")}if(t!=null&&lastCurrentTiddler!==t){lastCurrentTiddler=t;utils.setField("$:/temp/tmap/currentTiddler","text",t)}};var printChanges=function(e,t){if(!utils.isTrue($tm.config.sys.debug,false))return;$tm.logger("warn","=== Refresh "+t+" ===");for(var i in e){var a=e[i].deleted?"[Deleted]":"[Modified]";$tm.logger("warn",a,i,$tw.wiki.getTiddler(i))}};var registerMousemoveListener=function(){$tm.mouse={};var e=function(e){$tm.mouse=e};window.addEventListener("mousemove",e,false)};var registerClickListener=function(){var e=$tm.path.tempPopups;window.addEventListener("click",function(t){var i=utils.getTiddlersByPrefix(e);for(var a=i.length;a--;){if(utils.getText(i[a]))break}if(a===-1)return;if(!$tw.utils.hasClass(t.target,"tc-drop-down")&&!utils.getAncestorWithClass(t.target,"tc-drop-down")){for(var a=i.length;a--;){utils.setText(i[a],"")}}},false)};var updateTree=function(){updateGlobals();updateNodeTypesIndeces();updateEdgeTypesIndeces()};var registerChangeListener=function(e){var t=0;var i={};i[$tm.path.options]=updateGlobals;i[$tm.path.nodeTypes]=updateNodeTypesIndeces;i[$tm.path.edgeTypes]=updateEdgeTypesIndeces;$tw.wiki.addEventListener("change",function(a){$tm.start("Caretaker handling changes");printChanges(a,t++);e.handleChanges(a);var r={changedTiddlers:a};for(var s in a){var n=utils.getTiddler(s);if(n&&n.isDraft())continue;if($tw.wiki.isSystemTiddler(s)){handleSysTidChanges(s,n,r,i)}else{handleTidChanges(s,n,r)}}dispatchUpdates(r);updateLiveViewTrigger(a);$tm.stop("Caretaker handling changes")})};var handleSysTidChanges=function(e,t,i,a){var r=$tm.path;for(var s in a){if(utils.startsWith(e,s)&&!i[s]){$tm.logger("warn","[System change]",s);a[s]();i[s]=true;return}}};var handleTidChanges=function(e,t,i){if(t){checkForDublicates(t);$tm.adapter.assignId(t)}else{var a=$tm.indeces.idByT[e];if(!a)return;var r=utils.getTiddlerWithField("tmap.id",a);if(r){$tm.logger("warn","[Renamed]",e,"into",r)}else{$tm.adapter.deleteNode(a)}}};var cleanup=function(){utils.deleteByPrefix("$:/temp/felixhayashi");utils.deleteByPrefix("$:/temp/tiddlymap");utils.deleteByPrefix("$:/temp/tmap")};var setDefaults=function(){var e=$tm.config.sys.defaultView;if(!e)return;utils.setField($tm.ref.defaultViewHolder,"text",e)};var maybePrepareForFullscreenStart=function(e){if(!e.query["tmap-enlarged"])return;var t=$tm.ref;var i=utils.getTiddlersByPrefix("$:/state/tab/sidebar-")[0];utils.setText(i,t.mainEditor);var a=new ViewAbstraction(e.query["tmap-view"]);if(a.exists()){utils.setField(t.defaultViewHolder,"text",a.getLabel())}};var createMetaFile=function(){if(utils.tiddlerExists($tm.ref.sysMeta))return;$tm.logger("warn","Creating meta file");var e=$tw.wiki.getTiddler($tm.path.pluginRoot);$tw.wiki.setTiddlerData($tm.ref.sysMeta,{originalVersion:e.fields.version,dataStructureState:"0.6.9",showWelcomeMessage:true})};
+
+/*jslint node: true, browser: true */
+/*global $tw: false */
+"use strict";
+
+/*** Exports *******************************************************/
+
+// Export name and synchronous status
+exports.name = "tmap.caretaker";
+exports.platforms = [ "browser" ];
+exports.after = [ "startup", "tmap.environment" ];
+exports.before = [ "rootwidget" ];
+exports.synchronous = true;
+exports.startup = startup;
+
+/*** Imports *******************************************************/
+
+var visConfig       = require("$:/plugins/felixhayashi/tiddlymap/js/config/vis");
+var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+var fixer           = require("$:/plugins/felixhayashi/tiddlymap/js/fixer");
+var Adapter         = require("$:/plugins/felixhayashi/tiddlymap/js/Adapter");
+var DialogManager   = require("$:/plugins/felixhayashi/tiddlymap/js/DialogManager");
+var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager");
+var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
+var EdgeType        = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
+var NodeType        = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType");
+var vis             = require("$:/plugins/felixhayashi/vis/vis.js");
+
+/*** Code **********************************************************/
+
+/**
+ * This module is responsible for registering a global namespace
+ * under $tw and loading (and refreshing) the configuration.
+ * 
+ * Attention: Careful with the order of the function calls in this
+ * functions body!
+ * 
+ */
+function startup() {
+  
+  // register utils
+  $tm.utils = utils;
+  
+  // make classes publicly available
+  $tm.keycharm = vis.keycharm;
+  $tm.NodeType = NodeType;
+  $tm.EdgeType = EdgeType;
+  $tm.ViewAbstraction = ViewAbstraction;
+  
+  // register url
+  $tm.url = new $tm.utils.URL(window.location.href);
+  
+  // build and integrate global options   
+  updateGlobals();
+  
+  // register meta file (if not done yet)
+  createMetaFile();
+
+  // cleanup previous session
+  cleanup();
+  
+  // create indeces
+  attachIndeces($tm);
+  
+  $tm.updateTree = updateTree;
+  
+  // set defaults
+  setDefaults();
+        
+  // attach the adapter object to the tiddlymap namespace
+  $tm.adapter = new Adapter();
+        
+  // Run the fixer to update older wikis
+  fixer.fix();
+    
+  // create global callback and dialog managers 
+  $tm.callbackManager = new CallbackManager();
+  $tm.dialogManager = new DialogManager($tm.callbackManager);
+  
+  // all graphs need to register here. @see routineWalk()
+  $tm.registry = [];
+  window.setInterval(routineCheck, 5000);
+        
+  // AT THE VERY END: register change listener with the callback manager
+  registerChangeListener($tm.callbackManager);
+  
+  // register DOM listeners
+  registerMousemoveListener();
+  registerClickListener();
+  
+  // check for fullscreen directives
+  maybePrepareForFullscreenStart($tm.url);
+  
+  // issue notification
+  $tm.logger("warn", "TiddlyMap's caretaker successfully started");
+  
+};
+
+/**
+ * This function will append the global options to the tree. In case
+ * this function is called again, only the option leafs are rebuild
+ * so a process may safely store a reference to a branch of the option
+ * tree as the reference doesn't change.
+ *
+ * ATTENTION: For the path options, no trailing or double slashes!
+ * This is NOT unix where paths are normalized (// is not rewritten to /).
+ * 
+ * @see 
+ *   - [TW5] Is there a designated place for TW plugins to store stuff in the dom? 
+ *     https://groups.google.com/forum/#!topic/tiddlywikidev/MZZ37XiVcvY
+ * @param {object} parent The root where to insert the options into
+ */  
+var attachOptions = function(parent) {
+                    
+  var p = parent;
+    
+  // default configurations mixed with user config
+  if(!p.config) p.config = utils.makeHashMap();
+
+  // Never modify the imported config objects; instead, merge them
+  // into a new object  
+
+  // attention! it is a tw-data-tiddler!
+  p.config.sys = utils.merge(
+    p.config.sys,
+    utils.unflatten($tw.wiki.getTiddlerData(p.ref.sysUserConf))
+  );
+  
+  // CAREFUL: Never merge directly into the default vis config object
+  p.config.vis = utils.merge(
+    {}, visConfig, utils.parseFieldData(p.ref.visUserConf)
+  );
+
+  // a shortcut for fields property
+  if(!p.field) p.field = utils.makeHashMap();
+  $tw.utils.extend(p.field, p.config.sys.field);
+        
+};
+
+/**
+ * This function will cache/index some tiddler properties as javascript
+ * objects for faster access.
+ */
+var attachIndeces = function(parent) {
+  
+  $tm.start("Attaching Indeces");
+  
+  if(!parent.indeces) {
+    parent.indeces = {};
+    
+    var r = $tm.path.pluginRoot;
+    parent.indeces.tmapTiddlers = $tw.wiki.getPluginInfo(r).tiddlers;
+  }
+  
+  var allTiddlers = $tw.wiki.allTitles();
+    
+  updateTiddlerVsIdIndeces(parent.indeces, allTiddlers);
+  updateNodeTypesIndeces(parent.indeces);
+  updateEdgeTypesIndeces(parent.indeces);
+  
+  $tm.stop("Attaching Indeces");
+  
+};
+
+/**
+ * TiddlyMap uses ids to reference tiddlers. This function creates
+ * a table that maps ids to tRefs and vice versa.
+ * 
+ * Two indeces are added to the indeces chain:
+ * 1. tById – tiddler references by id
+ * 2. idByT – ids by tiddler references
+ * 
+ * @param {Object} [parent] - The global indeces object indeces.
+ *     If not stated, $tm.indeces is used.
+ * @param {Array<TiddlerReference>} [allTiddlers] - The tiddlers to
+ *     use as basis for this index. If not stated, all tiddlers in
+ *     the wiki are used.
+ */
+var updateTiddlerVsIdIndeces = function(parent, allTiddlers) {
+  
+  parent = parent || $tm.indeces;
+  allTiddlers = allTiddlers || $tw.wiki.allTitles();
+  
+  // usually the fixer is not to be called at this point but
+  // since the fixer relies on the adapter and the adapter
+  // relies on indeces but the indeces must not be build before
+  // the fixer had a chance to move ids, we have to call the fixer
+  // function at this place :(
+  // @TODO: remove this fixer code in 2016/2017 when it is highly
+  // unlikely that people are still using an older version  
+  fixer.fixId()
+
+  var tById = parent.tById = {}; // tiddlerById
+  var idByT = parent.idByT = {}; // idByTiddler
+  
+  $tw.wiki.each(function(tObj, tRef) {
+  
+    if(utils.isSystemOrDraft(tObj)) return;
+    
+    var id = tObj.fields["tmap.id"];
+    if(!id) {
+      id = utils.genUUID();
+      utils.setField(tObj, "tmap.id", id);
+    }
+    
+    tById[id] = tRef; // tiddlerById
+    idByT[tRef] = id; // idByTiddler
+    
+  });
+  
+};
+
+/**
+ * For faster access to node-type styles, we store all node-type
+ * objects as indeces in a table.
+ * 
+ * Types without a filter are not indexed since they are either
+ * special types that TiddlyMap manually assignes (e.g. tmap:neighbour,
+ * or tmap:selected).
+ * 
+ * Indeces added to the indeces chain:
+ * 1. glNTy – all global node types
+ * 
+ * @param {Object} [parent] - The global indeces object indeces.
+ *     If not stated, $tm.indeces is used.
+ * @param {Array<TiddlerReference>} [allTiddlers] - The tiddlers to
+ *     use as basis for this index. If not stated, all tiddlers in
+ *     the wiki are used.
+ */
+var updateNodeTypesIndeces = function(parent) {
+
+  parent = parent || $tm.indeces;
+  
+  var typePath = $tm.path.nodeTypes;
+  var glNTy = parent.glNTy = [];
+  var glNTyById = parent.glNTyById = utils.makeHashMap();
+    
+  $tw.wiki.eachTiddlerPlusShadows(function(tObj, tRef) {
+    if(utils.startsWith(tRef, typePath)) {
+      var type = new NodeType(tRef);
+      glNTyById[type.id] = type;
+      glNTy.push(type);
+    }
+  });
+  
+  glNTy.sort(function(a, b) {
+    return a.priority - b.priority;
+  });
+
+};
+
+var updateEdgeTypesIndeces = function(parent) {
+
+  parent = parent || $tm.indeces;
+
+  var typePath = $tm.path.edgeTypes;
+  var allETy = parent.allETy = utils.makeHashMap();
+  // magic edge-type field name
+  var maETyFiNa = parent.maETyFiNa = utils.makeHashMap();
+  var magicETyNamespaces = utils.getLookupTable($tm.misc.magicETyNamespaces);
+  
+  $tw.wiki.eachTiddlerPlusShadows(function(tObj, tRef) {
+    
+    if(utils.startsWith(tRef, typePath)) {
+      
+      var et = new EdgeType(tRef);
+      allETy[et.id] = et;
+      
+      if(magicETyNamespaces[et.namespace]) {
+        maETyFiNa[et.name] = et;
+      }      
+    }
+    
+  });
+
+};
+
+var updateAdjacencyList = function(tRefs) {
+
+};
+
+/**
+ * This function attaches all the top level functions to the
+ * tiddlymap namespace.
+ * 
+ * This will add the
+ * 1. global logger method,
+ * 2. the notify method
+ * 3. the stopwatch methods `start` and `stop`.
+ * 
+ * @param {Hashmap} parent - The parent object to attach the options to.
+ */
+var attachFunctions = function(parent) {
+  
+  var fn = parent;
+  var nirvana = function() { /* /dev/null */ }; 
+
+  if(utils.isTrue($tm.config.sys.debug, false) && console) {
+  
+    /**
+     * A logging mechanism that uses the first argument as type and
+     * passes all consequent arguments as console arguments. The
+     * reason for this functions existence is to be able to switch
+     * off the logging without redirecting every single console function
+     * such as log, debug, warn etc. Plus, we have more control over
+     * the logging.
+     * 
+     * @see http://stackoverflow.com/questions/5538972/console-log-apply-not-working-in-ie9
+     * @see http://stackoverflow.com/questions/9521921/why-does-console-log-apply-throw-an-illegal-invocation-error
+     *
+     * @param {string} type - The type of the message (debug, info, warning…)
+     *     which is exactly the same as in `console[type]`.
+     * @param {...*} message - An infinite number of arguments to be printed
+     *     (just like console).
+     */
+    fn.logger = function(/* type, [messages,] messages */) {
+      if(arguments.length < 2) return;
+      var args = Array.prototype.slice.call(arguments);
+      var arg1 = args.shift(args);
+      var type = (console.hasOwnProperty(arg1) ? arg1 : "debug");
+      console[type].apply(console, args);
+    };
+    
+    fn.start = function(timerName) {
+      console.time("[timer] " + timerName);
+    };
+    
+    fn.stop = function(timerName) {
+      console.timeEnd("[timer] " + timerName);
+    };
+    
+  } else {
+    
+    fn.logger = fn.start = fn.stop = nirvana;
+    
+  }
+
+  fn.notify = (utils.isTrue($tm.config.sys.notifications)
+               ? utils.notify
+               : nirvana);
+  
+};
+
+/**
+ * This periodic check is needed to trigger a cleanup if a graph is
+ * removed since a graph itself cannot react to its destruction.
+ * This includes removing listeners that were not attached to the
+ * local container or calling the vis destructor.
+ * 
+ * @todo Specify which functions are required for widgets that register
+ * themselves in the registry.
+ */
+var routineCheck = function() {
+  
+  for(var i = $tm.registry.length; i--;) {
+    var widget = $tm.registry[i];
+    
+    if(!widget.destruct || !widget.isZombieWidget) return; // no duck!
+    
+    if(widget.isZombieWidget()) { // removed!
+      $tm.logger("warn", "a widget will be removed");
+      $tm.registry.splice(i, 1);
+      widget.destruct();
+    }
+  }
+  
+};
+
+/**
+ * A more advanced change system.
+ * 
+ * @todo The MapConfigWidget does register itself in the registry to
+ * have its destructor called. Is this ok?
+ */
+var dispatchUpdates = function(updates) {
+  
+  var registry = $tm.registry;
+  for(var i = registry.length; i--;) {
+    var widget = registry[i];
+    
+    if(!widget.destruct || !widget.isZombieWidget) return; // no duck!
+    
+    if(widget.update && !widget.isZombieWidget()) {
+      widget.update(updates);
+    }
+  }
+  
+};
+
+var checkForDublicates = function(tObj) {
+
+  var id = tObj.fields["tmap.id"];
+  
+  if(!id) return;
+  
+  var opt = $tm;
+  var dublicates = utils.getTiddlersWithField("tmap.id", id, { limit: 2 });
+  delete dublicates[tObj.fields.title];
+  
+  var dublicate = Object.keys(dublicates)[0];
+  
+  if(dublicate) {
+    
+    var vars = {
+      param: {
+        changedTiddler: tObj.fields.title,
+        existingTiddler: dublicate,
+        id: id
+      }
+    }
+
+    $tm.dialogManager.open("dublicateIdInfo", vars);
+
+  }
+  
+  if(dublicate) {
+    // remove any defined edges
+    utils.setField(tObj, "tmap.edges", undefined);
+    // override id
+    $tm.adapter.assignId(tObj, true);
+  }  
+  
+};
+
+/**
+ * Builds and registers globals and the functions that depend on them.
+ */
+var updateGlobals = function(parent) {
+  
+  attachOptions($tm);
+  attachFunctions($tm);
+  
+  // attention: logger() cannot be called before functions are rebuild
+  $tm.logger("warn", "Rebuilt globals");
+  
+};
+
+var lastCurrentTiddler = null;
+var updateLiveViewTrigger = function(changedTiddlers) {
+  
+  if(changedTiddlers["$:/HistoryList"]) {
+    var tRef = utils.getField("$:/HistoryList", "current-tiddler");
+  } else if(changedTiddlers["$:/temp/focussedTiddler"]) {
+    var tRef = utils.getField("$:/temp/focussedTiddler", "text");
+  }
+  
+  if(tRef != null && lastCurrentTiddler !== tRef) {
+    lastCurrentTiddler = tRef;
+    utils.setField("$:/temp/tmap/currentTiddler", "text", tRef);
+  }   
+      
+};
+
+/**
+ * Only for debugging
+ */
+var printChanges = function(changedTiddlers, loopCount) {
+
+  if(!utils.isTrue($tm.config.sys.debug, false)) return;
+
+  $tm.logger("warn", "=== Refresh " + loopCount + " ===");
+
+  for(var tRef in changedTiddlers) {
+    var c = changedTiddlers[tRef].deleted ? "[Deleted]" : "[Modified]";
+    $tm.logger("warn", c, tRef, $tw.wiki.getTiddler(tRef));
+  }
+
+};
+
+/**
+ * Saves the last mousemove event under $tm.mouse
+ */
+var registerMousemoveListener = function() {
+  
+  $tm.mouse = {};
+  
+  var fn = function(evt) { $tm.mouse = evt };
+  window.addEventListener('mousemove', fn, false);
+  
+};
+
+/**
+ * @TODO: suggest this to Jeremy for TW popup handling
+ */
+var registerClickListener = function() {
+
+  var tempPopups = $tm.path.tempPopups;
+  window.addEventListener("click", function(evt) {
+    
+    var popupStates = utils.getTiddlersByPrefix(tempPopups);
+    
+    for(var i = popupStates.length; i--;) {
+      if(utils.getText(popupStates[i])) break;
+    }
+    
+    if(i === -1) return;
+                                          
+    if(!$tw.utils.hasClass(evt.target, "tc-drop-down")
+       && !utils.getAncestorWithClass(evt.target, "tc-drop-down")) {
+    // = clicked on an element that isn't a dropdown or inside one
+      for(var i = popupStates.length; i--;) {
+        utils.setText(popupStates[i], "");
+      }
+    }
+    
+  }, false);
+};
+
+/**
+ * Todo: implement this in a better way, also with regard to the
+ * change listener and the "rebuilders".
+ */
+var updateTree = function() {
+
+  updateGlobals();
+  updateNodeTypesIndeces();
+  updateEdgeTypesIndeces();
+  
+};
+
+var registerChangeListener = function(callbackManager) {
+  
+  var loopCount = 0;
+  var rebuilders = {};
+  rebuilders[$tm.path.options] = updateGlobals;
+  rebuilders[$tm.path.nodeTypes] = updateNodeTypesIndeces;
+  rebuilders[$tm.path.edgeTypes] = updateEdgeTypesIndeces;
+
+  $tw.wiki.addEventListener("change", function(changedTiddlers) {
+    
+    $tm.start("Caretaker handling changes");
+    
+    printChanges(changedTiddlers, loopCount++);
+    callbackManager.handleChanges(changedTiddlers);
+    
+    var updates = { changedTiddlers: changedTiddlers };
+    
+    for(var tRef in changedTiddlers) {
+      
+      var tObj = utils.getTiddler(tRef);
+      if(tObj && tObj.isDraft()) continue;
+
+      if($tw.wiki.isSystemTiddler(tRef)) {
+        handleSysTidChanges(tRef, tObj, updates, rebuilders);
+      } else {
+        handleTidChanges(tRef, tObj, updates);
+      }
+      
+    }
+    
+    dispatchUpdates(updates);
+    
+    // NOTE: changes will affect the next refresh cycle
+    updateLiveViewTrigger(changedTiddlers);
+    
+    $tm.stop("Caretaker handling changes");
+    
+  });
+  
+};
+
+var handleSysTidChanges = function(tRef, tObj, updates, rebuilders) {
+  
+  var p = $tm.path;
+    
+  for(var prefix in rebuilders) {
+    if(utils.startsWith(tRef, prefix) && !updates[prefix]) {
+      $tm.logger("warn", "[System change]", prefix);
+      rebuilders[prefix]();
+      updates[prefix] = true;
+      return;
+    }
+  }
+    
+};
+
+var handleTidChanges = function(tRef, tObj, updates) {
+  
+  if(tObj) { // created or modified
+    
+    checkForDublicates(tObj);
+    
+    // call assignId IN ANY CASE to make sure the index
+    // stays intact, also after a renaming operation
+    $tm.adapter.assignId(tObj);
+            
+  } else { // deleted or renamed
+    
+    var id = $tm.indeces.idByT[tRef];
+
+    // Ignore tiddler without id; assuming draft
+    if(!id) return;
+    
+    var tWithId = utils.getTiddlerWithField("tmap.id", id);
+    
+    if(tWithId) { // only renamed
+    
+      $tm.logger("warn", "[Renamed]", tRef, "into", tWithId);
+    
+    } else { // removed
+      
+      // remove node; any edges pointing in/out; update indeces
+      // CAREFUL with recursion here!
+      $tm.adapter.deleteNode(id);
+      
+    }
+    
+  }
+};
+
+var cleanup = function() {
+  
+  utils.deleteByPrefix("$:/temp/felixhayashi");
+  utils.deleteByPrefix("$:/temp/tiddlymap");
+  utils.deleteByPrefix("$:/temp/tmap");
+                 
+};
+
+var setDefaults = function() {
+  
+  var defaultView = $tm.config.sys.defaultView;
+  if(!defaultView) return;
+  
+  utils.setField($tm.ref.defaultViewHolder, "text", defaultView);
+                 
+};
+
+var maybePrepareForFullscreenStart = function(url) {
+  
+  if(!url.query["tmap-enlarged"]) return;
+  
+  var ref = $tm.ref; 
+  var tRef = utils.getTiddlersByPrefix("$:/state/tab/sidebar-")[0];
+  
+  utils.setText(tRef, ref.mainEditor);
+        
+  var view = new ViewAbstraction(url.query["tmap-view"]);
+  if(view.exists()) {
+    utils.setField(ref.defaultViewHolder, "text", view.getLabel());
+  }
+
+};
+
+var createMetaFile = function() {
+
+  if(utils.tiddlerExists($tm.ref.sysMeta)) return;
+  
+  $tm.logger("warn", "Creating meta file");
+  
+  var plugin = $tw.wiki.getTiddler($tm.path.pluginRoot);
+  $tw.wiki.setTiddlerData($tm.ref.sysMeta, {
+    // the version originally installed
+    originalVersion: plugin.fields.version,
+    // the data structure in use corresponds to version x
+    // if the structure is obsolete, it will be automatically
+    // fixed by the fixer module.
+    dataStructureState: "0.6.9",
+    // whether or not to display a welcome message
+    showWelcomeMessage: true
+  });
+  
+};

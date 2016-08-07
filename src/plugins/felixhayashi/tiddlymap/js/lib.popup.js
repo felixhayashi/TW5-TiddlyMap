@@ -50,19 +50,21 @@ function Popup(parentDomNode, options) {
   
   this._isEnabled = true;
   this._isPreventShowOrHide = false;
+  this._isHideOnClick = !!options.hideOnClick;
   this._timeoutShow = null;
   this._timeoutHide = null;
   this._signature = null;
   this._isDisplayNoneAfterAnimation = true;
     
   // delays
-  this._hideDelayLeavingPopup = 200;
-  this._hideDelay = utils.isInteger(parseInt(options.hideDelay))
-                    ? parseInt(options.hideDelay)
-                    : 200;
-  this._showDelay = utils.isInteger(parseInt(options.showDelay))
-                    ? parseInt(options.showDelay)
-                    : 200;
+  var val = parseInt(options.leavingDelay);
+  this._hideDelayLeavingPopup = utils.isInteger(val) ? val : 200;
+  
+  var val = parseInt(options.hideDelay);
+  this._hideDelay = utils.isInteger(val) ? val : 200;
+  
+  var val = parseInt(options.showDelay);
+  this._showDelay = utils.isInteger(val) ? val : 200;
 
   // force early binding of functions to this context
   utils.bind(this, [
@@ -70,13 +72,15 @@ function Popup(parentDomNode, options) {
     "_hide",
     "_handleEnter",
     "_handleLeave",
-    "_handleAnimationEnd"
+    "_handleAnimationEnd",
+    "_handleClick"
   ]);
 
   // specify handlers
   this._listeners = {
     "mouseenter": this._handleEnter,
-    "mouseleave": this._handleLeave
+    "mouseleave": this._handleLeave,
+    "click": [ this._handleClick, true ]
   };
   
   var fn = this._handleAnimationEnd;
@@ -116,6 +120,16 @@ Popup.prototype._handleLeave = function(ev) {
   
 };
 
+Popup.prototype._handleClick = function(ev) {
+  
+  //~ console.log("_handleLeave");
+  
+  if(this._isHideOnClick) {
+    this._hide(true);
+  }
+  
+};
+
 /**
  * Handler triggered when leaving the popup div.
  */
@@ -141,6 +155,7 @@ Popup.prototype._hide = function(isForce) {
   
   this._signature = null;
   this._isDisplayNoneAfterAnimation = true;
+  this._isPreventShowOrHide = false;
   
   $tw.utils.removeClass(this._domNode, "tmap-popup-active");
       
@@ -184,11 +199,6 @@ Popup.prototype._show = function(signature, text) {
   var parRect = this._parentDomNode.getBoundingClientRect();
   var x = $tm.mouse.clientX;
   var y = $tm.mouse.clientY;
-  
-  var isClickedInside = (parRect.left < x && x < parRect.right
-                         && parRect.top < y && y < parRect.bottom);
-
-  if(!isClickedInside) return;
 
   //~ console.log("_show SUCCESS");
   
@@ -264,7 +274,7 @@ Popup.prototype.hide = function(delay, isForce) {
     
   delay = (utils.isInteger(delay) ? delay : this._hideDelay);
   
-  if(isForce || delay === 0) {
+  if(isForce || delay === 0) { // @TODO is this really correct?
     this._hide(isForce);
   } else {
     this._timeoutHide = window.setTimeout(this._hide, delay, isForce);
@@ -277,6 +287,10 @@ Popup.prototype.hide = function(delay, isForce) {
  */
 Popup.prototype.setEnabled = function(isEnabled) {
   this._isEnabled = isEnabled;
+};
+
+Popup.prototype.isShown = function() {
+  return this._domNode.style.display === "block";
 };
   
 Popup.prototype._clearTimeouts = function() {

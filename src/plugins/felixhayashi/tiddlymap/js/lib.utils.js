@@ -466,6 +466,70 @@ utils.getTiddlerRef = function(tiddler) {
 };
 
 /**
+ * 
+ */
+utils.getTiddlerNode = function(tiddler) {
+  
+  var tRef = utils.getTiddlerRef(tiddler);
+  return {
+    type: "tiddler",
+    attributes: { tiddler: { type: "string", value: tRef } },
+    children: []
+  };
+
+};
+
+/**
+ * 
+ */
+utils.getTranscludeNode = function(tiddler, isBlock) {
+  
+  var tRef = utils.getTiddlerRef(tiddler);
+  return {
+    type: "transclude",
+    attributes: { tiddler: { type: "string", value: tRef } },
+    children: [],
+    isBlock: !!isBlock
+  };
+
+};
+
+/**
+ * 
+ */
+utils.getElementNode = function(type, text, className) {
+  
+  var node = {
+    type: "element",
+    tag: type,
+    attributes: { class: { type: "string", value: className }},
+    children: []
+  };
+  
+  if(text) { node.children.push({type: "text", text: text }); }
+  
+  return node;
+
+};
+
+/**
+ * 
+ */
+utils.registerTransclude = function(widget, name, tiddler, domNode) {
+  
+  // if an instance exists, remove it
+  utils.removeArrayElement(widget.children, widget[name]);
+  
+  var node = utils.getTiddlerNode(tiddler);
+  node.children.push(utils.getTranscludeNode(null, true));
+  widget[name] = widget.makeChildWidget(node);
+  widget.children.push(widget[name]);
+  
+  return widget[name];
+  
+};
+
+/**
  * Similar to {@code wiki.getTiddler()} but also accepts a tObj as
  * argument, thus, making it unnecessary to always differentiate or remember
  * if we are dealing with an object or a reference.
@@ -753,12 +817,17 @@ utils.parseJSON = function(str, data) {
  * @param {Tiddler} tiddler - The tiddler to store the json in.
  * @param {string} field - The field that will store the json.
  * @param {Object} data - The json data.
+ * @param {int} [indentation = 0] - the indentation
  */
-utils.writeFieldData = function(tiddler, field, data) {
+utils.writeFieldData = function(tiddler, field, data, indentation) {
 
-  if(typeof data === "object") {
-    utils.setField(tiddler, field, JSON.stringify(data));
+  if(typeof data !== "object") {
+    return;
   }
+  
+  indentation = parseInt(indentation), (indentation > 0 ? indentation : 0);
+  
+  utils.setField(tiddler, field, JSON.stringify(data, null, indentation));
   
 };
 

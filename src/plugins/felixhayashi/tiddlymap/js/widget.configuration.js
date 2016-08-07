@@ -194,7 +194,7 @@ MapConfigWidget.prototype.handleConfigChange = function(change) {
   if(this.mode === "manage-edge-types") { options = options["edges"]; }
   
   // save changes
-  utils.writeFieldData(this.pipeTRef, this.extensionTField, options);
+  utils.writeFieldData(this.pipeTRef, this.extensionTField, options, $tm.config.sys.jsonIndentation);
   
   // hack to ensure vis doesn't scroll
   var cls = "vis-configuration-wrapper";

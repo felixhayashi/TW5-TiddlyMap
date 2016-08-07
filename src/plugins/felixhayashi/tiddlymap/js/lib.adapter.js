@@ -105,7 +105,7 @@ Adapter.prototype.insertEdge = function(edge) {
  * @private
  * @return {Edge} The processed edge.
  */
-Adapter.prototype._processEdge = function(edge, action) {
+Adapter.prototype.processEdge = function(edge, action) {
   
   $tm.logger("debug", "Edge", action, edge);
 
@@ -176,7 +176,7 @@ Adapter.prototype._processTmapEdge = function(tiddler, edge, type, action) {
   }
   
   // save
-  utils.writeFieldData(tiddler, "tmap.edges", connections);
+  utils.writeFieldData(tiddler, "tmap.edges", connections, $tm.config.sys.jsonIndentation);
   
   return edge;
   
@@ -1090,6 +1090,13 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
       node.icon.color = color;
     }
     
+  }
+  
+  if(view.exists()) {
+    var node = nodes[view.getConfig("central-topic")];
+    if(node) {
+      utils.merge(node, $tm.indeces.glNTyById["tmap:central-topic"].style);
+    }
   }
   
 };

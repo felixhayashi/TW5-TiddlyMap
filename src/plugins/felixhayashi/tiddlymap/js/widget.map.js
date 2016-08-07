@@ -56,7 +56,8 @@ function MapWidget(parseTreeNode, options) {
     "handleCanvasScroll",
     "handleWidgetKeyup",
     "handleWidgetKeydown",
-    "handleTriggeredRefresh"
+    "handleTriggeredRefresh",
+    "handleContextMenu"
   ]);
             
   // instanciate managers
@@ -80,9 +81,11 @@ function MapWidget(parseTreeNode, options) {
       "tmap:tm-create-view": this.handleCreateView,
       "tmap:tm-rename-view": this.handleRenameView,
       "tmap:tm-delete-view": this.handleDeleteView,
+      "tmap:tm-delete-element": this.handleDeleteElement,
       "tmap:tm-edit-view": this.handleEditView,
       "tmap:tm-store-position": this.handleStorePositions,
       "tmap:tm-generate-widget": this.handleGenerateWidget,
+      "tmap:tm-toggle-central-topic": this.handleSetCentralTopic,
       "tmap:tm-save-canvas": this.handleSaveCanvas
     }, this, this);
   }
@@ -106,7 +109,6 @@ function MapWidget(parseTreeNode, options) {
     "hoverEdge": this.handleVisHoverElement,
     "blurNode": this.handleVisBlurElement,
     "blurEdge": this.handleVisBlurElement,
-    "oncontext": this.handleVisOnContext,
     "beforeDrawing": this.handleVisBeforeDrawing,
     "stabilizationProgress": this.handleVisLoading,
     "stabilizationIterationsDone": this.handleVisLoadingDone
@@ -120,7 +122,8 @@ function MapWidget(parseTreeNode, options) {
   this.canvasDomListeners = {
     "keyup": [ this.handleCanvasKeyup, true ],
     "keydown": [ this.handleCanvasKeydown, true ],
-    "mousewheel": [ this.handleCanvasScroll, true ]
+    "mousewheel": [ this.handleCanvasScroll, true ],
+    "contextmenu": [ this.handleContextMenu, true ]
   };
     
   this.widgetDomListeners = {
@@ -347,13 +350,7 @@ MapWidget.prototype.renderPreview = function(header, body) {
   if(snapshotTObj) {
 
     // Construct child widget tree
-    var placeholder = this.makeChildWidget({
-      type: "transclude",
-      attributes: {
-        tiddler: { type: "string", value: snapshotTRef }
-      }
-    });
-      
+    var placeholder = this.makeChildWidget(utils.getTranscludeNode(snapshotTRef), true);
     placeholder.renderChildren(body, null);
                       
   } else {
@@ -377,12 +374,19 @@ MapWidget.prototype.renderFullWidget = function(widget, header, body) {
   // add a loading bar
   this.addLoadingBar(this.domNode);
   
-  var popupOptions = {
-    showDelay: $tm.config.sys.popups.delay
-  };
-  
   // prepare the tooltip for graph elements
-  this.visTooltip = new Popup(this.domNode, popupOptions);
+  this.tooltip = new Popup(this.domNode, {
+    className: "tmap-tooltip",
+    showDelay: $tm.config.sys.popups.delay
+  });
+  
+  // prepare the context menu
+  this.contextMenu = new Popup(this.domNode, {
+    className: "tmap-context-menu",
+    showDelay: 0,
+    hideOnClick: true,
+    leavingDelay: 999999
+  });
     
   // register 
   this.sidebar = utils.getFirstElementByClassName("tc-sidebar-scrollable");
@@ -520,52 +524,23 @@ MapWidget.prototype.rebuildEditorBar = function() {
   }
   
   // Construct the child widget tree
-  var body = {
-    type: "tiddler",
-    attributes: {
-      tiddler: { type: "string", value: view.getRoot() }
-    },
-    children: []
-  };
+  var body = utils.getTiddlerNode(view.getRoot());
   
   if(this.editorMode === "advanced") {
     
-    body.children.push({
-      type: "transclude",
-      attributes: {
-        tiddler: { type: "string", value: $tm.ref.graphBar }
-      }
-    });
+    body.children.push(utils.getTranscludeNode($tm.ref.graphBar));
     
   } else {
     
-    body.children.push({
-      type: "element",
-      tag: "span",
-      attributes: { class: { type: "string", value: "tmap-view-label" }},
-      children: [ {type: "text", text: view.getLabel() } ]
-    });
+    var el = utils.getElementNode("span", view.getLabel(), "tmap-view-label");
+    body.children.push(el);
     
   }
   
-  body.children.push({
-    type: "transclude",
-    attributes: {
-      tiddler: { type: "string", value: $tm.ref.focusButton }
-    }
-  });
-  
-  //~ body.children.push({
-    //~ type: "element",
-    //~ tag: "div",
-    //~ attributes: { class: { type: "string", value: "tmap-flash-message" }},
-    //~ children: [ {type: "text", text: "hlao" } ]
-  //~ });
-
-      
+  body.children.push(utils.getTranscludeNode($tm.ref.focusButton));
+        
   this.makeChildWidgets([ body ]);
-  this.renderChildren(this.graphBarDomNode,
-                      this.graphBarDomNode.firstChild);
+  this.renderChildren(this.graphBarDomNode, this.graphBarDomNode.firstChild);
 
 };
     
@@ -665,11 +640,11 @@ MapWidget.prototype.update = function(updates) {
   
   if(reinitNetwork) {
     this.initAndRenderGraph(this.graphDomNode);
-    this.visTooltip.hide(0, true);
+    this.hidePopups(0, true);
     
   } else if(rebuildGraph) {
     this.rebuildGraph(rebuildGraphOptions);
-    this.visTooltip.hide(0, true);
+    this.hidePopups(0, true);
   }
   
   if(rebuildEditorBar) {
@@ -686,6 +661,13 @@ MapWidget.prototype.update = function(updates) {
   
   // reset this again
   this.ignoreNextViewModification = false;
+  
+};
+
+MapWidget.prototype.hidePopups = function(delay, isForce) {
+  
+  this.tooltip.hide(delay, isForce);
+  this.contextMenu.hide(0, true);
   
 };
 
@@ -972,7 +954,7 @@ MapWidget.prototype.initAndRenderGraph = function(parent) {
     edgesById: utils.makeHashMap()
   };
   
-  this.visTooltip.setEnabled(
+  this.tooltip.setEnabled(
     utils.isTrue($tm.config.sys.popups.enabled, true));
   
   this.network = new vis.Network(parent, this.graphData, this.visOptions);
@@ -1057,6 +1039,22 @@ MapWidget.prototype.handleCanvasKeyup = (function() {
   }
 })();
 
+MapWidget.prototype.handleDeleteElement = function(ev) {
+  
+  var id = ev.paramObject.id;
+  var elements = (id ? [ id ] : this.network.getSelectedNodes());
+  
+  this.handleRemoveElements({
+    nodes: elements
+  });
+  
+};
+
+MapWidget.prototype.handleConfigureElement = function(ev) {
+  
+  
+};
+
 MapWidget.prototype.handleCanvasKeydown = function(ev) {
 
   if(ev.keyCode === 46) { // delete
@@ -1085,8 +1083,41 @@ MapWidget.prototype.handleCanvasScroll = function(ev) {
     
     return false;
   }
-  
 
+};
+
+/**
+ * Called when the user click on the canvas with the right
+ * mouse button. A context menu is opened.
+ */
+MapWidget.prototype.handleContextMenu = function(ev) {
+  
+  ev.preventDefault();
+  
+  this.tooltip.hide(0, true);
+  
+  var nodeId = this.network.getNodeAt({ x: ev.offsetX, y: ev.offsetY });
+  if(!nodeId) return;
+  
+  // ids of selected nodes
+  var selectedNodes = this.network.getSelectedNodes();
+  
+  if(!utils.inArray(nodeId, selectedNodes)) {
+    // unselect other nodes and select this one instead…
+    selectedNodes = [ nodeId ];
+    this.network.selectNodes(selectedNodes);
+  }
+  
+  this.contextMenu.show(selectedNodes, function(selectedNodes, div) {
+        
+    var mode = (selectedNodes.length > 1 ? "multi" : "single");
+    
+    var tRef = "$:/plugins/felixhayashi/tiddlymap/editor/contextMenu/node";
+    utils.registerTransclude(this, "contextMenuWidget", tRef);
+    this.contextMenuWidget.setVariable("mode", mode);
+    this.contextMenuWidget.render(div);
+      
+  }.bind(this));
 
 };
 
@@ -1735,6 +1766,18 @@ MapWidget.prototype.handleGenerateWidget = function(event) {
   
 };
 
+MapWidget.prototype.handleSetCentralTopic = function(event) {
+   
+  var nodeId = event.paramObject.id || this.network.getSelectedNodes()[0];
+  
+  if(nodeId === this.view.getConfig("central-topic")) {
+    nodeId = "";
+  }
+  
+  this.view.setCentralTopic(nodeId);
+  
+};
+
 MapWidget.prototype.handleStorePositions = function(withNotify) {
 
   var data = this.view.getNodeData();
@@ -2069,7 +2112,7 @@ MapWidget.prototype.handleOpenMapElementEvent = function(properties) {
     
   }
   
-  this.visTooltip.hide(0, true);
+  this.hidePopups(0, true);
 
 };
 
@@ -2145,20 +2188,9 @@ MapWidget.prototype.handleClickEvent = function(evt) {
     this.canvas.focus();
     
   }
-
-};
-
-/**
- * Fired by vis when the user click on the canvas with the right
- * mouse button. 
- */
-MapWidget.prototype.handleVisOnContext = function(properties) {
   
-  //~ var id = this.network.getNodeAt(properties.pointer.DOM);
-  //~ if(id) {
-    //~ alert("right" + id);
-  //~ }
-  
+  this.contextMenu.hide(0, true);
+
 };
 
 MapWidget.prototype.handleVisSelectNode = function(properties) {
@@ -2259,25 +2291,10 @@ MapWidget.prototype.constructTooltip = function(signature, div) {
       // us from updating the tooltip content on refresh. So we need
       // to create a temporary widget that is registered to the dom
       // node passed by the tooltip.
-      
-      var parseTreeNode = {
-        type: "tiddler",
-        attributes: { tiddler: { type: "string", value: tRef }},
-        children: [
-          { type: "transclude", attributes: {}, isBlock: true }
-        ]
-      };
-      
-      // make sure the previously tooltip widget is removed
-      utils.removeArrayElement(this.children, this.tmpTooltipWidget);
-      // create the new tooltip widget
-      this.tmpTooltipWidget = this.makeChildWidget(parseTreeNode);
-      this.tmpTooltipWidget.setVariable("tv-tiddler-preview", "yes");
-      this.tmpTooltipWidget.render(div, null);
-      // register the tooltip widget to allow it to refresh
-      this.children.push(this.tmpTooltipWidget);
-      
-      return;
+            
+      utils.registerTransclude(this, "tooltipWidget", tRef);
+      this.tooltipWidget.setVariable("tv-tiddler-preview", "yes");
+      this.tooltipWidget.render(div);
       
     } else {
       
@@ -2317,10 +2334,10 @@ MapWidget.prototype.handleVisHoverElement = function(ev) {
   }
   
   // show tooltip if not in edit mode
-  if(!this.isVisInEditMode()) {
+  if(!this.isVisInEditMode() && !this.contextMenu.isShown()) {
     var populator = this.constructTooltip;
     var signature = JSON.stringify(ev);
-    this.visTooltip.show(signature, populator);
+    this.tooltip.show(signature, populator);
   }
 
 };
@@ -2329,7 +2346,7 @@ MapWidget.prototype.handleVisBlurElement = function(ev) {
   
   //~ console.log("vis blur fired");
   //~ this.graphDomNode.style.cursor = "auto";
-  this.visTooltip.hide();
+  this.tooltip.hide();
 
 };
 
@@ -2363,7 +2380,7 @@ MapWidget.prototype.handleVisLoadingDone = function(params) {
 MapWidget.prototype.handleVisDragStart = function(properties) {
 
   if(properties.nodes.length) {
-    this.visTooltip.hide(0, true);
+    this.hidePopups(0, true);
     this.assignActiveStyle(properties.nodes);
     this.setNodesMoveable(properties.nodes, true);
   }

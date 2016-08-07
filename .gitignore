@@ -10,3 +10,5 @@
 node_modules/
 docs/
 src/jsdoc/templates/docstrap/
+dist/
+bundle/

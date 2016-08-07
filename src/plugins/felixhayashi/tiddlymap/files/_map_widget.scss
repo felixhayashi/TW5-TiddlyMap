@@ -114,45 +114,11 @@
         right: 0px;
       }
     }
-    
-    .tc-drop-down {
-        background-color: #F3F3F3;
-        min-width: 170px;
-        max-width: 210px;
-        padding: $padding;
-        margin: 5px 0;
-                 
-        button, a {
-          padding : 0px;
-          text-decoration: none;
-          
-          &:hover {
-            color: #ffffff;
-          }
-    
-          svg {
-            vertical-align: middle;
-          }
-        }
-    }
-    
+        
     [hidden] {
       display: none;
     }
-    
-    .tc-block-dropdown {
-      width: 370px;
-      min-width: 370px;
-      padding: $padding;
-      margin: 15px 0 0 -370px;
-              
-        a {
-          display: inline;
-          padding : 0px;
-        }
-      
-    }
-    
+        
     select {
       width: 30%;
       max-width: 200px;
@@ -223,6 +189,42 @@
       text-align: center;
       padding: 20px;
     }
+  }
+}
+
+.tmap-widget {
+
+  .tc-drop-down {
+    min-width: 170px;
+    max-width: 210px;
+    padding: $padding;
+    margin: 5px 0;
+             
+    button, a {
+      padding: 0 2px;
+      text-decoration: none;
+      
+      &:hover {
+        color: #ffffff;
+      }
+
+      svg {
+        vertical-align: middle;
+      }
+    }
+  }
+  
+  .tc-block-dropdown {
+    width: 370px;
+    min-width: 370px;
+    padding: $padding;
+    margin: 15px 0 0 -370px;
+            
+      a {
+        display: inline;
+        padding : 0px;
+      }
+    
   }
 }
 

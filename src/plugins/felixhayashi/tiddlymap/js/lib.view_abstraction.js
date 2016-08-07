@@ -784,7 +784,7 @@ ViewAbstraction.prototype.saveNodeData = function() {
     return;
   }
   
-  utils.writeFieldData(this.comp.map, "text", data);
+  utils.writeFieldData(this.comp.map, "text", data, $tm.config.sys.jsonIndentation);
   
   // cache new values and prevent rebuild at refresh
   this.nodeData = data;
@@ -798,6 +798,12 @@ ViewAbstraction.prototype.saveNodePosition = function(node) {
   if(node.id && node.x && node.y) {
     this.saveNodeData(node.id, { x: node.x, y: node.y });
   }
+  
+};
+
+ViewAbstraction.prototype.setCentralTopic = function(id) {
+    
+  this.setConfig("central-topic", id);
   
 };
 

@@ -108,6 +108,7 @@ function run(parent) {
         width: "240px",
         height: "140px"
       },
+      jsonIndentation: "1",
       editNodeOnCreate: "false",
       singleClickMode: "false",
       editorMenuBar: {

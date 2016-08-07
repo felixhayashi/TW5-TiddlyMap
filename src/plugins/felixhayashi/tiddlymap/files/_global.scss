@@ -2,13 +2,13 @@
  * Do not allow blurred background for dialogs
  * see: https://github.com/Jermolene/TiddlyWiki5/issues/1893
  */
-.tc-page-container-wrapper.tc-modal-displayed {
+body .tc-page-container-wrapper.tc-modal-displayed {
   -webkit-filter: inherit;
   -moz-filter: inherit;
   filter: inherit;
 }
 
-.tc-modal-wrapper {
+body .tc-modal-wrapper {
   z-index: 1010;
   
   .tc-modal-header {

@@ -242,10 +242,13 @@ var updateNodeTypesIndeces = function(parent) {
   
   var typePath = $tm.path.nodeTypes;
   var glNTy = parent.glNTy = [];
+  var glNTyById = parent.glNTyById = utils.makeHashMap();
     
   $tw.wiki.eachTiddlerPlusShadows(function(tObj, tRef) {
     if(utils.startsWith(tRef, typePath)) {
-      glNTy.push(new NodeType(tRef));
+      var type = new NodeType(tRef);
+      glNTyById[type.id] = type;
+      glNTy.push(type);
     }
   });
   

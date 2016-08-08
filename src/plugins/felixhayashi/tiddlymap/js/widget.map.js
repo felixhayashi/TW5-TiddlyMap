@@ -227,9 +227,11 @@ MapWidget.prototype.checkForFreshInstall = function() {
   this.dialogManager.open(name, args, function(isConfirmed, outTObj) {
 
     if(utils.tiddlerExists("$:/plugins/felixhayashi/topstoryview")) {
+      
       utils.setText("$:/view", "top");
       utils.setText("$:/config/Navigation/openLinkFromInsideRiver", "above");
       utils.setText("$:/config/Navigation/openLinkFromOutsideRiver", "top");
+      utils.setText("$:/themes/tiddlywiki/vanilla/options/sidebarlayout", "fixed-fluid");
       
       // trigger a save and reload message
       utils.touch("$:/plugins/felixhayashi/topstoryview");

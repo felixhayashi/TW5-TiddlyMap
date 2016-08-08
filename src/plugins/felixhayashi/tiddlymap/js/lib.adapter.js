@@ -105,7 +105,7 @@ Adapter.prototype.insertEdge = function(edge) {
  * @private
  * @return {Edge} The processed edge.
  */
-Adapter.prototype.processEdge = function(edge, action) {
+Adapter.prototype._processEdge = function(edge, action) {
   
   $tm.logger("debug", "Edge", action, edge);
 

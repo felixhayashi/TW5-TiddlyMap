@@ -46,11 +46,6 @@ function Adapter() {
   this.visShapesWithTextInside = utils.getLookupTable([
       "ellipse", "circle", "database", "box", "text"
   ]);
-  
-  // hack to support
-  // https://github.com/felixhayashi/TW5-TiddlyMap/issues/198
-  this.isTransTypeEnabled = (typeof $tw.wiki.getTiddlerTranscludes
-                             === "function");
                               
 };
 
@@ -67,7 +62,20 @@ Adapter.prototype.deleteEdge = function(edge) {
   return this._processEdge(edge, "delete");
   
 };
-  
+
+/**
+ * Persists an edge by storing the vector (from, to, type).
+ *
+ * @param {Edge} edge - The edge to be saved. The edge necessarily
+ *     needs to possess a `to` and a `from` property.
+ * @return {Edge} The newly inserted edge.
+ */
+Adapter.prototype.insertEdge = function(edge) {
+
+  return this._processEdge(edge, "insert");
+
+};
+
 /**
  * Removes multiple edges from several stores.
  * 
@@ -79,19 +87,6 @@ Adapter.prototype.deleteEdges = function(edges) {
   for(var i = edges.length; i--;) {
     this.deleteEdge(edges[i]);
   }
-  
-};
-  
-/**
- * Persists an edge by storing the vector (from, to, type).
- * 
- * @param {Edge} edge - The edge to be saved. The edge necessarily
- *     needs to possess a `to` and a `from` property.
- * @return {Edge} The newly inserted edge.
- */  
-Adapter.prototype.insertEdge = function(edge) {
-  
-  return this._processEdge(edge, "insert");
   
 };
 
@@ -115,146 +110,28 @@ Adapter.prototype._processEdge = function(edge, action) {
   // get from-node and corresponding tiddler
   var fromTRef = $tm.indeces.tById[edge.from];
   if(!fromTRef || !utils.tiddlerExists(fromTRef)) return;
-
+  
   var type = new EdgeType(edge.type);
+  var handler = $tm.services.EdgeTypeSubscriberRegistry.get(type);
+  var fn = action + "Edge";
+    
+  if (!handler[fn]) {
+    $tm.notify("Operation not supported!");
+    return;
+  }
+  
   var tObj = utils.getTiddler(fromTRef);
-  var namespace = type.namespace;
-  
-  if(namespace === "tw-list") {
-    if(!edge.to) return;
-    return this._processListEdge(tObj, edge, type, action);
-
-  } else if(namespace === "tw-field") {
-    if(!edge.to) return;
-    return this._processFieldEdge(tObj, edge, type, action);
     
-  } else if(namespace === "tw-body") {
-    return null; // cannot delete links
-    
-  } else { // edge has no special meaning
-    return this._processTmapEdge(tObj, edge, type, action);
-    
-  }
-
-  return edge;
-      
-};
-
-/**
- * This method handles insertion or deletion of tiddlymap edges that
- * are stored as json using a tiddlymap structure.
- * 
- * @param {Tiddler} tiddler - A tiddler reference or object that
- *     represents the from part of the edge and will be used as store.
- * @param {Edge} edge - The edge to be saved.
- *     Required properties:
- *     * In case of deletion: `id`.
- *     * In case of insertion: `to`.
- * @param {EdgeType} type - The type of the edge.
- * @param {string} [action=delete] - Either "insert" or "delete".
- * @return {Edge} The processed edge.
- */
-Adapter.prototype._processTmapEdge = function(tiddler, edge, type, action) {
+  // action is either insert or delete
+  var edge = (handler[fn])(tObj, edge, type);
   
-  if(action === "delete" && !edge.id) return;
-  
-  // load
-  var connections = utils.parseFieldData(tiddler, "tmap.edges", {});
-  
-  // transform
-  if(action === "insert") {
-    // assign new id if not present yet
-    edge.id = edge.id || utils.genUUID();
-    // add to connections object
-    connections[edge.id] = { to: edge.to, type: type.id };
-    // if type is not know, create it
-    if(!type.exists()) {
-      type.save();
-    }
-  } else { // delete
-    delete connections[edge.id];
-  }
-  
-  // save
-  utils.writeFieldData(tiddler, "tmap.edges", connections, $tm.config.sys.jsonIndentation);
-  
-  return edge;
-  
-};
-
-
-/**
- * This method handles insertion or deletion of edges that are stored
- * inside list fields.
- * 
- * @param {Tiddler} tiddler - A tiddler reference or object that
- *     represents the from part of the edge and will be used as store.
- * @param {Edge} edge - The edge to be saved. Required properties: `to`.
- * @param {EdgeType} type - The type of the edge.
- * @param {string} [action=delete] - Either "insert" or "delete".
- * @return {Edge} The processed edge.
- */
-Adapter.prototype._processListEdge = function(tiddler, edge, type, action) {
-      
-  // get the name without the private marker or the namespace
-  var name = type.name;
-  
-  var tObj = utils.getTiddler(tiddler);
-  var list = $tw.utils.parseStringArray(tiddler.fields[name]);
-  // we need to clone the array since tiddlywiki might directly
-  // returned the auto-parsed field value (as in case of tags, or list)
-  // and this array would be read only!
-  list = (list || []).slice()
-  
-  // transform
-  var toTRef = $tm.indeces.tById[edge.to];
-      
-  if(action === "insert") {
-    list.push(toTRef);
-    if(!type.exists()) {
-      type.save();
-    }
-  } else { // delete
-    var index = list.indexOf(toTRef);
-    if(index > -1) {
-      list.splice(index, 1);
-    }
-  }
-
-  // save
-  utils.setField(tObj, name, $tw.utils.stringifyList(list));
-  
-  return edge;
-  
-};
-
-/**
- * This method handles insertion or deletion of an edge that
- * is stored inside a field that can only hold one connection.
- * 
- * @param {Tiddler} tiddler - A tiddler reference or object that
- *     represents the from part of the edge and will be used as store.
- * @param {Edge} edge - The edge to be saved. Required properties: `to`.
- * @param {EdgeType} type - The type of the edge.
- * @param {string} [action=delete] - Either "insert" or "delete".
- * @return {Edge} The processed edge.
- */
-Adapter.prototype._processFieldEdge = function(tiddler, edge, type, action) {
-
-  var toTRef = $tm.indeces.tById[edge.to];
-  if(toTRef == null) return; // null or undefined
-  
-  var val = (action === "insert" ? toTRef : "");
-  
-  // only use the name without the private marker or the namespace
-  utils.setField(tiddler, type.name, val);
-
-  if(!type.exists()) {
+  // if type is not know, create it
+  if(action === "insert" && !type.exists()) {
     type.save();
   }
-  
+    
   return edge;
-  
+      
 };
 
 /**
@@ -545,152 +422,25 @@ Adapter.prototype.getEdges = function(tiddler, toWL, typeWL) {
   if(!tObj || utils.isSystemOrDraft(tObj)) return;
   
   var edges = utils.makeHashMap();
-  this._addTmapEdges(edges, tObj, toWL, typeWL);
-  this._addBodyAndFieldEdges(edges, tObj, toWL, typeWL);
+    
+  var handlers = $tm.services.EdgeTypeSubscriberRegistry.getAll();
+  for (var name in handlers) {
+    $tw.utils.extend(edges, (handlers[name]).loadEdges(tObj, toWL, typeWL));
+  }
+  
+  for(var id in edges) {
+    var edge = edges[id];
+    edge = this._addEdgeData(edge);
+    
+    if(edge) {
+      edges[id] = edge;
+    }
+  }
 
   return edges;
 
 };
 
-/**
- * Adds body- and field-edges stored in a given tiddler to the
- * edges list.
- * 
- * Hashes are used as edge ids based on the from and to parts
- * of the edge and its type. This has the advantage that
- * 1. ids are unique
- * 2. ids only change if the underlying link/tag changes.
- * 
- * @private
- * 
- * @param {HashMap<Id, Edge>} edges - The list into which to inject
- *     the edges retrieved.
- * @param {$tw.Tiddler} tObj - A tiddler object from which to
- *     retrieve the edges.
- * @param {Hashmap<TiddlerReference, boolean>} [toWL]
- *     A hashmap on which basis it is decided, whether to include
- *     an edge that leads to a certain tiddler in the result or not.
- *     In this case, all edges stored in the tiddler are treated as
- *     outgoing and the arrow head is ignored. If not specified, 
- *     all edges are included.
- * @param {Hashmap<string, boolean>} [typeWL]
- *     A hashmap on which basis it is decided, whether to include
- *     an edge of a given type in the result or not. If not 
- *     specified, all edges are included.
- */
-Adapter.prototype._addBodyAndFieldEdges = function(edges, tObj, toWL, typeWL) {
-
-  // never assign a default to the typeWL. if it is not assigned it means
-  // all types!! NEVER: typeWL = typeWL || utils.makeHashMap();
-    
-  var fromTObjFields = tObj.fields;
-  var fromTRef = utils.getTiddlerRef(tObj);
-  var indeces = $tm.indeces;
-  var maETyFiNa = indeces.maETyFiNa; // magic edge-type field names
-  var refsByType = utils.makeHashMap();
-  
-  // 1) Prepare
-  
-  if(!typeWL || typeWL["tw-body:link"]) {
-    refsByType["tw-body:link"] = $tw.wiki.getTiddlerLinks(fromTRef);
-  }
-  
-  // hack to support
-  // https://github.com/felixhayashi/TW5-TiddlyMap/issues/198
-  if(this.isTransTypeEnabled && (!typeWL || typeWL["tw-body:transclude"])) {
-    refsByType["tw-body:transclude"] = $tw.wiki.getTiddlerTranscludes(fromTRef);
-  }
-
-  for(var f in fromTObjFields) {
-    
-    var type = maETyFiNa[f];
-      
-    if(!type || (typeWL && !typeWL[type.id])) continue;
-    
-    if(type.namespace === "tw-field") {
-      refsByType[type.id] = [ fromTObjFields[f] ];
-    } else if(type.namespace === "tw-list") {
-      refsByType[type.id] = $tw.utils.parseStringArray(fromTObjFields[f]);
-    } else if(type.namespace === "tw-filter") {
-      var filter = fromTObjFields[f];
-      refsByType[type.id] = utils.getMatches(filter, toWL);
-    }
-  }
-  
-  if(!refsByType) return;
-    
-  // 2) Add edges to list
-  
-  var fromId = tObj.fields["tmap.id"];
-  var idByT = indeces.idByT;
-  var allETy = indeces.allETy;
-  
-  for(var typeId in refsByType) {
-    var toRefs = refsByType[typeId];
-    
-    if(!toRefs) continue;
-    
-    var type = allETy[typeId];
-    for(var i = toRefs.length; i--;) {
-      var toTRef = toRefs[i];
-      
-      if(!toTRef
-         || !$tw.wiki.tiddlerExists(toTRef)
-         || utils.isSystemOrDraft(toTRef)
-         || (toWL && !toWL[toTRef])) continue;
-
-      var id = type.id + $tw.utils.hashString(fromTRef + toTRef); 
-      var edge = this.makeEdge(fromId, idByT[toTRef], type, id);
-
-      if(edge) {
-        edges[edge.id] = edge;
-      }
-    }
-  }
-  
-};
-
-/**
- * Adds tmap-edges stored in a given tiddler to the edges list.
- * 
- * @private
- * 
- * @param {HashMap<Id, Edge>} edges - The list into which to inject
- *     the edges retrieved.
- * @param {$tw.Tiddler} tObj - A tiddler object from which to
- *     retrieve the edges.
- * @param {Hashmap<TiddlerReference, boolean>} [toWL]
- *     A hashmap on which basis it is decided, whether to include
- *     an edge that leads to a certain tiddler in the result or not.
- *     In this case, all edges stored in the tiddler are treated as
- *     outgoing and the arrow head is ignored. If not specified, 
- *     all edges are included.
- * @param {Hashmap<string, boolean>} [typeWL]
- *     A hashmap on which basis it is decided, whether to include
- *     an edge of a given type in the result or not. If not 
- *     specified, all edges are included.
- */
-Adapter.prototype._addTmapEdges = function(edges, tObj, toWL, typeWL) {
-  
-  var connections = utils.parseFieldData(tObj, "tmap.edges");
-  if(!connections) return;
-  
-  var tById = $tm.indeces.tById;
-  var fromId = tObj.fields["tmap.id"];
-  
-  for(var conId in connections) {
-    var con = connections[conId];
-    var toTRef = tById[con.to];
-    if(toTRef && (!toWL || toWL[toTRef]) && (!typeWL || typeWL[con.type])) {
-      var edge = this.makeEdge(fromId, con.to, con.type, conId);
-      if(edge) {
-        edges[conId] = edge;
-      }
-    }
-  }
-  
-};
-  
 /**
  * The method will return all outgoing edges for a subset of tiddlers.
  * 
@@ -848,37 +598,16 @@ Adapter.prototype.selectNodeById = function(id, options) {
 
 /**
  * Sets up an edge object that is ready to be consumed by vis.
- * 
- * @param {$tw.Tiddler|Id} from - A tiddler **object** or a node id
- *     representing the from part of the relationship.
- * @param {Object} connection - The connection object having
- *     the properties *to*, *id*, *type*.
- * @param {string|EdgeType} [type] - An optional edge type that
- *     overrides the type possibly specified by the connection object.
- * @return {Edge} An edge object.
+ *
  */
-Adapter.prototype.makeEdge = function(from, to, type, id) {
-  
-  if(!from || !to) return;
-  
-  if(from instanceof $tw.Tiddler) {
-    from = from.fields["tmap.id"];
-  } else if(typeof from === "object") { // expect node
-    from = from.id;
-  } // else use from value as id
-  
-  type = $tm.indeces.allETy[type] || new EdgeType(type);
-  var label = type.getLabel();
-      
-  var edge = {
-    id: (id || utils.genUUID()),
-    from: from,
-    to: to,
-    type: type.id
-  };
-    
+Adapter.prototype._addEdgeData = function(edge) {
+
+  if(!edge.from || !edge.to) return;
+
+  var type = $tm.indeces.allETy[edge.type] || new EdgeType(edge.type);
+
   if(utils.isTrue(type["show-label"], true)) {
-    edge.label = label;
+    edge.label = type.getLabel();
   }
 
   edge = $tw.utils.extend(edge, type.style);

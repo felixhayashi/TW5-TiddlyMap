@@ -123,7 +123,9 @@ EdgeType._getIdParts = function(str, rootPath) {
 
 EdgeType._getId = function(marker, namespace, name) {
 
-  return marker + namespace + (namespace ? ":" : "") + name;
+  if (!name) return;
+
+  return (marker || "") + (namespace ? namespace + ":" : "") + name;
 
 };
 

@@ -24,16 +24,17 @@ exports.startup = startup;
 
 /*** Imports *******************************************************/
 
-var visConfig       = require("$:/plugins/felixhayashi/tiddlymap/js/config/vis");
-var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
-var fixer           = require("$:/plugins/felixhayashi/tiddlymap/js/fixer");
-var Adapter         = require("$:/plugins/felixhayashi/tiddlymap/js/Adapter");
-var DialogManager   = require("$:/plugins/felixhayashi/tiddlymap/js/DialogManager");
-var CallbackManager = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager");
-var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
-var EdgeType        = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
-var NodeType        = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType");
-var vis             = require("$:/plugins/felixhayashi/vis/vis.js");
+var visConfig               = require("$:/plugins/felixhayashi/tiddlymap/js/config/vis");
+var utils                   = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+var fixer                   = require("$:/plugins/felixhayashi/tiddlymap/js/fixer");
+var Adapter                 = require("$:/plugins/felixhayashi/tiddlymap/js/Adapter");
+var EdgeTypeSubscriberRegistry = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeTypeSubscriberRegistry");
+var DialogManager           = require("$:/plugins/felixhayashi/tiddlymap/js/DialogManager");
+var CallbackManager         = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager");
+var ViewAbstraction         = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
+var EdgeType                = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
+var NodeType                = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType");
+var vis                     = require("$:/plugins/felixhayashi/vis/vis.js");
 
 /*** Code **********************************************************/
 
@@ -55,7 +56,13 @@ function startup() {
   $tm.NodeType = NodeType;
   $tm.EdgeType = EdgeType;
   $tm.ViewAbstraction = ViewAbstraction;
-  
+      
+  // inject modules
+  var handler = $tw.modules.applyMethods("tmap.edgetypehandler");
+  $tm.services = {
+    EdgeTypeSubscriberRegistry: new EdgeTypeSubscriberRegistry(handler)
+  };
+      
   // register url
   $tm.url = new $tm.utils.URL(window.location.href);
   
@@ -266,7 +273,7 @@ var updateEdgeTypesIndeces = function(parent) {
   var allETy = parent.allETy = utils.makeHashMap();
   // magic edge-type field name
   var maETyFiNa = parent.maETyFiNa = utils.makeHashMap();
-  var magicETyNamespaces = utils.getLookupTable($tm.misc.magicETyNamespaces);
+  var magicNamespaceSubscribers = $tm.services.EdgeTypeSubscriberRegistry.getMagicNamespaceSubscribers();
   
   $tw.wiki.eachTiddlerPlusShadows(function(tObj, tRef) {
     
@@ -275,7 +282,7 @@ var updateEdgeTypesIndeces = function(parent) {
       var et = new EdgeType(tRef);
       allETy[et.id] = et;
       
-      if(magicETyNamespaces[et.namespace]) {
+      if(magicNamespaceSubscribers[et.namespace]) {
         maETyFiNa[et.name] = et;
       }      
     }

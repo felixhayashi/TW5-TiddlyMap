@@ -33,15 +33,24 @@
  * 
  * An edge connects nodes in a vis.Network.
  */
+
+/**
+ * @typedef {Object} EdgeTypeSubscriberInfo
+ *
+ * @property {("_"|undefined)} [marker] - The marker of the edge type.
+ * @property {string} [namespace] - The namespace of the edge type.
+ * @property {string} [name] - The name of the edge type.
+ * @property {boolean} [include=true] - Whether or not this subscriber should be registered.
+ */
  
 /**
  * @typedef {Object} Node
- * 
+ *
+ * This object is used by the vis.Network.
+ *
  * @property {Id} id - The id of the node.
  * @property {string} label - The label of the node that will be displayed
  *     in the rendered graph.
- * 
- * This object is used by the vis.Network.
  */
  
 /**
@@ -104,9 +113,9 @@
  
 /**
  * @typedef {Object} Position
- * 
+ *
+ * An object containing x, y properties.
+ *
  * @property {number} x - The x coordinate.
  * @property {number} y - The y coordinate.
- * 
- * An object containing x, y properties.
  */

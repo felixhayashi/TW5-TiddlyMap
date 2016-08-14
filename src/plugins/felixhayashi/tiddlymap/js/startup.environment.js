@@ -79,12 +79,7 @@ function run(parent) {
     liveViewLabel: "Live View",
     defaultViewLabel: "Default",
     mainEditorId: "main_editor",
-    arrows: { "in": "⇦", "out": "➡", "bi": "⇄" },
-    magicETyNamespaces: [
-      "tw-list",
-      "tw-field",
-      "tw-filter"
-    ]
+    arrows: { "in": "⇦", "out": "➡", "bi": "⇄" }
   };
 
   $tm.config = {
@@ -124,7 +119,7 @@ function run(parent) {
     edgeTypes: "[prefix[" + $tm.path.edgeTypes + "]]",
     views: "[" + $tm.config.sys.field.viewMarker + "[true]]"
   };
-    
+
   $tm.filter.defaultEdgeTypeFilter = " -[prefix[_]]" +
                                    " -[[tw-body:link]]" +
                                    " -[[tw-list:tags]]" +

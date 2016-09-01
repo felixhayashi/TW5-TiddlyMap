@@ -817,17 +817,17 @@ utils.parseJSON = function(str, data) {
  * @param {Tiddler} tiddler - The tiddler to store the json in.
  * @param {string} field - The field that will store the json.
  * @param {Object} data - The json data.
- * @param {int} [indentation = 0] - the indentation
+ * @param {int} [indent = 0] - the indentation
  */
-utils.writeFieldData = function(tiddler, field, data, indentation) {
+utils.writeFieldData = function(tiddler, field, data, indent) {
 
   if(typeof data !== "object") {
     return;
   }
   
-  indentation = parseInt(indentation), (indentation > 0 ? indentation : 0);
+  indent = (indent > 0 && field === "text" ? indent : 0);
   
-  utils.setField(tiddler, field, JSON.stringify(data, null, indentation));
+  utils.setField(tiddler, field, JSON.stringify(data, null, indent));
   
 };
 

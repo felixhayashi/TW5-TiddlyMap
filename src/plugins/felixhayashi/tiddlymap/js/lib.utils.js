@@ -825,6 +825,7 @@ utils.writeFieldData = function(tiddler, field, data, indent) {
     return;
   }
   
+  indent = parseInt(indent);
   indent = (indent > 0 && field === "text" ? indent : 0);
   
   utils.setField(tiddler, field, JSON.stringify(data, null, indent));

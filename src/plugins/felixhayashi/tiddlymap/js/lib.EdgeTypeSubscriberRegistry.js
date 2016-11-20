@@ -19,85 +19,83 @@ module.exports = EdgeTypeSubscriberRegistry;
 /*** Imports *******************************************************/
 
 var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
-var MagicEdgeTypeSubscriber = require("$:/plugins/felixhayashi/tiddlymap/js/MagicEdgeTypeSubscriber");
-  
+
 /***************************** CODE ********************************/
 
 /**
+ * Registry to store and retrieve EdgeTypeSubcriber modules that are responsible
+ * for handling the retrieval, insertion and deletion of EdgeType objects.
+ *
  * @constructor
+ *
+ * @param {AbstractEdgeTypeSubscriber[]} subscribers
+ * @param {EdgeType[]} allEdgeTypes
  */
-function EdgeTypeSubscriberRegistry(subscribers) {
-  
-  this.allSubscribers = [];
-  this.namespaceSubscribers = utils.makeHashMap();
-  this.fullTypeSubscribers = utils.makeHashMap();
-  this.magicNamespaceSubscribers = utils.makeHashMap();
+function EdgeTypeSubscriberRegistry(subscribers, allEdgeTypes) {
 
-  for (var id in subscribers) {
-    
-    var subscriber = new (subscribers[id])();
-    var subscription = subscriber.subscription;
-        
-    // ignore all subscribers that have their ignore flag set to false
-    if (subscription.ignore === true) continue;
-    
-    this.allSubscribers.push(subscriber);
-    
-    // a subscriber without a subscription is regarded as default subscriber
-    if (subscription.fallback) {
-      this.defaultSubscriber = subscriber;
-    }
-    
-    if (subscription.type) {
-        this.fullTypeSubscribers[subscription.type] = subscriber;
-        continue;
-    }
-      
-    if (subscription.namespace) {
-      
-      this.namespaceSubscribers[subscription.namespace] = subscriber;
-      
-      if (subscription.magic) {
-        this.magicNamespaceSubscribers[subscription.namespace] = subscriber;
-      }
-      
-    }
-  }
+  this.subscriberClasses = subscribers;
+  this.updateIndex(allEdgeTypes);
+
 }
 
-EdgeTypeSubscriberRegistry.prototype.getAll = function() {
-  
-  return this.allSubscribers;
-  
-};
+/**
+ * Gets all matching subscribers for a type.
+ *
+ * @param {EdgeType} edgeType
+ * @returns AbstractEdgeTypeSubscriber[]
+ */
+EdgeTypeSubscriberRegistry.prototype.getAllForType = function(edgeType) {
 
-EdgeTypeSubscriberRegistry.prototype.getFullTypeSubscribers = function() {
-  
-  return this.fullTypeSubscribers;
-  
-};
+  var allSubscribers = this.allSubscribers;
+  var subscribersForType = [];
+  for (var i = 0, l = allSubscribers.length; i < l; i++) {
+    if (allSubscribers[i].canHandle(edgeType)) {
+      subscribersForType.push(allSubscribers[i]);
+      if (allSubscribers[i].skipOthers) {
+        break;
+      }
+    }
+  }
 
-EdgeTypeSubscriberRegistry.prototype.getNamespaceSubscribers = function() {
-
-  return this.namespaceSubscribers;
-
-};
-
-EdgeTypeSubscriberRegistry.prototype.getMagicNamespaceSubscribers = function() {
-
-  return this.magicNamespaceSubscribers;
+  return subscribersForType;
 
 };
 
 /**
- * Gets a subscriber that matches the namespace or returns the default subscriber
- * @param namespace
- * @returns {*}
+ * Gets all subscribers.
+ *
+ * @returns AbstractEdgeTypeSubscriber[]
  */
-EdgeTypeSubscriberRegistry.prototype.get = function(type) {
-  
-  return this.fullTypeSubscribers[type.id]
-         || this.namespaceSubscribers[type.namespace]
-         || this.defaultSubscriber;
-  
+EdgeTypeSubscriberRegistry.prototype.getAll = function() {
+
+  return this.allSubscribers;
+
+};
+
+/**
+ * Indexes all subscribers.
+ * Most importantly, subscribers get linked to the edge types that currently exist in the wiki.
+ *
+ * @param {EdgeType[]} allEdgeTypes
+ */
+EdgeTypeSubscriberRegistry.prototype.updateIndex = function(allEdgeTypes) {
+
+  var allSubscribers = [];
+
+  // instantiate and register all active subscriber modules
+  var subscriberClass = this.subscriberClasses;
+  for (var moduleName in subscriberClass) {
+    var subscriber = new (subscriberClass[moduleName])(allEdgeTypes);
+
+    // ignore all subscribers that have their ignore flag set to false
+    if (subscriber.ignore === true) continue;
+
+    allSubscribers.push(subscriber);
+  }
+
+  // sort subscribers by priority
+  allSubscribers.sort(function(sub1, sub2) { return sub2.priority - sub1.priority; } );
+
+  this.allSubscribers = allSubscribers;
+
 };

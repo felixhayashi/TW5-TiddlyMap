@@ -28,6 +28,7 @@ var AbstractRefEdgeTypeSubscriber = require("$:/plugins/felixhayashi/tiddlymap/j
  * Note: This subscriber only retrieves edges, however doesn't store or delete them. It only
  * works if the `$tw.wiki.getTiddlerTranscludes` method is present in the wiki.
  *
+ * @inheritDoc
  * @constructor
  */
 function TranscludeEdgeTypeSubscriber(allEdgeTypes) {
@@ -64,6 +65,6 @@ TranscludeEdgeTypeSubscriber.prototype.getReferences = function(tObj, toWL, type
     return;
   }
 
-  return utils.makeHashMap({ 'tw-body:transclude': toRefs });
+  return { 'tw-body:transclude': toRefs };
 
 };

@@ -30,6 +30,8 @@ var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
  * Note: This subscriber only retrieves edges, however doesn't store or delete them.
  *
  * @see http://tiddlymap.org/#tw-body
+ *
+ * @inheritDoc
  * @constructor
  */
 function LinkEdgeTypeSubscriber(allEdgeTypes) {
@@ -62,7 +64,7 @@ LinkEdgeTypeSubscriber.prototype.getReferences = function(tObj, toWL, typeWL) {
     return;
   }
 
-  return utils.makeHashMap({ 'tw-body:link': toRefs });
+  return { 'tw-body:link': toRefs };
 
 };
 

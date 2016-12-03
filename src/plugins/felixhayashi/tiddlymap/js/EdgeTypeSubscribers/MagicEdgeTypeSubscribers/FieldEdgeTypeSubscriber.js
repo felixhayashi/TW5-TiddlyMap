@@ -8,18 +8,14 @@ module-type: tmap.edgetypehandler
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
 /*** Exports *******************************************************/
 
-exports["tw-field"] = FieldEdgeTypeSubscriber;
+exports['tw-field'] = FieldEdgeTypeSubscriber;
 
 /*** Imports *******************************************************/
 
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
-var AbstractMagicEdgeTypeSubscriber = require("$:/plugins/felixhayashi/tiddlymap/js/AbstractMagicEdgeTypeSubscriber");
+var utils = require('$:/plugins/felixhayashi/tiddlymap/js/utils');
+var AbstractMagicEdgeTypeSubscriber = require('$:/plugins/felixhayashi/tiddlymap/js/AbstractMagicEdgeTypeSubscriber');
 
 /*** Code **********************************************************/
 
@@ -38,6 +34,8 @@ var AbstractMagicEdgeTypeSubscriber = require("$:/plugins/felixhayashi/tiddlymap
  * Note: A single field can only hold one connection.
  *
  * @see http://tiddlymap.org/#tw-field
+ *
+ * @inheritDoc
  * @constructor
  */
 function FieldEdgeTypeSubscriber(allEdgeTypes) {
@@ -56,6 +54,15 @@ FieldEdgeTypeSubscriber.prototype = Object.create(AbstractMagicEdgeTypeSubscribe
 FieldEdgeTypeSubscriber.prototype.priority = 10;
 
 /**
+ * @inheritDoc
+ */
+FieldEdgeTypeSubscriber.prototype.canHandle = function(edgeType) {
+
+  return edgeType.namespace === 'tw-field';
+
+};
+
+/**
  * @override
  */
 FieldEdgeTypeSubscriber.prototype.getReferencesFromField = function(tObj, fieldName) {
@@ -71,7 +78,9 @@ FieldEdgeTypeSubscriber.prototype.getReferencesFromField = function(tObj, fieldN
 FieldEdgeTypeSubscriber.prototype.insertEdge = function(tObj, edge, type) {
 
   var toTRef = $tm.indeces.tById[edge.to];
-  if(toTRef == null) return; // null or undefined
+  if (toTRef == null) { // null or undefined
+    return;
+  }
 
   // only use the name without the private marker or the namespace
   utils.setField(tObj, type.name, toTRef);
@@ -86,20 +95,11 @@ FieldEdgeTypeSubscriber.prototype.insertEdge = function(tObj, edge, type) {
 FieldEdgeTypeSubscriber.prototype.deleteEdge = function(tObj, edge, type) {
 
   var toTRef = $tm.indeces.tById[edge.to];
-  if(toTRef == null) return; // null or undefined
+  if (toTRef == null) return; // null or undefined
 
   // only use the name without the private marker or the namespace
-  utils.setField(tObj, type.name, "");
+  utils.setField(tObj, type.name, '');
 
   return edge;
-
-};
-
-/**
- * @inheritDoc
- */
-FieldEdgeTypeSubscriber.prototype.canHandle = function(edgeType) {
-
-  return edgeType.namespace === "tw-field";
 
 };

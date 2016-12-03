@@ -10,16 +10,16 @@ module-type: tmap.edgetypehandler
 
 /*jslint node: true, browser: true */
 /*global $tw: false */
-"use strict";
+'use strict';
 
 /*** Exports *******************************************************/
 
-exports["tw-list"] = ListEdgeTypeSubscriber;
+exports['tw-list'] = ListEdgeTypeSubscriber;
 
 /*** Imports *******************************************************/
 
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
-var AbstractMagicEdgeTypeSubscriber = require("$:/plugins/felixhayashi/tiddlymap/js/AbstractMagicEdgeTypeSubscriber");
+var utils = require('$:/plugins/felixhayashi/tiddlymap/js/utils');
+var AbstractMagicEdgeTypeSubscriber = require('$:/plugins/felixhayashi/tiddlymap/js/AbstractMagicEdgeTypeSubscriber');
 
 /*** Code **********************************************************/
 
@@ -27,7 +27,7 @@ var AbstractMagicEdgeTypeSubscriber = require("$:/plugins/felixhayashi/tiddlymap
  * The ListEdgeTypeSubstriber deals with connections that are stored inside
  * tiddler fields in a tiddler-list format.
  *
- * If an EdgeType with a "tw-list" namespace is inserted or deleted, the type's name
+ * If an EdgeType with a 'tw-list" namespace is inserted or deleted, the type's name
  * is interpreted as field name and the list of connections is stored or removed in a tiddler
  * field with of that name. Each outgoing connection to a tiddler is stored by
  * inserting the title the edge is pointing to into a list.
@@ -38,6 +38,8 @@ var AbstractMagicEdgeTypeSubscriber = require("$:/plugins/felixhayashi/tiddlymap
  * added to this field.
  *
  * @see http://tiddlymap.org/#tw-list
+ *
+ * @inheritDoc
  * @constructor
  */
 function ListEdgeTypeSubscriber(allEdgeTypes) {
@@ -58,6 +60,15 @@ ListEdgeTypeSubscriber.prototype.priority = 10;
 /**
  * @inheritDoc
  */
+ListEdgeTypeSubscriber.prototype.canHandle = function(edgeType) {
+
+  return edgeType.namespace === 'tw-list';
+
+};
+
+/**
+ * @inheritDoc
+ */
 ListEdgeTypeSubscriber.prototype.getReferencesFromField = function(tObj, fieldName, toWL) {
 
   return $tw.utils.parseStringArray(tObj.fields[fieldName]);
@@ -65,7 +76,7 @@ ListEdgeTypeSubscriber.prototype.getReferencesFromField = function(tObj, fieldNa
 };
 
 /**
- * Stores and maybe overrides an edge in this tiddler
+ * @inheritDoc
  */
 ListEdgeTypeSubscriber.prototype.insertEdge = function(tObj, edge, type) {
 
@@ -93,7 +104,7 @@ ListEdgeTypeSubscriber.prototype.insertEdge = function(tObj, edge, type) {
 };
 
 /**
- * Deletes an edge in this tiddler
+ * @inheritDoc
  */
 ListEdgeTypeSubscriber.prototype.deleteEdge = function(tObj, edge, type) {
 
@@ -115,14 +126,5 @@ ListEdgeTypeSubscriber.prototype.deleteEdge = function(tObj, edge, type) {
   utils.setField(tObj, type.name, $tw.utils.stringifyList(list));
 
   return edge;
-
-};
-
-/**
- * @inheritDoc
- */
-ListEdgeTypeSubscriber.prototype.canHandle = function(edgeType) {
-
-  return edgeType.namespace === "tw-list";
 
 };

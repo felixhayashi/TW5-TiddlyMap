@@ -25,6 +25,9 @@ var AbstractEdgeTypeSubscriber  = require("$:/plugins/felixhayashi/tiddlymap/js/
 /*** Code **********************************************************/
 
 /**
+ * TiddlyMap's original EdgeTypeSubscriber. It will store and retrieve edges by relying on
+ * json stored in a tiddler field.
+ *
  * @constructor
  */
 function TmapEdgeTypeSubscriber(allEdgeTypes) {
@@ -47,11 +50,11 @@ TmapEdgeTypeSubscriber.prototype.priority = 0;
  */
 TmapEdgeTypeSubscriber.prototype.loadEdges = function(tObj, toWL, typeWL) {
 
-  var connections = utils.parseFieldData(tObj, "tmap.edges");
+  var connections = utils.parseFieldData(tObj, 'tmap.edges');
   if(!connections) return;
 
   var tById = $tm.indeces.tById;
-  var fromId = tObj.fields["tmap.id"];
+  var fromId = tObj.fields['tmap.id'];
 
   var edges = utils.makeHashMap();
 
@@ -68,12 +71,12 @@ TmapEdgeTypeSubscriber.prototype.loadEdges = function(tObj, toWL, typeWL) {
 };
 
 /**
- * Stores and maybe overrides an edge in this tiddler
+ * @inheritDoc
  */
 TmapEdgeTypeSubscriber.prototype.insertEdge = function(tObj, edge, type) {
 
   // load existing connections
-  var connections = utils.parseFieldData(tObj, "tmap.edges", {});
+  var connections = utils.parseFieldData(tObj, 'tmap.edges', {});
 
   // assign new id if not present yet
   edge.id = edge.id || utils.genUUID();
@@ -81,32 +84,35 @@ TmapEdgeTypeSubscriber.prototype.insertEdge = function(tObj, edge, type) {
   connections[edge.id] = { to: edge.to, type: type.id };
 
   // save
-  utils.writeFieldData(tObj, "tmap.edges", connections, $tm.config.sys.jsonIndentation);
+  utils.writeFieldData(tObj, 'tmap.edges', connections, $tm.config.sys.jsonIndentation);
 
   return edge;
 
 };
 
 /**
- * Deletes an edge in this tiddler
+ * @inheritDoc
  */
 TmapEdgeTypeSubscriber.prototype.deleteEdge = function(tObj, edge, type) {
 
   if(!edge.id) return;
 
   // load
-  var connections = utils.parseFieldData(tObj, "tmap.edges", {});
+  var connections = utils.parseFieldData(tObj, 'tmap.edges', {});
 
   // delete
   delete connections[edge.id];
 
   // save
-  utils.writeFieldData(tObj, "tmap.edges", connections, $tm.config.sys.jsonIndentation);
+  utils.writeFieldData(tObj, 'tmap.edges', connections, $tm.config.sys.jsonIndentation);
 
   return edge;
 
 };
 
+/**
+ * @inheritDoc
+ */
 TmapEdgeTypeSubscriber.prototype.canHandle = function(edgeType) {
 
   return true;

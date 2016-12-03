@@ -77,7 +77,7 @@ function startup() {
 
   // inject modules
   var handler = $tw.modules.applyMethods("tmap.edgetypehandler");
-  $tm.services.EdgeTypeSubscriberRegistry = new EdgeTypeSubscriberRegistry(handler, $tm.indeces.allETy);
+  $tm.services.edgeTypeSubscriberRegistry = new EdgeTypeSubscriberRegistry(handler, $tm.indeces.allETy);
 
   // set defaults
   setDefaults();
@@ -282,8 +282,8 @@ var updateEdgeTypesIndeces = function(parent) {
 
   });
 
-  if ($tm.services.EdgeTypeSubscriberRegistry) {
-    $tm.services.EdgeTypeSubscriberRegistry.updateIndex(allETy);
+  if ($tm.services.edgeTypeSubscriberRegistry) {
+    $tm.services.edgeTypeSubscriberRegistry.updateIndex(allETy);
   }
 
 };

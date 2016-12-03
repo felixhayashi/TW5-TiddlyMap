@@ -92,10 +92,8 @@ Adapter.prototype.deleteEdges = function(edges) {
 
 /**
  * Private function to handle the insertion or deletion of an edge.
- * It prepares the process arcoding to the action type and delegates
+ * It prepares the process according to the action type and delegates
  * the task to more specific functions.
- *
- * The edge type is optional!!
  *
  * @private
  * @return {Edge} The processed edge.
@@ -113,7 +111,7 @@ Adapter.prototype._processEdge = function(edge, action) {
 
   var tObj = utils.getTiddler(fromTRef);
   var type = new EdgeType(edge.type);
-  var handlers = $tm.services.EdgeTypeSubscriberRegistry.getAllForType(type);
+  var handlers = $tm.services.edgeTypeSubscriberRegistry.getAllForType(type);
   var fn = action + "Edge";
 
   for(var i = handlers.length; i--;) {
@@ -418,8 +416,8 @@ Adapter.prototype.getEdges = function(tiddler, toWL, typeWL) {
 
   var edges = utils.makeHashMap();
 
-  var eTySubscribers = $tm.services.EdgeTypeSubscriberRegistry.getAll();
-  for(var i = eTySubscribers.length; i--;) {
+  var eTySubscribers = $tm.services.edgeTypeSubscriberRegistry.getAll();
+  for(var i = 0, l = eTySubscribers.length; i < l; i++) {
     $tw.utils.extend(edges, (eTySubscribers[i]).loadEdges(tObj, toWL, typeWL));
   }
 
@@ -594,6 +592,7 @@ Adapter.prototype.selectNodeById = function(id, options) {
 /**
  * Sets up an edge object that is ready to be consumed by vis.
  *
+ * @param {Edge} edge
  */
 Adapter.prototype._addEdgeData = function(edge) {
 

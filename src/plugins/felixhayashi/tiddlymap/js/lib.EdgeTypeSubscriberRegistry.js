@@ -8,10 +8,6 @@ module-type: library
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
 /*** Exports *******************************************************/
 
 module.exports = EdgeTypeSubscriberRegistry;
@@ -73,8 +69,11 @@ EdgeTypeSubscriberRegistry.prototype.getAll = function() {
 };
 
 /**
- * Indexes all subscribers.
- * Most importantly, subscribers get linked to the edge types that currently exist in the wiki.
+ * Indexes all subscribers. Moreover, subscribers get linked to the edge
+ * types that currently exist in the wiki.
+ *
+ * This method should be called everytime after an edge type is added or
+ * removed in the system.
  *
  * @param {EdgeType[]} allEdgeTypes
  */
@@ -94,7 +93,7 @@ EdgeTypeSubscriberRegistry.prototype.updateIndex = function(allEdgeTypes) {
   }
 
   // sort subscribers by priority
-  allSubscribers.sort(function(sub1, sub2) { return sub2.priority - sub1.priority; } );
+  allSubscribers.sort(function(s1, s2) { return s2.priority - s1.priority; } );
 
   this.allSubscribers = allSubscribers;
 

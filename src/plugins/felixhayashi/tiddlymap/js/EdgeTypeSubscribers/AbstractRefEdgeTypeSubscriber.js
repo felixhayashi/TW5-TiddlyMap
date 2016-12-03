@@ -8,26 +8,25 @@ module-type: library
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
 /*** Exports *******************************************************/
 
 module.exports = AbstractRefEdgeTypeSubscriber;
 
 /*** Imports *******************************************************/
 
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
-var Edge  = require("$:/plugins/felixhayashi/tiddlymap/js/Edge");
-var AbstractEdgeTypeSubscriber  = require("$:/plugins/felixhayashi/tiddlymap/js/AbstractEdgeTypeSubscriber");
+var utils = require('$:/plugins/felixhayashi/tiddlymap/js/utils');
+var Edge  = require('$:/plugins/felixhayashi/tiddlymap/js/Edge');
+var AbstractEdgeTypeSubscriber  = require('$:/plugins/felixhayashi/tiddlymap/js/AbstractEdgeTypeSubscriber');
 
 /*** Code **********************************************************/
 
 /**
- * @constructor
+ * Parent class for all subscribers that retrieve or store
+ * non-TiddlyMap edges ({@see TmapEdgeTypeSubscriber) from a tiddler,
+ * for example tag or list references.
  *
- * @param {Object.<id, EdgeType>} [allEdgeTypes] -  EdgeTypes that are handled by this subscriber
+ * @constructor
+ * @inheritDoc
  */
 function AbstractRefEdgeTypeSubscriber(allEdgeTypes) {
 
@@ -49,7 +48,7 @@ AbstractRefEdgeTypeSubscriber.prototype.loadEdges = function(tObj, toWL, typeWL)
 
   if (!refsByType || !utils.hasElements(refsByType)) return;
 
-  var fromId = tObj.fields["tmap.id"];
+  var fromId = tObj.fields['tmap.id'];
   var idByT = $tm.indeces.idByT;
   var allETy = this.allEdgeTypes;
   var fromTRef = utils.getTiddlerRef(tObj);
@@ -80,7 +79,7 @@ AbstractRefEdgeTypeSubscriber.prototype.loadEdges = function(tObj, toWL, typeWL)
 };
 
 /**
- * Returns a list of references (= tiddler names) that are targeted by the specified tiddler.
+ * Returns a list of tiddlers (= tiddler names) that are targeted by the specified tiddler.
  * Note: All referenced tiddlers have to be grouped by their edge type.
  *
  * @param {Tiddler} tObj - the tiddler that holds the references.
@@ -88,7 +87,7 @@ AbstractRefEdgeTypeSubscriber.prototype.loadEdges = function(tObj, toWL, typeWL)
  *     be included in the result.
  * @param {Object<id, EdgeType>} typeWL - a whitelist that defines that only Tiddlers that are linked
  *     via a type specified in the list may be included in the result.
- * @return {Object<EdgeTypeId, TiddlerReference[]>|null}
+ * @return {Object<string, TiddlerReference[]>|null} a list of referenced tiddlers grouped by their edge type.
  */
 AbstractRefEdgeTypeSubscriber.prototype.getReferences = function(tObj, toWL, typeWL) {
 

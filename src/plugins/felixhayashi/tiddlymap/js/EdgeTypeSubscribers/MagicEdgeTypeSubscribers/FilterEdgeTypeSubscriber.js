@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/modules/edge-type-handler/filter
@@ -8,18 +9,10 @@ module-type: tmap.edgetypehandler
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-exports["tw-filter"] = FilterEdgeTypeSubstriber;
-
 /*** Imports *******************************************************/
 
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
-var AbstractMagicEdgeTypeSubscriber = require("$:/plugins/felixhayashi/tiddlymap/js/AbstractMagicEdgeTypeSubscriber");
+import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
+import AbstractMagicEdgeTypeSubscriber from '$:/plugins/felixhayashi/tiddlymap/js/AbstractMagicEdgeTypeSubscriber';
 
 /*** Code **********************************************************/
 
@@ -29,41 +22,38 @@ var AbstractMagicEdgeTypeSubscriber = require("$:/plugins/felixhayashi/tiddlymap
  *
  * @see http://tiddlymap.org/#tw-filter
  * @see https://github.com/felixhayashi/TW5-TiddlyMap/issues/206
- *
- * @constructor
  */
-function FilterEdgeTypeSubstriber(allEdgeTypes) {
+class FilterEdgeTypeSubstriber extends AbstractMagicEdgeTypeSubscriber {
 
-  AbstractMagicEdgeTypeSubscriber.call(this, allEdgeTypes);
+  /**
+   * @inheritDoc
+   */
+  constructor(allEdgeTypes, options = {}) {
+    super(allEdgeTypes, { priority: 10, ...options });
+  }
 
+  /**
+   * @inheritDoc
+   */
+  canHandle(edgeType) {
+
+    return edgeType.namespace === 'tw-filter';
+
+  }
+
+  /**
+   * @override
+   */
+  getReferencesFromField(tObj, fieldName) {
+
+    var filter = tObj.fields[fieldName];
+    var toRefs = utils.getMatches(filter, toWL);
+
+    return toRefs;
+
+  }
 }
 
-// !! EXTENSION !!
-FilterEdgeTypeSubstriber.prototype = Object.create(AbstractMagicEdgeTypeSubscriber.prototype);
-// !! EXTENSION !!
+/*** Exports *******************************************************/
 
-/**
- * @inheritDoc
- */
-FilterEdgeTypeSubstriber.prototype.priority = 10;
-
-/**
- * @inheritDoc
- */
-FilterEdgeTypeSubstriber.prototype.canHandle = function(edgeType) {
-
-  return edgeType.namespace === "tw-filter";
-
-};
-
-/**
- * @override
- */
-FilterEdgeTypeSubstriber.prototype.getReferencesFromField = function(tObj, fieldName, toWL) {
-
-  var filter = tObj.fields[fieldName];
-  var toRefs = utils.getMatches(filter, toWL);
-
-  return toRefs;
-
-};
+export { FilterEdgeTypeSubstriber };

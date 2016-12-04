@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/startup/environment
@@ -7,20 +8,6 @@ module-type: startup
 @preserve
 
 \*/
-  
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-// Export name and synchronous status
-exports.name = "tmap.environment";
-exports.platforms = [ "browser" ];
-exports.after = [ "startup" ];
-exports.before = [ "tmap.caretaker" ];
-exports.synchronous = true;
-exports.startup = run;
 
 /*** Imports *******************************************************/
 
@@ -148,3 +135,13 @@ function run(parent) {
   s.allPotentialNodes = "[all[tiddlers]!is[system]!has[draft.of]]";
 
 };
+
+
+/*** Exports *******************************************************/
+
+export const name = "tmap.environment";
+export const platforms = [ "browser" ];
+export const after = [ "startup" ];
+export const before = [ "tmap.caretaker" ];
+export const synchronous = true;
+export const startup = run;

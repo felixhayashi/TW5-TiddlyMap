@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/modules/edge-type-handler/tmap
@@ -8,19 +9,11 @@ module-type: tmap.edgetypehandler
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-exports["tmap"] = TmapEdgeTypeSubscriber;
-
 /*** Imports *******************************************************/
 
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
-var Edge  = require("$:/plugins/felixhayashi/tiddlymap/js/Edge");
-var AbstractEdgeTypeSubscriber  = require("$:/plugins/felixhayashi/tiddlymap/js/AbstractEdgeTypeSubscriber");
+import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
+import Edge from '$:/plugins/felixhayashi/tiddlymap/js/Edge';
+import AbstractEdgeTypeSubscriber from '$:/plugins/felixhayashi/tiddlymap/js/AbstractEdgeTypeSubscriber';
 
 /*** Code **********************************************************/
 
@@ -30,92 +23,87 @@ var AbstractEdgeTypeSubscriber  = require("$:/plugins/felixhayashi/tiddlymap/js/
  *
  * @constructor
  */
-function TmapEdgeTypeSubscriber(allEdgeTypes) {
+class TmapEdgeTypeSubscriber extends AbstractEdgeTypeSubscriber {
 
-  AbstractEdgeTypeSubscriber.call(this, allEdgeTypes);
-
-}
-
-// !! EXTENSION !!
-TmapEdgeTypeSubscriber.prototype = Object.create(AbstractEdgeTypeSubscriber.prototype);
-// !! EXTENSION !!
-
-/**
- * @inheritDoc
- */
-TmapEdgeTypeSubscriber.prototype.priority = 0;
-
-/**
- * @inheritDoc
- */
-TmapEdgeTypeSubscriber.prototype.loadEdges = function(tObj, toWL, typeWL) {
-
-  var connections = utils.parseFieldData(tObj, 'tmap.edges');
-  if(!connections) return;
-
-  var tById = $tm.indeces.tById;
-  var fromId = tObj.fields['tmap.id'];
-
-  var edges = utils.makeHashMap();
-
-  for(var conId in connections) {
-    var con = connections[conId];
-    var toTRef = tById[con.to];
-    if(toTRef && (!toWL || toWL[toTRef]) && (!typeWL || typeWL[con.type])) {
-      edges[conId] = new Edge(fromId, con.to, con.type, conId);
-    }
+  constructor(allEdgeTypes, options = {}) {
+    super(allEdgeTypes, { priority: 0, ...options });
   }
 
-  return edges;
+  /**
+   * @inheritDoc
+   */
+  loadEdges(tObj, toWL, typeWL) {
 
-};
+    var connections = utils.parseFieldData(tObj, 'tmap.edges');
+    if (!connections) return;
 
-/**
- * @inheritDoc
- */
-TmapEdgeTypeSubscriber.prototype.insertEdge = function(tObj, edge, type) {
+    var tById = $tm.indeces.tById;
+    var fromId = tObj.fields['tmap.id'];
 
-  // load existing connections
-  var connections = utils.parseFieldData(tObj, 'tmap.edges', {});
+    var edges = utils.makeHashMap();
 
-  // assign new id if not present yet
-  edge.id = edge.id || utils.genUUID();
-  // add to connections object
-  connections[edge.id] = { to: edge.to, type: type.id };
+    for (var conId in connections) {
+      var con = connections[conId];
+      var toTRef = tById[con.to];
+      if (toTRef && (!toWL || toWL[toTRef]) && (!typeWL || typeWL[con.type])) {
+        edges[conId] = new Edge(fromId, con.to, con.type, conId);
+      }
+    }
 
-  // save
-  utils.writeFieldData(tObj, 'tmap.edges', connections, $tm.config.sys.jsonIndentation);
+    return edges;
 
-  return edge;
+  }
 
-};
+  /**
+   * @inheritDoc
+   */
+  insertEdge(tObj, edge, type) {
 
-/**
- * @inheritDoc
- */
-TmapEdgeTypeSubscriber.prototype.deleteEdge = function(tObj, edge, type) {
+    // load existing connections
+    var connections = utils.parseFieldData(tObj, 'tmap.edges', {});
 
-  if(!edge.id) return;
+    // assign new id if not present yet
+    edge.id = edge.id || utils.genUUID();
+    // add to connections object
+    connections[edge.id] = {to: edge.to, type: type.id};
 
-  // load
-  var connections = utils.parseFieldData(tObj, 'tmap.edges', {});
+    // save
+    utils.writeFieldData(tObj, 'tmap.edges', connections, $tm.config.sys.jsonIndentation);
 
-  // delete
-  delete connections[edge.id];
+    return edge;
 
-  // save
-  utils.writeFieldData(tObj, 'tmap.edges', connections, $tm.config.sys.jsonIndentation);
+  }
 
-  return edge;
+  /**
+   * @inheritDoc
+   */
+  deleteEdge (tObj, edge, type) {
 
-};
+    if (!edge.id) return;
 
-/**
- * @inheritDoc
- */
-TmapEdgeTypeSubscriber.prototype.canHandle = function(edgeType) {
+    // load
+    var connections = utils.parseFieldData(tObj, 'tmap.edges', {});
 
-  return true;
+    // delete
+    delete connections[edge.id];
 
-};
+    // save
+    utils.writeFieldData(tObj, 'tmap.edges', connections, $tm.config.sys.jsonIndentation);
 
+    return edge;
+
+  }
+
+  /**
+   * @inheritDoc
+   */
+  canHandle(edgeType) {
+
+    return true;
+
+  }
+}
+
+/*** Exports *******************************************************/
+
+export { TmapEdgeTypeSubscriber };

@@ -1,3 +1,4 @@
+// tw-module
 /*\
 title: $:/plugins/felixhayashi/tiddlymap/js/macro/tmap
 type: application/javascript
@@ -7,23 +8,17 @@ module-type: macro
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-exports.name = "tmap";
-exports.params = getParamSlots(5);
-exports.run = run;
 
 /*** Imports *******************************************************/
 
-var EdgeType        = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
-var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
-var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
+import EdgeType from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
+import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
+import ViewAbstraction from '$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction';
   
 /*** Code **********************************************************/
+
+const name = "tmap";
+const params = getParamSlots(5);
 
 /**
  * @this MacroCallWidget
@@ -37,7 +32,7 @@ function run() {
   var fn = command[arguments[0]];
   var result = null;
   
-  if(typeof fn === "function") {
+  if (typeof fn === "function") {
     var args = Array.prototype.slice.call(arguments,1);
     var result = fn.apply(this, args);
   }
@@ -55,7 +50,7 @@ function getParamSlots(maxArgs) {
   
   var arr = [];
   
-  for(var i = 0; i < maxArgs; i++) {
+  for (var i = 0; i < maxArgs; i++) {
     arr.push({ name : ("arg" + i) });
   };
   
@@ -123,7 +118,7 @@ command.splitAndSelect = function(separator, index) {
 command.concat = function() {
   
   var str = "";
-  for(var i = 1, l = arguments.length; i < l; i++) {
+  for (var i = 1, l = arguments.length; i < l; i++) {
     str += arguments[i];
   }
   return str;
@@ -150,7 +145,7 @@ command.regRepl = function() {
 command.halfOfString = function() {
 
   var str = this.substVarRefs(arguments[0]);
-  if(!str) return "";
+  if (!str) return "";
   
   return str.substr(0, Math.ceil(str.length / 2));
                        
@@ -173,7 +168,7 @@ command.getETyId = function(viewNS, id) {
 command.scale = function() {
   
   var str = "";
-  for(var i = 1, l = parseInt(arguments[0]); i < l; i++) {
+  for (var i = 1, l = parseInt(arguments[0]); i < l; i++) {
     str += "[[" + i + "]]";
   }
   return str;
@@ -186,12 +181,12 @@ command.mergeFields = function() {
   var prefix = arguments[1];
   var separator = arguments[2] || " ";
 
-  if(!tObj) return;
+  if (!tObj) return;
 
   var fields = utils.getPropertiesByPrefix(tObj.fields, prefix);
   var str = "";
-  for(var name in fields) {
-    if(typeof fields[name] === "string") {
+  for (var name in fields) {
+    if (typeof fields[name] === "string") {
       str += fields[name] + separator;
     }
   }
@@ -204,14 +199,14 @@ command.option = function(path, unit) {
   var prop = $tm;
   var propertyPath = path.split(".");
 
-  for(var i = 0; i < propertyPath.length; i++) {
-    if(typeof prop == "object" && prop[propertyPath[i]]) {
+  for (var i = 0; i < propertyPath.length; i++) {
+    if (typeof prop == "object" && prop[propertyPath[i]]) {
       prop = prop[propertyPath[i]];
     }        
   }
   
   // TODO: ugly, use regex
-  if(unit && typeof prop === "string"
+  if (unit && typeof prop === "string"
      && utils.hasSubString(unit)
      && (prop.lastIndexOf(unit) + unit.length) === prop.length) {
     prop = prop + unit;
@@ -220,3 +215,7 @@ command.option = function(path, unit) {
   return prop;
                        
 };
+
+/*** Exports *******************************************************/
+
+export { run, name, params };

@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/fixer
@@ -8,38 +9,30 @@ module-type: library
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-module.exports = {};
-
 /*** Imports *******************************************************/
  
-var utils =           require("$:/plugins/felixhayashi/tiddlymap/js/utils");
-var Adapter =         require("$:/plugins/felixhayashi/tiddlymap/js/Adapter");
-var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
-var EdgeType =        require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
+import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
+import Adapter from '$:/plugins/felixhayashi/tiddlymap/js/Adapter';
+import ViewAbstraction from '$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction';
+import EdgeType from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
 
 /*** Code **********************************************************/
 
 var moveEdges = function(path, view) {
     
   var matches = utils.getTiddlersByPrefix(path);
-  for(var i = 0; i < matches.length; i++) {
+  for (var i = 0; i < matches.length; i++) {
     
     // create edge type
     var type = utils.getBasename(matches[i]);
-    if(type === "__noname__") { type = "tmap:unknown"; }
+    if (type === "__noname__") { type = "tmap:unknown"; }
     type = new EdgeType(type);
     
-    if(!type.exists()) type.save();
+    if (!type.exists()) type.save();
 
     // move edges
     var edges = $tw.wiki.getTiddlerData(matches[i]);
-    for(var j = 0; j < edges.length; j++) {        
+    for (var j = 0; j < edges.length; j++) {        
       // prefix formerly private edges with view name as namespace
       edges[j].type = (view ? view + ":" : "") + type.id;
       $tm.adapter.insertEdge(edges[j]);
@@ -54,7 +47,7 @@ var moveEdges = function(path, view) {
 
 var executeUpgrade = function(toVersion, curVersion, upgrade) {
   
-  if(!utils.isLeftVersionGreater(toVersion, curVersion)) return;
+  if (!utils.isLeftVersionGreater(toVersion, curVersion)) return;
   // = current data structure version is newer than version we
   // want to upgrade to.
     
@@ -69,7 +62,7 @@ var executeUpgrade = function(toVersion, curVersion, upgrade) {
   
 };
 
-var fixer = module.exports;
+var fixer = {};
 
 /**
  * Special fix that is not invoked along with the other fixes but
@@ -86,7 +79,7 @@ fixer.fixId = function() {
   
   executeUpgrade("0.9.2", meta.dataStructureState, function() {
     
-    if(utils.isLeftVersionGreater("0.9.2", meta.originalVersion)) {
+    if (utils.isLeftVersionGreater("0.9.2", meta.originalVersion)) {
       // path of the user conf at least in 0.9.2
       var userConf = "$:/plugins/felixhayashi/tiddlymap/config/sys/user";
       var nodeIdField = utils.getEntry(userConf, "field.nodeId", "tmap.id");
@@ -117,7 +110,7 @@ fixer.fix = function() {
     // move edges that were formerly bound to view ("private")
     var filter = $tm.selector.allViews;
     var viewRefs = utils.getMatches(filter);
-    for(var i = 0; i < viewRefs.length; i++) {
+    for (var i = 0; i < viewRefs.length; i++) {
       var view = new ViewAbstraction(viewRefs[i]);
       moveEdges(view.getRoot()+"/graph/edges", view);
     }
@@ -131,7 +124,7 @@ fixer.fix = function() {
   executeUpgrade("0.7.32", meta.dataStructureState, function() {
     
     var liveView = new $tm.ViewAbstraction("Live View");
-    if(!liveView.exists()) return;
+    if (!liveView.exists()) return;
     
     // Only listen to the current tiddler of the history list
     liveView.setNodeFilter("[field:title{$:/temp/tmap/currentTiddler}]",
@@ -159,7 +152,7 @@ fixer.fix = function() {
     var confRef = $tm.ref.visUserConf;
     var userConf = utils.unflatten($tw.wiki.getTiddlerData(confRef, {}));
     
-    if(typeof userConf.groups === "object") {
+    if (typeof userConf.groups === "object") {
                 
       var type = new $tm.NodeType("tmap:neighbour");
       type.setStyle(userConf.groups["neighbours"]);
@@ -187,7 +180,7 @@ fixer.fix = function() {
   executeUpgrade("0.9.16", meta.dataStructureState, function() {
     
     var glNTy = $tm.indeces.glNTy;
-    for(var i = glNTy.length; i--;) {
+    for (var i = glNTy.length; i--;) {
       glNTy[i].save(null, true);
     }
     
@@ -199,7 +192,7 @@ fixer.fix = function() {
   executeUpgrade("0.10.3", meta.dataStructureState, function() {
     
     var liveTab = $tm.ref.liveTab;
-    if(utils.getTiddler(liveTab).hasTag("$:/tags/SideBar")) {
+    if (utils.getTiddler(liveTab).hasTag("$:/tags/SideBar")) {
       $tw.wiki.deleteTiddler(liveTab);
       utils.setField(liveTab, "tags", "$:/tags/SideBar");
     }
@@ -220,14 +213,14 @@ fixer.fix = function() {
 
     var views = utils.getMatches($tm.selector.allViews);
     
-    for(var i = views.length; i--;) {
+    for (var i = views.length; i--;) {
       
       var view = new ViewAbstraction(views[i]);
       var eTyFilter = view.getEdgeTypeFilter("raw");
       var confKey = "edge_type_namespace";
       view.setConfig(confKey, view.getConfig(confKey));
       
-      if(eTyFilter) {
+      if (eTyFilter) {
         
         // remove any occurences of the egde type path prefix
         var edgeTypePath = $tm.path.edgeTypes;
@@ -257,3 +250,8 @@ fixer.fix = function() {
   });
                 
 };
+
+/*** Exports *******************************************************/
+
+export default fixer;
+

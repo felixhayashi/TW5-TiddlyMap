@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/modules/edge-type-handler/body/transclude
@@ -8,63 +9,56 @@ module-type: tmap.edgetypehandler
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-exports["tw-body-transclude"] = TranscludeEdgeTypeSubscriber;
-
-/*** Imports *******************************************************/
-
-var AbstractRefEdgeTypeSubscriber = require("$:/plugins/felixhayashi/tiddlymap/js/AbstractRefEdgeTypeSubscriber");
-
-/*** Code **********************************************************/
+import AbstractRefEdgeTypeSubscriber from '$:/plugins/felixhayashi/tiddlymap/js/AbstractRefEdgeTypeSubscriber';
 
 /**
  * The TranscludeEdgeTypeSubscriber retrieves connections that result tiddler transclusions.
  *
  * Note: This subscriber only retrieves edges, however doesn't store or delete them. It only
  * works if the `$tw.wiki.getTiddlerTranscludes` method is present in the wiki.
- *
- * @inheritDoc
- * @constructor
  */
-function TranscludeEdgeTypeSubscriber(allEdgeTypes) {
-  AbstractRefEdgeTypeSubscriber.call(this, allEdgeTypes);
+class TranscludeEdgeTypeSubscriber extends AbstractRefEdgeTypeSubscriber {
 
+  /**
+   * @inheritDoc
+   */
+  constructor(allEdgeTypes, options = {}) {
+    super(allEdgeTypes, {
+      priority: 20,
+      ignore: (typeof $tw.wiki.getTiddlerTranscludes !== 'function'),
+      ...options,
+    });
+  }
+
+  /**
+   * @inheritDoc
+   */
+  canHandle(edgeType) {
+
+    return edgeType.id === 'tw-body:link';
+
+  }
+
+  /**
+   * @inheritDoc
+   */
+  getReferences(tObj, toWL, typeWL) {
+
+    if (typeWL && !typeWL['tw-body:transclude']) {
+      return;
+    }
+
+    var toRefs = $tw.wiki.getTiddlerTranscludes(tObj.fields.title);
+
+    if (!toRefs || !toRefs.length) {
+      return;
+    }
+
+    return { 'tw-body:transclude': toRefs };
+
+  }
 }
 
-// !! EXTENSION !!
-TranscludeEdgeTypeSubscriber.prototype = Object.create(AbstractRefEdgeTypeSubscriber.prototype);
-// !! EXTENSION !!
+/*** Exports *******************************************************/
 
-/**
- * @inheritDoc
- */
-TranscludeEdgeTypeSubscriber.prototype.priority = 20;
-
-/**
- * @inheritDoc
- */
-TranscludeEdgeTypeSubscriber.prototype.ignore = (typeof $tw.wiki.getTiddlerTranscludes !== "function");
-
-/**
- * @override
- */
-TranscludeEdgeTypeSubscriber.prototype.getReferences = function(tObj, toWL, typeWL) {
-
-  if (typeWL && !typeWL['tw-body:transclude']) {
-    return;
-  }
-
-  var toRefs = $tw.wiki.getTiddlerTranscludes(tObj.fields.title);
-
-  if (!toRefs || !toRefs.length) {
-    return;
-  }
-
-  return { 'tw-body:transclude': toRefs };
-
-};
+export { TranscludeEdgeTypeSubscriber };

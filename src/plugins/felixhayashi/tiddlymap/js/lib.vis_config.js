@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/config/vis
@@ -8,14 +9,8 @@ module-type: library
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
+const visConfig = {
 
-/*** Exports *******************************************************/
-
-module.exports = {
-  
   locale: "en_EN",
   clickToUse: false,
   autoResize: false,
@@ -96,3 +91,5 @@ module.exports = {
     }
   }
 };
+
+export default visConfig;

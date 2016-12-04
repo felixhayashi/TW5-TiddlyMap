@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/EdgeType
@@ -8,18 +9,10 @@ module-type: library
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-module.exports = EdgeType;
-
 /*** Imports *******************************************************/
 
-var MapElementType = require("$:/plugins/felixhayashi/tiddlymap/js/MapElementType");
-var utils          = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+import MapElementType from '$:/plugins/felixhayashi/tiddlymap/js/MapElementType';
+import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
   
 /*** Code **********************************************************/
 
@@ -42,14 +35,14 @@ var utils          = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
  */
 function EdgeType(id, data, options) {
   
-  if(id instanceof EdgeType) return id; // bounce back!
+  if (id instanceof EdgeType) return id; // bounce back!
   
   options = options || {};
   
   this.root = $tm.path.edgeTypes;
   
   var parts = EdgeType._getIdParts(id, this.root);
-  if(!parts.name) return new EdgeType("tmap:unknown");
+  if (!parts.name) return new EdgeType("tmap:unknown");
   
   this.marker = parts.marker;
   this.name = parts.name;
@@ -62,9 +55,9 @@ function EdgeType(id, data, options) {
   // recreate the id.
   // Attention: the namespace is really a prefix and can have a
   // marker, which needs to be considered!
-  if(!this.namespace && options.namespace) {
+  if (!this.namespace && options.namespace) {
     
-    if(!(new EdgeType(this.id)).exists()) {
+    if (!(new EdgeType(this.id)).exists()) {
       return new EdgeType(options.namespace + ":" + this.name);
     }  
   }
@@ -74,12 +67,12 @@ function EdgeType(id, data, options) {
     
   var ar = this.style && this.style.arrows;
   
-  if(ar) {
+  if (ar) {
     this.invertedArrow = this._isArrow(ar, "from");
     this.toArrow = this._isArrow(ar, "to") || this._isArrow(ar, "middle");
     // determine if bi arrows (either from+to or no arrows)
     this.biArrow = (this.invertedArrow === this.toArrow);
-    if(this.biArrow) this.toArrow = this.invertedArrow = true;
+    if (this.biArrow) this.toArrow = this.invertedArrow = true;
   } else {
     this.toArrow = true;
   }
@@ -143,3 +136,8 @@ EdgeType.prototype._isArrow = function(arrowObj, pos) {
           || typeof type === "object" && type.enabled !== false);
   
 };
+
+
+/*** Exports *******************************************************/
+
+export default EdgeType;

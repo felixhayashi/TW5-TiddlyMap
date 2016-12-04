@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/utils
@@ -8,19 +9,11 @@ module-type: library
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-module.exports = {};
-
 /*** Imports *******************************************************/
 
-var vis       = require("$:/plugins/felixhayashi/vis/vis.js");
-var exception = require("$:/plugins/felixhayashi/tiddlymap/js/exception");
-var URL       = require("$:/plugins/felixhayashi/tiddlymap/js/URL");
+import vis from '$:/plugins/felixhayashi/vis/vis.js';
+import { EnvironmentError } from '$:/plugins/felixhayashi/tiddlymap/js/exception';
+import URL from '$:/plugins/felixhayashi/tiddlymap/js/URL';
 
 /*** Code **********************************************************/
 
@@ -41,7 +34,7 @@ var URL       = require("$:/plugins/felixhayashi/tiddlymap/js/URL");
  * @see Dom utilities {@link https://github.com/Jermolene/TiddlyWiki5/blob/master/core/modules/utils/*}
  * @namespace utils
  */
-var utils = module.exports;
+const utils = {};
 
 /**
  * Pendant to tw native {@code addTiddlers()}.
@@ -56,16 +49,16 @@ utils.deleteTiddlers = function(tiddlers) {
   var keys = Object.keys(tiddlers);
   var storyList = $tw.wiki.getTiddlerList("$:/StoryList");
 
-  for(var i = keys.length; i--;) {
+  for (var i = keys.length; i--;) {
     var tRef = utils.getTiddlerRef(tiddlers[keys[i]]);
-    if(!$tw.wiki.tiddlerExists(tiddlers[keys[i]])) {
+    if (!$tw.wiki.tiddlerExists(tiddlers[keys[i]])) {
       // this check is important!
       // see https://github.com/Jermolene/TiddlyWiki5/issues/1919
       continue;
     }
 
     var index = storyList.indexOf(tRef);
-    if(index !== -1) { // tiddler is displayed in river
+    if (index !== -1) { // tiddler is displayed in river
       storyList.splice(index, 1);
       utils.setField("$:/StoryList", "list", storyList);
     }
@@ -85,12 +78,12 @@ utils.moveFieldValues = function(oldName,
                                  isIncludeSystemTiddlers,
                                  tiddlers) {
 
-  if(oldName === newName) return;
+  if (oldName === newName) return;
 
   var allTiddlers = tiddlers || $tw.wiki.allTitles();
-  for(var i = allTiddlers.length; i--;) {
+  for (var i = allTiddlers.length; i--;) {
     var tObj = utils.getTiddler(allTiddlers[i]);
-    if(tObj.isDraft()
+    if (tObj.isDraft()
        || !tObj.fields[oldName]
        || (!isIncludeSystemTiddlers
            && $tw.wiki.isSystemTiddler(allTiddlers[i]))) {
@@ -99,7 +92,7 @@ utils.moveFieldValues = function(oldName,
 
     var fields = {};
     fields[newName] = tObj.fields[oldName];
-    if(isRemoveOldField) {
+    if (isRemoveOldField) {
       fields[oldName] = undefined;
     }
     $tw.wiki.addTiddler(new $tw.Tiddler(tObj, fields));
@@ -144,7 +137,7 @@ utils.ucFirst = function(string) {
  */
 utils.convert = function(col, outputType) {
 
-  if(typeof col !== "object") return;
+  if (typeof col !== "object") return;
 
   switch(outputType) {
 
@@ -152,7 +145,7 @@ utils.convert = function(col, outputType) {
       return utils.getValues(col);
     case "hashmap": // fall through alias
     case "object":
-      if(col instanceof vis.DataSet) { // a dataset
+      if (col instanceof vis.DataSet) { // a dataset
         return col.get({ returnType: "Object" }); // careful has proto
       } else { // object (array is an object itself)
         return col; // bounce back
@@ -160,10 +153,10 @@ utils.convert = function(col, outputType) {
 
     case "dataset":
     default:
-      if(col instanceof vis.DataSet) {
+      if (col instanceof vis.DataSet) {
         return col; // bounce back
       }
-      if(!Array.isArray(col)) {
+      if (!Array.isArray(col)) {
         col = utils.getValues(col);
       }
 
@@ -182,15 +175,15 @@ utils.convert = function(col, outputType) {
  */
 utils.getValues = function(col) {
 
-  if(Array.isArray(col)) {
+  if (Array.isArray(col)) {
     return col; // bounce back.
-  } else if(col instanceof vis.DataSet) { // a dataset
+  } else if (col instanceof vis.DataSet) { // a dataset
     return col.get({ returnType: "Array" });
   }
 
   var result = [];
   var keys = Object.keys(col);
-  for(var i = keys.length; i--;) {
+  for (var i = keys.length; i--;) {
     result.push(col[keys[i]]);
   }
 
@@ -206,12 +199,12 @@ utils.getDataUri = function(tiddler, type, isForceBase64) {
   var body = imgTObj.fields.text;
   var encoding = $tw.config.contentTypeInfo[type].encoding;
 
-  if(type === "image/svg+xml") {
+  if (type === "image/svg+xml") {
 
     // see http://stackoverflow.com/questions/10768451/inline-svg-in-css
     body = body.replace(/\r?\n|\r/g, " ");
 
-    if(!utils.hasSubString("xmlns", body)) {
+    if (!utils.hasSubString("xmlns", body)) {
       // @tiddlywiki it is bad to remove the xmlns attribute!
 
       body = body.replace(/<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
@@ -219,7 +212,7 @@ utils.getDataUri = function(tiddler, type, isForceBase64) {
 
   }
 
-  if(isForceBase64 && encoding !== "base64") {
+  if (isForceBase64 && encoding !== "base64") {
     encoding = "base64";
     body = window.btoa(body);
   }
@@ -304,22 +297,22 @@ utils.getMatches = function(filter, tiddlers) {
   // use wiki as default source
   var source = undefined;
 
-  if(typeof filter === "string") {
+  if (typeof filter === "string") {
     filter = $tw.wiki.compileFilter(filter);
   }
 
   // if a source is provided, create an iterator callback
-  if(tiddlers != null && typeof tiddlers === "object") {
+  if (tiddlers != null && typeof tiddlers === "object") {
 
     // shortcuts for performance
     var wiki = $tw.wiki;
 
-    if(!Array.isArray(tiddlers)) {
+    if (!Array.isArray(tiddlers)) {
       tiddlers = Object.keys(tiddlers);
     }
 
     source = function(callback) {
-      for(var i = tiddlers.length; i--;) {
+      for (var i = tiddlers.length; i--;) {
         var tObj = wiki.getTiddler(tiddlers[i]);
         callback(tObj, tiddlers[i]);
       }
@@ -336,7 +329,7 @@ var eTyFiltAutoPrefix = "[all[]] ";
 
 utils.getEdgeTypeMatches = function(filter, titles) {
 
-  if(!titles) {
+  if (!titles) {
     var prefix = $tm.path.edgeTypes + "/";
     titles = utils.getTiddlersByPrefix(prefix, {
       iterator: "eachTiddlerPlusShadows",
@@ -344,7 +337,7 @@ utils.getEdgeTypeMatches = function(filter, titles) {
     })
   }
 
-  if(titles != null && !Array.isArray(titles)) {
+  if (titles != null && !Array.isArray(titles)) {
     titles = Object.keys(titles);
   }
 
@@ -403,12 +396,12 @@ utils.replaceAll = function(str, defaultReplacement, subStrings) {
 
   defaultReplacement = defaultReplacement || "";
 
-  for(var i = subStrings.length; i--;) {
+  for (var i = subStrings.length; i--;) {
 
     var subString = subStrings[i];
     var replacement = defaultReplacement;
 
-    if(Array.isArray(subString)) {
+    if (Array.isArray(subString)) {
       replacement = subString[1];
       subString = subString[0];
     }
@@ -445,14 +438,14 @@ utils.replaceAll = function(str, defaultReplacement, subStrings) {
  */
 utils.isTrue = function(confVal, defVal) {
 
-  if(confVal == null) {
+  if (confVal == null) {
     return !!defVal;
-  } else if(typeof confVal === "string") {
+  } else if (typeof confVal === "string") {
     var n = parseInt(confVal);
     return (isNaN(n) ? (confVal === "true") : (n !== 0));
-  } else if(typeof confVal === "boolean") {
+  } else if (typeof confVal === "boolean") {
     return confVal;
-  } else if(typeof confVal === "number") {
+  } else if (typeof confVal === "number") {
     return (n !== 0);
   }
 
@@ -468,9 +461,9 @@ utils.isTrue = function(confVal, defVal) {
  */
 utils.getTiddlerRef = function(tiddler) {
 
-  if(tiddler instanceof $tw.Tiddler) {
+  if (tiddler instanceof $tw.Tiddler) {
     return tiddler.fields.title;
-  } else if(typeof tiddler === "string") {
+  } else if (typeof tiddler === "string") {
     return tiddler;
   }
 
@@ -517,7 +510,7 @@ utils.getElementNode = function(type, text, className) {
     children: []
   };
 
-  if(text) { node.children.push({type: "text", text: text }); }
+  if (text) { node.children.push({type: "text", text: text }); }
 
   return node;
 
@@ -553,8 +546,8 @@ utils.registerTransclude = function(widget, name, tiddler, domNode) {
  */
 utils.getTiddler = function(tiddler, isReload) {
 
-  if(tiddler instanceof $tw.Tiddler) {
-    if(!isReload) {
+  if (tiddler instanceof $tw.Tiddler) {
+    if (!isReload) {
       return tiddler;
     }
     tiddler = tiddler.fields.title;
@@ -613,8 +606,8 @@ utils.tiddlerExists = function(tiddler) {
  */
 utils.isPreviewed = function(widget) {
 
-  if(widget) {
-    if(widget.getVariable("tv-tiddler-preview")) {
+  if (widget) {
+    if (widget.getVariable("tv-tiddler-preview")) {
       return true;
     } else { // fallback for < v5.1.9
       var cls = "tc-tiddler-preview-preview";
@@ -632,11 +625,11 @@ utils.isPreviewed = function(widget) {
  */
 utils.getAncestorWithClass = function(el, cls) {
 
-  if(typeof el !== "object" || typeof cls !== "string") return;
+  if (typeof el !== "object" || typeof cls !== "string") return;
 
   while(el.parentNode) {
     el = el.parentNode;
-    if($tw.utils.hasClass(el, cls)) { return el; }
+    if ($tw.utils.hasClass(el, cls)) { return el; }
   }
 
 };
@@ -654,8 +647,8 @@ utils.getAncestorWithClass = function(el, cls) {
 utils.getPropertiesByPrefix = function(obj, prefix, removePrefix) {
 
     var r = utils.makeHashMap();
-    for(var p in obj) {
-      if(utils.startsWith(p, prefix)) {
+    for (var p in obj) {
+      if (utils.startsWith(p, prefix)) {
         r[(removePrefix ? p.substr(prefix.length) : p)] = obj[p];
       }
     }
@@ -680,8 +673,8 @@ utils.getWithoutPrefix = function(str, prefix) {
  */
 utils.hasKeyWithPrefix = function(obj, prefix) {
 
-  for(var p in obj) {
-    if(utils.startsWith(p, prefix)) {
+  for (var p in obj) {
+    if (utils.startsWith(p, prefix)) {
       return true;
     }
   }
@@ -727,13 +720,13 @@ utils.groupByProperty = function(col, prop) {
 
   var result = utils.makeHashMap();
   var keys = Object.keys(col);
-  for(var i in keys) {
+  for (var i in keys) {
     var item = col[keys[i]];
     var val = item[prop];
-    if(val == null) { // null or undefined
+    if (val == null) { // null or undefined
       throw "Cannot group by property " + prop;
     } else {
-      if(!Array.isArray(result[val])) {
+      if (!Array.isArray(result[val])) {
         result[val] = [];
       }
       result[val].push(item);
@@ -752,9 +745,9 @@ utils.groupByProperty = function(col, prop) {
  */
 utils.findAndRemoveClassNames = function(classNames) {
 
-  for(var i = classNames.length; i--;) {
+  for (var i = classNames.length; i--;) {
     var elements = document.getElementsByClassName(classNames[i]);
-    for(var j = elements.length; j--;) {
+    for (var j = elements.length; j--;) {
       $tw.utils.removeClass(elements[j], classNames[i]);
     }
   }
@@ -772,9 +765,9 @@ utils.findAndRemoveClassNames = function(classNames) {
 utils.parseFieldData = function(tiddler, field, data) {
 
   var tObj = utils.getTiddler(tiddler);
-  if(!tObj) return data;
+  if (!tObj) return data;
 
-  if(!field) field = "text";
+  if (!field) field = "text";
 
   return utils.parseJSON(tObj.fields[field], data);
 
@@ -786,14 +779,14 @@ utils.parseFieldData = function(tiddler, field, data) {
  */
 utils.getImgFromWeb = function(imgUri, callback) {
 
-  if(!imgUri || typeof callback !== "function") return;
+  if (!imgUri || typeof callback !== "function") return;
 
   var xhr = new XMLHttpRequest();
   xhr.open("GET", imgUri, true);
   xhr.responseType = "blob";
   xhr.onerror = function(e) { console.log(e); };
   xhr.onload = function(e) {
-    if(this.readyState === 4 && this.status === 200) {
+    if (this.readyState === 4 && this.status === 200) {
       var blob = this.response;
       callback(window.URL.createObjectURL(blob));
     }
@@ -832,7 +825,7 @@ utils.parseJSON = function(str, data) {
  */
 utils.writeFieldData = function(tiddler, field, data, indent) {
 
-  if(typeof data !== "object") {
+  if (typeof data !== "object") {
     return;
   }
 
@@ -869,7 +862,7 @@ utils.getPrettyFilter = function(expr) {
 
   var operandIndex = 0;
   var parts = [];
-  for(var i = 0; i < stringsPlusDummies.length; i++) {
+  for (var i = 0; i < stringsPlusDummies.length; i++) {
     parts[i] = (stringsPlusDummies[i] === "[]"
               ? operands[operandIndex++]
               : stringsPlusDummies[i]);
@@ -894,7 +887,7 @@ utils.getPrettyFilter = function(expr) {
  */
 utils.setField = function(tiddler, field, value) {
 
-  if(!tiddler || !field) return;
+  if (!tiddler || !field) return;
 
   var tRef = utils.getTiddlerRef(tiddler);
   var fields = { title: tRef };
@@ -903,7 +896,7 @@ utils.setField = function(tiddler, field, value) {
   // do not use any tObj provided, it may result in a lost update!
   var tObj = $tw.wiki.getTiddler(tRef, true);
 
-  if(field !== "text" && tObj && !tObj.fields.text) {
+  if (field !== "text" && tObj && !tObj.fields.text) {
     fields.text = "";
   }
 
@@ -946,8 +939,8 @@ utils.getEntry = function(tiddler, prop, defValue) {
 //~ utils.getNestedProperty = function(obj, propPath) {
 //~
   //~ propPath = propPath.split(".");
-  //~ for(var i = propPath.length; i--;) {
-    //~ if(obj !== null && typeof obj === "object") {
+  //~ for (var i = propPath.length; i--;) {
+    //~ if (obj !== null && typeof obj === "object") {
       //~ obj = obj[propPath[i]];
   //~ }
   //~
@@ -1004,16 +997,16 @@ utils.setText = function(tiddler, value) {
  * @param {boolean} [isRequired=true] - If true, an exception will be
  *     thrown if no element can be retrieved. This is important
  *     when depending on third party modules and class names change!
- * @throws {utils.exception.EnvironmentError} - May be thrown if
+ * @throws {EnvironmentError} - May be thrown if
  *    `isRequired` is set to true.
  * @return {DOMElement} Either a dom element or null is returned.
  */
 utils.getFirstElementByClassName = function(cls, root, isRequired) {
 
   var el = (root || document).getElementsByClassName(cls)[0];
-  if(!el && (typeof isRequired === "boolean" ? isRequired : true)) {
-    var text = "Missing element with class " + cls + " inside " + root;
-    throw new utils.exception.EnvironmentError(text);
+  if (!el && (typeof isRequired === "boolean" ? isRequired : true)) {
+    var text = `Missing element with class "${cls}" inside ${root}`;
+    throw new EnvironmentError(text);
   }
 
   return el;
@@ -1080,11 +1073,11 @@ utils.merge = (function() {
 
   var _merge = function(dest, src) {
 
-    if(typeof dest !== "object") { dest = {}; }
+    if (typeof dest !== "object") { dest = {}; }
 
-    for(var p in src) {
-      if(src.hasOwnProperty(p)) {
-        if(src[p] != null) { // skip null or undefined
+    for (var p in src) {
+      if (src.hasOwnProperty(p)) {
+        if (src[p] != null) { // skip null or undefined
           dest[p] = (typeof src[p] === "object"
                      ? _merge(dest[p], src[p])
                      : src[p]); // primitive type, stop recursion
@@ -1098,9 +1091,9 @@ utils.merge = (function() {
   return function(dest /*[,src], src*/) {
 
     // start the merging; i = 1 since first argument is the destination
-    for(var i = 1, l = arguments.length; i < l; i++) {
+    for (var i = 1, l = arguments.length; i < l; i++) {
       var src = arguments[i];
-      if(src != null && typeof src === "object") {
+      if (src != null && typeof src === "object") {
         dest = _merge(dest, src);
       }
     }
@@ -1133,13 +1126,13 @@ utils.drawRaster = function(context, scaleFactor, viewPosition, rasterSize, colo
   var offsetTop = viewPosition.y - (height / 2);
 
   // draw vertical lines
-  for(var x = offsetLeft; x < width; x += rasterSize) {
+  for (var x = offsetLeft; x < width; x += rasterSize) {
     context.moveTo(x, offsetTop);
     context.lineTo(x, height);
   }
 
   // draw horizontal lines
-  for(var y = offsetTop; y < height; y += rasterSize) {
+  for (var y = offsetTop; y < height; y += rasterSize) {
     context.moveTo(offsetLeft, y);
     context.lineTo(width, y);
   }
@@ -1154,7 +1147,7 @@ utils.drawRaster = function(context, scaleFactor, viewPosition, rasterSize, colo
  */
 utils.isSystemOrDraft = function(tiddler) {
 
-  if($tw.wiki.isSystemTiddler(utils.getTiddlerRef(tiddler))) {
+  if ($tw.wiki.isSystemTiddler(utils.getTiddlerRef(tiddler))) {
     return true;
   }
 
@@ -1174,14 +1167,14 @@ utils.isSystemOrDraft = function(tiddler) {
  */
 utils.getMergedTiddlers = function(tiddlers, title) {
 
-  if(!Array.isArray(tiddlers)) return;
+  if (!Array.isArray(tiddlers)) return;
 
   // turn all array elements into tiddler objects
-  for(var i = tiddlers.length; i--;) {
+  for (var i = tiddlers.length; i--;) {
     tiddlers[i] = utils.getTiddler(tiddlers[i]);
   }
 
-  if(!tiddlers.length) return;
+  if (!tiddlers.length) return;
 
   tiddlers.push(
     { title: (title || tiddlers[0].fields.title) },
@@ -1202,13 +1195,13 @@ utils.getMergedTiddlers = function(tiddlers, title) {
 utils.getChildWidgetByProperty = function(widget, prop, val) {
 
   var children = widget.children;
-  for(var i = children.length; i--;) {
+  for (var i = children.length; i--;) {
     var child = children[i];
-    if(child[prop] === val) {
+    if (child[prop] === val) {
       return child;
     } else {
       child = utils.getChildWidgetByProperty(child, prop, val);
-      if(child) {
+      if (child) {
         return child;
       }
     }
@@ -1238,11 +1231,11 @@ utils.setDomListeners = function(task, target, listeners, isCapt) {
   isCapt = (typeof isCapt === "boolean" ? isCapt : false);
   task = task + "EventListener";
 
-  for(var event in listeners) {
+  for (var event in listeners) {
 
     var l = listeners[event];
 
-    if(typeof l === "function") {
+    if (typeof l === "function") {
       target[task](event, l, isCapt);
     } else { // expect Array
       target[task](event, l[0], (typeof l[1] === "boolean" ? l[1] : isCapt));
@@ -1259,7 +1252,7 @@ utils.setDomListeners = function(task, target, listeners, isCapt) {
 utils.removeArrayElement = function(arr, el) {
 
   var index = arr.indexOf(el);
-  if(index > -1) {
+  if (index > -1) {
     return arr.splice(index, 1)[0];
   }
 
@@ -1271,7 +1264,7 @@ utils.removeArrayElement = function(arr, el) {
  */
 utils.removeDOMChildNodes = function(el) {
 
-  for(var i = el.childNodes.length; i--;) {
+  for (var i = el.childNodes.length; i--;) {
     el.removeChild(el.childNodes[i]);
   }
 
@@ -1285,7 +1278,7 @@ utils.removeDOMChildNodes = function(el) {
  * @param {Object} context - The context to bind the listeners to.
  */
 utils.addTWlisteners = function(listeners, widget, context) {
-  for(var id in listeners) {
+  for (var id in listeners) {
     widget.addEventListener(id, listeners[id].bind(context));
   }
 };
@@ -1293,24 +1286,15 @@ utils.addTWlisteners = function(listeners, widget, context) {
 /**
  * Force early binding of functions to this context.
  *
- * @param {Array<string>|string} fnNames - The prototype function names
+ * @param context the context to bind this function to (typically `this`)
+ * @param {Array<string>} fnNames - The prototype function names
  *     to bind to this context.
  */
-utils.bind = function(context, fnNames) {
+utils.bindTo = function(context, fnNames) {
 
-  if(typeof fnNames === "string") {
-
-    fnNames = [ fnNames ];
-
-  } else {
-
-    for(var i = fnNames.length; i--;) {
-      var fn = context[fnNames[i]];
-      if(typeof fn === "function") {
-        context[fnNames[i]] = fn.bind(context);
-      }
-    }
-
+  for (var i = fnNames.length; i--;) {
+    var fn = context[fnNames[i]];
+    context[fnNames[i]] = fn.bind(context);
   }
 
 };
@@ -1335,7 +1319,7 @@ utils.bind = function(context, fnNames) {
  */
 utils.mv = function(oldPrefix, newPrefix, isForce, isDelete) {
 
-  if(oldPrefix === newPrefix || !oldPrefix || !newPrefix) return;
+  if (oldPrefix === newPrefix || !oldPrefix || !newPrefix) return;
 
   isForce = (typeof isForce === "boolean" ? isForce : false);
   isDelete = (typeof isDelete === "boolean" ? isDelete : true);
@@ -1343,18 +1327,18 @@ utils.mv = function(oldPrefix, newPrefix, isForce, isDelete) {
   // prepare
   var targets = utils.getTiddlersByPrefix(oldPrefix);
   var fromToMapper = utils.makeHashMap();
-  for(var i = targets.length; i--;) {
+  for (var i = targets.length; i--;) {
     var oldTRef = targets[i];
     var newTRef = oldTRef.replace(oldPrefix, newPrefix);
-    if($tw.wiki.tiddlerExists(newTRef) && !isForce) {
+    if ($tw.wiki.tiddlerExists(newTRef) && !isForce) {
       return; // undefined
     }
     fromToMapper[oldTRef] = newTRef;
   }
 
-  for(var oldTRef in fromToMapper) {
+  for (var oldTRef in fromToMapper) {
     utils.setField(oldTRef, "title", fromToMapper[oldTRef]);
-    if(isDelete) $tw.wiki.deleteTiddler(oldTRef);
+    if (isDelete) $tw.wiki.deleteTiddler(oldTRef);
   }
 
   return fromToMapper;
@@ -1419,7 +1403,7 @@ utils.hasSubString = function(str, sub) {
  */
 utils.joinAndWrap = function(arr, left, right, separator) {
 
-  if(!separator) separator = " ";
+  if (!separator) separator = " ";
   return left + arr.join(right + separator + left) + right;
 
 };
@@ -1444,12 +1428,12 @@ utils.keysOfItemsWithProperty = function(col, key, val, limit) {
   var keys = Object.keys(col);
   var result = [];
   var limit = (typeof limit === "number" ? limit : keys.length);
-  for(var i = 0, l = keys.length; i < l; i++) {
+  for (var i = 0, l = keys.length; i < l; i++) {
     var index = keys[i];
-    if(typeof col[index] === "object" && col[index][key]) {
-      if(!val || col[index][key] === val) {
+    if (typeof col[index] === "object" && col[index][key]) {
+      if (!val || col[index][key] === val) {
         result.push(index);
-        if(result.length === limit) {
+        if (result.length === limit) {
           break;
         }
       }
@@ -1476,13 +1460,13 @@ utils.keyOfItemWithProperty = function(col, key, val) {
  */
 utils.deleteByPrefix = function(prefix, tiddlers) {
 
-  if(!prefix) return;
+  if (!prefix) return;
 
   tiddlers = tiddlers || $tw.wiki.allTitles();
 
   var deletedTiddlers = [];
-  for(var i = tiddlers.length; i--;) {
-    if(utils.startsWith(tiddlers[i], prefix)) {
+  for (var i = tiddlers.length; i--;) {
+    if (utils.startsWith(tiddlers[i], prefix)) {
       $tw.wiki.deleteTiddler(tiddlers[i]);
       deletedTiddlers.push(deletedTiddlers[i]);
     }
@@ -1525,7 +1509,7 @@ utils.getLookupTable = function(col, lookupKey) {
   var lookupTable = utils.makeHashMap();
 
   var keys = Object.keys(col);
-  for(var i = 0, l = keys.length; i < l; i++) {
+  for (var i = 0, l = keys.length; i < l; i++) {
 
     var key = keys[i];
 
@@ -1533,8 +1517,8 @@ utils.getLookupTable = function(col, lookupKey) {
     var idx = (lookupKey ? col[key][lookupKey] : col[key]);
 
     var type = typeof idx;
-    if((type === "string" && idx !== "") || type === "number") {
-      if(!lookupTable[idx]) { // doesn't exist yet!
+    if ((type === "string" && idx !== "") || type === "number") {
+      if (!lookupTable[idx]) { // doesn't exist yet!
         lookupTable[idx] = (lookupKey ? col[key] : true);
         continue;
       }
@@ -1553,7 +1537,7 @@ utils.getLookupTable = function(col, lookupKey) {
  * Remove any newline from a string
  */
 utils.getWithoutNewLines = function(str) {
-  if(typeof str === "string") {
+  if (typeof str === "string") {
     return str.replace(/[\n\r]/g, " ");
   }
 };
@@ -1585,7 +1569,7 @@ utils.getArrayValuesAsHashmapKeys = function(arr) {
  */
 utils.getTiddlersWithField = function(fieldName, value, options) {
 
-  if(!options || typeof options !== "object") options = {};
+  if (!options || typeof options !== "object") options = {};
 
   var tiddlers = options.tiddlers || $tw.wiki.allTitles();
   var limit = options.limit || 0;
@@ -1593,14 +1577,14 @@ utils.getTiddlersWithField = function(fieldName, value, options) {
   var result = utils.makeHashMap();
   var keys = Object.keys(tiddlers);
   var hasOwnProp = $tw.utils.hop;
-  for(var i = keys.length; i--;) {
+  for (var i = keys.length; i--;) {
     var tObj = utils.getTiddler(tiddlers[keys[i]]);
     var fields = tObj.fields;
-    if(hasOwnProp(fields, fieldName)
+    if (hasOwnProp(fields, fieldName)
        && (!hasOwnProp(fields, "draft.of") || isIncludeDrafts)) {
-      if(!value || fields[fieldName] === value ) {
+      if (!value || fields[fieldName] === value ) {
         result[fields.title] = tObj;
-        if(--limit === 0) break;
+        if (--limit === 0) break;
       }
     }
   }
@@ -1635,7 +1619,7 @@ utils.getTiddlersByPrefix = function(prefix, options) {
   var removePrefix = (options.removePrefix === true);
   var result = [];
   $tw.wiki[options.iterator || "each"](function(tObj, tRef) {
-    if(utils.startsWith(tRef, prefix)) {
+    if (utils.startsWith(tRef, prefix)) {
       result.push(removePrefix
                   ? utils.getWithoutPrefix(tRef, prefix)
                   : tRef);
@@ -1658,7 +1642,7 @@ utils.getTiddlersByPrefix = function(prefix, options) {
 utils.addTiddler = function(tiddler, isForce) {
 
   var tObj = utils.getTiddler(tiddler);
-  if(!isForce && tObj) return tObj;
+  if (!isForce && tObj) return tObj;
 
   tObj = new $tw.Tiddler({
                            title: tiddler,
@@ -1683,11 +1667,6 @@ utils.getSnapshotTitle = function(viewLabel, type) {
 };
 
 /**
- * Contains all TiddlyMap exceptions
- */
-utils.exception = exception;
-
-/**
  * URL parsing
  */
 utils.URL = URL;
@@ -1702,7 +1681,7 @@ utils.makeDraftTiddler = function(targetTitle) {
 
   // See if there is already a draft tiddler for this tiddler
   var draftTitle = $tw.wiki.findDraft(targetTitle);
-  if(draftTitle) {
+  if (draftTitle) {
     return $tw.wiki.getTiddler(draftTitle);
   }
   // Get the current value of the tiddler we're editing
@@ -1771,7 +1750,7 @@ utils.getFullScreenApis = function() {
               d.msFullscreenElement !== undefined ? "MSFullscreenChange" :
               d.fullscreenElement !== undefined ? "fullscreenchange" : ""
   };
-  if(!result._requestFullscreen || !result._exitFullscreen || !result._fullscreenElement) {
+  if (!result._requestFullscreen || !result._exitFullscreen || !result._fullscreenElement) {
     return null;
   } else {
     return result;
@@ -1935,3 +1914,7 @@ utils.genUUID = (function() {
   };
 
 })();
+
+/*** Exports *******************************************************/
+
+export default utils;

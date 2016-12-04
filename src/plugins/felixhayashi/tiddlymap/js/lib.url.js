@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/URL
@@ -7,14 +8,6 @@ module-type: library
 @preserve
 
 \*/
-
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-module.exports = Url;
 
 /*** Code **********************************************************/
 
@@ -304,3 +297,7 @@ var
       })( qs);
     }
   ;
+  
+/*** Exports *******************************************************/
+
+export default Url;

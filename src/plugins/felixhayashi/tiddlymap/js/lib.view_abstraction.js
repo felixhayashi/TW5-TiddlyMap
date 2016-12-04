@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction
@@ -8,18 +9,10 @@ module-type: library
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-module.exports = ViewAbstraction;
-
 /*** Imports *******************************************************/
 
-var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
-var utils    = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+import EdgeType from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
+import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
   
 /*** Code **********************************************************/
 
@@ -41,7 +34,7 @@ function ViewAbstraction(view, options) {
   // register shortcuts and aliases
   this._edgeTypePath = $tm.path.edgeTypes;
 
-  if(view instanceof ViewAbstraction) {
+  if (view instanceof ViewAbstraction) {
     // bounce back the object we received
     return view;
   }
@@ -49,11 +42,11 @@ function ViewAbstraction(view, options) {
   // start building paths
   this._registerPaths(view, options.isCreate);
         
-  if(options.isCreate) {
+  if (options.isCreate) {
     
     this._createView(options);
     
-  } else if(!this.exists()) { // no valid config path
+  } else if (!this.exists()) { // no valid config path
     
     // if the view doesn't exist, then we return a dummy object
     // whose sole purpose is to tell the world that this
@@ -113,22 +106,22 @@ ViewAbstraction.prototype._registerPaths = function(view, isCreate) {
  */
 ViewAbstraction.prototype._getConfigPath = function(view, isCreate) {
 
-  if(view instanceof $tw.Tiddler) { // is a tiddler object
+  if (view instanceof $tw.Tiddler) { // is a tiddler object
     return view.fields.title;
   }
   
-  if(typeof view === "string") {
+  if (typeof view === "string") {
       
     // remove prefix and slash
     view = utils.getWithoutPrefix(view, $tm.path.views + "/");
 
-    if(view && !utils.hasSubString(view, "/")) {
+    if (view && !utils.hasSubString(view, "/")) {
       // a valid label must not contain any slashes
       return $tm.path.views + "/" + view; // add prefix (again)
     }
   }
   
-  if(isCreate) {
+  if (isCreate) {
     var t = $tm.path.views + "/" + utils.getRandomLabel({ plural: true });
     return $tw.wiki.generateNewTitle(t);
   }
@@ -155,15 +148,15 @@ ViewAbstraction.prototype.getPaths = function() {
 ViewAbstraction.prototype._createView = function(options) {
   
   // destroy any former view that existed in this path
-  if(this.exists()) {
+  if (this.exists()) {
     
-    if(!options.isForce) return;
+    if (!options.isForce) return;
     
     this.destroy();
   }
   
   var protoView = new ViewAbstraction(options.protoView);
-  if(protoView.exists()) {
+  if (protoView.exists()) {
     var results = utils.cp(protoView.getRoot(), this.comp.config, true);
   }
     
@@ -171,7 +164,7 @@ ViewAbstraction.prototype._createView = function(options) {
   var fields = {};
   fields.title = this.comp.config;
   
-  if(!options.isHidden) {
+  if (!options.isHidden) {
     fields[$tm.field.viewMarker] = true;
   }
   
@@ -203,7 +196,7 @@ ViewAbstraction.prototype.update = function(updates) {
   
   var changedTiddlers = updates.changedTiddlers;
   
-  if(updates[$tm.path.edgeTypes]
+  if (updates[$tm.path.edgeTypes]
      || utils.hasKeyWithPrefix(changedTiddlers, this.comp.config)) {
     
     this.rebuildCache();
@@ -219,7 +212,7 @@ ViewAbstraction.prototype.update = function(updates) {
  */
 ViewAbstraction.prototype.rebuildCache = function(isForce) {
   
-  if(!isForce && this._noNeedToRebuildCache) {
+  if (!isForce && this._noNeedToRebuildCache) {
     this._noNeedToRebuildCache = false;
     return;
   }
@@ -273,7 +266,7 @@ ViewAbstraction.prototype.getRoot = function() {
 ViewAbstraction.prototype.getCreationDate = function(asString) {
     
   var val = $tw.wiki.getTiddler(this.comp.config).fields["created"];
-  if(asString) { 
+  if (asString) { 
     // note: th will be translated as well!
     return (val instanceof Date
             ? $tw.utils.formatDateString(val, "DDth MMM YYYY")
@@ -324,9 +317,9 @@ ViewAbstraction.prototype.getOccurrences = function() {
 
 ViewAbstraction.prototype.rename = function(newLabel) {
 
-  if(typeof newLabel !== "string") return false;
+  if (typeof newLabel !== "string") return false;
     
-  if(utils.inArray("/", newLabel)) {
+  if (utils.inArray("/", newLabel)) {
     $tm.notify("A view name must not contain any \"/\"");
     return false;
   }
@@ -341,13 +334,13 @@ ViewAbstraction.prototype.rename = function(newLabel) {
   
   // update references
   
-  if($tm.config.sys.defaultView === oldLabel) {
+  if ($tm.config.sys.defaultView === oldLabel) {
      utils.setEntry($tm.ref.sysUserConf,
                     "defaultView",
                     newLabel);
   }
   
-  if($tm.config.sys.liveTab.fallbackView === oldLabel) {
+  if ($tm.config.sys.liveTab.fallbackView === oldLabel) {
      utils.setEntry($tm.ref.sysUserConf,
                     "liveTab.fallbackView",
                     newLabel);
@@ -355,20 +348,20 @@ ViewAbstraction.prototype.rename = function(newLabel) {
   
   $tw.wiki.each(function(tObj, tRef) {
     
-    if(tObj.fields["tmap.open-view"] === oldLabel) {
+    if (tObj.fields["tmap.open-view"] === oldLabel) {
       
       // update global node data fields referencing this view
       utils.setField(tRef, "tmap.open-view", newLabel);
       
-    } else if(utils.startsWith(tRef, $tm.path.views)) {
+    } else if (utils.startsWith(tRef, $tm.path.views)) {
       
       // update all local node data referencing this view
       var view = new ViewAbstraction(tRef);
-      if(!view.exists()) return;
+      if (!view.exists()) return;
       
       var nodes = view.getNodeData();
-      for(var id in nodes) {
-        if(nodes[id]["open-view"] === oldLabel) {
+      for (var id in nodes) {
+        if (nodes[id]["open-view"] === oldLabel) {
           nodes[id]["open-view"] = newLabel;
         }
       }
@@ -409,7 +402,7 @@ ViewAbstraction.prototype.isEnabled = function(name) {
  */
 ViewAbstraction.prototype.getConfig = function(name, isRebuild, defValue) {
   
-  if(!isRebuild && this.config) {
+  if (!isRebuild && this.config) {
     
     var config = this.config;
     
@@ -438,15 +431,15 @@ ViewAbstraction.prototype.getConfig = function(name, isRebuild, defValue) {
  */
 ViewAbstraction.prototype.getHierarchyEdgeTypes = function() {
   
-  if(this.getConfig("layout.active") !== "hierarchical") return [];
+  if (this.getConfig("layout.active") !== "hierarchical") return [];
   
   var orderByEdges = utils.getPropertiesByPrefix(this.getConfig(), "config.layout.hierarchical.order-by-", true);
   
   var labels = utils.makeHashMap();
-  for(var id in orderByEdges) {
-    if(orderByEdges[id] === "true") {
+  for (var id in orderByEdges) {
+    if (orderByEdges[id] === "true") {
       var tObj = utils.getTiddler($tm.indeces.tById[id]);
-      if(tObj) {
+      if (tObj) {
         labels[utils.getBasename(tObj.fields.title)] = true;
       }
     }
@@ -463,29 +456,29 @@ ViewAbstraction.prototype.setConfig = function() {
   
   var args = arguments;
   
-  if(args[0] == null) return; // null or undefined
+  if (args[0] == null) return; // null or undefined
   
-  if(args.length === 1 && typeof args[0] === "object") {
+  if (args.length === 1 && typeof args[0] === "object") {
     
-    for(var prop in args[0]) {
+    for (var prop in args[0]) {
       this.setConfig(prop, args[0][prop]);
     }
     
-  } else if(args.length === 2 && typeof args[0] === "string") {
+  } else if (args.length === 2 && typeof args[0] === "string") {
     
     var prop = utils.getWithoutPrefix(args[0], "config.");
     var val = args[1];
     
-    if(val === undefined) return;
+    if (val === undefined) return;
     
-    if(val === null) {
+    if (val === null) {
       
       $tm.logger("debug", "Removing config", prop);
       delete this.config["config."+prop]; // todo set this to null
       
     } else {
       
-      if(prop === "edge_type_namespace") {
+      if (prop === "edge_type_namespace") {
         var match = val.match(/[^:]+/);
         val = (match ? match[0] : "");
       }
@@ -533,7 +526,7 @@ ViewAbstraction.prototype.isLiveView = function() {
 
 ViewAbstraction.prototype._getAddNodeFilterPart = function(node) {
   
-  if(!node) { throw "Supplied param is not a node!"; }
+  if (!node) { throw "Supplied param is not a node!"; }
   
   var id = (typeof node === "object" ? node.id : node);
   return "[field:tmap.id[" + id + "]]";
@@ -549,13 +542,13 @@ ViewAbstraction.prototype.setNodeFilter = function(expr, force) {
         
   expr = expr.replace(/[\n\r]/g, " ");
   
-  if(this.getNodeFilter("raw") === expr) {
+  if (this.getNodeFilter("raw") === expr) {
     // already up to date;
     // This check is critical to prevent recursion!
     return;
   }
   
-  if(this.isLiveView() && !force) {
+  if (this.isLiveView() && !force) {
     var text = "You must not change the live view's node filter!";
     $tm.notify(text);
     return;
@@ -576,7 +569,7 @@ ViewAbstraction.prototype.setEdgeTypeFilter = function(expr) {
     
   expr = expr.replace(/[\n\r]/g, " ");
   
-  if(this.getEdgeTypeFilter("raw") === expr) { // already up to date
+  if (this.getEdgeTypeFilter("raw") === expr) { // already up to date
     // This check is critical to prevent recursion!
     return;
   }
@@ -600,7 +593,7 @@ ViewAbstraction.prototype.setEdgeTypeFilter = function(expr) {
  */
 ViewAbstraction.prototype.addNode = function(node) {
    
-  if(this.isExplicitNode(node)) return false;
+  if (this.isExplicitNode(node)) return false;
   
   var part = this._getAddNodeFilterPart(node);
   this.setNodeFilter(this.getNodeFilter("raw") + " " + part);
@@ -619,7 +612,7 @@ ViewAbstraction.prototype.addNode = function(node) {
  */
 ViewAbstraction.prototype.removeNode = function(node) {
     
-  if(!this.isExplicitNode(node)) return false;
+  if (!this.isExplicitNode(node)) return false;
   
   var part = this._getAddNodeFilterPart(node);
   var f = this.getNodeFilter("raw").replace(part, "");
@@ -646,7 +639,7 @@ ViewAbstraction.prototype.removeNode = function(node) {
  */
 ViewAbstraction.prototype.getEdgeTypeFilter = function(type, isRebuild) {
   
-  if(!isRebuild && this.edgeTypeFilter) {
+  if (!isRebuild && this.edgeTypeFilter) {
     
     var f = this.edgeTypeFilter;
     
@@ -696,7 +689,7 @@ ViewAbstraction.prototype.isEdgeTypeVisible = function(type) {
  */
 ViewAbstraction.prototype.getNodeFilter = function(type, isRebuild) {
 
-  if(!isRebuild && this.nodeFilter) {
+  if (!isRebuild && this.nodeFilter) {
     
     var f = this.nodeFilter;
     
@@ -736,7 +729,7 @@ ViewAbstraction.prototype.getNodeData = function(id, isRebuild) {
 
 ViewAbstraction.prototype.equals = function(view) {
   
-  if(view === this) return true;
+  if (view === this) return true;
   
   var view = new ViewAbstraction(view);
   return (view.exists() && this.getRoot() === view.getRoot());
@@ -762,10 +755,10 @@ ViewAbstraction.prototype.saveNodeData = function() {
   var args = arguments;
   var data = this.getNodeData();
   
-  if(args.length === 2) {
+  if (args.length === 2) {
     
-    if(typeof args[1] === "object") {
-      if(args[1] === null) {
+    if (typeof args[1] === "object") {
+      if (args[1] === null) {
         // remember – in js null is an object :D
         // we use null as a signal for deletion of the item
         data[args[0]] = undefined;
@@ -774,7 +767,7 @@ ViewAbstraction.prototype.saveNodeData = function() {
       }
     }
     
-  } else if(args.length === 1 && typeof args[0] === "object") {
+  } else if (args.length === 1 && typeof args[0] === "object") {
     
     $tm.logger("log", "Storing data in", this.comp.map);
     
@@ -795,7 +788,7 @@ ViewAbstraction.prototype.saveNodeData = function() {
 
 ViewAbstraction.prototype.saveNodePosition = function(node) {
     
-  if(node.id && node.x && node.y) {
+  if (node.id && node.x && node.y) {
     this.saveNodeData(node.id, { x: node.x, y: node.y });
   }
   
@@ -812,10 +805,10 @@ ViewAbstraction.prototype.saveNodeStyle = function(id, style) {
   // remove any previos style from store;
   // @TODO: optimize this only null in style var needs to be removed
   var data = this.getNodeData()[id];
-  if(data) {
+  if (data) {
     // delete all previous properties, except positions
-    for(var p in data) {
-      if(p !== "x" && p !== "y") data[p] = undefined;
+    for (var p in data) {
+      if (p !== "x" && p !== "y") data[p] = undefined;
     }
   }
   
@@ -823,3 +816,7 @@ ViewAbstraction.prototype.saveNodeStyle = function(id, style) {
   this.saveNodeData(id, style);
  
 };
+
+/*** Exports *******************************************************/
+
+export default ViewAbstraction;

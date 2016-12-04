@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/modules/edge-type-handler/body/link
@@ -8,20 +9,7 @@ module-type: tmap.edgetypehandler
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-exports["tw-body-link"] = LinkEdgeTypeSubscriber;
-
-/*** Imports *******************************************************/
-
-var AbstractRefEdgeTypeSubscriber = require("$:/plugins/felixhayashi/tiddlymap/js/AbstractRefEdgeTypeSubscriber");
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
-
-/*** Code **********************************************************/
+import AbstractRefEdgeTypeSubscriber from '$:/plugins/felixhayashi/tiddlymap/js/AbstractRefEdgeTypeSubscriber';
 
 /**
  * The LinkEdgeTypeSubscriber deals with connections that are stored inside
@@ -30,49 +18,45 @@ var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
  * Note: This subscriber only retrieves edges, however doesn't store or delete them.
  *
  * @see http://tiddlymap.org/#tw-body
- *
- * @inheritDoc
- * @constructor
  */
-function LinkEdgeTypeSubscriber(allEdgeTypes) {
+class LinkEdgeTypeSubscriber extends AbstractRefEdgeTypeSubscriber {
 
-  AbstractRefEdgeTypeSubscriber.call(this, allEdgeTypes);
+  /**
+   * @inheritDoc
+   */
+  constructor(allEdgeTypes, options = {}) {
+    super(allEdgeTypes, { priority: 20, ...options });
+  }
 
+  /**
+   * @inheritDoc
+   */
+  canHandle(edgeType) {
+
+    return edgeType.id === 'tw-body:link';
+
+  }
+
+  /**
+   * @inheritDoc
+   */
+  getReferences(tObj, toWL, typeWL) {
+
+    if (typeWL && !typeWL['tw-body:link']) {
+      return;
+    }
+
+    var toRefs = $tw.wiki.getTiddlerLinks(tObj.fields.title);
+
+    if (!toRefs || !toRefs.length) {
+      return;
+    }
+
+    return { 'tw-body:link': toRefs };
+
+  }
 }
 
-// !! EXTENSION !!
-LinkEdgeTypeSubscriber.prototype = Object.create(AbstractRefEdgeTypeSubscriber.prototype);
-// !! EXTENSION !!
+/*** Exports *******************************************************/
 
-/**
- * @inheritDoc
- */
-LinkEdgeTypeSubscriber.prototype.priority = 20;
-
-/**
- * @inheritDoc
- */
-LinkEdgeTypeSubscriber.prototype.getReferences = function(tObj, toWL, typeWL) {
-
-  if (typeWL && !typeWL['tw-body:link']) {
-    return;
-  }
-
-  var toRefs = $tw.wiki.getTiddlerLinks(tObj.fields.title);
-
-  if (!toRefs || !toRefs.length) {
-    return;
-  }
-
-  return { 'tw-body:link': toRefs };
-
-};
-
-/**
- * @inheritDoc
- */
-LinkEdgeTypeSubscriber.prototype.canHandle = function(edgeType) {
-
-  return edgeType.id === 'tw-body:link';
-
-};
+export { LinkEdgeTypeSubscriber };

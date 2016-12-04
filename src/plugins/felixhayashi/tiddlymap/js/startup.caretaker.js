@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/startup/caretaker
@@ -8,33 +9,19 @@ module-type: startup
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-// Export name and synchronous status
-exports.name = "tmap.caretaker";
-exports.platforms = [ "browser" ];
-exports.after = [ "startup", "tmap.environment" ];
-exports.before = [ "rootwidget" ];
-exports.synchronous = true;
-exports.startup = startup;
-
 /*** Imports *******************************************************/
 
-var visConfig               = require("$:/plugins/felixhayashi/tiddlymap/js/config/vis");
-var utils                   = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
-var fixer                   = require("$:/plugins/felixhayashi/tiddlymap/js/fixer");
-var Adapter                 = require("$:/plugins/felixhayashi/tiddlymap/js/Adapter");
-var EdgeTypeSubscriberRegistry = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeTypeSubscriberRegistry");
-var DialogManager           = require("$:/plugins/felixhayashi/tiddlymap/js/DialogManager");
-var CallbackManager         = require("$:/plugins/felixhayashi/tiddlymap/js/CallbackManager");
-var ViewAbstraction         = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
-var EdgeType                = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
-var NodeType                = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType");
-var vis                     = require("$:/plugins/felixhayashi/vis/vis.js");
+import visConfig                  from '$:/plugins/felixhayashi/tiddlymap/js/config/vis';
+import utils                      from '$:/plugins/felixhayashi/tiddlymap/js/utils';
+import fixer                      from '$:/plugins/felixhayashi/tiddlymap/js/fixer';
+import Adapter                    from '$:/plugins/felixhayashi/tiddlymap/js/Adapter';
+import EdgeTypeSubscriberRegistry from '$:/plugins/felixhayashi/tiddlymap/js/EdgeTypeSubscriberRegistry';
+import DialogManager              from '$:/plugins/felixhayashi/tiddlymap/js/DialogManager';
+import CallbackManager            from '$:/plugins/felixhayashi/tiddlymap/js/CallbackManager';
+import ViewAbstraction            from '$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction';
+import EdgeType                   from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
+import NodeType                   from '$:/plugins/felixhayashi/tiddlymap/js/NodeType';
+import vis                        from '$:/plugins/felixhayashi/vis/vis.js';
 
 /*** Code **********************************************************/
 
@@ -46,7 +33,7 @@ var vis                     = require("$:/plugins/felixhayashi/vis/vis.js");
  * functions body!
  *
  */
-function startup() {
+function init() {
 
   // register utils
   $tm.utils = utils;
@@ -130,7 +117,7 @@ var attachOptions = function(parent) {
   var p = parent;
 
   // default configurations mixed with user config
-  if(!p.config) p.config = utils.makeHashMap();
+  if (!p.config) p.config = utils.makeHashMap();
 
   // Never modify the imported config objects; instead, merge them
   // into a new object
@@ -147,7 +134,7 @@ var attachOptions = function(parent) {
   );
 
   // a shortcut for fields property
-  if(!p.field) p.field = utils.makeHashMap();
+  if (!p.field) p.field = utils.makeHashMap();
   $tw.utils.extend(p.field, p.config.sys.field);
 
 };
@@ -160,7 +147,7 @@ var attachIndeces = function(parent) {
 
   $tm.start("Attaching Indeces");
 
-  if(!parent.indeces) {
+  if (!parent.indeces) {
     parent.indeces = {};
 
     var r = $tm.path.pluginRoot;
@@ -210,10 +197,10 @@ var updateTiddlerVsIdIndeces = function(parent, allTiddlers) {
 
   $tw.wiki.each(function(tObj, tRef) {
 
-    if(utils.isSystemOrDraft(tObj)) return;
+    if (utils.isSystemOrDraft(tObj)) return;
 
     var id = tObj.fields["tmap.id"];
-    if(!id) {
+    if (!id) {
       id = utils.genUUID();
       utils.setField(tObj, "tmap.id", id);
     }
@@ -251,7 +238,7 @@ var updateNodeTypesIndeces = function(parent) {
   var glNTyById = parent.glNTyById = utils.makeHashMap();
 
   $tw.wiki.eachTiddlerPlusShadows(function(tObj, tRef) {
-    if(utils.startsWith(tRef, typePath)) {
+    if (utils.startsWith(tRef, typePath)) {
       var type = new NodeType(tRef);
       glNTyById[type.id] = type;
       glNTy.push(type);
@@ -273,7 +260,7 @@ var updateEdgeTypesIndeces = function(parent) {
 
   $tw.wiki.eachTiddlerPlusShadows(function(tObj, tRef) {
 
-    if(utils.startsWith(tRef, typePath)) {
+    if (utils.startsWith(tRef, typePath)) {
 
       var et = new EdgeType(tRef);
       allETy[et.id] = et;
@@ -308,7 +295,7 @@ var attachFunctions = function(parent) {
   var fn = parent;
   var nirvana = function() { /* /dev/null */ };
 
-  if(utils.isTrue($tm.config.sys.debug, false) && console) {
+  if (utils.isTrue($tm.config.sys.debug, false) && console) {
 
     /**
      * A logging mechanism that uses the first argument as type and
@@ -327,7 +314,7 @@ var attachFunctions = function(parent) {
      *     (just like console).
      */
     fn.logger = function(/* type, [messages,] messages */) {
-      if(arguments.length < 2) return;
+      if (arguments.length < 2) return;
       var args = Array.prototype.slice.call(arguments);
       var arg1 = args.shift(args);
       var type = (console.hasOwnProperty(arg1) ? arg1 : "debug");
@@ -365,12 +352,12 @@ var attachFunctions = function(parent) {
  */
 var routineCheck = function() {
 
-  for(var i = $tm.registry.length; i--;) {
+  for (var i = $tm.registry.length; i--;) {
     var widget = $tm.registry[i];
 
-    if(!widget.destruct || !widget.isZombieWidget) return; // no duck!
+    if (!widget.destruct || !widget.isZombieWidget) return; // no duck!
 
-    if(widget.isZombieWidget()) { // removed!
+    if (widget.isZombieWidget()) { // removed!
       $tm.logger("warn", "a widget will be removed");
       $tm.registry.splice(i, 1);
       widget.destruct();
@@ -388,12 +375,12 @@ var routineCheck = function() {
 var dispatchUpdates = function(updates) {
 
   var registry = $tm.registry;
-  for(var i = registry.length; i--;) {
+  for (var i = registry.length; i--;) {
     var widget = registry[i];
 
-    if(!widget.destruct || !widget.isZombieWidget) return; // no duck!
+    if (!widget.destruct || !widget.isZombieWidget) return; // no duck!
 
-    if(widget.update && !widget.isZombieWidget()) {
+    if (widget.update && !widget.isZombieWidget()) {
       widget.update(updates);
     }
   }
@@ -404,7 +391,7 @@ var checkForDublicates = function(tObj) {
 
   var id = tObj.fields["tmap.id"];
 
-  if(!id) return;
+  if (!id) return;
 
   var opt = $tm;
   var dublicates = utils.getTiddlersWithField("tmap.id", id, { limit: 2 });
@@ -412,7 +399,7 @@ var checkForDublicates = function(tObj) {
 
   var dublicate = Object.keys(dublicates)[0];
 
-  if(dublicate) {
+  if (dublicate) {
 
     var vars = {
       param: {
@@ -426,7 +413,7 @@ var checkForDublicates = function(tObj) {
 
   }
 
-  if(dublicate) {
+  if (dublicate) {
     // remove any defined edges
     utils.setField(tObj, "tmap.edges", undefined);
     // override id
@@ -451,13 +438,13 @@ var updateGlobals = function(parent) {
 var lastCurrentTiddler = null;
 var updateLiveViewTrigger = function(changedTiddlers) {
 
-  if(changedTiddlers["$:/HistoryList"]) {
+  if (changedTiddlers["$:/HistoryList"]) {
     var tRef = utils.getField("$:/HistoryList", "current-tiddler");
-  } else if(changedTiddlers["$:/temp/focussedTiddler"]) {
+  } else if (changedTiddlers["$:/temp/focussedTiddler"]) {
     var tRef = utils.getField("$:/temp/focussedTiddler", "text");
   }
 
-  if(tRef != null && lastCurrentTiddler !== tRef) {
+  if (tRef != null && lastCurrentTiddler !== tRef) {
     lastCurrentTiddler = tRef;
     utils.setField("$:/temp/tmap/currentTiddler", "text", tRef);
   }
@@ -469,11 +456,11 @@ var updateLiveViewTrigger = function(changedTiddlers) {
  */
 var printChanges = function(changedTiddlers, loopCount) {
 
-  if(!utils.isTrue($tm.config.sys.debug, false)) return;
+  if (!utils.isTrue($tm.config.sys.debug, false)) return;
 
   $tm.logger("warn", "=== Refresh " + loopCount + " ===");
 
-  for(var tRef in changedTiddlers) {
+  for (var tRef in changedTiddlers) {
     var c = changedTiddlers[tRef].deleted ? "[Deleted]" : "[Modified]";
     $tm.logger("warn", c, tRef, $tw.wiki.getTiddler(tRef));
   }
@@ -502,16 +489,16 @@ var registerClickListener = function() {
 
     var popupStates = utils.getTiddlersByPrefix(tempPopups);
 
-    for(var i = popupStates.length; i--;) {
-      if(utils.getText(popupStates[i])) break;
+    for (var i = popupStates.length; i--;) {
+      if (utils.getText(popupStates[i])) break;
     }
 
-    if(i === -1) return;
+    if (i === -1) return;
 
-    if(!$tw.utils.hasClass(evt.target, "tc-drop-down")
+    if (!$tw.utils.hasClass(evt.target, "tc-drop-down")
        && !utils.getAncestorWithClass(evt.target, "tc-drop-down")) {
     // = clicked on an element that isn't a dropdown or inside one
-      for(var i = popupStates.length; i--;) {
+      for (var i = popupStates.length; i--;) {
         utils.setText(popupStates[i], "");
       }
     }
@@ -536,12 +523,12 @@ var registerChangeListener = function(callbackManager) {
 
     var updates = { changedTiddlers: changedTiddlers };
 
-    for(var tRef in changedTiddlers) {
+    for (var tRef in changedTiddlers) {
 
       var tObj = utils.getTiddler(tRef);
-      if(tObj && tObj.isDraft()) continue;
+      if (tObj && tObj.isDraft()) continue;
 
-      if($tw.wiki.isSystemTiddler(tRef)) {
+      if ($tw.wiki.isSystemTiddler(tRef)) {
         handleSysTidChanges(tRef, tObj, updates, rebuilders);
       } else {
         handleTidChanges(tRef, tObj, updates);
@@ -564,8 +551,8 @@ var handleSysTidChanges = function(tRef, tObj, updates, rebuilders) {
 
   var p = $tm.path;
 
-  for(var prefix in rebuilders) {
-    if(utils.startsWith(tRef, prefix) && !updates[prefix]) {
+  for (var prefix in rebuilders) {
+    if (utils.startsWith(tRef, prefix) && !updates[prefix]) {
       $tm.logger("warn", "[System change]", prefix);
       rebuilders[prefix]();
       updates[prefix] = true;
@@ -577,7 +564,7 @@ var handleSysTidChanges = function(tRef, tObj, updates, rebuilders) {
 
 var handleTidChanges = function(tRef, tObj, updates) {
 
-  if(tObj) { // created or modified
+  if (tObj) { // created or modified
 
     checkForDublicates(tObj);
 
@@ -590,11 +577,11 @@ var handleTidChanges = function(tRef, tObj, updates) {
     var id = $tm.indeces.idByT[tRef];
 
     // Ignore tiddler without id; assuming draft
-    if(!id) return;
+    if (!id) return;
 
     var tWithId = utils.getTiddlerWithField("tmap.id", id);
 
-    if(tWithId) { // only renamed
+    if (tWithId) { // only renamed
 
       $tm.logger("warn", "[Renamed]", tRef, "into", tWithId);
 
@@ -620,7 +607,7 @@ var cleanup = function() {
 var setDefaults = function() {
 
   var defaultView = $tm.config.sys.defaultView;
-  if(!defaultView) return;
+  if (!defaultView) return;
 
   utils.setField($tm.ref.defaultViewHolder, "text", defaultView);
 
@@ -628,7 +615,7 @@ var setDefaults = function() {
 
 var maybePrepareForFullscreenStart = function(url) {
 
-  if(!url.query["tmap-enlarged"]) return;
+  if (!url.query["tmap-enlarged"]) return;
 
   var ref = $tm.ref;
   var tRef = utils.getTiddlersByPrefix("$:/state/tab/sidebar-")[0];
@@ -636,7 +623,7 @@ var maybePrepareForFullscreenStart = function(url) {
   utils.setText(tRef, ref.mainEditor);
 
   var view = new ViewAbstraction(url.query["tmap-view"]);
-  if(view.exists()) {
+  if (view.exists()) {
     utils.setField(ref.defaultViewHolder, "text", view.getLabel());
   }
 
@@ -644,7 +631,7 @@ var maybePrepareForFullscreenStart = function(url) {
 
 var createMetaFile = function() {
 
-  if(utils.tiddlerExists($tm.ref.sysMeta)) return;
+  if (utils.tiddlerExists($tm.ref.sysMeta)) return;
 
   $tm.logger("warn", "Creating meta file");
 
@@ -661,3 +648,12 @@ var createMetaFile = function() {
   });
 
 };
+
+/*** Exports *******************************************************/
+
+export const name = "tmap.caretaker";
+export const platforms = [ "browser" ];
+export const after = [ "startup", "tmap.environment" ];
+export const before = [ "rootwidget" ];
+export const synchronous = true;
+export const startup = init;

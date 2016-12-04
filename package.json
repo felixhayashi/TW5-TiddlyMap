@@ -1,6 +1,6 @@
 {
   "name": "tiddlymap",
-  "version": "0.11.0",
+  "version": "0.11.9",
   "author": "Felix Küppers <felix.kueppers@outlook.com>",
   "description": "TiddlyMap is a TiddlyWiki plugin that turns your favorite personal note taking software in a wiki-concept-map hybrid!",
   "license": "BSD-2-Clause",
@@ -23,27 +23,47 @@
     "url": "https://github.com/felixhayashi/TW5-TiddlyMap/issues"
   },
   "keywords": [
-    "tiddlywiki", "tw5", "wiki", "mind map", "concept mapt",
-    "visjs", "vis", "wiki", "visualization", "network", "graph", "knowledge management", "browser"
+    "tiddlywiki",
+    "tw5",
+    "wiki",
+    "mind map",
+    "concept mapt",
+    "visjs",
+    "vis",
+    "wiki",
+    "visualization",
+    "network",
+    "graph",
+    "knowledge management",
+    "browser"
   ],
   "devDependencies": {
-    "gulp": "^3.8.10",
-    "gulp-util": "^3.0.1",
-    "gulp-sass": "^2.0.1",
+    "async": "^1.5.2",
+    "babel-cli": "^6.18.0",
+    "babel-plugin-transform-object-rest-spread": "^6.19.0",
+    "babel-preset-latest": "^6.16.0",
+    "beepbeep": "^1.2.0",
+    "del": "^2.0.0",
+    "eslint": "^3.3.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-bump": "^2.5.1",
+    "gulp-debug": "^2.1.2",
+    "gulp-esprima": "^0.1.0",
+    "gulp-if": "^2.0.0",
     "gulp-jsdoc3": "^0.1.1",
     "gulp-replace": "^0.5.4",
+    "gulp-sass": "^2.0.1",
     "gulp-uglify": "^1.5.1",
-    "gulp-esprima": "^0.1.0",
-    "gulp-debug": "^2.1.2",
-    "gulp-babel": "^6.1.2",
-    "gulp-if": "^2.0.0",
-    "beepbeep": "^1.2.0",
-    "semver": "^5.1.0",
+    "gulp-util": "^3.0.1",
     "is-there": "^4.3.1",
-    "yargs": "^3.0.0",
-    "tiddlywiki": "^5.1.5",
     "run-sequence": "^1.1.5",
-    "async": "^1.5.2",
-    "del": "^2.0.0"
-  }  
+    "semver": "^5.1.0",
+    "tiddlywiki": "^5.1.5",
+    "yargs": "^3.0.0"
+  },
+  "scripts": {
+    "build": "gulp",
+    "build:production": "gulp --production"
+  }
 }

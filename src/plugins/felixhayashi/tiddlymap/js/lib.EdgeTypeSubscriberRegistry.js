@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/EdgeTypeSubscriberRegistry
@@ -8,13 +9,9 @@ module-type: library
 
 \*/
 
-/*** Exports *******************************************************/
-
-module.exports = EdgeTypeSubscriberRegistry;
-
 /*** Imports *******************************************************/
 
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 
 /***************************** CODE ********************************/
 
@@ -98,3 +95,7 @@ EdgeTypeSubscriberRegistry.prototype.updateIndex = function(allEdgeTypes) {
   this.allSubscribers = allSubscribers;
 
 };
+
+/*** Exports *******************************************************/
+
+export default EdgeTypeSubscriberRegistry;

@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/startup/listener
@@ -7,29 +8,13 @@ module-type: startup
 @preserve
 
 \*/
-  
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-exports.name = "tmap.listener";
-exports.platforms = [ "browser" ];
-exports.after = [ "rootwidget", "tmap.caretaker" ];
-exports.before = [ "story" ];
-exports.synchronous = true;
-exports.startup = function() {
-  // will register its lister functions to the root widget
-  new GlobalListener();
-};
 
 /*** Imports *******************************************************/
 
-var NodeType   = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType");
-var EdgeType   = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
-var utils      = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
-var visDefConf = require("$:/plugins/felixhayashi/tiddlymap/js/config/vis");
+import NodeType from '$:/plugins/felixhayashi/tiddlymap/js/NodeType';
+import EdgeType from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
+import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
+import visDefConf from '$:/plugins/felixhayashi/tiddlymap/js/config/vis';
 
 /*** Code **********************************************************/
 
@@ -69,7 +54,7 @@ GlobalListener.prototype.handleCancelDialog = function(event) {
 GlobalListener.prototype.handleClearTiddler = function(event) {
   
   var params = event.paramObject;
-  if(!params || !params.title) return;
+  if (!params || !params.title) return;
   
   var tObj = utils.getTiddler(params.title);
   var originalFields = tObj ? tObj.fields : {};
@@ -79,7 +64,7 @@ GlobalListener.prototype.handleClearTiddler = function(event) {
     text: "" // see https://github.com/Jermolene/TiddlyWiki5/issues/2025
   };
   
-  for(var i = fieldsToKeep.length; i--;) {
+  for (var i = fieldsToKeep.length; i--;) {
     var fieldName = fieldsToKeep[i];
     cloneFields[fieldName] = originalFields[fieldName];
   }
@@ -92,7 +77,7 @@ GlobalListener.prototype.handleClearTiddler = function(event) {
 GlobalListener.prototype.handleMixTiddlers = function(event) {
   
   var params = event.paramObject;
-  if(!params || !params.tiddlers) return;
+  if (!params || !params.tiddlers) return;
   
   var tiddlers = $tw.utils.parseStringArray(params.tiddlers);
   var tObj = utils.getMergedTiddlers(tiddlers, params.output);
@@ -109,7 +94,7 @@ GlobalListener.prototype.handleConfirmDialog = function(event) {
   
 GlobalListener.prototype.handleSuppressDialog = function(event) {
 
-  if(utils.isTrue(event.paramObject.suppress, false)) {
+  if (utils.isTrue(event.paramObject.suppress, false)) {
     utils.setEntry(
         $tm.ref.sysUserConf,
         "suppressedDialogs." + event.paramObject.dialog,
@@ -167,7 +152,7 @@ GlobalListener.prototype.handleConfigureSystem = function() {
   var name = "globalConfig";
   $tm.dialogManager.open(name, args, function(isConfirmed, outTObj) {
     
-    if(!isConfirmed) return;
+    if (!isConfirmed) return;
       
     var config = utils.getPropertiesByPrefix(outTObj.fields,
                                              "config.sys.",
@@ -178,7 +163,7 @@ GlobalListener.prototype.handleConfigureSystem = function() {
 
     // show or hide the live tab; to hide the live tab, we override
     // the shadow tiddler; to show it, we remove the overlay again.
-    if(utils.isTrue(outTObj.fields.liveTab, false)) {
+    if (utils.isTrue(outTObj.fields.liveTab, false)) {
       utils.setField($tm.ref.liveTab, "tags", "$:/tags/SideBar");
     } else {
       $tw.wiki.deleteTiddler($tm.ref.liveTab);
@@ -198,7 +183,7 @@ GlobalListener.prototype.handleConfigureSystem = function() {
 
 GlobalListener.prototype.handleGenerateWidget = function(event) {
   
-  if(!event.paramObject) event.paramObject = {};
+  if (!event.paramObject) event.paramObject = {};
   
   var options = {
     dialog: {
@@ -223,9 +208,9 @@ GlobalListener.prototype.handleCreateEdge = function(event) {
   var to = event.paramObject.to;
   var isForce = event.paramObject.force;
   
-  if(!from || !to) return;
+  if (!from || !to) return;
   
-  if((utils.tiddlerExists(from) && utils.tiddlerExists(to)) || isForce) {
+  if ((utils.tiddlerExists(from) && utils.tiddlerExists(to)) || isForce) {
 
     // will not override any existing tiddlers…
     utils.addTiddler(to);
@@ -247,12 +232,12 @@ GlobalListener.prototype.handleCreateEdge = function(event) {
 
 GlobalListener.prototype.handleOpenTypeManager = function(event) {
     
-  if(!event.paramObject) event.paramObject = {};
+  if (!event.paramObject) event.paramObject = {};
   
   // either "manage-edge-types" or "manage-node-types"
   var mode = event.type.match(/tmap:tm-(.*)/)[1];
   
-  if(mode === "manage-edge-types") {
+  if (mode === "manage-edge-types") {
     var topic = "Edge-Type Manager";
     var allTypesSelector = $tm.selector.allEdgeTypes;
     var typeRootPath = $tm.path.edgeTypes;
@@ -271,7 +256,7 @@ GlobalListener.prototype.handleOpenTypeManager = function(event) {
   
   var dialogTObj = $tm.dialogManager.open("MapElementTypeManager", args);
   
-  if(event.paramObject.type) {
+  if (event.paramObject.type) {
     this.handleLoadTypeForm({
       paramObject: {
         mode: mode,
@@ -296,7 +281,7 @@ GlobalListener.prototype.handleLoadTypeForm = function(event) {
   
   // fields that need preprocessing
   
-  if(event.paramObject.mode === "manage-edge-types") {
+  if (event.paramObject.mode === "manage-edge-types") {
     var usage = $tm.adapter.selectEdgesByType(type);
     var count = Object.keys(usage).length;
     utils.setField(outTRef, "temp.usageCount", count);
@@ -320,14 +305,14 @@ GlobalListener.prototype.handleLoadTypeForm = function(event) {
 GlobalListener.prototype.handleSaveTypeForm = function(event) {
   
   var tObj = utils.getTiddler(event.paramObject.output);  
-  if(!tObj) return;
+  if (!tObj) return;
   
   var mode = event.paramObject.mode;
   var type = (mode === "manage-edge-types"
               ? new EdgeType(tObj.fields.id)
               : new NodeType(tObj.fields.id));
   
-  if(utils.isTrue(tObj.fields["temp.deleteType"], false)) {
+  if (utils.isTrue(tObj.fields["temp.deleteType"], false)) {
     this.deleteType(mode, type, tObj);
   } else {
     this.saveType(mode, type, tObj);
@@ -339,7 +324,7 @@ GlobalListener.prototype.deleteType = function(mode, type, dialogOutput) {
   
   $tm.logger("debug", "Deleting type", type);
       
-  if(mode === "manage-edge-types") {
+  if (mode === "manage-edge-types") {
     $tm.adapter._processEdgesWithType(type, { action: "delete" });
   } else {
     $tm.adapter.removeNodeType(type);
@@ -363,9 +348,9 @@ GlobalListener.prototype.saveType = function(mode, type, dialogOutput) {
     
   var newId = tObj.fields["temp.newId"];
   
-  if(newId && newId !== tObj.fields["id"]) { //renamed
+  if (newId && newId !== tObj.fields["id"]) { //renamed
     
-    if(mode === "manage-edge-types") {
+    if (mode === "manage-edge-types") {
       
       $tm.adapter._processEdgesWithType(type, {
         action: "rename",
@@ -416,4 +401,17 @@ GlobalListener.prototype.getTypeFromEvent = function(event) {
           ? new EdgeType(event.paramObject.id)
           : new NodeType(event.paramObject.id));
           
+};
+
+
+/*** Exports *******************************************************/
+
+export const name = "tmap.listener";
+export const platforms = [ "browser" ];
+export const after = [ "rootwidget", "tmap.caretaker" ];
+export const before = [ "story" ];
+export const synchronous = true;
+export const startup = () => {
+  // will register its lister functions to the root widget
+  new GlobalListener();
 };

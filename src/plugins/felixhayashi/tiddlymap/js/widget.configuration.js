@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/widget/MapConfigWidget
@@ -8,20 +9,12 @@ module-type: widget
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-exports["tmap-config"] = MapConfigWidget;
-
 /*** Imports *******************************************************/
  
-var ViewAbstraction = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
-var utils           = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
-var vis             = require("$:/plugins/felixhayashi/vis/vis.js");
-var Widget          = require("$:/core/modules/widgets/widget.js").widget;
+import ViewAbstraction from '$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction';
+import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
+import vis from '$:/plugins/felixhayashi/vis/vis.js';
+import { widget as Widget } from '$:/core/modules/widgets/widget.js';
 
 /*** Code **********************************************************/
 
@@ -67,13 +60,13 @@ MapConfigWidget.prototype.render = function(parent, nextSibling) {
   // remember our place in the dom
   this.parentDomNode = parent;
   
-  if(!this.domNode) {
+  if (!this.domNode) {
     this.domNode = this.document.createElement("div");
     $tw.utils.addClass(this.domNode, "tmap-config-widget");
     parent.insertBefore(this.domNode, nextSibling);
   }
 
-  if(this.network) {
+  if (this.network) {
         
     // destroy any previous instance
     this.network.destroy();
@@ -92,17 +85,17 @@ MapConfigWidget.prototype.render = function(parent, nextSibling) {
   this.mode = this.getAttribute("mode");
   
   // load inherited options
-  for(var i = 0; i < this.inheritedFields.length; i++) {
+  for (var i = 0; i < this.inheritedFields.length; i++) {
     var fieldName = this.inheritedFields[i];
     var style = utils.parseFieldData(this.pipeTRef, fieldName, {});
     
     // maybe the inherited options also come without a top level property
     // so we do the same here to…
     // TODO looks clumsy; do it in a more generic way…
-    if(this.mode === "manage-edge-types") {
-      if(!style.edges) { style = { edges: style }; }
-    } else if(this.mode === "manage-node-types") {
-      if(!style.nodes) { style = { nodes: style }; }
+    if (this.mode === "manage-edge-types") {
+      if (!style.edges) { style = { edges: style }; }
+    } else if (this.mode === "manage-node-types") {
+      if (!style.nodes) { style = { nodes: style }; }
     }
         
     this.inherited = utils.merge(this.inherited, style);
@@ -114,12 +107,12 @@ MapConfigWidget.prototype.render = function(parent, nextSibling) {
   // append it again, if not done so already.
   this.extension = utils.parseFieldData(this.pipeTRef, this.extensionTField, {});
   // TODO looks clumsy; do it in a more generic way…
-  if(this.mode === "manage-edge-types") {
-    if(!this.extension.edges) {
+  if (this.mode === "manage-edge-types") {
+    if (!this.extension.edges) {
       this.extension = { edges: this.extension };
     }
-  } else if(this.mode === "manage-node-types") {
-    if(!this.extension.nodes) {
+  } else if (this.mode === "manage-node-types") {
+    if (!this.extension.nodes) {
       this.extension = { nodes: this.extension };
     }
   }
@@ -178,7 +171,7 @@ MapConfigWidget.prototype.handleConfigChange = function(change) {
   var confPath = Object.keys(utils.flatten(change))[0];
   var isReset = (flatChange[confPath] === null);
     
-  if(isReset) { // we interpret this as delete
+  if (isReset) { // we interpret this as delete
     
     flatChanges[confPath] = undefined;
     this.changes = utils.unflatten(flatChanges);
@@ -190,8 +183,8 @@ MapConfigWidget.prototype.handleConfigChange = function(change) {
   
   // when storing edge- or node-styles we strip the root property
   var options = utils.merge({}, this.changes);
-  if(this.mode === "manage-node-types") { options = options["nodes"]; }
-  if(this.mode === "manage-edge-types") { options = options["edges"]; }
+  if (this.mode === "manage-node-types") { options = options["nodes"]; }
+  if (this.mode === "manage-edge-types") { options = options["edges"]; }
   
   // save changes
   utils.writeFieldData(this.pipeTRef, this.extensionTField, options, $tm.config.sys.jsonIndentation);
@@ -201,7 +194,7 @@ MapConfigWidget.prototype.handleConfigChange = function(change) {
   var div = this.networkContainer.getElementsByClassName(cls)[0];
   div.style.height = div.getBoundingClientRect().height + "px";
     
-  if(isReset) {
+  if (isReset) {
     
     // we need to use a timeout here, otherwise we cause a vis bug
     // since it is in the middle of storing the value!
@@ -226,13 +219,13 @@ MapConfigWidget.prototype.enhanceConfigurator = function() {
                      .getElementsByClassName(cls)[0].children;
   var list = [];
   var changes = utils.flatten(this.changes);
-  for(var i = 0; i < elements.length; i++) {
-    if(!elements[i].classList.contains("vis-config-item")) continue;
+  for (var i = 0; i < elements.length; i++) {
+    if (!elements[i].classList.contains("vis-config-item")) continue;
     
     var conf = new VisConfElement(elements[i], list, i);
     list.push(conf);
     
-    if(conf.level === 0) continue;
+    if (conf.level === 0) continue;
     
     conf.setActive(!!changes[conf.path]);
 
@@ -265,10 +258,10 @@ function VisConfElement(el, list, pos) {
   
   this.path = this.label;
   
-  if(this.level > 0) {
-    for(var i = pos; i--;) {
+  if (this.level > 0) {
+    for (var i = pos; i--;) {
       var prev = list[i];
-      if(prev.level < this.level) {
+      if (prev.level < this.level) {
         this.path = prev.path + "." + this.path;
         break;
       }
@@ -278,14 +271,14 @@ function VisConfElement(el, list, pos) {
 
 VisConfElement.prototype.setActive = function(isEnable) {
   
-  if(!isEnable) return;
+  if (!isEnable) return;
   
   // cannot use utils.hasKeyWithPrefix because some keys start with
   // same value as others
   var cls = "tmap-vis-config-item-" + (isEnable ? "active" : "inactive");
   $tw.utils.addClass(this.el, cls);
   
-  if(isEnable) {
+  if (isEnable) {
   
     var button = document.createElement("button");
     button.innerHTML = "reset";
@@ -368,9 +361,9 @@ MapConfigWidget.prototype.getOptionFilter = function(mode) {
     }
   };  
   
-  if(mode === "manage-edge-types") {
+  if (mode === "manage-edge-types") {
     whitelist = { edges: whitelist.edges };
-  } else if(mode === "manage-node-types") {
+  } else if (mode === "manage-node-types") {
     whitelist = { nodes: whitelist.nodes };
   } else {
     whitelist.edges.arrows = false;
@@ -382,10 +375,10 @@ MapConfigWidget.prototype.getOptionFilter = function(mode) {
     path = path.concat([ option ]);
     
     var wlObj = whitelist;
-    for(var i = 0, l = path.length; i < l; i++) {
-      if(wlObj[path[i]] === true) {
+    for (var i = 0, l = path.length; i < l; i++) {
+      if (wlObj[path[i]] === true) {
         return true;
-      } else if(wlObj[path[i]] == null) {
+      } else if (wlObj[path[i]] == null) {
         return false;
       } // else assume object
       wlObj = wlObj[path[i]];
@@ -417,7 +410,7 @@ MapConfigWidget.prototype.isZombieWidget = function() {
  */
 MapConfigWidget.prototype.destruct = function() {
     
-  if(this.network) {
+  if (this.network) {
     this.network.destroy();
   }
   
@@ -431,9 +424,9 @@ MapConfigWidget.prototype.destruct = function() {
  */
 MapConfigWidget.prototype.refresh = function(changedTiddlers) {
   
-  if(this.isZombieWidget() || !this.network) return;
+  if (this.isZombieWidget() || !this.network) return;
   
-  if(!changedTiddlers || changedTiddlers[this.refreshTrigger]) {
+  if (!changedTiddlers || changedTiddlers[this.refreshTrigger]) {
     this.refreshSelf();
     return true;
   }
@@ -443,7 +436,7 @@ MapConfigWidget.prototype.refresh = function(changedTiddlers) {
 MapConfigWidget.prototype.setNull = function(obj) {
   
   for (var p in obj) {
-    if(typeof obj[p] == "object") {
+    if (typeof obj[p] == "object") {
       this.setNull(obj[p]);
     } else {
       obj[p] = undefined;
@@ -451,3 +444,8 @@ MapConfigWidget.prototype.setNull = function(obj) {
   }
   
 };
+
+
+/*** Exports *******************************************************/
+
+exports["tmap-config"] = MapConfigWidget;

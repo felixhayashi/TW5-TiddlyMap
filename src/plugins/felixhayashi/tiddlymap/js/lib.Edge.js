@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/Edge
@@ -8,28 +9,26 @@ module-type: library
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-module.exports = Edge;
-
 /*** Imports *******************************************************/
 
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 
-/***************************** CODE ********************************/
+/*** Code **********************************************************/
 
 /**
  * @constructor
  */
-function Edge(from, to, type, id) {
-  
-  this.from = from;
-  this.to = to;
-  this.type = type;
-  this.id = (id || utils.genUUID());
-  
+class Edge {
+
+  constructor(from, to, type, id) {
+    this.from = from;
+    this.to = to;
+    this.type = type;
+    this.id = (id || utils.genUUID());
+  }
+
 }
+
+/*** Exports *******************************************************/
+
+export default Edge;

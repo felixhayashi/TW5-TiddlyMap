@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/NodeType
@@ -8,18 +9,10 @@ module-type: library
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-module.exports = NodeType;
-
 /*** Imports *******************************************************/
 
-var MapElementType = require("$:/plugins/felixhayashi/tiddlymap/js/MapElementType");
-var utils          = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+import MapElementType from '$:/plugins/felixhayashi/tiddlymap/js/MapElementType';
+import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
   
 /*** Code **********************************************************/
 
@@ -32,7 +25,7 @@ var utils          = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
  */
 function NodeType(id, data) {
 
-  if(id instanceof NodeType) {
+  if (id instanceof NodeType) {
     return id; // bounce back!
   }
  
@@ -85,3 +78,7 @@ NodeType.prototype.getInheritors = function(src) {
   return (s ? utils.getMatches(s, src || $tw.wiki.allTitles()) : []);
   
 };
+
+/*** Exports *******************************************************/
+
+export default NodeType;

@@ -1,10 +1,15 @@
 # @see http://git-scm.com/docs/gitignore
 #--------------------------------------------------------------------
 
-# ignore all files with a leading dot
+# ignore all files with a leading dot...
 .*
+
+# ...except from these:
 !.gitignore
 !.git
+!.babelrc
+!.editorconfig
+!.eslintrc.yml
 
 # ignore file in these paths
 node_modules/

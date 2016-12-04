@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/CallbackManager
@@ -8,101 +9,94 @@ module-type: library
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-module.exports = CallbackManager;
-
 /*** Imports *******************************************************/
- 
-var utils = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+
+import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 
 /*** Code **********************************************************/
-      
+
 /**
  * @constructor
  */
-function CallbackManager() {
-  
-  this.callbacks = utils.makeHashMap();
+class CallbackManager {
 
-};
-        
-/**
- * The callback mechanism allows to dynamically listen to tiddler
- * changes without hardcoding a change-check for a tiddler name
- * in the refresh function.
- * 
- * @param [TiddlerReference] tRef - A tiddler whose change triggers
- *     the callback.
- * @param {function} callback - A function that is called when the
- *     tiddler has changed.
- * @param {boolean} [deleteOnCall=true] - True if to delete the
- *     callback once it has been called, false otherwise.
- */
-CallbackManager.prototype.add = function(tRef, callback, isDeleteOnCall) {
-  
-  $tm.logger("debug", "A callback was registered for changes of \"" + tRef + "\"");
-  this.callbacks[tRef] = {
-    execute : callback,
-    isDeleteOnCall : (typeof isDeleteOnCall === "boolean" ? isDeleteOnCall : true)
+  constructor() {
+    this.callbacks = utils.makeHashMap();
+  }
+
+  /**
+   * The callback mechanism allows to dynamically listen to tiddler
+   * changes without hardcoding a change-check for a tiddler name
+   * in the refresh function.
+   *
+   * @param {TiddlerReference} tRef - A tiddler whose change triggers
+   *     the callback.
+   * @param {function} callback - A function that is called when the
+   *     tiddler has changed.
+   * @param {boolean} [isDeleteOnCall=true] - True if to delete the
+   *     callback once it has been called, false otherwise.
+   */
+  add(tRef, callback, isDeleteOnCall) {
+
+    $tm.logger('debug', `A callback was registered for changes of "${tRef}"`);
+    this.callbacks[tRef] = {
+      execute: callback,
+      isDeleteOnCall: (typeof isDeleteOnCall === 'boolean' ? isDeleteOnCall : true)
+    };
+
   };
-  
-};
 
-/**
- * Removes the callback from the list of tiddler callbacks.
- * 
- * @see CallbackManager#registerCallback
- */
-CallbackManager.prototype.remove = function(refOrRefList) {
-  
-  if(!refOrRefList) return;
-  
-  if(typeof refOrRefList === "string") {
-    refOrRefList = [ refOrRefList ];
-  }
-  
-  for(var i = refOrRefList.length; i--;) {
-    var tRef = refOrRefList[i];
-    if(this.callbacks[tRef]) {
-      $tm.logger("debug", "A callback for \"" + tRef + "\" will be deleted");
-      delete this.callbacks[tRef];
-    }
-  }
-  
-};
+  /**
+   * Removes the callback from the list of tiddler callbacks.
+   */
+  remove(refOrRefList) {
 
-/**
- * this method has to be implemented at the top of the refresh method.
- * It checks for changed tiddlers that have
- * registered callbacks. If `deleteOnCall` was specified during
- * registration of the callback, the callback will be deleted
- * automatically.
- * 
- * @see CallbackManager#registerCallback
- */
-CallbackManager.prototype.handleChanges = function(changedTiddlers) {
-  
-  if(this.callbacks.length == 0) return;
-  
-  for(var tRef in changedTiddlers) {
-    if(!this.callbacks[tRef]) continue;
-    
-    if($tw.wiki.getTiddler(tRef)) {
-      
-      $tm.logger("debug", "Executing a callback for: " + tRef);
-      this.callbacks[tRef].execute(tRef);
-      
-      // a continue prevents deleting the callback
-      if(!this.callbacks.isDeleteOnCall) continue;
-      
+    if (!refOrRefList) return;
+
+    if (typeof refOrRefList === 'string') {
+      refOrRefList = [refOrRefList];
     }
-    
-    this.remove(tRef);
-  }
-  
-};
+
+    for (var i = refOrRefList.length; i--;) {
+      var tRef = refOrRefList[i];
+      if (this.callbacks[tRef]) {
+        $tm.logger('debug', `A callback for "${tRef}" will be deleted`);
+        delete this.callbacks[tRef];
+      }
+    }
+
+  };
+
+  /**
+   * this method has to be implemented at the top of the refresh method.
+   * It checks for changed tiddlers that have
+   * registered callbacks. If `deleteOnCall` was specified during
+   * registration of the callback, the callback will be deleted
+   * automatically.
+   */
+  handleChanges(changedTiddlers) {
+
+    if (this.callbacks.length == 0) return;
+
+    for (var tRef in changedTiddlers) {
+      if (!this.callbacks[tRef]) continue;
+
+      if ($tw.wiki.getTiddler(tRef)) {
+
+        $tm.logger('debug', `Executing a callback for: ${tRef}`);
+        this.callbacks[tRef].execute(tRef);
+
+        // a continue prevents deleting the callback
+        if (!this.callbacks.isDeleteOnCall) continue;
+
+      }
+
+      this.remove(tRef);
+    }
+
+  };
+}
+
+/*** Exports *******************************************************/
+
+export default CallbackManager;

@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/Adapter
@@ -8,22 +9,14 @@ module-type: library
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-module.exports = Adapter;
-
 /*** Imports *******************************************************/
 
-var ViewAbstraction   = require("$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction");
-var EdgeType          = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
-var NodeType          = require("$:/plugins/felixhayashi/tiddlymap/js/NodeType");
-var utils             = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
-var vis               = require("$:/plugins/felixhayashi/vis/vis.js");
-var getContrastColour = require("$:/core/modules/macros/contrastcolour.js").run;
+import ViewAbstraction   from '$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction';
+import EdgeType          from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
+import NodeType          from '$:/plugins/felixhayashi/tiddlymap/js/NodeType';
+import utils             from '$:/plugins/felixhayashi/tiddlymap/js/utils';
+import vis               from '$:/plugins/felixhayashi/vis/vis.js';
+import { run as getContrastColour } from '$:/core/modules/macros/contrastcolour.js';
 
 /***************************** CODE ********************************/
 
@@ -84,7 +77,7 @@ Adapter.prototype.insertEdge = function(edge) {
 Adapter.prototype.deleteEdges = function(edges) {
 
   edges = utils.convert(edges, "array");
-  for(var i = edges.length; i--;) {
+  for (var i = edges.length; i--;) {
     this.deleteEdge(edges[i]);
   }
 
@@ -102,24 +95,24 @@ Adapter.prototype._processEdge = function(edge, action) {
 
   $tm.logger("debug", "Edge", action, edge);
 
-  if(typeof edge !== "object" || !action || !edge.from) return;
-  if(action === "insert" && !edge.to) return;
+  if (typeof edge !== "object" || !action || !edge.from) return;
+  if (action === "insert" && !edge.to) return;
 
   // get from-node and corresponding tiddler
   var fromTRef = $tm.indeces.tById[edge.from];
-  if(!fromTRef || !utils.tiddlerExists(fromTRef)) return;
+  if (!fromTRef || !utils.tiddlerExists(fromTRef)) return;
 
   var tObj = utils.getTiddler(fromTRef);
   var type = new EdgeType(edge.type);
   var handlers = $tm.services.edgeTypeSubscriberRegistry.getAllForType(type);
   var fn = action + "Edge";
 
-  for(var i = handlers.length; i--;) {
+  for (var i = handlers.length; i--;) {
     (handlers[i][fn])(tObj, edge, type);
   }
 
   // if type didn't exist yet, create it
-  if(action === "insert" && !type.exists()) {
+  if (action === "insert" && !type.exists()) {
     type.save();
   }
 
@@ -150,7 +143,7 @@ Adapter.prototype.getAdjacencyList = function(groupBy, opts) {
 
   opts = opts || {};
 
-  if(!opts.edges) {
+  if (!opts.edges) {
     var tRefs = utils.getMatches($tm.selector.allPotentialNodes);
     opts.edges = this.getEdgesForSet(tRefs, opts.toWL, opts.typeWL);
   }
@@ -228,10 +221,10 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
   var addAsNeighbour = function(edge, role) {
     allEdgesLeadingToNeighbours[edge.id] = edge;
     var tRef = tById[edge[role]];
-    if(!visited[tRef]) {
+    if (!visited[tRef]) {
       visited[tRef] = true;
       var node = this.makeNode(tRef, protoNode);
-      if(node) { // saveguard against obsolete edges or other problems
+      if (node) { // saveguard against obsolete edges or other problems
         // record node
         allNeighbours[node.id] = node;
         neighboursOfThisStep.push(tRef);
@@ -240,16 +233,16 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
   }.bind(this);
 
   // loop if still steps to be taken and we have a non-empty starting set
-  for(var step = 0; step < maxSteps && matches.length; step++) {
+  for (var step = 0; step < maxSteps && matches.length; step++) {
 
     // neighbours that are discovered in the current step;
     // starting off from the current set of matches;
     var neighboursOfThisStep = [];
 
     // loop over all nodes in the original set
-    for(var i = matches.length; i--;) {
+    for (var i = matches.length; i--;) {
 
-      if(utils.isSystemOrDraft(matches[i])) {
+      if (utils.isSystemOrDraft(matches[i])) {
         // = this might happen if the user manually created edges
         // that link to a system/draft tiddler or if the original
         // set contained system/draft tiddlers.
@@ -259,9 +252,9 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
       // get all outgoing edges
       // = edges originating from the starting set and point outwards
       var outgoing = this.getEdges(matches[i], toWL, typeWL);
-      for(var id in outgoing) {
+      for (var id in outgoing) {
         var t = allETy[outgoing[id].type];
-        if(isWalkBoth || isWalkOut && t.toArrow || isWalkIn && t.invertedArrow) {
+        if (isWalkBoth || isWalkOut && t.toArrow || isWalkIn && t.invertedArrow) {
           addAsNeighbour(outgoing[id], "to");
         }
       }
@@ -269,11 +262,11 @@ Adapter.prototype.getNeighbours = function(matches, opts) {
       // get all incoming edges
       // = edges originating from outside pointing to the starting set
       var incoming = adjList[idByT[matches[i]]];
-      if(!incoming) continue;
+      if (!incoming) continue;
 
-      for(var j = incoming.length; j--;) {
+      for (var j = incoming.length; j--;) {
         var t = allETy[incoming[j].type];
-        if(isWalkBoth || isWalkIn && t.toArrow || isWalkOut && t.invertedArrow) {
+        if (isWalkBoth || isWalkIn && t.toArrow || isWalkOut && t.invertedArrow) {
           addAsNeighbour(incoming[j], "from");
         }
       }
@@ -347,7 +340,7 @@ Adapter.prototype.getGraph = function(opts) {
     })
   };
 
-  if(neighScope) {
+  if (neighScope) {
     var neighbours = this.getNeighbours(matches, {
       steps: neighScope,
       view: view,
@@ -360,7 +353,7 @@ Adapter.prototype.getGraph = function(opts) {
     // merge neighbours (nodes and edges) into graph
     utils.merge(graph, neighbours);
 
-    if(view.exists() && view.isEnabled("show_inter_neighbour_edges")) {
+    if (view.exists() && view.isEnabled("show_inter_neighbour_edges")) {
       var nodeTRefs = this.getTiddlersById(neighbours.nodes);
       // this time we need a whitelist based on the nodeTRefs
       var toWL = utils.getArrayValuesAsHashmapKeys(nodeTRefs);
@@ -412,20 +405,20 @@ Adapter.prototype.getGraph = function(opts) {
 Adapter.prototype.getEdges = function(tiddler, toWL, typeWL) {
 
   var tObj = utils.getTiddler(tiddler);
-  if(!tObj || utils.isSystemOrDraft(tObj)) return;
+  if (!tObj || utils.isSystemOrDraft(tObj)) return;
 
   var edges = utils.makeHashMap();
 
   var eTySubscribers = $tm.services.edgeTypeSubscriberRegistry.getAll();
-  for(var i = 0, l = eTySubscribers.length; i < l; i++) {
+  for (var i = 0, l = eTySubscribers.length; i < l; i++) {
     $tw.utils.extend(edges, (eTySubscribers[i]).loadEdges(tObj, toWL, typeWL));
   }
 
-  for(var id in edges) {
+  for (var id in edges) {
     var edge = edges[id];
     edge = this._addEdgeData(edge);
 
-    if(edge) {
+    if (edge) {
       edges[id] = edge;
     }
   }
@@ -443,7 +436,7 @@ Adapter.prototype.getEdges = function(tiddler, toWL, typeWL) {
 Adapter.prototype.getEdgesForSet = function(tiddlers, toWL, typeWL) {
 
   var edges = utils.makeHashMap();
-  for(var i = tiddlers.length; i--;) {
+  for (var i = tiddlers.length; i--;) {
     $tw.utils.extend(edges, this.getEdges(tiddlers[i], toWL, typeWL));
   }
 
@@ -481,7 +474,7 @@ Adapter.prototype._processEdgesWithType = function(type, task) {
   // get edges
   var edges = this.selectEdgesByType(type);
 
-  if(task.action === "rename") {
+  if (task.action === "rename") {
 
     // clone type first to prevent auto-creation
     var newType = new EdgeType(task.newName);
@@ -490,9 +483,9 @@ Adapter.prototype._processEdgesWithType = function(type, task) {
 
   }
 
-  for(var id in edges) {
+  for (var id in edges) {
     this._processEdge(edges[id], "delete");
-    if(task.action === "rename") {
+    if (task.action === "rename") {
       edges[id].type = task.newName;
       this._processEdge(edges[id], "insert");
     }
@@ -544,10 +537,10 @@ Adapter.prototype.selectNodesByReferences = function(tiddlers, options) {
   var result = utils.makeHashMap();
   var keys = Object.keys(tiddlers);
 
-  for(var i = keys.length; i--;) {
+  for (var i = keys.length; i--;) {
 
     var node = this.makeNode(tiddlers[keys[i]], protoNode);
-    if(node) { result[node.id] = node; }  // ATTENTION: edges may be obsolete
+    if (node) { result[node.id] = node; }  // ATTENTION: edges may be obsolete
 
   }
 
@@ -596,11 +589,11 @@ Adapter.prototype.selectNodeById = function(id, options) {
  */
 Adapter.prototype._addEdgeData = function(edge) {
 
-  if(!edge.from || !edge.to) return;
+  if (!edge.from || !edge.to) return;
 
   var type = $tm.indeces.allETy[edge.type] || new EdgeType(edge.type);
 
-  if(utils.isTrue(type["show-label"], true)) {
+  if (utils.isTrue(type["show-label"], true)) {
     edge.label = type.getLabel();
   }
 
@@ -623,7 +616,7 @@ Adapter.prototype.makeNode = function(tiddler, protoNode) {
 
   var tObj = utils.getTiddler(tiddler);
 
-  if(!tObj || utils.isSystemOrDraft(tObj)) return;
+  if (!tObj || utils.isSystemOrDraft(tObj)) return;
 
   var node = utils.merge({}, protoNode);
 
@@ -646,14 +639,14 @@ Adapter.prototype.getInheritedNodeStyles = function(nodes) {
   var protoByTRef = {};
   var glNTy = $tm.indeces.glNTy;
 
-  for(var i = glNTy.length; i--;) {
+  for (var i = glNTy.length; i--;) {
     var type = glNTy[i];
 
-    if(type.id === "tmap:neighbour") { // special case
+    if (type.id === "tmap:neighbour") { // special case
       var tById = $tm.indeces.tById;
       var inheritors = [];
-      for(var id in nodes) {
-        if(nodes[id].group === "tmap:neighbour") {
+      for (var id in nodes) {
+        if (nodes[id].group === "tmap:neighbour") {
           inheritors.push(tById[id]);
         }
       }
@@ -661,7 +654,7 @@ Adapter.prototype.getInheritedNodeStyles = function(nodes) {
       var inheritors = type.getInheritors(src);
     }
 
-    for(var j = inheritors.length; j--;) {
+    for (var j = inheritors.length; j--;) {
       var tRef = inheritors[j];
       var proto = protoByTRef[tRef] = (protoByTRef[tRef] || {});
       proto.style = utils.merge(
@@ -672,9 +665,9 @@ Adapter.prototype.getInheritedNodeStyles = function(nodes) {
       // ATTENTION: only override proto icons when the type provides
       // an icon since otherwise we might erase previously
       // inherited icons.
-      if(type["fa-icon"]) {
+      if (type["fa-icon"]) {
         proto["fa-icon"] = type["fa-icon"];
-      } else if(type["tw-icon"]) {
+      } else if (type["tw-icon"]) {
         proto["tw-icon"] = type["tw-icon"];
       }
 
@@ -696,13 +689,13 @@ Adapter.prototype.attachStylesToEdges = function(edges, view) {
 Adapter.prototype._removeObsoleteViewData = function(nodes, view) {
 
   view = new ViewAbstraction(view);
-  if(!view.exists() || !nodes) return;
+  if (!view.exists() || !nodes) return;
 
   var data = view.getNodeData();
 
   var obsoleteDataItems = 0;
-  for(var id in data) {
-    if(nodes[id] === undefined && data[id] != null) {
+  for (var id in data) {
+    if (nodes[id] === undefined && data[id] != null) {
       // we only set this to undefined as deletion would
       // slow down V8, however, this necessarily requires
       // a safeguard agains recursion: data[id] != null
@@ -711,7 +704,7 @@ Adapter.prototype._removeObsoleteViewData = function(nodes, view) {
     }
   }
 
-  if(obsoleteDataItems) {
+  if (obsoleteDataItems) {
     $tm.logger("debug", "[Cleanup]",
                 "Removed obsolete node data:",
                 view.getLabel(), obsoleteDataItems);
@@ -734,7 +727,7 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
   var nodeIconField = $tm.field.nodeIcon;
   var tById = $tm.indeces.tById;
 
-  for(var id in nodes) {
+  for (var id in nodes) {
     var tRef = tById[id];
     var tObj = $tw.wiki.getTiddler(tRef);
     var fields = tObj.fields;
@@ -745,9 +738,9 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
     // == group styles ==
 
     // will add local and global group styles
-    if(inheritedStyles[tRef]) {
+    if (inheritedStyles[tRef]) {
 
-      if(inheritedStyles[tRef].style) {
+      if (inheritedStyles[tRef].style) {
         utils.merge(node, inheritedStyles[tRef].style);
       }
       faIcon = inheritedStyles[tRef]["fa-icon"];
@@ -757,10 +750,10 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
     // == global node styles ==
 
     // background color
-    if(fields.color) { node.color = fields.color }
+    if (fields.color) { node.color = fields.color }
 
     // global node style from vis editor
-    if(fields["tmap.style"]) {
+    if (fields["tmap.style"]) {
       utils.merge(node, utils.parseJSON(fields["tmap.style"]));
     }
 
@@ -770,9 +763,9 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
     // == local node styles ==
 
     // local node style and positions
-    if(viewNodeData[id]) {
+    if (viewNodeData[id]) {
       utils.merge(node, viewNodeData[id]);
-      if(isStaticMode) {
+      if (isStaticMode) {
         // fix x if x-position is set; same for y
         node.fixed = {
           x: (node.x != null),
@@ -803,21 +796,21 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
     // him- or herself to adjust the font
     node.font = node.font || {};
 
-    if(node.shape && !this.visShapesWithTextInside[node.shape]) {
+    if (node.shape && !this.visShapesWithTextInside[node.shape]) {
       node.font.color = "black"; // force a black color
-    } else if(!node.font.color && color) {
+    } else if (!node.font.color && color) {
       node.font.color = getContrastColour(color, color, "black", "white");
     }
 
-    if(node.shape === "icon" && typeof node.icon === "object") {
+    if (node.shape === "icon" && typeof node.icon === "object") {
       node.icon.color = color;
     }
 
   }
 
-  if(view.exists()) {
+  if (view.exists()) {
     var node = nodes[view.getConfig("central-topic")];
-    if(node) {
+    if (node) {
       utils.merge(node, $tm.indeces.glNTyById["tmap:central-topic"].style);
     }
   }
@@ -839,7 +832,7 @@ Adapter.prototype.attachStylesToNodes = function(nodes, view) {
  */
 Adapter.prototype.deleteNode = function(node) {
 
-  if(!node) return;
+  if (!node) return;
 
   var id = (typeof node === "object" ? node.id : node);
   var tRef = $tm.indeces.tById[id];
@@ -847,7 +840,7 @@ Adapter.prototype.deleteNode = function(node) {
   // delete tiddler and remove it from the river; this will
   // automatically remove the global node style and the outgoing edges
 
-  if(tRef) {
+  if (tRef) {
     // checking for tRef is needed;
     // see: https://github.com/Jermolene/TiddlyWiki5/issues/1919
     utils.deleteTiddlers([ tRef ]);
@@ -856,10 +849,10 @@ Adapter.prototype.deleteNode = function(node) {
   // delete local node-data in views containing the node
 
   var viewRefs = utils.getMatches($tm.selector.allViews);
-  for(var i = viewRefs.length; i--;) {
+  for (var i = viewRefs.length; i--;) {
     var view = new ViewAbstraction(viewRefs[i]);
     view.removeNode(id);
-    if(view.getNodeData(id)) {
+    if (view.getNodeData(id)) {
       view.saveNodeData(id, null);
     }
   }
@@ -889,7 +882,7 @@ Adapter.prototype.deleteNode = function(node) {
 Adapter.prototype.deleteNodes = function(nodes) {
 
   nodes = utils.convert(nodes, "array");
-  for(var i = nodes.length; i--;) {
+  for (var i = nodes.length; i--;) {
     this.deleteNode(nodes[i]);
   }
 
@@ -904,7 +897,7 @@ Adapter.prototype.deleteNodes = function(nodes) {
 Adapter.prototype.storePositions = function(positions, view) {
 
   view = new ViewAbstraction(view);
-  if(!view.exists()) return;
+  if (!view.exists()) return;
 
   view.saveNodeData(positions);
 
@@ -930,11 +923,11 @@ Adapter.prototype.assignId = function(tiddler, isForce) {
   // Therefore, do not use utils.getTiddler(tiddler)!
   var tObj = utils.getTiddler(tiddler, true);
 
-  if(!tObj) return;
+  if (!tObj) return;
 
   var id = tObj.fields["tmap.id"];
 
-  if(!id || isForce) {
+  if (!id || isForce) {
     id = utils.genUUID();
     utils.setField(tObj, "tmap.id", id);
     $tm.logger("info", "Assigning new id to", tObj.fields.title);
@@ -976,7 +969,7 @@ Adapter.prototype.insertNode = function(node, view, options) {
   };
 
   // https://github.com/Jermolene/TiddlyWiki5/issues/2025
-  if(!options.fields || !options.fields.text) {
+  if (!options.fields || !options.fields.text) {
     fields.text = "";
   }
 
@@ -998,7 +991,7 @@ Adapter.prototype.insertNode = function(node, view, options) {
   node = this.makeNode(tObj, node);
 
   var view = new ViewAbstraction(view);
-  if(view.exists()) {
+  if (view.exists()) {
     view.addNode(node);
   }
 
@@ -1025,16 +1018,16 @@ Adapter.prototype._getFAdigits = function(str) {
 Adapter.prototype.getTiddlersById = function(nodeIds) {
 
   // transform into a hashmap with all values being true
-  if(Array.isArray(nodeIds)) {
+  if (Array.isArray(nodeIds)) {
     nodeIds = utils.getArrayValuesAsHashmapKeys(nodeIds);
-  } else if(nodeIds instanceof vis.DataSet) {
+  } else if (nodeIds instanceof vis.DataSet) {
     nodeIds = utils.getLookupTable(nodeIds, "id"); // use id field as key
   }
 
   var result = [];
   var tById = $tm.indeces.tById;
-  for(var id in nodeIds) {
-    if(tById[id]) result.push(tById[id]);
+  for (var id in nodeIds) {
+    if (tById[id]) result.push(tById[id]);
   }
 
   return result;
@@ -1054,7 +1047,7 @@ Adapter.prototype.getId = function(tiddler) {
 Adapter.prototype._addNodeIcon = function(node, faIcon, twIcon) {
 
   // Font Awesome style
-  if(faIcon) {
+  if (faIcon) {
     node.shape = "icon";
     node.icon = {
       shape: "icon",
@@ -1068,21 +1061,25 @@ Adapter.prototype._addNodeIcon = function(node, faIcon, twIcon) {
 
   // TiddlyWiki stored icons
 
-  if(!twIcon) return;
+  if (!twIcon) return;
 
   var imgTObj = utils.getTiddler(twIcon);
-  if(!imgTObj) return;
+  if (!imgTObj) return;
 
-  if(imgTObj.fields["_canonical_uri"]) { // image is a url address
+  if (imgTObj.fields["_canonical_uri"]) { // image is a url address
     node.image = imgTObj.fields["_canonical_uri"];
     node.shape = "image";
     return;
   }
 
-  if(imgTObj.fields.text) {
+  if (imgTObj.fields.text) {
     node.image = utils.getDataUri(imgTObj);
     node.shape = "image";
     return;
   }
 
 };
+
+/*** Exports *******************************************************/
+
+export default Adapter;

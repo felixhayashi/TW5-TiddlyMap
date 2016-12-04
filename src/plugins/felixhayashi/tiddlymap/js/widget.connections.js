@@ -1,3 +1,4 @@
+// tw-module
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/widget/connections
@@ -8,20 +9,11 @@ module-type: widget
 
 \*/
 
-/*jslint node: true, browser: true */
-/*global $tw: false */
-"use strict";
-
-/*** Exports *******************************************************/
-
-exports["tmap-edgelistitem"] = EdgeListItemWidget;
-exports["tmap-connections"] = EdgeListWidget;
-
 /*** Imports *******************************************************/
 
-var Widget   = require("$:/core/modules/widgets/widget.js").widget;
-var EdgeType = require("$:/plugins/felixhayashi/tiddlymap/js/EdgeType");
-var utils    = require("$:/plugins/felixhayashi/tiddlymap/js/utils");
+import { widget as Widget } from '$:/core/modules/widgets/widget.js';
+import EdgeType from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
+import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 
 /*** Code **********************************************************/
 
@@ -69,11 +61,11 @@ EdgeListWidget.prototype.execute = function() {
   var edges = neighbourhood.edges;
   
   var entries = [];
-  for(var id in edges) {
+  for (var id in edges) {
     var edge = edges[id];
     var neighbour = neighbours[edge.to] || neighbours[edge.from];
     
-    if(!neighbour) continue; // obsolete edge from old times;
+    if (!neighbour) continue; // obsolete edge from old times;
     
     // make item template
     entries.push({
@@ -87,10 +79,10 @@ EdgeListWidget.prototype.execute = function() {
     });
   }
   
-  if(!entries.length) {
+  if (!entries.length) {
     this.wasEmpty = true;
     entries = this.getEmptyMessage();
-  } else if(this.wasEmpty) {
+  } else if (this.wasEmpty) {
     // we need to remove the empty message
     this.removeChildDomNodes();
   }
@@ -114,13 +106,13 @@ EdgeListWidget.prototype.refresh = function(changedTiddlers) {
   
   var changedAttributes = this.computeAttributes();
   var hasChangedAttributes = Object.keys(changedAttributes).length;
-  if(hasChangedAttributes) {
+  if (hasChangedAttributes) {
     this.refreshSelf();
     return true;
   }
 
-  for(var tRef in changedTiddlers) {
-    if(!utils.isSystemOrDraft(tRef)) {
+  for (var tRef in changedTiddlers) {
+    if (!utils.isSystemOrDraft(tRef)) {
       this.refreshSelf();
       return true;
     } 
@@ -153,8 +145,8 @@ EdgeListItemWidget.prototype.execute = function() {
   
   // make edge properties available as variables
   var edge = utils.flatten(item.edge);
-  for(var p in edge) {
-    if(typeof edge[p] === "string") {
+  for (var p in edge) {
+    if (typeof edge[p] === "string") {
       this.setVariable("edge." + p, edge[p]);
     }
   }
@@ -168,12 +160,12 @@ EdgeListItemWidget.prototype.execute = function() {
   var indexedAs = (edge.to === item.neighbour.id ? "to" : "from");
   var arrow = indexedAs;
   
-  if(type.biArrow) {
+  if (type.biArrow) {
     arrow = "bi";  
   } else {
-    if(indexedAs === "to" && type.invertedArrow) {
+    if (indexedAs === "to" && type.invertedArrow) {
       arrow = "from";
-    } else if(indexedAs === "from" && type.invertedArrow) {
+    } else if (indexedAs === "from" && type.invertedArrow) {
       arrow = "to";
     }
   }
@@ -195,3 +187,9 @@ EdgeListItemWidget.prototype.refresh = function(changedTiddlers) {
   return this.refreshChildren(changedTiddlers);
   
 };
+
+
+/*** Exports *******************************************************/
+
+exports["tmap-edgelistitem"] = EdgeListItemWidget;
+exports["tmap-connections"] = EdgeListWidget;

@@ -68,7 +68,7 @@ import fs from 'fs';
 // packages
 
 import TiddlyWiki from 'tiddlywiki';
-import argv from 'yargs';
+import { argv } from 'yargs';
 import del from 'del';
 import exists from 'is-there'; // why on earth is fs.exists depreciated anyway by node?
 import SemVer from 'semver';
@@ -77,7 +77,6 @@ import beep from 'beepbeep';
 import gulp from 'gulp';
 import gulpif from 'gulp-if';
 import babel from 'gulp-babel';
-import gutil from 'gulp-util'; // contains gutil.log
 import sass from 'gulp-sass';
 import replace from 'gulp-replace';
 import uglify from 'gulp-uglify';
@@ -85,6 +84,7 @@ import jsdoc from 'gulp-jsdoc3';
 import esprima from 'gulp-esprima';
 import debug from 'gulp-debug';
 import bump from 'gulp-bump';
+import sourcemaps from 'gulp-sourcemaps';
 
 /**** Preprocessing ************************************************/
 
@@ -95,20 +95,21 @@ const pluginInfoPath = path.resolve(pluginSrc, pluginNamespace, 'plugin.info');
 const pluginInfo = JSON.parse(fs.readFileSync(pluginInfoPath, 'utf8'));
 
 // build paths where we output our results
-var outPath = {
+const outPath = {
   bundle: './bundle/',
   dist: './dist/',
-  docs: './docs/'
+  docs: './docs/',
+  maps: './maps/'
 };
 
 // a quick sanity check
-if(pluginTiddler !== pluginInfo.title) {
+if (pluginTiddler !== pluginInfo.title) {
   throw new Error('Gulp settings do not match the plugin.info');
 }
 
 /**** Replacements *************************************************/
 
-var replaceAfterSass = {
+const replaceAfterSass = {
   '__breakpoint__': '{{$:/themes/tiddlywiki/vanilla/metrics/sidebarbreakpoint}}'
 };
 
@@ -119,8 +120,8 @@ var replaceAfterSass = {
  */
 gulp.task('perform cleanup', () => {
 
-  var cleanupPaths = [];
-  for(var path in outPath) {
+  const cleanupPaths = [];
+  for (let path in outPath) {
     cleanupPaths.push(outPath[path]);
   }
 
@@ -136,10 +137,10 @@ gulp.task('perform cleanup', () => {
 gulp.task('bump version', (cb) => {
 
   // bump plugin info
-  var v = new SemVer(pluginInfo.version);
-  var build = (isIncrBuild ? '+' + (parseInt(v.build[0] || 0) + 1) : '');
-  var mode = (argv.mode && argv.mode !== 'master' ? `-${argv.mode}` : '');
-  var version = `${v.major}.${v.minor}.${v.patch}${mode}`;
+  const v = new SemVer(pluginInfo.version);
+  const build = (isIncrBuild ? '+' + (parseInt(v.build[0] || 0) + 1) : '');
+  const mode = (argv.mode && argv.mode !== 'master' ? `-${argv.mode}` : '');
+  const version = `${v.major}.${v.minor}.${v.patch}${mode}`;
   pluginInfo.version = version + build;
   pluginInfo.released = new Date().toUTCString();
   fs.writeFileSync(pluginInfoPath, JSON.stringify(pluginInfo, null, 2));
@@ -172,15 +173,15 @@ gulp.task('copy vanilla files', () => {
  */
 gulp.task('compile and move styles', () => {
 
-  var opts = {
+  const opts = {
     outputStyle: (argv.production ? 'compressed' : 'nested'),
     sourceComments: false,
   };
 
-  var stream = gulp.src(pluginSrc + '/**/*.scss')
-                   .pipe(sass(opts));
+  let stream = gulp.src(pluginSrc + '/**/*.scss')
+                 .pipe(sass(opts));
 
-  for(var str in replaceAfterSass) {
+  for (let str in replaceAfterSass) {
     stream = stream.pipe(replace(str, replaceAfterSass[str]));
   }
 
@@ -197,15 +198,22 @@ gulp.task('compile and move styles', () => {
  */
 gulp.task('compile and move scripts', () => {
 
-  var opts = {
+  const uglifyOpts = {
     compress: false, // no further optimization
-    preserveComments: 'some'
+    preserveComments: 'some',
+  };
+
+  const sourceMapOpts = {
+    destPath: outPath.maps,
+    sourceMappingURLPrefix: '.'
   };
 
   return gulp.src(pluginSrc + '/**/*.js')
-             .pipe(gulpif(argv.production, uglify(opts)))
-             .pipe(babel())
-             .pipe(gulp.dest(outPath.dist));
+    .pipe(sourcemaps.init())
+    .pipe(babel())
+    .pipe(gulpif (argv.production, uglify(uglifyOpts)))
+    .pipe(sourcemaps.write('./maps', sourceMapOpts))
+    .pipe(gulp.dest(outPath.dist));
 
 });
 
@@ -226,11 +234,11 @@ gulp.task('Javascript validation', () => {
  */
 gulp.task('create docs', (cb) => {
 
-  if(!argv.production) { cb(); return; }
+  if (!argv.production) { cb(); return; }
 
   // use require to load the jsdoc config;
   // note the extension is discarted when loading json with require!
-  var config = require('./src/jsdoc/config');
+  const config = require('./src/jsdoc/config');
   config.opts.destination = outPath.docs;
 
   gulp.src([ pluginSrc + '/**/*.js', './src/jsdoc/README.md' ])
@@ -248,7 +256,7 @@ gulp.task('create docs', (cb) => {
 gulp.task('bundle the plugin', (cb) => {
 
   // init the tw environment
-  var $tw = TiddlyWiki.TiddlyWiki();
+  const $tw = TiddlyWiki.TiddlyWiki();
 
   // set the output to verbose;
   // Attention: argv always needs to contain at least one element,
@@ -263,15 +271,15 @@ gulp.task('bundle the plugin', (cb) => {
   $tw.boot.boot();
 
   // bundle from the plugin files as json
-  var plugin = $tw.loadPluginFolder(path.resolve(outPath.dist, pluginNamespace));
+  const plugin = $tw.loadPluginFolder(path.resolve(outPath.dist, pluginNamespace));
 
   //make sure the bundle path exists
-  if(!exists(outPath.bundle)) fs.mkdirSync(outPath.bundle);
+  if (!exists(outPath.bundle)) fs.mkdirSync(outPath.bundle);
 
   // write the json to the dist dir;
   // note: tw requires the json to be wrapped in an array, since
   // a collection of tiddlers are possible.
-  var outName = pluginName + '_' + pluginInfo.version + '.json';
+  const outName = pluginName + '_' + pluginInfo.version + '.json';
   fs.writeFileSync(path.resolve(outPath.bundle, outName),
                    JSON.stringify([ plugin ], null, 2));
 

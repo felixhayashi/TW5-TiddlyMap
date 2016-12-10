@@ -19,6 +19,7 @@ globals:
   node: true
   browser: true
   $tw: true
+  $tm: true
 
 rules:
     semi: 1 # require semicolons
@@ -26,3 +27,4 @@ rules:
     quotes: [ 1, 'single' ]
     indent: [ 1, 2 ] # 2-space indentation
     keyword-spacing: 1 # space before and after
+    array-bracket-spacing: [1, 'always']  # enforce spaces inside of brackets

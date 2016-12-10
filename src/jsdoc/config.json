@@ -21,7 +21,7 @@
         "highlightTutorialCode" : true
     },
     "opts": {
-      "template": "templates/docstrap/template",
+      "template": "./node_modules/ink-docstrap/template",
       "encoding": "utf8"
     }
 }

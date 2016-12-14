@@ -103,3 +103,4 @@ Felix Küppers, @felixhayashi, 2014-11-20
 Rich Rath @rcrath 2014-04-12  
 Cameron Fischer @flibbles 2016-01-19  
 Michael Ballantyne @michaelballantyne 2016-06-13
+Victor Ling @kasukoxr 2016-12-14

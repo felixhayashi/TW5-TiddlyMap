@@ -880,10 +880,9 @@ class Adapter {
    */
   assignId(tiddler, isForce) {
 
-    // ALWAYS reload from store to avoid setting wrong ids on tiddler
+    // Note: always reload from store to avoid setting wrong ids on tiddler
     // being in the role of from and to at the same time.
-    // Therefore, do not use utils.getTiddler(tiddler)!
-    const tObj = utils.getTiddler(tiddler, true);
+    const tObj = utils.getTiddler(tiddler);
 
     if (!tObj) return;
 

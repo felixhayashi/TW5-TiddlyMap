@@ -11,7 +11,6 @@ module-type: widget
 
 /*** Imports *******************************************************/
 
-import utils                from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 import DialogManager        from '$:/plugins/felixhayashi/tiddlymap/js/DialogManager';
 import CallbackManager      from '$:/plugins/felixhayashi/tiddlymap/js/CallbackManager';
 import ViewAbstraction      from '$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction';
@@ -19,6 +18,7 @@ import EdgeType             from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType'
 import Popup                from '$:/plugins/felixhayashi/tiddlymap/js/Popup';
 import vis                  from '$:/plugins/felixhayashi/vis/vis.js';
 import { widget as Widget } from '$:/core/modules/widgets/widget.js';
+import utils                from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 
 /*** Code **********************************************************/
 
@@ -144,27 +144,23 @@ class MapWidget extends Widget {
    */
   handleConnectionEvent(edge, callback) {
 
-    var eTyFilter = this.view.getEdgeTypeFilter();
+    const eTyFilter = this.view.getEdgeTypeFilter();
 
-    var param = {
+    const param = {
       fromLabel: $tm.adapter.selectNodeById(edge.from).label,
       toLabel: $tm.adapter.selectNodeById(edge.to).label,
       viewNS: this.view.getConfig('edge_type_namespace'),
       eTyFilter: eTyFilter.raw
     };
 
-    var name = 'getEdgeType';
-    this.dialogManager.open(name, param, (isConfirmed, outTObj) => {
+    this.dialogManager.open('getEdgeType', param, (isConfirmed, outTObj) => {
 
       if (isConfirmed) {
 
-        var type = utils.getText(outTObj);
-
-        var options = {
+        const options = {
           namespace: this.view.getConfig('edge_type_namespace')
         };
-
-        type = new EdgeType(type, null, options);
+        const type = new EdgeType(utils.getText(outTObj), null, options);
 
         // persist the type if it doesn't exist
         if (!type.exists()) type.save();
@@ -175,17 +171,13 @@ class MapWidget extends Widget {
 
         if (!this.view.isEdgeTypeVisible(type.id)) {
 
-          var args = {
+          this.dialogManager.open('edgeNotVisible', {
             type: type.id,
             view: this.view.getLabel(),
             eTyFilter: eTyFilter.pretty
-          };
-
-          this.dialogManager.open('edgeNotVisible', args);
+          });
 
         }
-
-        this.preventFitAfterRebuild = true;
 
       }
 
@@ -195,7 +187,7 @@ class MapWidget extends Widget {
 
     });
 
-  };
+  }
 
   /**
    * The first time a map is opened, we want to display a welcome message.
@@ -203,15 +195,13 @@ class MapWidget extends Widget {
    */
   checkForFreshInstall() {
 
-    var sysMeta = $tm.ref.sysMeta;
-    if (!utils.getEntry(sysMeta, 'showWelcomeMessage', true)) return;
+    if (!utils.getEntry($tm.ref.sysMeta, 'showWelcomeMessage', true)) {
+      return;
+    }
 
-    // set flag
-    utils.setEntry(sysMeta, 'showWelcomeMessage', false);
+    utils.setEntry($tm.ref.sysMeta, 'showWelcomeMessage', false);
 
-    var args = {};
-    var name = 'welcome';
-    this.dialogManager.open(name, args, (isConfirmed, outTObj) => {
+    this.dialogManager.open('welcome', {}, (isConfirmed, outTObj) => {
 
       if (utils.tiddlerExists('$:/plugins/felixhayashi/topstoryview')) {
 
@@ -224,19 +214,16 @@ class MapWidget extends Widget {
         utils.touch('$:/plugins/felixhayashi/topstoryview');
       }
 
-      var view = $tm.misc.defaultViewLabel;
+      const view = $tm.misc.defaultViewLabel;
 
-      var node = { label: 'Have fun with', x: 0, y: 0 };
-      var n1 = $tm.adapter.insertNode(node, view);
-
-      node = { label: 'TiddlyMap!!', x: 100, y: 100 };
-      var n2 = $tm.adapter.insertNode(node, view);
+      const n1 = $tm.adapter.insertNode({ label: 'Have fun with', x: 0, y: 0 }, view);
+      const n2 = $tm.adapter.insertNode({ label: 'TiddlyMap!!', x: 100, y: 100 }, view);
 
       $tm.adapter.insertEdge({ from: n1.id, to: n2.id });
 
     });
 
-  };
+  }
 
   /**
    * A very basic dialog that will tell the user he/she has to make
@@ -248,10 +235,10 @@ class MapWidget extends Widget {
    */
   openStandardConfirmDialog(callback, message) {
 
-    var param = { message : message };
+    const param = { message : message };
     this.dialogManager.open('getConfirmation', param, callback);
 
-  };
+  }
 
   /**
    * An extention of the default logger mechanism. It works like
@@ -267,14 +254,14 @@ class MapWidget extends Widget {
 
     if (this.isDebug) {
 
-      var args = Array.prototype.slice.call(arguments, 1);
+      const args = Array.prototype.slice.call(arguments, 1);
       args.unshift('@' + this.id);
       args.unshift(type);
       $tm.logger.apply(this, args);
 
     }
 
-  };
+  }
 
   /**
    * Method to render this widget into the DOM.
@@ -321,17 +308,17 @@ class MapWidget extends Widget {
 
     }
 
-  };
+  }
 
   /**
    * When the widget is only previewed we do some alternative rendering.
    */
   renderPreview(header, body) {
 
-    var snapshotTRef = this.view.getRoot() + '/snapshot';
-    var snapshotTObj = utils.getTiddler(snapshotTRef);
+    const snapshotTRef = this.view.getRoot() + '/snapshot';
+    const snapshotTObj = utils.getTiddler(snapshotTRef);
 
-    var label = this.document.createElement('span');
+    const label = this.document.createElement('span');
     label.innerHTML = this.view.getLabel();
     label.className = 'tmap-view-label';
     header.appendChild(label);
@@ -339,7 +326,7 @@ class MapWidget extends Widget {
     if (snapshotTObj) {
 
       // Construct child widget tree
-      var placeholder = this.makeChildWidget(utils.getTranscludeNode(snapshotTRef), true);
+      const placeholder = this.makeChildWidget(utils.getTranscludeNode(snapshotTRef), true);
       placeholder.renderChildren(body, null);
 
     } else {
@@ -348,7 +335,7 @@ class MapWidget extends Widget {
 
     }
 
-  };
+  }
 
   /**
    * The standard way of rendering.
@@ -383,16 +370,8 @@ class MapWidget extends Widget {
                                  && !this.domNode.isTiddlyWikiFakeDom
                                  && this.sidebar.contains(this.domNode));
 
-    // flag that determines whether to zoom after stabilization finished;
-    // always set to false after the next stabilization
-    this.doFitAfterStabilize = true;
-
-    // flag that determines whether to zoom after rebuilding the graph;
-    // always set to false after the next rebuild
-    this.preventFitAfterRebuild = false;
-
     // *first* inject the bar
-    this.initAndRenderEditorBar(header);
+    this.rebuildEditorBar(header);
 
     // *second* initialise graph variables and render the graph
     this.initAndRenderGraph(body);
@@ -408,7 +387,7 @@ class MapWidget extends Widget {
 
     if (this.id === $tm.misc.mainEditorId) {
 
-      var url = $tm.url;
+      const url = $tm.url;
       if (url && url.query['tmap-enlarged']) {
 
         this.toggleEnlargedMode(url.query['tmap-enlarged']);
@@ -418,7 +397,7 @@ class MapWidget extends Widget {
 
     }
 
-  };
+  }
 
   /**
    * Add some classes to give the user a chance to apply some css
@@ -426,7 +405,7 @@ class MapWidget extends Widget {
    */
   registerClassNames(parent) {
 
-    var addClass = $tw.utils.addClass;
+    const addClass = $tw.utils.addClass;
 
     // add main class
     addClass(parent, 'tmap-widget');
@@ -451,7 +430,7 @@ class MapWidget extends Widget {
       addClass(parent, this.getAttr('class'));
     }
 
-  };
+  }
 
   /**
    * Adds a loading bar div below the parent.
@@ -462,7 +441,7 @@ class MapWidget extends Widget {
     $tw.utils.addClass(this.graphLoadingBarDomNode, 'tmap-loading-bar');
     parent.appendChild(this.graphLoadingBarDomNode);
 
-  };
+  }
 
   /**
    * The editor bar contains a bunch of widgets that allow the user
@@ -471,15 +450,6 @@ class MapWidget extends Widget {
    * Attention: The Editor bar needs to render *after* the graph
    * because some elements depend on the graph's nodes which are
    * calculated when the network is created.
-   */
-  initAndRenderEditorBar() {
-
-    this.rebuildEditorBar();
-
-  };
-
-  /**
-   * Creates this widget's child-widgets.
    *
    * @see https://groups.google.com/forum/#!topic/tiddlywikidev/sJrblP4A0o4
    * @see blob/master/editions/test/tiddlers/tests/test-wikitext-parser.js
@@ -488,8 +458,8 @@ class MapWidget extends Widget {
 
     // register variables
 
-    var view = this.view;
-    var variables = {
+    const view = this.view;
+    const variables = {
       widgetQualifier: this.getStateQualifier(),
       widgetTempPath: this.widgetTempPath,
       widgetPopupsPath: this.widgetPopupsPath,
@@ -505,12 +475,12 @@ class MapWidget extends Widget {
                              : '')
     };
 
-    for (var name in variables) {
+    for (let name in variables) {
       this.setVariable(name, variables[name]);
     }
 
     // Construct the child widget tree
-    var body = utils.getTiddlerNode(view.getRoot());
+    const body = utils.getTiddlerNode(view.getRoot());
 
     if (this.editorMode === 'advanced') {
 
@@ -518,7 +488,7 @@ class MapWidget extends Widget {
 
     } else {
 
-      var el = utils.getElementNode('span', view.getLabel(), 'tmap-view-label');
+      const el = utils.getElementNode('span', 'tmap-view-label', view.getLabel());
       body.children.push(el);
 
     }
@@ -528,7 +498,7 @@ class MapWidget extends Widget {
     this.makeChildWidgets([ body ]);
     this.renderChildren(this.graphBarDomNode, this.graphBarDomNode.firstChild);
 
-  };
+  }
 
   /**
    * This function is called by the system to notify the widget about
@@ -546,7 +516,7 @@ class MapWidget extends Widget {
     // TiddlyMap never needs a full refresh so we return false
     return false;
 
-  };
+  }
 
   /**
    * This function is called by the caretaker module to notify the
@@ -571,11 +541,12 @@ class MapWidget extends Widget {
       return;
     }
 
-    var changedTiddlers = updates.changedTiddlers;
-    var rebuildEditorBar = false;
-    var rebuildGraph = false;
-    var reinitNetwork = false;
-    var rebuildGraphOptions = {};
+    const changedTiddlers = updates.changedTiddlers;
+
+    let rebuildEditorBar = false;
+    let rebuildGraph = false;
+    let reinitNetwork = false;
+    let rebuildGraphOptions = {};
 
     // check for callback changes
     this.callbackManager.handleChanges(changedTiddlers);
@@ -597,7 +568,7 @@ class MapWidget extends Widget {
     } else { // view has not been switched
 
       // give the view a chance to refresh its components
-      var isViewUpdated = this.view.update(updates);
+      const isViewUpdated = this.view.update(updates);
 
       if (isViewUpdated && !this.ignoreNextViewModification) {
 
@@ -607,10 +578,6 @@ class MapWidget extends Widget {
         rebuildEditorBar = true;
         rebuildGraph = true;
         rebuildGraphOptions.resetEdgeTypeWL = true;
-
-        if (!this.preventFitAfterRebuild) {
-          rebuildGraphOptions.resetFocus = { delay: 0, duration: 0 };
-        }
 
       } else { // neither view switch or view modification
 
@@ -648,14 +615,14 @@ class MapWidget extends Widget {
     // reset this again
     this.ignoreNextViewModification = false;
 
-  };
+  }
 
   hidePopups(delay, isForce) {
 
     this.tooltip.hide(delay, isForce);
     this.contextMenu.hide(0, true);
 
-  };
+  }
 
   /**
    * Refresh-triggers are tiddlers whose mere occurrence in the
@@ -678,63 +645,39 @@ class MapWidget extends Widget {
     this.callbackManager.remove(this.refreshTriggers);
 
     // load new trigger list either from attribute or view config
-    var str = this.getAttr('refresh-triggers')
-              || this.view.getConfig('refresh-triggers');
+    const str = this.getAttr('refresh-triggers') || this.view.getConfig('refresh-triggers');
     this.refreshTriggers = $tw.utils.parseStringArray(str) || [];
 
     this.logger('debug', 'Registering refresh trigger', this.refreshTriggers);
 
     // TODO: not nice, if more than one trigger changed it
     // will cause multiple reassertments
-    for (var i = this.refreshTriggers.length; i--;) {
+    for (let i = this.refreshTriggers.length; i--;) {
       this.callbackManager.add(this.refreshTriggers[i],
                                this.handleTriggeredRefresh,
                                false);
     }
 
-  };
+  }
 
   /**
    * Calling this method will cause the graph to be rebuild, which means
    * the graph data is refreshed. A rebuild of the graph will always
    * cause the network to stabilize again.
    *
-   * @param {Hashmap} [options] - An optional options object.
-   * @param {boolean} [options.refreshData=false] - If this is set to
-   *     true, all datasets will be cleared before new data is added.
-   *     This guarantees a fresh start. This option should only be
-   *     used when the topic of the graph changes (= view switched).
-   * @param {boolean} [options.refreshOptions=false] - If this is set
-   *     to true, the vis options will also be reloaded. This option
-   *     should only be used if the options have actually changed, which
-   *     is always the case when a view is switched or sometimes when
-   *     a view is modified.
-   * @param {Hashmap} [options.resetFocus=null] - If not false or null,
+   * @param {Hashmap} [resetFocus=null] - If not false or null,
    *     this object requires two properties to be set: `delay` (the
    *     time to wait before starting the fit), `duration` (the length
-   *     of the fit animation). If the global flag `preventFitAfterRebuild`
-   *     is set to true at the time `rebuildGraph` is called with the
-   *     `resetFocus` option specified, then it overrules this option
-   *     and the fit will not take place. After the rebuild,
-   *     `preventFitAfterRebuild` is said to false again.
+   *     of the fit animation).
    */
-  rebuildGraph(options) {
+  rebuildGraph({ resetFocus } = {}) {
 
     if (utils.isPreviewed(this)) return;
 
     this.logger('debug', 'Rebuilding graph');
 
-    options = options || {};
-
     // always reset to allow handling of stabilized-event!
     this.hasNetworkStabilized = false;
-
-    if (options.resetData) {
-      this.graphData.edges.clear();
-      this.graphData.nodes.clear();
-      this.graphData.edgesById = null;
-      this.graphData.nodesById = null;
-    }
 
     if (!this.view.isEnabled('physics_mode')) {
 
@@ -743,45 +686,26 @@ class MapWidget extends Widget {
       // zero to something. Yes, we override the users
       // central gravity value… who cares about central
       // gravity in static mode anyways.
-      var physics = this.visOptions.physics;
+      const physics = this.visOptions.physics;
       physics[physics.solver].centralGravity = 0.015;
     }
 
-    if (!options.resetFocus) {
-      // option or data resets always overrule any flags!
-      this.doFitAfterStabilize = false;
-    }
-
     this.rebuildGraphData();
-
-    //~ this.rebuildGraphData({
-      //~ resetEdgeTypeWL: options.resetEdgeTypeWL
-    //~ });
 
     if (!utils.hasElements(this.graphData.nodesById)) {
       return;
     }
 
-    // see https://github.com/almende/vis/issues/987#issuecomment-113226216
-    // see https://github.com/almende/vis/issues/939
-    this.network.stabilize();
+    if (resetFocus) {
+      // see https://github.com/almende/vis/issues/987#issuecomment-113226216
+      // see https://github.com/almende/vis/issues/939
+      this.network.stabilize();
 
-    // resetting the focus is not the same as zooming after stabilization,
-    // the question is whether after a rebuild the focus should be immediately
-    // reset or not. Zooming after stabilization does always(!) takes place
-    // after a rebuild, in contrast, resetting the focus doesn't necessarily take place.
-    if (options.resetFocus && !this.preventFitAfterRebuild) {
-
-      // a not-prevented focus reset will always also cause a fit after stabilize
-      this.doFitAfterStabilize = true;
-      this.fitGraph(options.resetFocus.delay, options.resetFocus.duration);
+      this.fitGraph(resetFocus.delay, resetFocus.duration);
 
     }
 
-    // in any case, reset to default
-    this.preventFitAfterRebuild = false;
-
-  };
+  }
 
   /**
    * WARNING: Do not change this functionname as it is used by the
@@ -791,7 +715,7 @@ class MapWidget extends Widget {
 
     return this.domNode;
 
-  };
+  }
 
   /**
    *
@@ -800,44 +724,37 @@ class MapWidget extends Widget {
 
     $tm.start('Reloading Network');
 
-    var graph = $tm.adapter.getGraph({
-      view: this.view
-    });
+    const graph = $tm.adapter.getGraph({ view: this.view });
 
-    var nodes = graph.nodes;
-    var edges = graph.edges;
+    utils.refreshDataSet(
+      this.graphData.nodes, // dataset
+      graph.nodes // new nodes
+    );
 
-    this.graphData.nodes = this.getRefreshedDataSet(nodes, // new nodes
-                                         this.graphData.nodesById, // old nodes
-                                         this.graphData.nodes); // dataset
-
-    this.graphData.edges = this.getRefreshedDataSet(edges, // new edges
-                                         this.graphData.edgesById, // old edges
-                                         this.graphData.edges); // dataset
+    utils.refreshDataSet(
+      this.graphData.edges, // dataset
+      graph.edges // new edges
+    );
 
     // create lookup tables
 
-    this.graphData.nodesById = nodes;
-    this.graphData.edgesById = edges;
+    this.graphData.nodesById = graph.nodes;
+    this.graphData.edgesById = graph.edges;
 
     // TODO: that's a performance killer. this should be loaded when
     // the search is actually used!
     // update: Careful when refactoring, some modules are using this…
-    utils.setField('$:/temp/tmap/nodes/' + this.view.getLabel(),
-                   'list',
-                   $tm.adapter.getTiddlersById(nodes));
+    utils.setField(`$:/temp/tmap/nodes/${this.view.getLabel()}`, 'list', $tm.adapter.getTiddlersById(graph.nodes));
 
     $tm.stop('Reloading Network');
 
-    return this.graphData;
-
-  };
+  }
 
   isViewBound() {
 
     return utils.startsWith(this.getViewHolderRef(), $tm.path.localHolders);
 
-  };
+  }
 
   /**
    * A view is switched, if the holder was changed.
@@ -846,7 +763,7 @@ class MapWidget extends Widget {
 
     return changedTiddlers[this.getViewHolderRef()];
 
-  };
+  }
 
   /**
    * A view is switched, if the holder was changed.
@@ -855,7 +772,7 @@ class MapWidget extends Widget {
 
     return Object.keys(this.computeAttributes()).length;
 
-  };
+  }
 
   /**
    * Rebuild or update the graph if one of the following is true:
@@ -878,14 +795,15 @@ class MapWidget extends Widget {
    */
   hasChangedElements(changedTiddlers) {
 
-    var maybeMatches = [];
-    var inGraph = this.graphData.nodesById;
-    var isShowNeighbourhood = this.view.isEnabled('neighbourhood_scope');
+    const maybeMatches = [];
+    const inGraph = this.graphData.nodesById;
+    const isShowNeighbourhood = this.view.isEnabled('neighbourhood_scope');
 
-    for (var tRef in changedTiddlers) {
+    for (let tRef in changedTiddlers) {
 
-      if (utils.isSystemOrDraft(tRef)) continue;
-
+      if (utils.isSystemOrDraft(tRef)) {
+        continue;
+      }
 
       if (inGraph[$tm.adapter.getId(tRef)] || isShowNeighbourhood) {
         return true;
@@ -893,21 +811,20 @@ class MapWidget extends Widget {
 
 
       if (changedTiddlers[tRef].modified) {
-        // still may be a match so we store this and process it later
-
+        // may be a match so we store this and process it later
         maybeMatches.push(tRef);
       }
     }
 
     if (maybeMatches.length) {
 
-      var nodeFilter = this.view.getNodeFilter('compiled');
-      var matches = utils.getMatches(nodeFilter, maybeMatches);
+      const nodeFilter = this.view.getNodeFilter('compiled');
+      const matches = utils.getMatches(nodeFilter, maybeMatches);
       return !!matches.length;
 
     }
 
-  };
+  }
 
   /**
    * Rebuild the graph
@@ -927,7 +844,7 @@ class MapWidget extends Widget {
     }
 
     this.visOptions = this.getVisOptions();
-    //~ this.edgeTypeWL = null;
+
     this.graphData = {
       nodes: new vis.DataSet(),
       edges: new vis.DataSet(),
@@ -935,8 +852,7 @@ class MapWidget extends Widget {
       edgesById: utils.makeHashMap()
     };
 
-    this.tooltip.setEnabled(
-      utils.isTrue($tm.config.sys.popups.enabled, true));
+    this.tooltip.setEnabled(utils.isTrue($tm.config.sys.popups.enabled, true));
 
     this.network = new vis.Network(parent, this.graphData, this.visOptions);
     // after vis.Network has been instantiated, we fetch a reference to
@@ -945,29 +861,32 @@ class MapWidget extends Widget {
     // just to be sure
     this.canvas.tabIndex = 0;
 
-    for (var event in this.visListeners) {
-
+    for (let event in this.visListeners) {
       this.network.on(event, this.visListeners[event].bind(this));
     }
 
     this.addGraphButtons({
-      'fullscreen-button': function() {
-        this.toggleEnlargedMode('fullscreen'); },
-      'halfscreen-button': function() {
-        this.toggleEnlargedMode('halfscreen'); }
+      'fullscreen-button': () => { this.toggleEnlargedMode('fullscreen'); },
+      'halfscreen-button': () => { this.toggleEnlargedMode('halfscreen'); }
     });
 
     utils.setDomListeners('add', this.canvas, this.canvasDomListeners);
 
     this.reloadBackgroundImage();
-    this.rebuildGraph({ resetFocus: { delay: 0, duration: 0 }});
+    this.rebuildGraph({
+      resetFocus: {
+        delay: 0,
+        duration: 0
+      },
+    });
     this.handleResizeEvent();
     this.canvas.focus();
 
-  };
+  }
 
   handleCanvasKeyup(ev) {
-    var nodeIds = this.network.getSelectedNodes();
+
+    const nodeIds = this.network.getSelectedNodes();
 
     if (ev.ctrlKey) { // ctrl key is hold down
       ev.preventDefault();
@@ -986,13 +905,13 @@ class MapWidget extends Widget {
         this.handlePasteNodesFromClipboard();
 
       } else if (ev.keyCode === 65) { // a
-        var allNodes = Object.keys(this.graphData.nodesById);
+        const allNodes = Object.keys(this.graphData.nodesById);
         this.network.selectNodes(allNodes);
 
       } else if (ev.keyCode === 49 || ev.keyCode === 50) { // 1 || 2
         if (nodeIds.length !== 1) return;
 
-        var role = ev.keyCode === 49 ? 'from' : 'to';
+        const role = ev.keyCode === 49 ? 'from' : 'to';
         $tm.notify(utils.ucFirst(role) + '-part selected');
 
         this.conVector[role] = nodeIds[0];
@@ -1017,14 +936,12 @@ class MapWidget extends Widget {
 
   handleDeleteElement(ev) {
 
-    var id = ev.paramObject.id;
-    var elements = (id ? [ id ] : this.network.getSelectedNodes());
+    const id = ev.paramObject.id;
+    const elements = (id ? [ id ] : this.network.getSelectedNodes());
 
-    this.handleRemoveElements({
-      nodes: elements
-    });
+    this.handleRemoveElements({ nodes: elements });
 
-  };
+  }
 
   handleCanvasKeydown(ev) {
 
@@ -1033,12 +950,12 @@ class MapWidget extends Widget {
       this.handleRemoveElements(this.network.getSelection());
     }
 
-  };
+  }
 
   //https://github.com/almende/vis/blob/111c9984bc4c1870d42ca96b45d90c13cb92fe0a/lib/network/modules/InteractionHandler.js
   handleCanvasScroll(ev) {
 
-    var zoomView = !!(ev.ctrlKey || this.isInSidebar || this.enlargedMode);
+    const zoomView = !!(ev.ctrlKey || this.isInSidebar || this.enlargedMode);
 
     if (zoomView) {
       ev.preventDefault();
@@ -1055,7 +972,7 @@ class MapWidget extends Widget {
       return false;
     }
 
-  };
+  }
 
   /**
    * Called when the user click on the canvas with the right
@@ -1090,11 +1007,11 @@ class MapWidget extends Widget {
 
     });
 
-  };
+  }
 
   handleWidgetKeyup(ev) {
 
-  };
+  }
 
   handleWidgetKeydown(ev) {
 
@@ -1104,15 +1021,16 @@ class MapWidget extends Widget {
       if (ev.keyCode === 70) { // f
         ev.preventDefault();
 
-        var focusButtonStateTRef = this.widgetPopupsPath + '/focus';
-        utils.setText(focusButtonStateTRef,
-                      utils.getText(focusButtonStateTRef) ? '' : '1');
+        const focusButtonStateTRef = `${this.widgetPopupsPath}/focus`;
+        utils.setText(focusButtonStateTRef, utils.getText(focusButtonStateTRef) ? '' : '1');
 
         // note: it is ok to focus the graph right after this,
         // if the focus button is activated it will steal the focus anyway
 
       } else {
+
         return;
+
       }
 
     } else if (ev.keyCode === 120) { // F9
@@ -1134,7 +1052,7 @@ class MapWidget extends Widget {
 
     this.canvas.focus();
 
-  };
+  }
 
   handlePasteNodesFromClipboard() {
 
@@ -1143,63 +1061,66 @@ class MapWidget extends Widget {
       return;
     }
 
-    if ($tm.clipBoard) {
-      if ($tm.clipBoard.type === 'nodes') {
-        var nodes = $tm.clipBoard.nodes;
-        var ids = Object.keys(nodes);
-        if (ids.length) {
-          for (var id in nodes) {
-
-            // node already present in this view
-
-            if (this.graphData.nodesById[id]) continue;
-
-
-            this.view.addNode(nodes[id]);
-            // paste nodes already so we can select them!
-
-            this.graphData.nodes.update({
-              id: id
-            });
-          }
-          this.network.selectNodes(ids);
-          $tm.notify('pasted ' + ids.length + ' nodes into map.');
-        }
-        return;
-      }
+    if (!$tm.clipBoard || $tm.clipBoard.type !== 'nodes') {
+      $tm.notify('TiddlyMap clipboad is empty!');
     }
 
-    $tm.notify('TiddlyMap clipboad is empty!');
+    const nodes = $tm.clipBoard.nodes;
+    const ids = Object.keys(nodes);
 
-  };
+    for (let i = ids.length; i--;) {
+
+      const id = ids[i];
+
+      if (this.graphData.nodesById[id]) {
+        // node already present in this view
+        continue;
+      }
+
+      this.view.addNode(nodes[id]);
+
+      // paste nodes so we can select them!
+      this.graphData.nodes.update({ id });
+    }
+
+    this.network.selectNodes(ids);
+
+    this.rebuildGraph({ resetFocus: { delay: 0, duration: 0 }});
+
+    $tm.notify(`pasted ${ids.length} nodes into map.`);
+
+  }
 
   handleAddNodesToClipboard(mode) {
 
-    var nodeIds = this.network.getSelectedNodes();
-    if (!nodeIds.length) return;
+    const nodeIds = this.network.getSelectedNodes();
+
+    if (!nodeIds.length) {
+      return;
+    }
 
     $tm.clipBoard = {
       type: 'nodes',
-      nodes: this.graphData.nodes.get(nodeIds,
-                                      { returnType: 'Object' })
+      nodes: this.graphData.nodes.get(nodeIds, { returnType: 'Object' })
     };
 
-    $tm.notify('Copied ' + nodeIds.length + ' nodes to clipboard');
+    $tm.notify(`Copied ${nodeIds.length} nodes to clipboard`);
 
     if (mode === 'move') {
-      for (var i = nodeIds.length; i--;) {
+      for (let i = nodeIds.length; i--;) {
         this.view.removeNode(nodeIds[i]);
       }
     }
 
-  };
+  }
 
   isMobileMode() {
 
     const breakpoint = utils.getText($tm.ref.sidebarBreakpoint, 960);
+
     return (window.innerWidth <= parseInt(breakpoint));
 
-  };
+  }
 
   /**
    * @todo Instead of redrawing the whole graph when an edge or node is
@@ -1259,21 +1180,24 @@ class MapWidget extends Widget {
 
     return options;
 
-  };
+  }
 
   resetVisManipulationBar(visCallback) {
 
-    if (visCallback) visCallback(null);
+    if (visCallback) {
+      visCallback(null);
+    }
+
     this.network.disableEditMode();
     this.network.enableEditMode();
 
-  };
+  }
 
   isVisInEditMode() {
 
     return this.graphDomNode.getElementsByClassName('vis-button vis-back').length > 0;
 
-  };
+  }
 
   /**
    * Create an empty view. A dialog is opened that asks the user how to
@@ -1312,7 +1236,7 @@ class MapWidget extends Widget {
 
     });
 
-  };
+  }
 
   handleRenameView() {
 
@@ -1348,7 +1272,7 @@ class MapWidget extends Widget {
         this.setView(this.view);
       }
     });
-  };
+  }
 
   handleEditView() {
 
@@ -1401,7 +1325,7 @@ class MapWidget extends Widget {
       this.view.setEdgeTypeFilter(eTf);
 
     });
-  };
+  }
 
   /**
    * Triggers a download dialog where the user can store the canvas
@@ -1452,7 +1376,7 @@ class MapWidget extends Widget {
 
     });
 
-  };
+  }
 
   handleDownloadSnapshot(title) {
 
@@ -1466,7 +1390,7 @@ class MapWidget extends Widget {
     const event = new MouseEvent('click');
     a.dispatchEvent(event);
 
-  };
+  }
 
   createAndSaveSnapshot(title) {
 
@@ -1480,7 +1404,7 @@ class MapWidget extends Widget {
 
     return tRef;
 
-  };
+  }
 
   getSnapshot(stripPreamble) {
 
@@ -1490,7 +1414,7 @@ class MapWidget extends Widget {
             ? utils.getWithoutPrefix(data, 'data:image/png;base64,')
             : data);
 
-  };
+  }
 
   handleDeleteView() {
 
@@ -1537,7 +1461,7 @@ class MapWidget extends Widget {
 
     }, message);
 
-  };
+  }
 
   /**
    * This will rebuild the graph after a trigger has been activated.
@@ -1566,44 +1490,40 @@ class MapWidget extends Widget {
       resetFocus: {
         delay: 1000,
         duration: 1000
-      }
+      },
     });
 
-  };
+  }
 
   /**
    * Called by vis when the user tries to delete nodes or edges.
    * The action is delegated to subhandlers.
    *
-   * @param {Object} elements - An object containing the elements to be
-   *     removed.
-   * @param {Array<Id>} elements.nodes - Removed edges.
-   * @param {Array<Id>} elements.edges - Removed nodes.
+   * @param {Array<Id>} nodes - Removed edges.
+   * @param {Array<Id>} edges - Removed nodes.
    */
-  handleRemoveElements(elements) {
+  handleRemoveElements({ nodes, edges }) {
 
-    if (elements.nodes.length) {
+    if (nodes.length) {
       // the adapter also removes edges when nodes are removed.
-      this.handleRemoveNodes(elements.nodes);
+      this.handleRemoveNodes(nodes);
 
-    } else if (elements.edges.length) {
-      this.handleRemoveEdges(elements.edges);
+    } else if (edges.length) {
+      this.handleRemoveEdges(edges);
 
     }
 
     this.resetVisManipulationBar();
 
 
-  };
+  }
 
   handleRemoveEdges(edgeIds) {
 
     $tm.adapter.deleteEdges(this.graphData.edges.get(edgeIds));
     $tm.notify('edge' + (edgeIds.length > 1 ? 's' : '') + ' removed');
 
-    this.preventFitAfterRebuild = true;
-
-  };
+  }
 
 
   /**
@@ -1644,12 +1564,12 @@ class MapWidget extends Widget {
 
         for (let i = nodeIds.length; i--;) {
           const success = this.view.removeNode(nodeIds[i]);
-          if (success) deletionCount++;
+          if (success) {
+            deletionCount++;
+          }
         }
 
       }
-
-      this.preventFitAfterRebuild = true;
 
       $tm.notify(`
         Removed ${deletionCount}
@@ -1659,7 +1579,7 @@ class MapWidget extends Widget {
 
     });
 
-  };
+  }
 
   /**
    * Calling this function will toggle the enlargement of the map
@@ -1672,7 +1592,9 @@ class MapWidget extends Widget {
 
   toggleEnlargedMode(type) {
 
-    if (!this.isInSidebar && type === 'halfscreen') return;
+    if (!this.isInSidebar && type === 'halfscreen') {
+      return;
+    }
 
     this.logger('log', 'Toggled graph enlargement');
 
@@ -1683,11 +1605,13 @@ class MapWidget extends Widget {
 
       // reset click to use
       this.network.setOptions({ clickToUse: this.clickToUse });
+
       // remove markers
       utils.findAndRemoveClassNames([
-        'tmap-has-' + enlargedMode + '-widget',
-        'tmap-' + enlargedMode
+        `tmap-has-${enlargedMode}-widget`,
+        `tmap-${enlargedMode}`
       ]);
+
       // reset flag
       this.enlargedMode = null;
       document.body.scrollTop = this.scrollTop;
@@ -1706,9 +1630,9 @@ class MapWidget extends Widget {
                         ? this.sidebar
                         : utils.getFirstElementByClassName('tc-story-river'));
 
-      $tw.utils.addClass(this.document.body, 'tmap-has-' + type + '-widget');
-      $tw.utils.addClass(pContainer, 'tmap-has-' + type + '-widget');
-      $tw.utils.addClass(this.domNode, 'tmap-' + type);
+      $tw.utils.addClass(this.document.body, `tmap-has-${type}-widget`);
+      $tw.utils.addClass(pContainer, `tmap-has-${type}-widget`);
+      $tw.utils.addClass(this.domNode, `tmap-${type}`);
 
       // disable click to use by force
       this.network.setOptions({ clickToUse: false });
@@ -1720,7 +1644,7 @@ class MapWidget extends Widget {
     // always do resize
     this.handleResizeEvent();
 
-  };
+  }
 
   handleGenerateWidget(event) {
 
@@ -1729,11 +1653,11 @@ class MapWidget extends Widget {
       paramObject: { view: this.view.getLabel() }
     });
 
-  };
+  }
 
-  handleSetCentralTopic(event) {
+  handleSetCentralTopic({ paramObject }) {
 
-    let nodeId = event.paramObject.id || this.network.getSelectedNodes()[0];
+    let nodeId = paramObject.id || this.network.getSelectedNodes()[0];
 
     if (nodeId === this.view.getConfig('central-topic')) {
       nodeId = '';
@@ -1741,20 +1665,21 @@ class MapWidget extends Widget {
 
     this.view.setCentralTopic(nodeId);
 
-  };
+  }
 
   handleStorePositions(withNotify) {
 
     const data = this.view.getNodeData();
     const positions = this.network.getPositions();
+
     for (let id in positions) {
 
       data[id] = data[id] || {};
-
       data[id].x = positions[id].x;
-
       data[id].y = positions[id].y;
+
     }
+
     this.view.saveNodeData(data);
     this.ignoreNextViewModification = true;
 
@@ -1762,7 +1687,7 @@ class MapWidget extends Widget {
       $tm.notify('positions stored');
     }
 
-  };
+  }
 
   /**
    * Called by vis when the graph has stabilized itself.
@@ -1785,16 +1710,16 @@ class MapWidget extends Widget {
       // store positions if new nodes without position were added
       const nodes = this.graphData.nodesById;
       const idsOfNodesWithoutPosition = [];
-      for (let id in nodes) {
 
+      for (let id in nodes) {
         if (!nodes[id].x) {
-          idsOfNodesWithoutPosition.push(id); }
+          idsOfNodesWithoutPosition.push(id);
+        }
       }
+
       if (idsOfNodesWithoutPosition.length) {
         this.setNodesMoveable(idsOfNodesWithoutPosition, false);
-        $tm.notify(idsOfNodesWithoutPosition.length
-                    + ' nodes were added to the graph');
-        this.doFitAfterStabilize = true;
+        $tm.notify(`${idsOfNodesWithoutPosition.length} nodes were added to the graph`);
       }
 
       // after storing positions, set gravity to zero again
@@ -1804,12 +1729,7 @@ class MapWidget extends Widget {
 
     }
 
-    if (this.doFitAfterStabilize) {
-      this.doFitAfterStabilize = false;
-      this.fitGraph(1000, 1000);
-    }
-
-  };
+  }
 
   /**
    * Zooms on a specific node in the graph
@@ -1818,11 +1738,13 @@ class MapWidget extends Widget {
    *     that holds a tiddler reference/title.
    */
   handleFocusNode(event) {
+
     this.network.focus($tm.adapter.getId(event.param), {
       scale: 1.5,
       animation: true
     });
-  };
+
+  }
 
   /**
    * A zombie widget is a widget that is removed from the dom tree
@@ -1834,13 +1756,10 @@ class MapWidget extends Widget {
    */
   isZombieWidget() {
 
-    if (this.domNode.isTiddlyWikiFakeDom === true) {
-      return true;
-    } else {
-      return !this.document.body.contains(this.getContainer());
-    }
+    return this.domNode.isTiddlyWikiFakeDom === true
+           || !this.document.body.contains(this.getContainer());
 
-  };
+  }
 
   /**
    * This method allows us to specify after what time and for how long
@@ -1850,13 +1769,10 @@ class MapWidget extends Widget {
    * @param {number} [duration=0] - After the delay, how long should it
    *     take for the graph to be zoomed.
    */
-  fitGraph(delay, duration) {
+  fitGraph(delay = 0, duration = 0) {
 
     // clear any existing fitting attempt
     window.clearTimeout(this.activeFitTimeout);
-
-    duration = duration || 0;
-    delay = delay || 0;
 
     const fit = () => {
 
@@ -1886,9 +1802,11 @@ class MapWidget extends Widget {
    */
   handleInsertNode(node) {
 
-    const params = {};
-    this.dialogManager.open('addNodeToMap', params, (isConfirmed, outTObj) => {
-      if (!isConfirmed) return;
+    this.dialogManager.open('addNodeToMap', {}, (isConfirmed, outTObj) => {
+
+      if (!isConfirmed) {
+        return;
+      }
 
       const tRef = utils.getField(outTObj, 'draft.title');
 
@@ -1901,6 +1819,7 @@ class MapWidget extends Widget {
           return;
 
         } else {
+
           node = $tm.adapter.makeNode(tRef, node);
           this.view.addNode(node);
 
@@ -1915,11 +1834,9 @@ class MapWidget extends Widget {
 
       }
 
-      this.preventFitAfterRebuild = true;
-
     });
 
-  };
+  }
 
   /**
    * Open the node editor to style the node.
@@ -1952,10 +1869,9 @@ class MapWidget extends Widget {
       'view': viewLabel,
       'tiddler': tObj.fields.title,
       'tidColor': tObj.fields['color'],
-      'tidIcon': tObj.fields[$tm.field.nodeIcon]
-                 || tObj.fields['tmap.fa-icon'],
-      'tidLabelField': 'global.' + $tm.field.nodeLabel,
-      'tidIconField': 'global.' + $tm.field.nodeIcon,
+      'tidIcon': tObj.fields[$tm.field.nodeIcon] || tObj.fields['tmap.fa-icon'],
+      'tidLabelField': `global.${$tm.field.nodeLabel}`,
+      'tidIconField': `global.${$tm.field.nodeIcon}`,
       dialog: {
         preselects: {
           'inherited-global-default-style': globalDefaults,
@@ -2003,21 +1919,20 @@ class MapWidget extends Widget {
 
       // save local individual data (style + config)
       const local = utils.getPropertiesByPrefix(fields, 'local.', true);
+
       // CAREFUL: Never change 'local-node-style' to 'local.node-style'
       // (with a dot) because it will get included in the loop!
       const data = utils.parseJSON(fields['local-node-style'], {});
-      for (let p in local) {
 
+      for (let p in local) {
         data[p] = local[p] || undefined;
       }
 
       this.view.saveNodeStyle(node.id, data);
 
-      this.preventFitAfterRebuild = true;
-
     });
 
-  };
+  }
 
   /**
    * This handler is registered at and called by the vis network event
@@ -2030,7 +1945,7 @@ class MapWidget extends Widget {
       this.handleOpenMapElementEvent(properties);
     }
 
-  };
+  }
 
   /**
    * This handler is registered at and called by the vis network event
@@ -2058,7 +1973,7 @@ class MapWidget extends Widget {
       }
     }
 
-  };
+  }
 
   handleOpenMapElementEvent({ nodes, edges }) {
 
@@ -2086,7 +2001,7 @@ class MapWidget extends Widget {
 
     this.hidePopups(0, true);
 
-  };
+  }
 
   handleEditEdgeType(type) {
 
@@ -2134,7 +2049,7 @@ class MapWidget extends Widget {
 
     this.repaintGraph(); // redraw graph
 
-  };
+  }
 
   /**
    * used to prevent nasty deletion as edges are not unselected when leaving vis
@@ -2161,14 +2076,14 @@ class MapWidget extends Widget {
 
     this.contextMenu.hide(0, true);
 
-  };
+  }
 
-  handleVisSelectNode(properties) {
+  handleVisSelectNode({ nodes }) {
 
     // assign selected style
-    this.assignActiveStyle(properties.nodes);
+    this.assignActiveStyle(nodes);
 
-  };
+  }
 
   /**
    * Assign some styles when the graph element becomes active, i.e.
@@ -2196,7 +2111,7 @@ class MapWidget extends Widget {
       });
     }
 
-  };
+  }
 
   handleVisDeselectNode(properties) {
 
@@ -2204,7 +2119,7 @@ class MapWidget extends Widget {
     //~ for (var i = prevSelectedNodes.length; i--;) {
     //~ };
 
-  };
+  }
 
   /**
    * Called by vis when the dragging of a node(s) has ended.
@@ -2220,7 +2135,7 @@ class MapWidget extends Widget {
     // if in static mode, fixing will be ignored
     this.setNodesMoveable(nodes, false);
 
-  };
+  }
 
   handleVisBeforeDrawing(context2d) {
 
@@ -2229,7 +2144,7 @@ class MapWidget extends Widget {
       context2d.drawImage(this.backgroundImage, 0, 0);
     }
 
-  };
+  }
 
   /**
    * called by tooltip class when tooltip is displayed;
@@ -2284,7 +2199,7 @@ class MapWidget extends Widget {
 
     }
 
-  };
+  }
 
   handleVisHoverElement(ev) {
 
@@ -2308,7 +2223,7 @@ class MapWidget extends Widget {
       this.tooltip.show(signature, populator);
     }
 
-  };
+  }
 
   handleVisBlurElement(ev) {
 
@@ -2316,27 +2231,27 @@ class MapWidget extends Widget {
     //~ this.graphDomNode.style.cursor = 'auto';
     this.tooltip.hide();
 
-  };
+  }
 
-  handleVisLoading(params) {
+  handleVisLoading({ total, iterations }) {
 
     // we only start to show the progress bar after a while
     //~ if (params.iterations / params.total < 0.05) return;
 
     this.graphLoadingBarDomNode.style.display = 'block';
-    this.graphLoadingBarDomNode.setAttribute('max', params.total);
-    this.graphLoadingBarDomNode.setAttribute('value', params.iterations);
+    this.graphLoadingBarDomNode.setAttribute('max', total);
+    this.graphLoadingBarDomNode.setAttribute('value', iterations);
 
-    //~ var text = 'Loading ' + Math.round((params.iterations / params.total) * 100) + '%';
+    //~ var text = 'Loading ' + Math.round((iterations / total) * 100) + '%';
     //~ this.graphLoadingBarDomNode.innerHTML = text;
 
-  };
+  }
 
   handleVisLoadingDone(params) {
 
     this.graphLoadingBarDomNode.style.display = 'none';
 
-  };
+  }
 
    /**
    * Called by vis when a node is being dragged.
@@ -2352,7 +2267,7 @@ class MapWidget extends Widget {
       this.setNodesMoveable(nodes, true);
     }
 
-  };
+  }
 
   /**
    * called from outside.
@@ -2366,7 +2281,8 @@ class MapWidget extends Widget {
     utils.setDomListeners('remove', this.domNode, this.widgetDomListeners);
 
     this._destructVis();
-  };
+
+  }
 
   /**
    * Only destructs stuff related to vis.
@@ -2380,7 +2296,7 @@ class MapWidget extends Widget {
     this.network.destroy();
     this.network = null;
 
-  };
+  }
 
   /**
    * Opens the tiddler that corresponds to the given id either as
@@ -2405,10 +2321,7 @@ class MapWidget extends Widget {
 
       }
 
-      const args = {
-        draftTRef: draftTRef,
-        originalTRef: tRef
-      };
+      const args = { draftTRef, originalTRef: tRef };
 
       this.dialogManager.open('fullscreenTiddlerEditor', args, (isConfirmed, outTObj) => {
 
@@ -2450,7 +2363,7 @@ class MapWidget extends Widget {
       });
 
     }
-  };
+  }
 
   /**
    * The view holder is a tiddler that stores a references to the current
@@ -2481,13 +2394,13 @@ class MapWidget extends Widget {
 
       this.logger('log', `User wants to bind view "${viewName}' to graph`);
 
-      const viewRef = $tm.path.views + '/' + viewName;
+      const viewRef = `${$tm.path.views}/${viewName}`;
 
       if ($tw.wiki.getTiddler(viewRef)) {
 
         // create a view holder that is exclusive for this graph
 
-        holderRef = $tm.path.localHolders + '/' + utils.genUUID();
+        holderRef = `${$tm.path.localHolders}/${utils.genUUID()}`;
         this.logger('log', `Created an independent temporary view holder "${holderRef}"`);
 
         // we do not use setView here because it would store and reload the view unnecessarily...
@@ -2508,7 +2421,7 @@ class MapWidget extends Widget {
 
     return holderRef;
 
-  };
+  }
 
   /**
    * This function will switch the current view reference of the
@@ -2530,7 +2443,9 @@ class MapWidget extends Widget {
 
     view = new ViewAbstraction(view);
 
-    if (!view.exists()) return;
+    if (!view.exists()) {
+      return;
+    }
 
     const viewLabel = view.getLabel();
     viewHolderRef = viewHolderRef || this.viewHolderRef;
@@ -2544,7 +2459,7 @@ class MapWidget extends Widget {
     // e.g. via `this.view = this.getView(true)` This would produce a
     // race condition!
 
-  };
+  }
 
   /**
    * This function will return a view abstraction that is based on the
@@ -2575,7 +2490,7 @@ class MapWidget extends Widget {
 
     return view;
 
-  };
+  }
 
   reloadBackgroundImage(msg) {
 
@@ -2607,40 +2522,7 @@ class MapWidget extends Widget {
 
     }
 
-  };
-
-  /**
-   * using an existing dataset to reflect the changes between
-   * two node sets.
-   *
-   * @param {Hashmap<id, Node>} ltNew - Lookup table that contains the
-   *     *new* set of nodes.
-   * @param {Hashmap<id, Node>} ltOld - lookup table that holds the
-   *     *old* set of nodes.
-   * @param {vis.DataSet} [ds] - The dataset to be updated
-   */
-  getRefreshedDataSet(ltNew, ltOld, ds) {
-
-    if (!ds) {
-      return new vis.DataSet(utils.getValues(ltNew));
-    }
-
-    // remove all elements;
-    // formerly I kept all elements that were included in the new set in
-    // the dataset. I would then set properties to null that are
-    // not present anymore to prevent property relicts. This turned out
-    // to be cumbersome and didn't really work with vis, especially
-    // setting nested properties to null. therefore I decided to simply
-    // remove all previous elements – surprisingly you don't see any
-    // performance decrease…
-    if (ltOld) ds.remove(Object.keys(ltOld));
-
-    // inject the new data
-    ds.update(utils.getValues(ltNew));
-
-    return ds;
-
-  };
+  }
 
   /**
    * The graph of this widget is only repainted if the following counts:
@@ -2663,7 +2545,7 @@ class MapWidget extends Widget {
 
     }
 
-  };
+  }
 
   /**
    * If a button is enabled it means it is displayed on the graph canvas.
@@ -2675,16 +2557,16 @@ class MapWidget extends Widget {
    */
   setGraphButtonEnabled(name, enable) {
 
-    const className = 'vis-button' + ' ' + 'tmap-' + name;
+    const className = `vis-button tmap-${name}`;
     const b = utils.getFirstElementByClassName(className, this.domNode);
     $tw.utils.toggleClass(b, 'tmap-button-enabled', enable);
 
-  };
+  }
 
   /**
    * Allow the given nodes to be moveable.
    *
-   * @param {Array<NodeId>} nodeIds - The ids of the nodes for which
+   * @param {Array<number>} nodeIds - The ids of the nodes for which
    *     we allow or disallow the movement.
    * @param {boolean} isMoveable - True, if the nodes are allowed to
    *     move or be moved.
@@ -2719,7 +2601,7 @@ class MapWidget extends Widget {
       this.handleStorePositions();
     }
 
-  };
+  }
 
   /**
    * This function will create the dom elements for all tiddlymap-vis
@@ -2734,7 +2616,7 @@ class MapWidget extends Widget {
 
     for (let name in buttonEvents) {
       const div = this.document.createElement('div');
-      div.className = 'vis-button ' + ' ' + 'tmap-' + name;
+      div.className = `vis-button tmap-${name}`;
 
       div.addEventListener('click', buttonEvents[name].bind(this), false);
       parent.appendChild(div);
@@ -2743,8 +2625,7 @@ class MapWidget extends Widget {
       this.setGraphButtonEnabled(name, true);
 
     }
-
-  };
+  }
 }
 
 /*** Exports *******************************************************/

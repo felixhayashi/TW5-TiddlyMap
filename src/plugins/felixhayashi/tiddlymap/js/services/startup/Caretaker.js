@@ -22,6 +22,8 @@ import ViewAbstraction            from '$:/plugins/felixhayashi/tiddlymap/js/Vie
 import EdgeType                   from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
 import NodeType                   from '$:/plugins/felixhayashi/tiddlymap/js/NodeType';
 import vis                        from '$:/plugins/felixhayashi/vis/vis.js';
+import * as environment           from '$:/plugins/felixhayashi/tiddlymap/js/lib/environment';
+import URL                        from '$:/plugins/felixhayashi/tiddlymap/js/URL';
 
 /*** Code **********************************************************/
 
@@ -34,6 +36,8 @@ import vis                        from '$:/plugins/felixhayashi/vis/vis.js';
  *
  */
 function init() {
+
+  $tm = { ...environment };
 
   // register utils
   $tm.utils = utils;
@@ -48,7 +52,7 @@ function init() {
   $tm.services = {};
 
   // register url
-  $tm.url = new $tm.utils.URL(window.location.href);
+  $tm.url = new URL(window.location.href);
 
   // build and integrate global options
   updateGlobals();

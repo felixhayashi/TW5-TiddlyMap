@@ -355,7 +355,7 @@ export const getImgFromWeb = (imgUri, callback) => {
   xhr.responseType = 'blob';
   xhr.onerror = function(e) { console.log(e); };
   xhr.onload = function(e) {
-    if (this.readyState === 4 && this.status === 200) {
+    if (this.readyState === 4 && (this.status===200 || (this.status === 0 && this.response.size > 0))) {
       const blob = this.response;
       callback(window.URL.createObjectURL(blob));
     }

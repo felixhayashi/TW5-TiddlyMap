@@ -1,7 +1,7 @@
 // @preserve
 /*\
 
-title: $:/plugins/felixhayashi/tiddlymap/js/fixer
+title: $:/plugins/felixhayashi/tiddlymap/js/Fixer
 type: application/javascript
 module-type: library
 
@@ -11,243 +11,265 @@ module-type: library
 
 /*** Imports *******************************************************/
 
-import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
+import utils           from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 import ViewAbstraction from '$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction';
-import EdgeType from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
+import EdgeType        from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
+import NodeType        from '$:/plugins/felixhayashi/tiddlymap/js/NodeType';
+import * as env        from '$:/plugins/felixhayashi/tiddlymap/js/lib/environment';
 
 /*** Code **********************************************************/
 
-var moveEdges = function(path, view) {
+class Fixer {
 
-  var matches = utils.getTiddlersByPrefix(path);
-  for (var i = 0; i < matches.length; i++) {
+  /**
+   * @param {Adapter} adapter
+   * @param {Object} logger
+   * @param {Object} glNTy
+   */
+  constructor(adapter, logger, glNTy) {
 
-    // create edge type
-    var type = utils.getBasename(matches[i]);
-    if (type === '__noname__') { type = 'tmap:unknown'; }
-    type = new EdgeType(type);
-
-    if (!type.exists()) type.save();
-
-    // move edges
-    var edges = $tw.wiki.getTiddlerData(matches[i]);
-    for (var j = 0; j < edges.length; j++) {
-      // prefix formerly private edges with view name as namespace
-      edges[j].type = (view ? view + ':' : '') + type.id;
-      $tm.adapter.insertEdge(edges[j]);
-    }
-
-    // finally remove the store
-    $tw.wiki.deleteTiddler(matches[i]);
+    this.adapter = adapter;
+    this.logger = logger;
+    this.wiki = $tw.wiki;
+    this.glNTy = glNTy;
 
   }
 
-};
+  moveEdges(path, view) {
 
-var executeUpgrade = function(toVersion, curVersion, upgrade) {
+    const matches = utils.getTiddlersByPrefix(path);
+    for (let i = 0; i < matches.length; i++) {
 
-  if (!utils.isLeftVersionGreater(toVersion, curVersion)) return;
-  // = current data structure version is newer than version we
-  // want to upgrade to.
+      // create edge type
+      let type = utils.getBasename(matches[i]);
 
-  // issue debug message
-  $tm.logger('debug',  'Upgrading data structure to ' + toVersion);
-  // execute fix
-  var msg = upgrade();
-  // update meta
-  utils.setEntry($tm.ref.sysMeta, 'dataStructureState', toVersion);
+      if (type === '__noname__') {
+        type = 'tmap:unknown';
+      }
 
-  return msg;
+      type = new EdgeType(type);
 
-};
+      if (!type.exists()) {
+        type.save();
+      }
 
-var fixer = {};
+      // move edges
+      const edges = this.wiki.getTiddlerData(matches[i]);
+      for (let j = 0; j < edges.length; j++) {
+        // prefix formerly private edges with view name as namespace
+        edges[j].type = (view ? view + ':' : '') + type.id;
+        this.adapter.insertEdge(edges[j]);
+      }
 
-/**
- * Special fix that is not invoked along with the other fixes but
- * when creating the index (see caretaker code).
- *
- * Changes:
- * 1. The node id field is moved to tmap.id if **original version**
- *    is below v0.9.2.
- */
-fixer.fixId = function() {
-
-  var meta = $tw.wiki.getTiddlerData($tm.ref.sysMeta, {});
-
-  executeUpgrade('0.9.2', meta.dataStructureState, function() {
-
-    if (utils.isLeftVersionGreater('0.9.2', meta.originalVersion)) {
-      // path of the user conf at least in 0.9.2
-      var userConf = '$:/plugins/felixhayashi/tiddlymap/config/sys/user';
-      var nodeIdField = utils.getEntry(userConf, 'field.nodeId', 'tmap.id');
-      utils.moveFieldValues(nodeIdField, 'tmap.id', true, false);
-    }
-
-  });
-
-};
-
-fixer.fix = function() {
-
-  var meta = $tw.wiki.getTiddlerData($tm.ref.sysMeta, {});
-
-  $tm.logger('debug', 'Fixer is started');
-  $tm.logger('debug', 'Data-structure currently in use: ', meta.dataStructureState);
-
-  /**
-   * Changes:
-   * 1. Edges are stored in tiddlers instead of type based edge stores
-   * 2. No more private views
-   */
-  executeUpgrade('0.7.0', meta.dataStructureState, function() {
-
-    // move edges that were formerly "global"
-    moveEdges('$:/plugins/felixhayashi/tiddlymap/graph/edges', null);
-
-    // move edges that were formerly bound to view ("private")
-    var filter = $tm.selector.allViews;
-    var viewRefs = utils.getMatches(filter);
-    for (var i = 0; i < viewRefs.length; i++) {
-      var view = new ViewAbstraction(viewRefs[i]);
-      moveEdges(view.getRoot()+'/graph/edges', view);
-    }
-
-  });
-
-  /**
-   * Changes:
-   * 1. Changes to the live view filter and refresh trigger field
-   */
-  executeUpgrade('0.7.32', meta.dataStructureState, function() {
-
-    var liveView = new $tm.ViewAbstraction('Live View');
-    if (!liveView.exists()) return;
-
-    // Only listen to the current tiddler of the history list
-    liveView.setNodeFilter('[field:title{$:/temp/tmap/currentTiddler}]',
-                           true);
-
-    liveView.setConfig({
-      'refresh-trigger': null, // delete the field (renamed)
-      'refresh-triggers': $tw.utils.stringifyList([
-        '$:/temp/tmap/currentTiddler'
-      ])
-    });
-
-  });
-
-  /**
-   * Changes:
-   * 1. Group styles for matches and neighbours are now modulized
-   *    and stored as node-types.
-   * 2. vis user configuration is restored unflattened!
-   *    The user only interacts through the GUI.
-   * 3. If the node id field was "id" it is moved to tmap.id
-   */
-  executeUpgrade('0.9.0', meta.dataStructureState, function() {
-
-    var confRef = $tm.ref.visUserConf;
-    var userConf = utils.unflatten($tw.wiki.getTiddlerData(confRef, {}));
-
-    if (typeof userConf.groups === 'object') {
-
-      var type = new $tm.NodeType('tmap:neighbour');
-      type.setStyle(userConf.groups['neighbours']);
-      type.save();
-
-      delete userConf.groups;
-      $tw.wiki.setTiddlerData(confRef, userConf);
+      // finally remove the store
+      this.wiki.deleteTiddler(matches[i]);
 
     }
 
-  });
+  }
+
+  executeUpgrade(toVersion, curVersion, upgrade) {
+
+    if (!utils.isLeftVersionGreater(toVersion, curVersion)) {
+      // = current data structure version is newer than version we want to upgrade to.
+      return;
+    }
+
+    // issue debug message
+    this.logger('debug', `Upgrading data structure to ${toVersion}`);
+    // execute fix
+    const msg = upgrade();
+    // update meta
+    utils.setEntry(env.ref.sysMeta, 'dataStructureState', toVersion);
+
+    return msg;
+
+  };
 
   /**
+   * Special fix that is not invoked along with the other fixes but
+   * when creating the index (see caretaker code).
+   *
    * Changes:
    * 1. The node id field is moved to tmap.id if **original version**
    *    is below v0.9.2.
    */
-  fixer.fixId();
+  fixId() {
 
+    const meta = this.wiki.getTiddlerData(env.ref.sysMeta, {});
 
-  /**
-   * This will ensure that all node types have a prioritization field
-   * set.
-   */
-  executeUpgrade('0.9.16', meta.dataStructureState, function() {
+    this.executeUpgrade('0.9.2', meta.dataStructureState, () => {
 
-    var glNTy = $tm.indeces.glNTy;
-    for (var i = glNTy.length; i--;) {
-      glNTy[i].save(null, true);
-    }
+      if (utils.isLeftVersionGreater('0.9.2', meta.originalVersion)) {
+        // path of the user conf at least in 0.9.2
+        const userConf = '$:/plugins/felixhayashi/tiddlymap/config/sys/user';
+        const nodeIdField = utils.getEntry(userConf, 'field.nodeId', 'tmap.id');
+        utils.moveFieldValues(nodeIdField, 'tmap.id', true, false);
+      }
+    });
 
-  });
+  };
 
-  /**
-   * Fixes the live tab
-   */
-  executeUpgrade('0.10.3', meta.dataStructureState, function() {
+  fix() {
 
-    var liveTab = $tm.ref.liveTab;
-    if (utils.getTiddler(liveTab).hasTag('$:/tags/SideBar')) {
-      $tw.wiki.deleteTiddler(liveTab);
-      utils.setField(liveTab, 'tags', '$:/tags/SideBar');
-    }
+    const meta = this.wiki.getTiddlerData(env.ref.sysMeta, {});
 
-  });
+    this.logger('debug', 'Fixer is started');
+    this.logger('debug', 'Data-structure currently in use: ', meta.dataStructureState);
 
-  /**
-   * 1) Fixes the edge type filter. Before, an empty filter was
-   * treated as default filter, i.e. no links and tags shown.
-   * Now an empty filter means that we show all edge types.
-   *
-   * 2) Adds prefix to hide private edges per default
-   *
-   * 3) Corrects view-namespaces (formerly stored with colon).
-   *
-   */
-  executeUpgrade('0.11.0', meta.dataStructureState, function() {
+    /**
+     * Changes:
+     * 1. Edges are stored in tiddlers instead of type based edge stores
+     * 2. No more private views
+     */
+    this.executeUpgrade('0.7.0', meta.dataStructureState, () => {
 
-    const views = utils.getMatches($tm.selector.allViews);
+      // move edges that were formerly "global"
+      moveEdges('$:/plugins/felixhayashi/tiddlymap/graph/edges', null);
 
-    for (let i = views.length; i--;) {
+      // move edges that were formerly bound to view ("private")
+      const filter = env.selector.allViews;
+      const viewRefs = utils.getMatches(filter);
+      for (let i = 0; i < viewRefs.length; i++) {
+        const view = new ViewAbstraction(viewRefs[i]);
+        moveEdges(`${view.getRoot()}/graph/edges`, view);
+      }
 
-      const view = new ViewAbstraction(views[i]);
-      let eTyFilter = view.getEdgeTypeFilter('raw');
-      const confKey = 'edge_type_namespace';
-      view.setConfig(confKey, view.getConfig(confKey));
+    });
 
-      let f = $tm.filter.defaultEdgeTypeFilter;
+    /**
+     * Changes:
+     * 1. Changes to the live view filter and refresh trigger field
+     */
+    this.executeUpgrade('0.7.32', meta.dataStructureState, () => {
 
-      if (eTyFilter) {
+      const liveView = new ViewAbstraction('Live View');
 
-        // remove any occurences of the egde type path prefix
-        const edgeTypePath = $tm.path.edgeTypes;
-        eTyFilter = utils.replaceAll(eTyFilter, '', [
-          edgeTypePath,
-          edgeTypePath + '/',
-          '[prefix[' + edgeTypePath + ']]',
-          '[prefix[' + edgeTypePath + '/]]',
-          [ '[suffix[tw-body:link]]', '[[tw-body:link]]' ],
-          [ '[suffix[tw-list:tags]]', '[[tw-list:tags]]' ],
-          [ '[suffix[tw-list:list]]', '[[tw-body:list]]' ],
-          [ '[suffix[tmap:unknown]]', '[[tmap:unknown]]' ],
-          [ '[suffix[unknown]]', '[[tmap:unknown]]' ],
-        ]);
+      if (!liveView.exists()) {
+        return;
+      }
 
-        f = '-[prefix[_]] ' + eTyFilter;
+      // Only listen to the current tiddler of the history list
+      liveView.setNodeFilter('[field:title{$:/temp/tmap/currentTiddler}]', true);
+
+      liveView.setConfig({
+        'refresh-trigger': null, // delete the field (renamed)
+        'refresh-triggers': utils.stringifyList(['$:/temp/tmap/currentTiddler'])
+      });
+
+    });
+
+    /**
+     * Changes:
+     * 1. Group styles for matches and neighbours are now modulized
+     *    and stored as node-types.
+     * 2. vis user configuration is restored unflattened!
+     *    The user only interacts through the GUI.
+     * 3. If the node id field was "id" it is moved to tmap.id
+     */
+    this.executeUpgrade('0.9.0', meta.dataStructureState, () => {
+
+      const confRef = env.ref.visUserConf;
+      const userConf = utils.unflatten(this.wiki.getTiddlerData(confRef, {}));
+
+      if (typeof userConf.groups === 'object') {
+
+        const type = new NodeType('tmap:neighbour');
+        type.setStyle(userConf.groups['neighbours']);
+        type.save();
+
+        delete userConf.groups;
+        this.wiki.setTiddlerData(confRef, userConf);
 
       }
 
-      view.setEdgeTypeFilter(f);
-    }
+    });
 
-  });
+    /**
+     * Changes:
+     * 1. The node id field is moved to tmap.id if **original version**
+     *    is below v0.9.2.
+     */
+    this.fixId();
 
-};
+
+    /**
+     * This will ensure that all node types have a prioritization field
+     * set.
+     */
+    this.executeUpgrade('0.9.16', meta.dataStructureState, () => {
+
+      for (let i = this.glNTy.length; i--;) {
+        this.glNTy[i].save(null, true);
+      }
+
+    });
+
+    /**
+     * Fixes the live tab
+     */
+    this.executeUpgrade('0.10.3', meta.dataStructureState, function () {
+
+      const liveTab = env.ref.liveTab;
+      if (utils.getTiddler(liveTab).hasTag('$:/tags/SideBar')) {
+        this.wiki.deleteTiddler(liveTab);
+        utils.setField(liveTab, 'tags', '$:/tags/SideBar');
+      }
+
+    });
+
+    /**
+     * 1) Fixes the edge type filter. Before, an empty filter was
+     * treated as default filter, i.e. no links and tags shown.
+     * Now an empty filter means that we show all edge types.
+     *
+     * 2) Adds prefix to hide private edges per default
+     *
+     * 3) Corrects view-namespaces (formerly stored with colon).
+     *
+     */
+    this.executeUpgrade('0.11.0', meta.dataStructureState, function () {
+
+      const views = utils.getMatches(env.selector.allViews);
+
+      for (let i = views.length; i--;) {
+
+        const view = new ViewAbstraction(views[i]);
+        let eTyFilter = view.getEdgeTypeFilter('raw');
+        const confKey = 'edge_type_namespace';
+        view.setConfig(confKey, view.getConfig(confKey));
+
+        let f = env.filter.defaultEdgeTypeFilter;
+
+        if (eTyFilter) {
+
+          // remove any occurences of the egde type path prefix
+          const edgeTypePath = env.path.edgeTypes;
+          eTyFilter = utils.replaceAll(eTyFilter, '', [
+            edgeTypePath,
+            edgeTypePath + '/',
+            '[prefix[' + edgeTypePath + ']]',
+            '[prefix[' + edgeTypePath + '/]]',
+            [ '[suffix[tw-body:link]]', '[[tw-body:link]]' ],
+            [ '[suffix[tw-list:tags]]', '[[tw-list:tags]]' ],
+            [ '[suffix[tw-list:list]]', '[[tw-body:list]]' ],
+            [ '[suffix[tmap:unknown]]', '[[tmap:unknown]]' ],
+            [ '[suffix[unknown]]', '[[tmap:unknown]]' ],
+          ]);
+
+          f = '-[prefix[_]] ' + eTyFilter;
+
+        }
+
+        view.setEdgeTypeFilter(f);
+      }
+
+    });
+
+  };
+}
 
 /*** Exports *******************************************************/
 
-export default fixer;
+export default Fixer;
 

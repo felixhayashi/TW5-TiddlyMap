@@ -142,7 +142,7 @@ EdgeListItemWidget.prototype = Object.create(Widget.prototype);
 EdgeListItemWidget.prototype.execute = function() {
 
   var item = this.parseTreeNode;
-  var tRef = $tm.indeces.tById[item.neighbour.id];
+  var tRef = $tm.tracker.getTiddlerById(item.neighbour.id);
 
   // make edge properties available as variables
   var edge = utils.flatten(item.edge);

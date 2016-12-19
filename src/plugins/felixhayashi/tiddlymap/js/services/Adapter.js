@@ -17,6 +17,7 @@ import NodeType                     from '$:/plugins/felixhayashi/tiddlymap/js/N
 import utils                        from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 import Edge                         from '$:/plugins/felixhayashi/tiddlymap/js/Edge';
 import vis                          from '$:/plugins/felixhayashi/vis/vis.js';
+import * as env                     from '$:/plugins/felixhayashi/tiddlymap/js/lib/environment';
 import { run as getContrastColour } from '$:/core/modules/macros/contrastcolour.js';
 
 /***************************** CODE ********************************/
@@ -37,10 +38,19 @@ import { run as getContrastColour } from '$:/core/modules/macros/contrastcolour.
  */
 class Adapter {
 
-  constructor() {
+  /**
+   * @param {Tracker} tracker
+   * @param {EdgeTypeSubscriberRegistry} edgeTypeSubscriberRegistry
+   */
+  constructor(tracker, edgeTypeSubscriberRegistry) {
+
+    this.getTiddlerById = tracker.getTiddlerById.bind(tracker);
+    this.getId = tracker.getIdByTiddler.bind(tracker);
+    this.assignId = tracker.assignId.bind(tracker);
+
+    this.edgeTypeSubscriberRegistry = edgeTypeSubscriberRegistry;
 
     this.indeces = $tm.indeces;
-    this.services = $tm.services;
     this.wiki = $tw.wiki;
 
     this.visShapesWithTextInside = utils.getLookupTable([
@@ -102,7 +112,7 @@ class Adapter {
     $tm.logger('debug', 'Edge', action, edge);
 
     // get from-node and corresponding tiddler
-    const fromTRef = this.indeces.tById[edge.from];
+    const fromTRef = this.getTiddlerById(edge.from);
 
     if (!fromTRef || !utils.tiddlerExists(fromTRef)) {
       return;
@@ -110,7 +120,7 @@ class Adapter {
 
     const tObj = utils.getTiddler(fromTRef);
     const type = this.indeces.allETy[edge.type] || new EdgeType(edge.type);
-    const handlers = this.services.edgeTypeSubscriberRegistry.getAllForType(type);
+    const handlers = this.edgeTypeSubscriberRegistry.getAllForType(type);
     const fn = `${action}Edge`;
 
     for (let i = handlers.length; i--;) {
@@ -148,7 +158,7 @@ class Adapter {
     $tm.start('Creating adjacency list');
 
     if (!opts.edges) {
-      const tRefs = utils.getMatches($tm.selector.allPotentialNodes);
+      const tRefs = utils.getMatches(env.selector.allPotentialNodes);
       opts.edges = this.getEdgesForSet(tRefs, opts.toWL, opts.typeWL);
     }
 
@@ -197,7 +207,7 @@ class Adapter {
     $tm.start('Get neighbours');
 
     const { addProperties, toWL, typeWL, steps } = opts;
-    const { allETy, tById, idByT } = this.indeces;
+    const { allETy } = this.indeces;
 
     // index of all tiddlers have already are been visited, either by
     // having been included in the original set, or by having been
@@ -217,7 +227,7 @@ class Adapter {
 
     const addAsNeighbour = (edge, role, neighboursOfThisStep) => {
       allEdgesLeadingToNeighbours[edge.id] = edge;
-      const tRef = tById[edge[role]];
+      const tRef = this.getTiddlerById(edge[role]);
       if (!visited[tRef]) {
         visited[tRef] = true;
         const node = this.makeNode(tRef, addProperties);
@@ -229,8 +239,11 @@ class Adapter {
       }
     };
 
+    // needed later
+    let step;
+
     // loop if still steps to be taken and we have a non-empty starting set
-    for (var step = 0; step < maxSteps && matches.length; step++) {
+    for (step = 0; step < maxSteps && matches.length; step++) {
 
       // neighbours that are discovered in the current step;
       // starting off from the current set of matches;
@@ -260,7 +273,7 @@ class Adapter {
 
         // get all incoming edges
         // = edges originating from outside pointing to the starting set
-        const incoming = adjList[idByT[matches[i]]];
+        const incoming = adjList[this.getId(matches[i])];
         if (!incoming) {
           continue;
         }
@@ -348,7 +361,7 @@ class Adapter {
       Object.assign(graph.edges, neighbours.edges);
 
       if (view.exists() && view.isEnabled('show_inter_neighbour_edges')) {
-        const nodeTRefs = this.getTiddlersById(neighbours.nodes);
+        const nodeTRefs = this.getTiddlersByIds(neighbours.nodes);
         // this time we need a whitelist based on the nodeTRefs
         const toWL = utils.getArrayValuesAsHashmapKeys(nodeTRefs);
         Object.assign(graph.edges, this.getEdgesForSet(nodeTRefs, toWL));
@@ -406,7 +419,7 @@ class Adapter {
 
     const { allETy } = this.indeces;
     const edges = utils.makeHashMap();
-    const eTySubscribers = this.services.edgeTypeSubscriberRegistry.getAll();
+    const eTySubscribers = this.edgeTypeSubscriberRegistry.getAll();
 
     for (let i = 0, l = eTySubscribers.length; i < l; i++) {
       Object.assign(edges, (eTySubscribers[i]).loadEdges(tObj, toWL, typeWL));
@@ -457,8 +470,10 @@ class Adapter {
    */
   selectEdgesByType(type) {
 
-    const typeWL = utils.makeHashMap();
-    typeWL[new EdgeType(type).id] = true;
+    const typeWL = utils.makeHashMap({
+      [new EdgeType(type).id]: true,
+    });
+
     return this.getEdgesForSet(this.getAllPotentialNodes(), null, typeWL);
 
   }
@@ -541,7 +556,7 @@ class Adapter {
    */
   selectNodesByIds(nodeIds, options) {
 
-    const tRefs = this.getTiddlersById(nodeIds);
+    const tRefs = this.getTiddlersByIds(nodeIds);
 
     return this.selectNodesByReferences(tRefs, options);
 
@@ -593,7 +608,7 @@ class Adapter {
     // merge(!) so later node manipulations do not affect other nodes
     const node = utils.merge({}, protoNode);
 
-    // assignId() will not assign an id if the tiddler already has one
+    // note: assignId() will not assign an id if the tiddler already has one
     node.id = this.assignId(tObj);
 
     // add label
@@ -614,7 +629,7 @@ class Adapter {
    */
   getInheritedNodeStyles(nodes) {
 
-    const src = this.getTiddlersById(nodes);
+    const src = this.getTiddlersByIds(nodes);
     const protoByTRef = {};
     const glNTy = this.indeces.glNTy;
 
@@ -623,12 +638,11 @@ class Adapter {
 
       let inheritors = [];
       if (type.id === 'tmap:neighbour') { // special case
-        const tById = this.indeces.tById;
         for (let id in nodes) {
 
           if (nodes[id].group === 'tmap:neighbour') {
 
-            inheritors.push(tById[id]);
+            inheritors.push(this.getTiddlerById(id));
           }
         }
       } else {
@@ -674,12 +688,9 @@ class Adapter {
     const viewNodeData = view.exists() ? view.getNodeData() : utils.makeHashMap();
     const isStaticMode = view.exists() && !view.isEnabled('physics_mode');
 
-    // shortcuts (for performance and readability)
-    const tById = this.indeces.tById;
-
     for (let id in nodes) {
 
-      const tRef = tById[id];
+      const tRef = this.getTiddlerById(id);
       const tObj = this.wiki.getTiddler(tRef);
       const fields = tObj.fields;
 
@@ -793,7 +804,7 @@ class Adapter {
     if (!node) return;
 
     const id = (typeof node === 'object' ? node.id : node);
-    const tRef = this.indeces.tById[id];
+    const tRef = this.getTiddlerById(id);
 
     // delete tiddler and remove it from the river; this will
     // automatically remove the global node style and the outgoing edges
@@ -806,7 +817,7 @@ class Adapter {
 
     // delete local node-data in views containing the node
 
-    const viewRefs = utils.getMatches($tm.selector.allViews);
+    const viewRefs = utils.getMatches(env.selector.allViews);
     for (let i = viewRefs.length; i--;) {
       const view = new ViewAbstraction(viewRefs[i]);
       view.removeNode(id);
@@ -832,8 +843,8 @@ class Adapter {
     //
     // THEREFORE:
     //
-    // DO NOT DO delete this.indeces.tById[id];
-    // DO NOT DO delete this.indeces.idByT[tRef];
+    // DO NOT DO delete this.tById[id];
+    // DO NOT DO delete this.idByT[tRef];
 
   }
 
@@ -862,44 +873,6 @@ class Adapter {
     if (!view.exists()) return;
 
     view.saveNodeData(positions);
-
-  }
-
-  /**
-   * This method will assign an id to an *existing* tiddler that does
-   * not already possess and id. Any assigned id will be registered
-   * at the id->tiddler index.
-   *
-   * @todo It is a bottleneck that the tiddler is always reloaded from the db.
-   *
-   * @param {Tiddler} tiddler - The tiddler to assign the id to.
-   * @param {boolean} isForce - True if the id should be overridden,
-   *     false otherwise. Only works if the id field is not set to title.
-   *
-   * @return {Id} The assigned or retrieved id.
-   */
-  assignId(tiddler, isForce) {
-
-    // Note: always reload from store to avoid setting wrong ids on tiddler
-    // being in the role of from and to at the same time.
-    const tObj = utils.getTiddler(tiddler);
-
-    if (!tObj) return;
-
-    let id = tObj.fields['tmap.id'];
-
-    if (!id || isForce) {
-      id = utils.genUUID();
-      utils.setField(tObj, 'tmap.id', id);
-      $tm.logger('info', 'Assigning new id to', tObj.fields.title);
-    }
-
-    // blindly update the index IN ANY CASE because tiddler may have
-    // an id but it is not indexed yet (e.g. because of renaming operation)
-    this.indeces.tById[id] = tObj.fields.title;
-    this.indeces.idByT[tObj.fields.title] = id;
-
-    return id;
 
   }
 
@@ -952,7 +925,7 @@ class Adapter {
    * @param {Array.<Id>|Hashmap.<Id, *>|vis.DataSet} nodeIds - The ids.
    * @return {Array<TiddlerReference>} The resulting tiddlers.
    */
-  getTiddlersById(nodeIds) {
+  getTiddlersByIds(nodeIds) {
 
     // transform into a hashmap with all values being true
     if (Array.isArray(nodeIds)) {
@@ -962,22 +935,14 @@ class Adapter {
     }
 
     const result = [];
-    const tById = this.indeces.tById;
     for (let id in nodeIds) {
-
-      if (tById[id]) {
-        result.push(tById[id]);
+      const tRef = this.getTiddlerById(id);
+      if (tRef) {
+        result.push(tRef);
       }
     }
 
     return result;
-
-  }
-
-  getId(tiddler) {
-
-    return this.indeces.idByT[utils.getTiddlerRef(tiddler)];
-    // works too: return utils.getField(tiddler, 'tmap.id');
 
   }
 }
@@ -1085,6 +1050,7 @@ const addStyleToEdge = (edge, type) => {
   if (utils.isTrue(type['show-label'], true)) {
     edge.label = type.getLabel();
   }
+
 };
 
 /*** Exports *******************************************************/

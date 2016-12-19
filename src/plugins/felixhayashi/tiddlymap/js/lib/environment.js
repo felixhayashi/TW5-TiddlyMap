@@ -104,12 +104,17 @@ const allSelector = '[all[tiddlers+shadows]!has[draft.of]]';
 
 // some popular selectors
 // usually used from within tiddlers via the tmap macro
-export const selector = {
+
+const s = {
   allEdgeTypes: `${allSelector} +${filter.edgeTypes}`,
-  allEdgeTypesById: `${s.allEdgeTypes} +[removeprefix[${path.edgeTypes}/]]`,
   allNodeTypes: `${allSelector} +${filter.nodeTypes}`,
-  allNodeTypesById: `${s.allNodeTypes} +[removeprefix[${path.nodeTypes}/]]`,
   allViews: `${allSelector} +${filter.views}`,
-  allViewsByLabel: `${s.allViews} +[removeprefix[${path.views}/]]`,
   allPotentialNodes: '[all[tiddlers]!is[system]!has[draft.of]]',
+};
+
+export const selector = {
+  ...s,
+  allEdgeTypesById: `${s.allEdgeTypes} +[removeprefix[${path.edgeTypes}/]]`,
+  allNodeTypesById: `${s.allNodeTypes} +[removeprefix[${path.nodeTypes}/]]`,
+  allViewsByLabel: `${s.allViews} +[removeprefix[${path.views}/]]`,
 };

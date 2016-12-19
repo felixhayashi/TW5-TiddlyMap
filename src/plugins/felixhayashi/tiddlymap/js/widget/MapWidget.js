@@ -549,7 +549,7 @@ class MapWidget extends Widget {
     let rebuildGraphOptions = {};
 
     // check for callback changes
-    this.callbackManager.handleChanges(changedTiddlers);
+    this.callbackManager.refresh(changedTiddlers);
 
     if (this.isViewSwitched(changedTiddlers)
        || this.hasChangedAttributes()
@@ -672,7 +672,9 @@ class MapWidget extends Widget {
    */
   rebuildGraph({ resetFocus } = {}) {
 
-    if (utils.isPreviewed(this)) return;
+    if (utils.isPreviewed(this)) {
+      return;
+    }
 
     this.logger('debug', 'Rebuilding graph');
 
@@ -701,7 +703,7 @@ class MapWidget extends Widget {
       // see https://github.com/almende/vis/issues/939
       this.network.stabilize();
 
-      this.fitGraph(resetFocus.delay, resetFocus.duration);
+      this.resetFocus = resetFocus;
 
     }
 
@@ -744,7 +746,7 @@ class MapWidget extends Widget {
     // TODO: that's a performance killer. this should be loaded when
     // the search is actually used!
     // update: Careful when refactoring, some modules are using this…
-    utils.setField(`$:/temp/tmap/nodes/${this.view.getLabel()}`, 'list', $tm.adapter.getTiddlersById(graph.nodes));
+    utils.setField(`$:/temp/tmap/nodes/${this.view.getLabel()}`, 'list', $tm.adapter.getTiddlersByIds(graph.nodes));
 
     $tm.stop('Reloading Network');
 
@@ -1537,7 +1539,7 @@ class MapWidget extends Widget {
    */
   handleRemoveNodes(nodeIds) {
 
-    const tiddlers = $tm.adapter.getTiddlersById(nodeIds);
+    const tiddlers = $tm.adapter.getTiddlersByIds(nodeIds);
     const params = {
       'count': nodeIds.length.toString(),
       'tiddlers': $tw.utils.stringifyList(tiddlers),
@@ -1698,7 +1700,9 @@ class MapWidget extends Widget {
    */
   handleVisStabilizedEvent(properties) {
 
-    if (this.hasNetworkStabilized) return;
+    if (this.hasNetworkStabilized) {
+      return;
+    }
 
     this.hasNetworkStabilized = true;
     this.logger('log', 'Network stabilized after',
@@ -1729,17 +1733,19 @@ class MapWidget extends Widget {
 
     }
 
+    if (this.resetFocus) {
+      this.fitGraph(this.resetFocus.delay, this.resetFocus.duration);
+      this.resetFocus = null;
+    }
+
   }
 
   /**
    * Zooms on a specific node in the graph
-   *
-   * @param {Object} event - An object containing a `param` property
-   *     that holds a tiddler reference/title.
    */
-  handleFocusNode(event) {
+  handleFocusNode({ param: tRef }) {
 
-    this.network.focus($tm.adapter.getId(event.param), {
+    this.network.focus($tm.adapter.getId(tRef), {
       scale: 1.5,
       animation: true
     });
@@ -1843,7 +1849,7 @@ class MapWidget extends Widget {
    */
   handleEditNode(node) {
 
-    const tRef = $tm.indeces.tById[node.id];
+    const tRef = $tm.tracker.getTiddlerById(node.id);
     const tObj = utils.getTiddler(tRef);
     const globalDefaults = JSON.stringify($tm.config.vis);
     const localDefaults = this.view.getConfig('vis');
@@ -2160,7 +2166,7 @@ class MapWidget extends Widget {
 
     if (ev.node) { // node
 
-      const tRef = $tm.indeces.tById[id];
+      const tRef = $tm.tracker.getTiddlerById(id);
       const tObj = utils.getTiddler(tRef);
 
       const descr = tObj.fields[$tm.field.nodeInfo];
@@ -2304,7 +2310,7 @@ class MapWidget extends Widget {
    */
   openTiddlerWithId(id) {
 
-    const tRef = $tm.indeces.tById[id];
+    const tRef = $tm.tracker.getTiddlerById(id)
 
     this.logger('debug', 'Opening tiddler', tRef, 'with id', id);
 

@@ -13,8 +13,9 @@ module-type: startup
 
 import visConfig                  from '$:/plugins/felixhayashi/tiddlymap/js/config/vis';
 import utils                      from '$:/plugins/felixhayashi/tiddlymap/js/utils';
-import fixer                      from '$:/plugins/felixhayashi/tiddlymap/js/fixer';
+import Fixer                      from '$:/plugins/felixhayashi/tiddlymap/js/Fixer';
 import Adapter                    from '$:/plugins/felixhayashi/tiddlymap/js/Adapter';
+import Tracker                    from '$:/plugins/felixhayashi/tiddlymap/js/services/tracker';
 import EdgeTypeSubscriberRegistry from '$:/plugins/felixhayashi/tiddlymap/js/EdgeTypeSubscriberRegistry';
 import DialogManager              from '$:/plugins/felixhayashi/tiddlymap/js/DialogManager';
 import CallbackManager            from '$:/plugins/felixhayashi/tiddlymap/js/CallbackManager';
@@ -22,66 +23,46 @@ import ViewAbstraction            from '$:/plugins/felixhayashi/tiddlymap/js/Vie
 import EdgeType                   from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
 import NodeType                   from '$:/plugins/felixhayashi/tiddlymap/js/NodeType';
 import vis                        from '$:/plugins/felixhayashi/vis/vis.js';
-import * as environment           from '$:/plugins/felixhayashi/tiddlymap/js/lib/environment';
+import * as env                   from '$:/plugins/felixhayashi/tiddlymap/js/lib/environment';
 import URL                        from '$:/plugins/felixhayashi/tiddlymap/js/URL';
 
 /*** Code **********************************************************/
 
 /**
  * This module is responsible for registering a global namespace
- * under $tw and loading (and refreshing) the configuration.
+ * under $tw and loading (and refreshing) the configuration and services.
  *
  * Attention: Careful with the order of the function calls in this
  * functions body!
  *
  */
-function init() {
+const init = () => {
 
-  $tm = { ...environment };
-
-  // register utils
-  $tm.utils = utils;
-
-  // make classes publicly available
-  $tm.keycharm = vis.keycharm;
-  $tm.NodeType = NodeType;
-  $tm.EdgeType = EdgeType;
-  $tm.ViewAbstraction = ViewAbstraction;
-
-  // create namespace for services
-  $tm.services = {};
-
-  // register url
-  $tm.url = new URL(window.location.href);
-
-  // build and integrate global options
-  updateGlobals();
-
-  // register meta file (if not done yet)
-  createMetaFile();
+  window.$tm = { ...env, utils, url: new URL(window.location.href) };
 
   // cleanup previous session
   cleanup();
 
+  registerPublicClasses($tm);
+
+  // build and integrate global options
+  updateGlobals($tm);
+
+  // register meta file (if not done yet)
+  createMetaFile($tm.logger);
+
   // create indeces
-  attachIndeces($tm);
+  const indeces = attachIndeces($tm);
 
-  // inject modules
-  var handler = $tw.modules.applyMethods('tmap.edgetypehandler');
-  $tm.services.edgeTypeSubscriberRegistry = new EdgeTypeSubscriberRegistry(handler, $tm.indeces.allETy);
+  // create services
+  const services = getInitializedServices(indeces);
+  Object.assign($tm, services);
 
-  // set defaults
-  setDefaults();
-
-  // attach the adapter object to the tiddlymap namespace
-  $tm.adapter = new Adapter();
+  // load defaults
+  loadDefaultView($tm.config.sys.defaultView);
 
   // Run the fixer to update older wikis
-  fixer.fix();
-
-  // create global callback and dialog managers
-  $tm.callbackManager = new CallbackManager();
-  $tm.dialogManager = new DialogManager($tm.callbackManager);
+  services.fixer.fix();
 
   // all graphs need to register here. @see routineWalk()
   $tm.registry = [];
@@ -95,12 +76,64 @@ function init() {
   registerClickListener();
 
   // check for fullscreen directives
-  maybePrepareForFullscreenStart($tm.url);
+  if ($tm.url.query['tmap-enlarged']) {
+    prepareFullscreenStart($tm.url);
+  }
 
   // issue notification
   $tm.logger('warn', 'TiddlyMap\'s caretaker successfully started');
 
-}
+};
+
+/**
+ * Injects dependencies and registers services
+ *
+ * @param indeces
+ * @return Object
+ */
+const getInitializedServices = indeces => {
+
+  const tracker = new Tracker(fixer);
+
+  // inject modules
+  const handler = $tw.modules.applyMethods('tmap.edgetypehandler');
+  const edgeTypeSubscriberRegistry = new EdgeTypeSubscriberRegistry(
+    handler,
+    indeces.allETy,
+    tracker
+  );
+
+  // attach the adapter object to the tiddlymap namespace
+  const adapter = new Adapter(
+    tracker,
+    edgeTypeSubscriberRegistry
+  );
+
+  const callbackManager = new CallbackManager();
+  const dialogManager = new DialogManager(callbackManager);
+
+  const fixer = new Fixer(adapter, $tm.logger, indeces.glNTy)
+
+  return {
+    edgeTypeSubscriberRegistry,
+    tracker,
+    adapter,
+    callbackManager,
+    dialogManager,
+    fixer,
+  };
+
+};
+
+/**
+ * make classes available for console users
+ */
+const registerPublicClasses = (parent) => {
+  parent.keycharm = vis.keycharm;
+  parent.NodeType = NodeType;
+  parent.EdgeType = EdgeType;
+  parent.ViewAbstraction = ViewAbstraction;
+};
 
 /**
  * This function will append the global options to the tree. In case
@@ -129,12 +162,12 @@ var attachOptions = function(parent) {
   // attention! it is a tw-data-tiddler!
   p.config.sys = utils.merge(
     p.config.sys,
-    utils.unflatten($tw.wiki.getTiddlerData(p.ref.sysUserConf))
+    utils.unflatten($tw.wiki.getTiddlerData(env.ref.sysUserConf))
   );
 
   // CAREFUL: Never merge directly into the default vis config object
   p.config.vis = utils.merge(
-    {}, visConfig, utils.parseFieldData(p.ref.visUserConf)
+    {}, visConfig, utils.parseFieldData(env.ref.visUserConf)
   );
 
   // a shortcut for fields property
@@ -147,71 +180,18 @@ var attachOptions = function(parent) {
  * This function will cache/index some tiddler properties as javascript
  * objects for faster access.
  */
-var attachIndeces = function(parent) {
+const attachIndeces = (parent) => {
 
   $tm.start('Attaching Indeces');
 
-  if (!parent.indeces) {
-    parent.indeces = {};
+  parent.indeces = parent.indeces || {};
 
-    var r = $tm.path.pluginRoot;
-    parent.indeces.tmapTiddlers = $tw.wiki.getPluginInfo(r).tiddlers;
-  }
-
-  var allTiddlers = $tw.wiki.allTitles();
-
-  updateTiddlerVsIdIndeces(parent.indeces, allTiddlers);
   updateNodeTypesIndeces(parent.indeces);
   updateEdgeTypesIndeces(parent.indeces);
 
   $tm.stop('Attaching Indeces');
 
-};
-
-/**
- * TiddlyMap uses ids to reference tiddlers. This function creates
- * a table that maps ids to tRefs and vice versa.
- *
- * Two indeces are added to the indeces chain:
- * 1. tById – tiddler references by id
- * 2. idByT – ids by tiddler references
- *
- * @param {Object} [parent] - The global indeces object indeces.
- *     If not stated, $tm.indeces is used.
- * @param {Array<TiddlerReference>} [allTiddlers] - The tiddlers to
- *     use as basis for this index. If not stated, all tiddlers in
- *     the wiki are used.
- */
-var updateTiddlerVsIdIndeces = function(parent, allTiddlers) {
-
-  parent = parent || $tm.indeces;
-
-  // usually the fixer is not to be called at this point but
-  // since the fixer relies on the adapter and the adapter
-  // relies on indeces but the indeces must not be build before
-  // the fixer had a chance to move ids, we have to call the fixer
-  // function at this place :(
-  // @TODO: remove this fixer code in 2016/2017 when it is highly
-  // unlikely that people are still using an older version
-  fixer.fixId();
-
-  var tById = parent.tById = {}; // tiddlerById
-  var idByT = parent.idByT = {}; // idByTiddler
-
-  $tw.wiki.each(function(tObj, tRef) {
-
-    if (utils.isSystemOrDraft(tObj)) return;
-
-    var id = tObj.fields['tmap.id'];
-    if (!id) {
-      id = utils.genUUID();
-      utils.setField(tObj, 'tmap.id', id);
-    }
-
-    tById[id] = tRef; // tiddlerById
-    idByT[tRef] = id; // idByTiddler
-
-  });
+  return parent.indeces;
 
 };
 
@@ -272,8 +252,8 @@ var updateEdgeTypesIndeces = function(parent) {
 
   });
 
-  if ($tm.services.edgeTypeSubscriberRegistry) {
-    $tm.services.edgeTypeSubscriberRegistry.updateIndex(allETy);
+  if ($tm.edgeTypeSubscriberRegistry) {
+    $tm.edgeTypeSubscriberRegistry.updateIndex(allETy);
   }
 
 };
@@ -334,9 +314,7 @@ var attachFunctions = function(parent) {
 
   }
 
-  fn.notify = (utils.isTrue($tm.config.sys.notifications)
-               ? utils.notify
-               : nirvana);
+  fn.notify = (utils.isTrue($tm.config.sys.notifications) ? utils.notify : nirvana);
 
 };
 
@@ -366,40 +344,42 @@ var routineCheck = function() {
 };
 
 /**
- * A more advanced change system.
+ * Every widget that has registered itself in the registry
+ * will receive the `updates` object. The `updates` object is a more
+ * advanced
  *
- * @todo The MapConfigWidget does register itself in the registry to
- * have its destructor called. Is this ok?
+ * @param {Updates} updates
  */
-var dispatchUpdates = function(updates) {
+const dispatchUpdates = updates => {
 
-  var registry = $tm.registry;
-  for (var i = registry.length; i--;) {
-    var widget = registry[i];
+  const registry = $tm.registry;
+  for (let i = registry.length; i--;) {
 
-    if (!widget.destruct || !widget.isZombieWidget) return; // no duck!
+    const widget = registry[i];
 
-    if (widget.update && !widget.isZombieWidget()) {
+    if (widget.update && (widget.isZombieWidget && !widget.isZombieWidget())) {
       widget.update(updates);
     }
   }
 
 };
 
-var checkForDublicates = function(tObj) {
+const checkForDublicates = tObj => {
 
-  var id = tObj.fields['tmap.id'];
+  const id = $tm.tracker.getIdByTiddler(tObj);
 
-  if (!id) return;
+  if (!id) {
+    return;
+  }
 
-  var dublicates = utils.getTiddlersWithField('tmap.id', id, { limit: 2 });
+  const dublicates = utils.getTiddlersWithField('tmap.id', id, { limit: 2 });
   delete dublicates[tObj.fields.title];
 
-  var dublicate = Object.keys(dublicates)[0];
+  const dublicate = Object.keys(dublicates)[0];
 
   if (dublicate) {
 
-    var vars = {
+    const args = {
       param: {
         changedTiddler: tObj.fields.title,
         existingTiddler: dublicate,
@@ -407,15 +387,12 @@ var checkForDublicates = function(tObj) {
       }
     };
 
-    $tm.dialogManager.open('dublicateIdInfo', vars);
+    $tm.dialogManager.open('dublicateIdInfo', args);
 
-  }
-
-  if (dublicate) {
     // remove any defined edges
     utils.setField(tObj, 'tmap.edges', undefined);
     // override id
-    $tm.adapter.assignId(tObj, true);
+    $tm.tracker.assignId(tObj, true);
   }
 
 };
@@ -423,7 +400,7 @@ var checkForDublicates = function(tObj) {
 /**
  * Builds and registers globals and the functions that depend on them.
  */
-var updateGlobals = function(parent) {
+const updateGlobals = parent => {
 
   attachOptions($tm);
   attachFunctions($tm);
@@ -506,38 +483,34 @@ var registerClickListener = function() {
   }, false);
 };
 
-var registerChangeListener = function(callbackManager) {
+/**
+ * Registers a change listener that will dispatch
+ * @param callbackManager
+ */
+const registerChangeListener = callbackManager => {
 
-  var loopCount = 0;
-  var rebuilders = {};
-  rebuilders[$tm.path.options] = updateGlobals;
-  rebuilders[$tm.path.nodeTypes] = updateNodeTypesIndeces;
-  rebuilders[$tm.path.edgeTypes] = updateEdgeTypesIndeces;
+  let loopCount = 0;
 
-  $tw.wiki.addEventListener('change', function(changedTiddlers) {
+  $tw.wiki.addEventListener('change', changedTiddlers => {
 
     $tm.start('Caretaker handling changes');
 
     printChanges(changedTiddlers, loopCount++);
-    callbackManager.handleChanges(changedTiddlers);
+    callbackManager.refresh(changedTiddlers);
 
-    var updates = { changedTiddlers: changedTiddlers };
+    const updates = { changedTiddlers: {} };
 
-    for (var tRef in changedTiddlers) {
+    for (let tRef in changedTiddlers) {
 
+      const tObj = utils.getTiddler(tRef);
 
-      var tObj = utils.getTiddler(tRef);
-      if (tObj && tObj.isDraft()) continue;
-
-
-      if ($tw.wiki.isSystemTiddler(tRef)) {
-
-        handleSysTidChanges(tRef, tObj, updates, rebuilders);
-      } else {
-
-        handleTidChanges(tRef, tObj, updates);
+      if (tObj && tObj.isDraft()) {
+        continue;
       }
 
+      updates.changedTiddlers[tRef] = changedTiddlers[tRef];
+
+      handleTiddlerChange(tRef, tObj, updates);
     }
 
     dispatchUpdates(updates);
@@ -551,45 +524,58 @@ var registerChangeListener = function(callbackManager) {
 
 };
 
-var handleSysTidChanges = function(tRef, tObj, updates, rebuilders) {
-
-  for (var prefix in rebuilders) {
-
-    if (utils.startsWith(tRef, prefix) && !updates[prefix]) {
-
-      $tm.logger('warn', '[System change]', prefix);
-
-      rebuilders[prefix]();
-
-      updates[prefix] = true;
-      return;
-    }
-  }
-
+/**
+ * Mapping of paths and callbacks that should be invoked if tiddlers
+ * within theses paths change.
+ */
+const rebuilders = {
+  [env.path.options]: updateGlobals,
+  [env.path.nodeTypes]: updateNodeTypesIndeces,
+  [env.path.edgeTypes]: updateEdgeTypesIndeces,
 };
 
-var handleTidChanges = function(tRef, tObj, updates) {
+/**
+ * This function will deal with tiddler changes and will log changes
+ * to the provided `updates` object.
+ *
+ * @param {TiddlerReference} tRef
+ * @param {$tw.Tiddler} tObj
+ * @param {Updates} updates
+ */
+const handleTiddlerChange = (tRef, tObj, updates) => {
 
-  if (tObj) { // created or modified
+  if ($tw.wiki.isSystemTiddler(tRef)) {
+
+    for (let path in rebuilders) {
+      if (utils.startsWith(tRef, path) && !updates[path]) {
+        $tm.logger('warn', '[System change]', path);
+        rebuilders[path]();
+        updates[path] = true;
+        return;
+      }
+    }
+
+  } else if (tObj) { // created or modified
 
     checkForDublicates(tObj);
 
     // call assignId IN ANY CASE to make sure the index
     // stays intact, also after a renaming operation
-    $tm.adapter.assignId(tObj);
+    $tm.tracker.assignId(tObj);
 
   } else { // deleted or renamed
 
-    var id = $tm.indeces.idByT[tRef];
+    const id = $tm.tracker.getIdByTiddler(tRef);
 
-    // Ignore tiddler without id; assuming draft
-    if (!id) return;
+    if (!id) { // ignore tiddler without id
+      return;
+    }
 
-    var tWithId = utils.getTiddlerWithField('tmap.id', id);
+    const tRefWithId = utils.getTiddlerWithField('tmap.id', id);
 
-    if (tWithId) { // only renamed
+    if (tRefWithId) { // only renamed
 
-      $tm.logger('warn', '[Renamed]', tRef, 'into', tWithId);
+      $tm.logger('warn', '[Renamed]', tRef, 'into', tRefWithId);
 
     } else { // removed
 
@@ -598,11 +584,14 @@ var handleTidChanges = function(tRef, tObj, updates) {
       $tm.adapter.deleteNode(id);
 
     }
-
   }
+
 };
 
-var cleanup = function() {
+/**
+ * Remove temp files from previous session.
+ */
+const cleanup = () => {
 
   utils.deleteByPrefix('$:/temp/felixhayashi');
   utils.deleteByPrefix('$:/temp/tiddlymap');
@@ -610,39 +599,50 @@ var cleanup = function() {
 
 };
 
-var setDefaults = function() {
+/**
+ * Register the view that should be displayed at startup.
+ */
+const loadDefaultView = defaultView => {
 
-  var defaultView = $tm.config.sys.defaultView;
-  if (!defaultView) return;
-
-  utils.setField($tm.ref.defaultViewHolder, 'text', defaultView);
-
-};
-
-var maybePrepareForFullscreenStart = function(url) {
-
-  if (!url.query['tmap-enlarged']) return;
-
-  var ref = $tm.ref;
-  var tRef = utils.getTiddlersByPrefix('$:/state/tab/sidebar-')[0];
-
-  utils.setText(tRef, ref.mainEditor);
-
-  var view = new ViewAbstraction(url.query['tmap-view']);
-  if (view.exists()) {
-    utils.setField(ref.defaultViewHolder, 'text', view.getLabel());
+  if (defaultView) {
+    utils.setText(env.ref.defaultViewHolder, $tm.config.sys.defaultView);
   }
 
 };
 
-var createMetaFile = function() {
+/**
+ * Init the wiki so we can start the main editor with the specified
+ * view in fullscreen mode.
+ *
+ * @param {ViewAbstraction|string} view
+ */
+const prepareFullscreenStart = view => {
 
-  if (utils.tiddlerExists($tm.ref.sysMeta)) return;
+  const { mainEditor, defaultViewHolder } = env.ref;
 
-  $tm.logger('warn', 'Creating meta file');
+  utils.setSidebarTab(mainEditor);
 
-  var plugin = $tw.wiki.getTiddler($tm.path.pluginRoot);
-  $tw.wiki.setTiddlerData($tm.ref.sysMeta, {
+  view = new ViewAbstraction(view);
+  if (view.exists()) {
+    utils.setField(defaultViewHolder, 'text', view.getLabel());
+  }
+
+};
+
+/**
+ * The meta file keeps track of installation data.
+ */
+const createMetaFile = (logger) => {
+
+  if (utils.tiddlerExists(env.ref.sysMeta)) {
+    return;
+  }
+
+  logger('warn', 'Creating meta file');
+
+  const plugin = $tw.wiki.getTiddler(env.path.pluginRoot);
+
+  $tw.wiki.setTiddlerData(env.ref.sysMeta, {
     // the version originally installed
     originalVersion: plugin.fields.version,
     // the data structure in use corresponds to version x
@@ -659,7 +659,7 @@ var createMetaFile = function() {
 
 export const name = 'tmap.caretaker';
 export const platforms = [ 'browser' ];
-export const after = [ 'startup', 'tmap.environment' ];
+export const after = [ 'startup' ];
 export const before = [ 'rootwidget' ];
 export const synchronous = true;
 export const startup = init;

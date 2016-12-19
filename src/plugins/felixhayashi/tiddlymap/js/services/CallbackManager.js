@@ -12,7 +12,7 @@ module-type: library
 import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 
 /**
- * @constructor
+ * Makes it possible to register callbacks for tiddler changes.
  */
 class CallbackManager {
 
@@ -34,12 +34,12 @@ class CallbackManager {
    * @param {boolean} [isDeleteOnCall=true] - True if to delete the
    *     callback once it has been called, false otherwise.
    */
-  add(tRef, callback, isDeleteOnCall) {
+  add(tRef, callback, isDeleteOnCall = true) {
 
     this.logger('debug', `A callback was registered for changes of "${tRef}"`);
     this.callbacks[tRef] = {
       execute: callback,
-      isDeleteOnCall: (typeof isDeleteOnCall === 'boolean' ? isDeleteOnCall : true)
+      isDeleteOnCall
     };
 
   };
@@ -60,7 +60,7 @@ class CallbackManager {
     for (let i = refOrRefList.length; i--;) {
       const tRef = refOrRefList[i];
       if (this.callbacks[tRef]) {
-        this.logger('debug', `A callback for "${tRef}" will be deleted`);
+        this.logger('debug', `Deleting callback for "${tRef}"`);
         delete this.callbacks[tRef];
       }
     }
@@ -74,9 +74,11 @@ class CallbackManager {
    * registration of the callback, the callback will be deleted
    * automatically.
    */
-  handleChanges(changedTiddlers) {
+  refresh(changedTiddlers) {
 
-    if (this.callbacks.length == 0) return;
+    if (this.callbacks.length == 0) {
+      return;
+    }
 
     for (let tRef in changedTiddlers) {
 

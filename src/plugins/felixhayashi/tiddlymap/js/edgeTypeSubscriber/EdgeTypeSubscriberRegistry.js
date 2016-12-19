@@ -18,10 +18,13 @@ class EdgeTypeSubscriberRegistry {
   /**
    * @param {AbstractEdgeTypeSubscriber[]} subscribers
    * @param {EdgeType[]} allEdgeTypes
+   * @param {Tracker} tracker
    */
-  constructor(subscribers, allEdgeTypes) {
+  constructor(subscribers, allEdgeTypes, tracker) {
 
     this.subscriberClasses = subscribers;
+    this.tracker = tracker;
+
     this.updateIndex(allEdgeTypes);
 
   }
@@ -82,6 +85,7 @@ class EdgeTypeSubscriberRegistry {
     for (let moduleName in subscriberClass) {
 
       const subscriber = new (subscriberClass[moduleName])(allEdgeTypes);
+      subscriber.setTracker(this.tracker);
 
       // ignore all subscribers that have their ignore flag set to false
       if (subscriber.ignore === true) {

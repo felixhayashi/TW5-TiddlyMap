@@ -34,18 +34,20 @@ class TmapEdgeTypeSubscriber extends AbstractEdgeTypeSubscriber {
    */
   loadEdges(tObj, toWL, typeWL) {
 
-    var connections = utils.parseFieldData(tObj, 'tmap.edges');
-    if (!connections) return;
+    const connections = utils.parseFieldData(tObj, 'tmap.edges');
+    if (!connections) {
+      return;
+    }
 
-    var tById = $tm.indeces.tById;
-    var fromId = tObj.fields['tmap.id'];
+    const tById = this.tracker.getTiddlersByIds();
+    const fromId = tObj.fields['tmap.id'];
 
-    var edges = utils.makeHashMap();
+    const edges = utils.makeHashMap();
 
-    for (var conId in connections) {
+    for (let conId in connections) {
 
-      var con = connections[conId];
-      var toTRef = tById[con.to];
+      const con = connections[conId];
+      const toTRef = tById[con.to];
       if (toTRef && (!toWL || toWL[toTRef]) && (!typeWL || typeWL[con.type])) {
 
         edges[conId] = new Edge(fromId, con.to, con.type, conId);

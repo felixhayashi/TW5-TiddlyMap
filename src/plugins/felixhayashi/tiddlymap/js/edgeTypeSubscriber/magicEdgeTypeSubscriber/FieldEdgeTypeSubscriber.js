@@ -64,7 +64,7 @@ class FieldEdgeTypeSubscriber extends AbstractMagicEdgeTypeSubscriber {
    */
   insertEdge(tObj, edge, type) {
 
-    var toTRef = $tm.indeces.tById[edge.to];
+    const toTRef = this.tracker.getTiddlerById(edge.to);
     if (toTRef == null) { // null or undefined
       return;
     }
@@ -81,8 +81,11 @@ class FieldEdgeTypeSubscriber extends AbstractMagicEdgeTypeSubscriber {
    */
   deleteEdge(tObj, edge, type) {
 
-    var toTRef = $tm.indeces.tById[edge.to];
-    if (toTRef == null) return; // null or undefined
+    const toTRef = this.tracker.getTiddlerById(edge.to);
+
+    if (toTRef == null) { // null or undefined
+      return;
+    }
 
     // only use the name without the private marker or the namespace
     utils.setField(tObj, type.name, '');

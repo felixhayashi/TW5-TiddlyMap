@@ -31,34 +31,37 @@ class AbstractRefEdgeTypeSubscriber extends AbstractEdgeTypeSubscriber {
   loadEdges(tObj, toWL, typeWL) {
 
     // references to other tiddlers grouped by their edge type
-    var refsByType = this.getReferences(tObj, toWL, typeWL);
+    const refsByType = this.getReferences(tObj, toWL, typeWL);
 
     if (!refsByType || !utils.hasElements(refsByType)) return;
 
-    var fromId = tObj.fields['tmap.id'];
-    var idByT = $tm.indeces.idByT;
-    var allETy = this.allEdgeTypes;
-    var fromTRef = utils.getTiddlerRef(tObj);
+    const fromId = tObj.fields['tmap.id'];
+    const idByT = $tm.tracker.getIdsByTiddlers();
+    const allETy = this.allEdgeTypes;
+    const fromTRef = utils.getTiddlerRef(tObj);
 
-    var edges = utils.makeHashMap();
+    const edges = utils.makeHashMap();
 
-    for (var typeId in refsByType) {
+    for (let typeId in refsByType) {
 
-      var toRefs = refsByType[typeId];
+      const toRefs = refsByType[typeId];
 
-      if (!toRefs) continue;
+      if (!toRefs) {
+        continue;
+      }
 
-
-      var type = allETy[typeId];
-      for (var i = toRefs.length; i--;) {
-        var toTRef = toRefs[i];
+      const type = allETy[typeId];
+      for (let i = toRefs.length; i--;) {
+        const toTRef = toRefs[i];
 
         if (!toTRef
           || !$tw.wiki.tiddlerExists(toTRef)
           || utils.isSystemOrDraft(toTRef)
-          || (toWL && !toWL[toTRef])) continue;
+          || (toWL && !toWL[toTRef])) {
+          continue;
+        }
 
-        var id = type.id + $tw.utils.hashString(fromTRef + toTRef);
+        const id = type.id + $tw.utils.hashString(fromTRef + toTRef);
         edges[id] = new Edge(fromId, idByT[toTRef], type.id, id);
       }
     }

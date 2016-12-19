@@ -400,7 +400,7 @@ ViewAbstraction.prototype.isEnabled = function(name) {
  * @result {string|Object} If `type` is not specified an object containing
  *     all configurations is returned, otherwise a single value will be returned.
  */
-ViewAbstraction.prototype.getConfig = function(name, isRebuild, defValue) {
+ViewAbstraction.prototype.getConfig = function(name, isRebuild) {
 
   if (!isRebuild && this.config) {
 
@@ -414,9 +414,7 @@ ViewAbstraction.prototype.getConfig = function(name, isRebuild, defValue) {
   }
 
   // TODO use regex to add "config."
-  return (name
-          ? config[(utils.startsWith(name, 'config.') ? name : 'config.' + name)]
-          : config);
+  return (name ? config[(utils.startsWith(name, 'config.') ? name : 'config.' + name)] : config);
 
 };
 
@@ -440,7 +438,7 @@ ViewAbstraction.prototype.getHierarchyEdgeTypes = function() {
 
     if (orderByEdges[id] === 'true') {
 
-      var tObj = utils.getTiddler($tm.indeces.tById[id]);
+      var tObj = utils.getTiddler($tm.tracker.getTiddlerById(id));
       if (tObj) {
         labels[utils.getBasename(tObj.fields.title)] = true;
       }

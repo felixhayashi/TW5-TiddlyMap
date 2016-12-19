@@ -41,6 +41,14 @@ class AbstractEdgeTypeSubscriber {
   }
 
   /**
+   * DI
+   * @param {Tracker} tracker
+   */
+  setTracker(tracker) {
+    this.tracker = tracker;
+  }
+
+  /**
    * Returns all edges stored in the specified tiddler.
    *
    * @interface

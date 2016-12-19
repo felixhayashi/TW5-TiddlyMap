@@ -64,19 +64,21 @@ class ListEdgeTypeSubscriber extends AbstractMagicEdgeTypeSubscriber {
    */
   insertEdge(tObj, edge, type) {
 
-    if (!edge.to) return;
+    if (!edge.to) {
+      return;
+    }
 
     // get the name without the private marker or the namespace
-    var name = type.name;
+    const name = type.name;
 
-    var list = $tw.utils.parseStringArray(tObj.fields[name]);
+    let list = $tw.utils.parseStringArray(tObj.fields[name]);
     // we need to clone the array since tiddlywiki might directly
     // returned the auto-parsed field value (as in case of tags, or list)
     // and this array would be read only!
     list = (list || []).slice();
 
     // transform
-    var toTRef = $tm.indeces.tById[edge.to];
+    const toTRef = this.tracker.getTiddlerById(edge.to);
 
     list.push(toTRef);
 
@@ -92,16 +94,16 @@ class ListEdgeTypeSubscriber extends AbstractMagicEdgeTypeSubscriber {
    */
   deleteEdge(tObj, edge, type) {
 
-    var list = $tw.utils.parseStringArray(tObj.fields[type.name]);
+    let list = $tw.utils.parseStringArray(tObj.fields[type.name]);
     // we need to clone the array since tiddlywiki might directly
     // returned the auto-parsed field value (as in case of tags, or list)
     // and this array would be read only!
     list = (list || []).slice();
 
     // transform
-    var toTRef = $tm.indeces.tById[edge.to];
+    const toTRef = this.tracker.getTiddlerById(edge.to);
 
-    var index = list.indexOf(toTRef);
+    const index = list.indexOf(toTRef);
     if (index > -1) {
       list.splice(index, 1);
     }

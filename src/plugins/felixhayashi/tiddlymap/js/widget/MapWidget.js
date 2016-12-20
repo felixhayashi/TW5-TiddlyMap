@@ -19,6 +19,7 @@ import Popup                from '$:/plugins/felixhayashi/tiddlymap/js/Popup';
 import vis                  from '$:/plugins/felixhayashi/vis/vis.js';
 import { widget as Widget } from '$:/core/modules/widgets/widget.js';
 import utils                from '$:/plugins/felixhayashi/tiddlymap/js/utils';
+import SelectionRectangle   from '$:/plugins/felixhayashi/tiddlymap/js/lib/SelectionRectangle';
 
 /*** Code **********************************************************/
 
@@ -45,6 +46,7 @@ class MapWidget extends Widget {
       'handleCanvasKeyup',
       'handleCanvasKeydown',
       'handleCanvasScroll',
+      'handleCanvasMouseMove',
       'handleWidgetKeyup',
       'handleWidgetKeydown',
       'handleTriggeredRefresh',
@@ -100,25 +102,27 @@ class MapWidget extends Widget {
       'blurNode': this.handleVisBlurElement,
       'blurEdge': this.handleVisBlurElement,
       'beforeDrawing': this.handleVisBeforeDrawing,
+      'afterDrawing': this.handleVisAfterDrawing,
       'stabilizationProgress': this.handleVisLoading,
       'stabilizationIterationsDone': this.handleVisLoadingDone
     };
 
     this.windowDomListeners = {
       'resize': [ this.handleResizeEvent, false ],
-      'click': [ this.handleClickEvent, false ]
+      'click': [ this.handleClickEvent, false ],
+      'mousemove': [ this.handleCanvasMouseMove, true ],
     };
 
     this.canvasDomListeners = {
       'keyup': [ this.handleCanvasKeyup, true ],
       'keydown': [ this.handleCanvasKeydown, true ],
       'mousewheel': [ this.handleCanvasScroll, true ],
-      'contextmenu': [ this.handleContextMenu, true ]
+      'contextmenu': [ this.handleContextMenu, true ],
     };
 
     this.widgetDomListeners = {
       'keyup': [ this.handleWidgetKeyup, true ],
-      'keydown': [ this.handleWidgetKeydown, true ]
+      'keydown': [ this.handleWidgetKeydown, true ],
     };
 
     this.conVector = { from: null, to: null };
@@ -837,7 +841,9 @@ class MapWidget extends Widget {
   initAndRenderGraph(parent) {
 
     // make sure to destroy any previous instance
-    if (this.network) this._destructVis();
+    if (this.network) {
+      this._destructVis();
+    }
 
     this.logger('info', 'Initializing and rendering the graph');
 
@@ -890,6 +896,8 @@ class MapWidget extends Widget {
 
     const nodeIds = this.network.getSelectedNodes();
 
+    // this.isCtrlKeyDown = ev.ctrlKey;
+
     if (ev.ctrlKey) { // ctrl key is hold down
       ev.preventDefault();
 
@@ -927,13 +935,25 @@ class MapWidget extends Widget {
 
       }
 
-    } else if (ev.keyCode === 13) { // ENTER
+    } else { // ctrl is not pressed
 
-      if (nodeIds.length !== 1) return;
+      if (ev.keyCode === 13) { // ENTER
 
-      this.openTiddlerWithId(nodeIds[0]);
+        if (nodeIds.length !== 1) return;
 
+        this.openTiddlerWithId(nodeIds[0]);
+
+      }
     }
+  }
+
+  handleCanvasKeydown(ev) {
+
+    if (ev.keyCode === 46) { // delete
+      ev.preventDefault();
+      this.handleRemoveElements(this.network.getSelection());
+    }
+
   }
 
   handleDeleteElement(ev) {
@@ -945,12 +965,61 @@ class MapWidget extends Widget {
 
   }
 
-  handleCanvasKeydown(ev) {
+  /**
+   *
+   * @param ev
+   */
+  handleCanvasMouseMove(ev) {
 
-    if (ev.keyCode === 46) { // delete
-      ev.preventDefault();
-      this.handleRemoveElements(this.network.getSelection());
+    const { network } = this;
+
+    if (!(ev.ctrlKey && ev.buttons)) {
+
+      if (this.selectRect) {
+        this.selectRect = null;
+        const selectedNodes = network.getSelectedNodes();
+        $tm.notify(`${selectedNodes.length} nodes selected`);
+        network.redraw();
+      }
+
+      return;
+
     }
+
+    // prevent vis' network drag if ctrl key and mouse button is pressed
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    if (!this.domNode.contains(ev.target)) {
+      // since we are using a global mouse listener, we need to check whether
+      // we are actually inside our widget, so we stop updating the selectRect
+      return;
+    }
+
+    const mouse = network.DOMtoCanvas({ x: ev.offsetX, y: ev.offsetY });
+
+    if (!this.selectRect) {
+      this.selectRect = new SelectionRectangle(mouse.x, mouse.y);
+    }
+
+    // register new coordinates
+    this.selectRect.span(mouse.x, mouse.y);
+    // retrieve current mouse positions
+    const nodePositions = network.getPositions();
+    // we include previously selected nodes in the new set
+    const selectedNodes = network.getSelectedNodes();
+
+    for (let id in nodePositions) {
+
+      if (this.selectRect.isPointWithin(nodePositions[id]) && !utils.inArray(id, selectedNodes)) {
+        selectedNodes.push(id);
+      }
+    }
+
+    network.selectNodes(selectedNodes);
+    this.assignActiveStyle(selectedNodes);
+
+    network.redraw();
 
   }
 
@@ -969,7 +1038,7 @@ class MapWidget extends Widget {
       ev.stopPropagation();
 
       this.visOptions.interaction.zoomView = zoomView;
-      this.network.setOptions({ interaction: { zoomView: zoomView }});
+      this.network.setOptions({ interaction: { zoomView }});
 
       return false;
     }
@@ -984,18 +1053,20 @@ class MapWidget extends Widget {
 
     ev.preventDefault();
 
+    const { network } = this;
+
     this.tooltip.hide(0, true);
 
-    const nodeId = this.network.getNodeAt({ x: ev.offsetX, y: ev.offsetY });
+    const nodeId = network.getNodeAt({ x: ev.offsetX, y: ev.offsetY });
     if (!nodeId) return;
 
     // ids of selected nodes
-    let selectedNodes = this.network.getSelectedNodes();
+    let selectedNodes = network.getSelectedNodes();
 
     if (!utils.inArray(nodeId, selectedNodes)) {
       // unselect other nodes and select this one instead…
       selectedNodes = [ nodeId ];
-      this.network.selectNodes(selectedNodes);
+      network.selectNodes(selectedNodes);
     }
 
     this.contextMenu.show(selectedNodes, (selectedNodes, div) => {
@@ -1113,14 +1184,6 @@ class MapWidget extends Widget {
         this.view.removeNode(nodeIds[i]);
       }
     }
-
-  }
-
-  isMobileMode() {
-
-    const breakpoint = utils.getText($tm.ref.sidebarBreakpoint, 960);
-
-    return (window.innerWidth <= parseInt(breakpoint));
 
   }
 
@@ -2135,7 +2198,9 @@ class MapWidget extends Widget {
    */
   handleVisDragEnd({ nodes }) {
 
-    if (!nodes.length) return;
+    if (!nodes.length) {
+      return;
+    }
 
     // fix node again and store positions
     // if in static mode, fixing will be ignored
@@ -2148,6 +2213,26 @@ class MapWidget extends Widget {
     if (this.backgroundImage) {
       //utils.drawRaster(context2d, this.network.getScale(), this.network.getViewPosition());
       context2d.drawImage(this.backgroundImage, 0, 0);
+    }
+
+  }
+
+  handleVisAfterDrawing(context2d) {
+
+    if (this.selectRect) {
+
+      const rect = this.selectRect.getRect();
+
+      // fill
+      context2d.globalAlpha = 0.5;
+      context2d.fillStyle = '#EAFFEF';
+      context2d.fillRect(...rect);
+
+      // stroke
+      context2d.globalAlpha = 1;
+      context2d.strokeStyle = '#B4D9BD';
+      context2d.strokeRect(...rect);
+
     }
 
   }
@@ -2233,8 +2318,6 @@ class MapWidget extends Widget {
 
   handleVisBlurElement(ev) {
 
-    //~ console.log('vis blur fired');
-    //~ this.graphDomNode.style.cursor = 'auto';
     this.tooltip.hide();
 
   }
@@ -2268,9 +2351,11 @@ class MapWidget extends Widget {
   handleVisDragStart({ nodes }) {
 
     if (nodes.length) {
+
       this.hidePopups(0, true);
       this.assignActiveStyle(nodes);
       this.setNodesMoveable(nodes, true);
+
     }
 
   }
@@ -2508,12 +2593,14 @@ class MapWidget extends Widget {
 
     const img = new Image();
     const ajaxCallback = function(b64) { img.src = b64; };
-    img.onload = function() {
+    img.onload = () => {
       // only now set the backgroundImage to the img object!
       this.backgroundImage = img;
       this.repaintGraph();
-      if (msg) { $tm.notify(msg); }
-    }.bind(this);
+      if (msg) {
+        $tm.notify(msg);
+      }
+    };
 
     if (imgTObj) { // try loading from tiddler
       const urlField = imgTObj.fields['_canonical_uri'];

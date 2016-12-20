@@ -96,8 +96,8 @@ const handleSuppressDialog = ({paramObject}) => {
  */
 const handleDownloadGraph = ({paramObject}) => {
 
-  const {view} = paramObject;
-  const graph = $tm.adapter.getGraph({view});
+  const { view } = paramObject;
+  const graph = $tm.adapter.getGraph({ view });
 
   graph.nodes = utils.convert(graph.nodes, 'array');
   graph.edges = utils.convert(graph.edges, 'array');
@@ -110,7 +110,7 @@ const handleDownloadGraph = ({paramObject}) => {
     type: 'tm-download-file',
     param: tRef,
     paramObject: {
-      filename: view + '.json'
+      filename: `${view}.json`
     }
   });
 };

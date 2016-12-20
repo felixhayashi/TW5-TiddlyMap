@@ -16,14 +16,14 @@ classes: tmap-modal-add-node
         keep="draft.title"
         title=<<output>> />
   </$button>
-  
+
   <$list filter="[<output>get[draft.title]is[tiddler]]">
   <div class="tmap-flash-message tmap-warning">
    Tiddler already exists! Use another title or click
    "<<backButtonText>>" to cancel your edit.
   </div>
   </$list>
-  
+
   <div class="tmap-modal-editor">
     <table class="tmap-config-table">
       <tr class="tmap-template-select">
@@ -35,7 +35,7 @@ classes: tmap-modal-add-node
             <option value=""></option>
             <$list filter=<<tmap "option" "selector.allPotentialNodes">>>
             <option><$view field="title" /></option>
-            </$list> 
+            </$list>
           </$select>
           <$button>Load
             <$action-sendmessage
@@ -74,7 +74,10 @@ classes: tmap-modal-add-node
           focus="true"
           type="text"
           tag="input"
-          default="" />
+          default=""
+          class="tmap-trigger-field
+                 tmap-triggers-ok-button-on-enter
+                 tmap-triggers-cancel-button-on-esc" />
       <$list filter="[<output>get[draft.title]!is[tiddler]]">
       <$button
           tooltip="The tiddler does not exist yet and you may edit it

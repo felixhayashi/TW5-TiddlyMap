@@ -2,9 +2,17 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
 
 \define concat(str) $str$
 
-\define input-text(field, index, default, readonly)
+\define input-text(field, index, default, readonly, class, focus)
   <$reveal type="match" text="" default="$readonly$">
-    <$edit-text tiddler=<<output>> field="$field$" index="$index$" type="text" tag="input" default="$default$" />
+    <$edit-text
+        tiddler=<<output>>
+        field="$field$"
+        index="$index$"
+        type="text"
+        tag="input"
+        default="$default$"
+        focus="$focus$"
+        class="$class$" />
   </$reveal>
   <$reveal type="nomatch" text="" default="$readonly$">
     <input type="text" value="$default$" readonly="true" disabled="true" />
@@ -19,8 +27,17 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
   </div>
 \end
 
-\define input-textarea(field, index, default, default)
-  <$edit-text tiddler=<<output>> field="$field$" index="$index$" autoHeight="no" type="text" tag="textarea" default="$default$" />
+\define input-textarea(field, index, default, default, class, focus)
+  <$edit-text
+      tiddler=<<output>>
+      field="$field$"
+      index="$index$"
+      autoHeight="no"
+      type="text"
+      tag="textarea"
+      default="$default$"
+      class="$class$"
+      focus="$focus$" />
 \end
 
 \define input-checkbox(field, index, readonly, default)
@@ -67,9 +84,9 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
     </$set>
     <$list filter="$selectFilter$">
       <option value=<<tmap "splitAndSelect" "|" "0">> >
-        <$view tiddler=<<tmap "splitAndSelect" "|" "1">> field="title" />   
+        <$view tiddler=<<tmap "splitAndSelect" "|" "1">> field="title" />
       </option>
-    </$list> 
+    </$list>
   </$select>
 \end
 
@@ -85,7 +102,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
   </$list>
 \end
 
-\define tmap-row(title, field, index, type, descr, note, label, default, readonly, reset, selectFilter, nochoice, invert)
+\define tmap-row(title, field, index, type, descr, note, label, default, readonly, reset, selectFilter, nochoice, invert, class, focus)
   <tr>
     <td class="tmap-title">$title$:</td>
     <td>
@@ -97,7 +114,9 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
           label:"$label$"
           invert:"$invert$"
           selectFilter:"$selectFilter$"
-          nochoice:"$nochoice$" >>
+          nochoice:"$nochoice$"
+          focus:"$focus$"
+          class:"$class$">>
         <$reveal type="match" text="true" default="$reset$">
           <$button>reset
             <$action-setfield $tiddler=<<output>> $field="$field$" $index="$index$" $value="$default$" />
@@ -113,10 +132,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
   </tr>
 \end
 
-\define visConfiguration(inheritedList,
-                         extensionField,
-                         styleName:"style")
-                         
+\define visConfiguration(inheritedList, extensionField, styleName:"style")
   <fieldset><legend>Visjs configurations ($styleName$)</legend>
     <div class="tmap-flash-message tmap-info">
       Only config items that you actually changed have an effect on
@@ -125,7 +141,6 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/macros
     <$tmap-config
         mode="manage-node-types"
         inherited="$inheritedList$"
-        extension="$extensionField$"
-    />
+        extension="$extensionField$" />
   </fieldset>
 \end

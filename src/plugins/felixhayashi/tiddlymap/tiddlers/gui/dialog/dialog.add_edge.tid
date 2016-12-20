@@ -33,7 +33,7 @@ subtitle: {{$:/plugins/felixhayashi/tiddlymap/icon}} Edge type specification
     <$list filter="[<id>regexp[.+:.+]]">
       <<badge "orange" "namespace" "This type is prefixed with a proper namespace">>
     </$list>
-  </$list>  
+  </$list>
 </div>
 </$set>
 </$set>
@@ -55,7 +55,9 @@ subtitle: {{$:/plugins/felixhayashi/tiddlymap/icon}} Edge type specification
           type="text"
           tag="input"
           default=""
-          class="tmap-trigger-field tmap-triggers-ok-button-on-enter" />
+          class="tmap-trigger-field
+                 tmap-triggers-ok-button-on-enter
+                 tmap-triggers-cancel-button-on-esc" />
       <<badges>>
     </td>
   </tr>

@@ -125,14 +125,14 @@ class Fixer {
     this.executeUpgrade('0.7.0', meta.dataStructureState, () => {
 
       // move edges that were formerly "global"
-      moveEdges('$:/plugins/felixhayashi/tiddlymap/graph/edges', null);
+      this.moveEdges('$:/plugins/felixhayashi/tiddlymap/graph/edges', null);
 
       // move edges that were formerly bound to view ("private")
       const filter = env.selector.allViews;
       const viewRefs = utils.getMatches(filter);
       for (let i = 0; i < viewRefs.length; i++) {
         const view = new ViewAbstraction(viewRefs[i]);
-        moveEdges(`${view.getRoot()}/graph/edges`, view);
+        this.moveEdges(`${view.getRoot()}/graph/edges`, view);
       }
 
     });
@@ -154,7 +154,7 @@ class Fixer {
 
       liveView.setConfig({
         'refresh-trigger': null, // delete the field (renamed)
-        'refresh-triggers': utils.stringifyList(['$:/temp/tmap/currentTiddler'])
+        'refresh-triggers': $tw.utils.stringifyList([ '$:/temp/tmap/currentTiddler' ]),
       });
 
     });
@@ -175,7 +175,7 @@ class Fixer {
       if (typeof userConf.groups === 'object') {
 
         const type = new NodeType('tmap:neighbour');
-        type.setStyle(userConf.groups['neighbours']);
+        type.setStyle(userConf.groups[ 'neighbours' ]);
         type.save();
 
         delete userConf.groups;

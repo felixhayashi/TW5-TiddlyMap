@@ -511,7 +511,7 @@ class MapWidget extends Widget {
    * ATTENTION: TiddlyMap doesn't use the refresh mechanism here.
    * The caretaker module dispatches an `updates` object that provides
    * more advanced information, tailored to the needs of TiddlyMap.
-   * These updates are picked up by {@link MapWidget#updates}.
+   * These updates are picked up by {@link MapWidget#update}.
    *
    * @override
    */
@@ -693,10 +693,16 @@ class MapWidget extends Widget {
       // central gravity value… who cares about central
       // gravity in static mode anyways.
       const physics = this.visOptions.physics;
-      physics[physics.solver].centralGravity = 0.015;
+      physics[physics.solver].centralGravity = 0.25;
+      this.network.setOptions(this.visOptions);
+
     }
 
-    this.rebuildGraphData();
+    const changes = this.rebuildGraphData();
+
+    if (changes.changedNodes.withoutPosition.length && !resetFocus) {
+      resetFocus = { delay: 1000, duration: 1000 };
+    }
 
     if (!utils.hasElements(this.graphData.nodesById)) {
       return;
@@ -732,12 +738,12 @@ class MapWidget extends Widget {
 
     const graph = $tm.adapter.getGraph({ view: this.view });
 
-    utils.refreshDataSet(
+    const changedNodes = utils.refreshDataSet(
       this.graphData.nodes, // dataset
       graph.nodes // new nodes
     );
 
-    utils.refreshDataSet(
+    const changedEdges = utils.refreshDataSet(
       this.graphData.edges, // dataset
       graph.edges // new edges
     );
@@ -753,6 +759,8 @@ class MapWidget extends Widget {
     utils.setField(`$:/temp/tmap/nodes/${this.view.getLabel()}`, 'list', $tm.adapter.getTiddlersByIds(graph.nodes));
 
     $tm.stop('Reloading Network');
+
+    return { changedEdges, changedNodes };
 
   }
 
@@ -814,7 +822,6 @@ class MapWidget extends Widget {
       if (inGraph[$tm.adapter.getId(tRef)] || isShowNeighbourhood) {
         return true;
       }
-
 
       if (changedTiddlers[tRef].modified) {
         // may be a match so we store this and process it later
@@ -882,10 +889,7 @@ class MapWidget extends Widget {
 
     this.reloadBackgroundImage();
     this.rebuildGraph({
-      resetFocus: {
-        delay: 0,
-        duration: 0
-      },
+      resetFocus: { delay: 0, duration: 0 },
     });
     this.handleResizeEvent();
     this.canvas.focus();
@@ -1768,9 +1772,7 @@ class MapWidget extends Widget {
     }
 
     this.hasNetworkStabilized = true;
-    this.logger('log', 'Network stabilized after',
-                        properties.iterations,
-                        'iterations');
+    this.logger('log', 'Network stabilized after', properties.iterations, 'iterations');
 
     if (!this.view.isEnabled('physics_mode')) { // static mode
 

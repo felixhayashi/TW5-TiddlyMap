@@ -16,23 +16,14 @@ as well as manipulating views:
 
 ```javascript
 // create a new view
-var myView = $tw.tmap.adapter.createView("My new View");
+var myView = new $tm.ViewAbstraction("My View", { isCreate: true });
 
 // insert a node in this view
-var node = { label: "I am a node" };
 var options = { view: myView };
-$tw.tmap.adapter.insertNode(node, options);
-```
-
-To retrieve view-information or manipulate views, use the ViewAbstraction class:
-
-```javascript
-// open an existing view
-var myView = $tw.tmap.adapter.getView("My existing View");
+var node = $tm.adapter.insertNode({ label: "I am a node" }, myView)
 
 // some examples...
-myView.getNodeFilter("expression");
-myView.setNodeFilter("[tags[homework]]");
-myView.setNodePosition({ id: 123, x: 4, y: 54});
-myView.destroy();
+myView.getNodeFilter();
+myView.saveNodePosition({ id: node.id, x: 4, y: 54});
+//myView.destroy();
 ```

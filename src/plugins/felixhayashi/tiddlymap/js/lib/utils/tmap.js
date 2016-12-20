@@ -288,6 +288,11 @@ export const refreshDataSet = (ds, ltNew) => {
 
   const ltOld = ds.get({ returnType: 'Object' });
 
+  const inserted = [];
+  const updated = [];
+  const withoutPosition = [];
+  const removed = [];
+
   for (let id in ltNew) {
 
     if (ltOld[id]) { // element already exists in graph
@@ -297,7 +302,17 @@ export const refreshDataSet = (ds, ltNew) => {
         continue;
       }
 
+      updated.push(id);
       ds.remove(id);
+
+    } else {
+
+      inserted.push(id);
+
+    }
+
+    if (!ltNew[id].x) {
+      withoutPosition.push(id);
     }
 
     ds.add(ltNew[id]);
@@ -305,9 +320,17 @@ export const refreshDataSet = (ds, ltNew) => {
 
   for (let id in ltOld) {
     if (!ltNew[id]) {
+      removed.push(id);
       ds.remove(id);
     }
   }
+
+  return {
+    withoutPosition,
+    inserted,
+    updated,
+    removed,
+  };
 
 };
 

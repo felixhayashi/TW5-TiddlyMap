@@ -479,6 +479,16 @@ class Adapter {
   }
 
   /**
+   *
+   * @return {*}
+   */
+  getAllPotentialNodes() {
+
+    return utils.getMatches($tm.selector.allPotentialNodes);
+
+  };
+
+  /**
    * Deletes or renames all edges of a given type.
    *
    * @param {string|EdgeType} type - Either the edge type id (name) or an EdgeType object.

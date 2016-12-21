@@ -364,36 +364,35 @@ const dispatchUpdates = updates => {
 
 };
 
-const checkForDublicates = tObj => {
+/**
+ * We need to do this check as TiddlyWiki does not allow us to hook into the
+ * clone process to find out whether a node was cloned.
+ *
+ * @param tObj
+ */
+const checkForClone = tObj => {
 
-  const id = $tm.tracker.getIdByTiddler(tObj);
+  const tRefs = utils.getDublicates(tObj);
 
-  if (!id) {
+  if (!tRefs.length) {
     return;
   }
 
-  const dublicates = utils.getTiddlersWithField('tmap.id', id, { limit: 2 });
-  delete dublicates[tObj.fields.title];
+  // remove any defined edges
+  utils.setField(tObj, 'tmap.edges', undefined);
 
-  const dublicate = Object.keys(dublicates)[0];
+  // force override id
+  $tm.tracker.assignId(tObj, true);
 
-  if (dublicate) {
+  // inform the user about what we did
+  $tm.dialogManager.open('dublicateIdInfo', {
+    param: {
+      changedTiddler: tObj.fields.title,
+      filter : utils.joinAndWrap(tRefs, '[[', ']]'),
+      id: utils.getId(tObj),
+    }
+  });
 
-    const args = {
-      param: {
-        changedTiddler: tObj.fields.title,
-        existingTiddler: dublicate,
-        id: id
-      }
-    };
-
-    $tm.dialogManager.open('dublicateIdInfo', args);
-
-    // remove any defined edges
-    utils.setField(tObj, 'tmap.edges', undefined);
-    // override id
-    $tm.tracker.assignId(tObj, true);
-  }
 
 };
 
@@ -557,7 +556,7 @@ const handleTiddlerChange = (tRef, tObj, updates) => {
 
   } else if (tObj) { // created or modified
 
-    checkForDublicates(tObj);
+    checkForClone(tObj);
 
     // call assignId IN ANY CASE to make sure the index
     // stays intact, also after a renaming operation

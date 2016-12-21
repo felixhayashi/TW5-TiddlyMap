@@ -51,7 +51,7 @@ classes: tmap-modal-add-node
             </$list>
           </$button>
        </td>
-       <td></td>
+       <td>Press the "load" button to activate the template.</td>
       </tr>
     </table>
     <$importvariables filter="[all[tiddlers+shadows]prefix[$:/core/macros/]]">

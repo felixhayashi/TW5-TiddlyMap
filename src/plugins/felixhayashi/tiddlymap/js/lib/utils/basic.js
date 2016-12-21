@@ -35,12 +35,14 @@ export const hasElements = obj => Object.keys(obj).length > 0;
 export const escapeRegex = str => str.replace(/[-$^?.+*[\]\\(){}|]/g, '\\$&');
 
 /**
- * Returns the basename of a path. A path is a string with slashes.
+ * Returns the basename of a path.
+ * A path is a string with slashes (or another separator).
  *
  * @param {string} path - The path
+ * @param {string} [separator='/']
  * @return {string} The basename
  */
-export const getBasename = path => path.substring(path.lastIndexOf('/') + 1);
+export const getBasename = (path, separator = '/') => path.substring(path.lastIndexOf(separator) + 1);
 
 /**
  * Helper to increase the code semantics.

@@ -685,23 +685,24 @@ class MapWidget extends Widget {
     // always reset to allow handling of stabilized-event!
     this.hasNetworkStabilized = false;
 
-    if (!this.view.isEnabled('physics_mode')) {
-
-      // in static mode we need to ensure that objects spawn
-      // near center so we need to set physics from
-      // zero to something. Yes, we override the users
-      // central gravity value… who cares about central
-      // gravity in static mode anyways.
-      const physics = this.visOptions.physics;
-      physics[physics.solver].centralGravity = 0.25;
-      this.network.setOptions(this.visOptions);
-
-    }
-
     const changes = this.rebuildGraphData();
 
-    if (changes.changedNodes.withoutPosition.length && !resetFocus) {
-      resetFocus = { delay: 1000, duration: 1000 };
+    if (changes.changedNodes.withoutPosition.length) {
+
+      resetFocus = resetFocus || { delay: 1000, duration: 1000 };
+
+      if (!this.view.isEnabled('physics_mode')) {
+
+        // in static mode we need to ensure that objects spawn
+        // near center so we need to set physics from
+        // zero to something. Yes, we override the users
+        // central gravity value… who cares about central
+        // gravity in static mode anyways.
+        const physics = this.visOptions.physics;
+        physics[physics.solver].centralGravity = 0.25;
+        this.network.setOptions(this.visOptions);
+
+      }
     }
 
     if (!utils.hasElements(this.graphData.nodesById)) {
@@ -1403,6 +1404,7 @@ class MapWidget extends Widget {
   handleSaveCanvas() {
 
     const tempImagePath = '$:/temp/tmap/snapshot';
+    this.createAndSaveSnapshot(tempImagePath);
     let defaultName = utils.getSnapshotTitle(this.view.getLabel(), 'png');
 
     const args = {

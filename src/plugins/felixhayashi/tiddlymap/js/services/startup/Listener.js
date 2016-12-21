@@ -124,20 +124,19 @@ const handleConfigureSystem = () => {
   const allEdges = $tm.adapter.getEdgesForSet(allTiddlers);
   const plugin = $tw.wiki.getTiddler($tm.path.pluginRoot).fields;
   const meta = $tw.wiki.getTiddlerData($tm.ref.sysMeta);
-  const hasLiveTab = utils.getTiddler($tm.ref.liveTab)
-    .hasTag('$:/tags/SideBar');
+  const hasLiveTab = utils.getTiddler($tm.ref.liveTab).hasTag('$:/tags/SideBar');
 
   const args = {
     numberOfNodes: '' + allTiddlers.length,
     numberOfEdges: '' + Object.keys(allEdges).length,
-    pluginVersion: 'v' + plugin.version,
-    dataStructureVersion: 'v' + meta.dataStructureState,
+    pluginVersion: `v${plugin.version}`,
+    dataStructureVersion: `v${meta.dataStructureState}`,
     dialog: {
       preselects: {
         'liveTab': '' + hasLiveTab,
         'vis-inherited': JSON.stringify(visDefConf),
         'config.vis': utils.getText($tm.ref.visUserConf),
-        'config.sys': $tm.config.sys
+        'config.sys': $tm.config.sys,
       }
     }
   };
@@ -159,8 +158,7 @@ const handleConfigureSystem = () => {
       $tw.wiki.deleteTiddler($tm.ref.liveTab);
     }
 
-    // tw doesn't translate the json to an object so this is
-    // already a string
+    // tw doesn't translate the json to an object so this is already a string
     utils.setField($tm.ref.visUserConf, 'text', outTObj.fields['config.vis']);
 
   });

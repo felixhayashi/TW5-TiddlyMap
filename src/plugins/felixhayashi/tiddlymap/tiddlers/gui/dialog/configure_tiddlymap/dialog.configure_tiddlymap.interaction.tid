@@ -4,15 +4,6 @@ caption: Interaction & behaviour
 \rules except wikilink
 
 <table class="tmap-config-table">
-<!--
-  <<tmap-row type:"input-select"
-      title:"Default node tooltip"
-      field:"config.sys.defaultNodeTooltip" 
-      descr:"What to show when hovering over a node."
-      nochoice:"No"
-      selectFilter:"[[nothing|Nothing]]
-                    [[manager|Open edge-type manager]]">>
--->
   <$macrocall type="input-select"
         $name="tmap-row"
         title="Default startup view"
@@ -22,7 +13,7 @@ caption: Interaction & behaviour
         descr="The view to display at startup" />
   <<tmap-row type:"input-checkbox"
       title:"Show popups"
-      field:"config.sys.popups.enabled" 
+      field:"config.sys.popups.enabled"
       descr:"Set this to true if you want to see automatic
              popups in the map.">>
   <$list filter="[config.sys.popups.enabled[true]]">
@@ -46,7 +37,7 @@ caption: Interaction & behaviour
   </$list>
   <<tmap-row type:"input-checkbox"
       title:"Allow single click mode"
-      field:"config.sys.singleClickMode" 
+      field:"config.sys.singleClickMode"
       descr:"A single click on a node is sufficient to open the
              corresponding tiddler."
       note:"Drag and drop will still work and does not cause a
@@ -54,8 +45,29 @@ caption: Interaction & behaviour
             the map editor.">>
   <<tmap-row type:"input-select"
       title:"Edge click behaviour"
-      field:"config.sys.edgeClickBehaviour" 
+      field:"config.sys.edgeClickBehaviour"
       selectFilter:"[[nothing|Nothing]]
                     [[manager|Open edge-type manager]]"
       descr:"What should happen when you click on an edge?">>
+</table>
+
+!! Suppressed dialogs
+
+<div class="tmap-flash-message tmap-plain">
+  Dialogs that you decided to suppress in the past are listed here.
+  Remove the checkmark to enable dialogs again.
+</div>
+
+<table class="tmap-config-table">
+  <$list
+      filter="[<output>fields[]prefix[config.sys.suppressedDialogs]]"
+      emptyMessage="–">
+      <$set name="dialogName" value=<<tmap basename ".">>>
+      <$macrocall $name="tmap-row"
+            type="input-checkbox"
+            title="Suppress '$(dialogName)$' dialog"
+            field=<<currentTiddler>> />
+      </$set>
+    <br />
+  </$list>
 </table>

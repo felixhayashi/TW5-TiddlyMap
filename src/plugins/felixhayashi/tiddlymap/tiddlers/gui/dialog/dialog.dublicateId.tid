@@ -7,8 +7,13 @@ buttons: ok_suppress
 TiddlyMap requires the value of the id field ("tmap.id") to be
 unique in order to correctly identify nodes and tiddlers.
 
-The tiddler "<<param.changedTiddler>>" had the same id as the
-tiddler "<<param.existingTiddler>>".
+The id of the "<<param.changedTiddler>>" already exists for these tiddlers:
+
+<ul>
+<$list filter=<<param.filter>> variable="item">
+  <li><$link><<item>></$link></li>
+</$list>
+</ul>
 
 Therefore TiddlyMap
 

@@ -73,10 +73,10 @@ var command = utils.makeHashMap();
  *
  * @see {@link utils.basename}
  */
-command.basename = function(path) {
+command.basename = function(separator) {
 
-  var str = path || this.getVariable('currentTiddler');
-  return utils.getBasename(str);
+  var str = this.getVariable('currentTiddler');
+  return utils.getBasename(str, separator);
 
 };
 
@@ -89,7 +89,6 @@ command.datauri = function(tiddler, type) {
   return utils.getDataUri(tiddler, type, true);
 
 };
-
 
 command.testJSON = function(fieldName) {
 

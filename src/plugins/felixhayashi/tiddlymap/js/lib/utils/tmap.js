@@ -335,6 +335,41 @@ export const refreshDataSet = (ds, ltNew) => {
 };
 
 /**
+ * Returns the tmap id that is stored in a designated field in the tiddler.
+ *
+ * @param tiddler
+ * @return {string} the tmap id of this tiddler
+ */
+export const getId = tiddler => wikiUtils.getTiddler(tiddler).fields['tmap.id'];
+
+/**
+ * Returns all other tiddlers that have the same tmap.id field entry.
+ *
+ * Note: typically tiddlers don't have the same id assigned, however,
+ * this can happen when tiddlers are imported or cloned.
+ *
+ * @param {Tiddler} tiddler
+ * @return {array<TiddlerReference>} a list of tiddlers with the same id as the
+ *    provided tiddler (excluding the provided tiddler itself).
+ */
+export const getDublicates = tiddler => {
+
+  const id = getId(tiddler);
+
+  if (!id) {
+
+    return [];
+
+  }
+
+  const tiddlers = wikiUtils.getTiddlersWithField('tmap.id', id, {limit: 2});
+  delete tiddlers[wikiUtils.getTiddlerRef(tiddler)];
+
+  return Object.keys(tiddlers);
+
+};
+
+/**
  * Function that searches an array for an object with a property
  * having a certain value.
  *

@@ -1,0 +1,12 @@
+"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _typeof=typeof Symbol==="function"&&typeof Symbol.iterator==="symbol"?function(e){return typeof e}:function(e){return e&&typeof Symbol==="function"&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e};// @preserve
+/*\
+
+title: $:/plugins/felixhayashi/tiddlymap/js/EdgeType
+type: application/javascript
+module-type: library
+
+@preserve
+
+\*/
+var _MapElementType=require("$:/plugins/felixhayashi/tiddlymap/js/MapElementType");var _MapElementType2=_interopRequireDefault(_MapElementType);var _utils=require("$:/plugins/felixhayashi/tiddlymap/js/utils");var _utils2=_interopRequireDefault(_utils);function _interopRequireDefault(e){return e&&e.__esModule?e:{default:e}}function EdgeType(e,t,r){if(e instanceof EdgeType)return e;r=r||{};this.root=$tm.path.edgeTypes;var i=EdgeType._getIdParts(e,this.root);if(!i.name)return new EdgeType("tmap:unknown");this.marker=i.marker;this.name=i.name;this.namespace=i.namespace;this.id=EdgeType._getId(this.marker,this.namespace,this.name);if(!this.namespace&&r.namespace){if(!new EdgeType(this.id).exists()){return new EdgeType(r.namespace+":"+this.name)}}_MapElementType2.default.call(this,this.id,this.root,EdgeType._fieldMeta,t);var n=this.style&&this.style.arrows;if(n){this.invertedArrow=this._isArrow(n,"from");this.toArrow=this._isArrow(n,"to")||this._isArrow(n,"middle");this.biArrow=this.invertedArrow===this.toArrow;if(this.biArrow)this.toArrow=this.invertedArrow=true}else{this.toArrow=true}}EdgeType.prototype=Object.create(_MapElementType2.default.prototype);EdgeType._fieldMeta=$tw.utils.extend({},_MapElementType2.default._fieldMeta,{label:{},"show-label":{}});EdgeType.edgeTypeRegexStr="^(_?)([^:_][^:]*):?([^:]*)";EdgeType.edgeTypeRegex=new RegExp(EdgeType.edgeTypeRegexStr);EdgeType._getIdParts=function(e,t){e=_utils2.default.getWithoutPrefix(e||"",t+"/");var r=e.match(EdgeType.edgeTypeRegex)||[];return{marker:r[1]||"",namespace:r[3]&&r[2]||"",name:r[3]||r[2]||""}};EdgeType._getId=function(e,t,r){if(!r)return;return(e||"")+(t?t+":":"")+r};EdgeType.prototype.getLabel=function(){return this.label||this.name};EdgeType.prototype._isArrow=function(e,t){var r=e[t];return t==="to"&&r==null||r===true||(typeof r==="undefined"?"undefined":_typeof(r))==="object"&&r.enabled!==false};exports.default=EdgeType;
+//# sourceMappingURL=./maps/felixhayashi/tiddlymap/js/graph/EdgeType.js.map

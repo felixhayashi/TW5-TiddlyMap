@@ -1,0 +1,12 @@
+"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _typeof=typeof Symbol==="function"&&typeof Symbol.iterator==="symbol"?function(t){return typeof t}:function(t){return t&&typeof Symbol==="function"&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t};// @preserve
+/*\
+
+title: $:/plugins/felixhayashi/tiddlymap/js/MapElementType
+type: application/javascript
+module-type: library
+
+@preserve
+
+\*/
+var _utils=require("$:/plugins/felixhayashi/tiddlymap/js/utils");var _utils2=_interopRequireDefault(_utils);function _interopRequireDefault(t){return t&&t.__esModule?t:{default:t}}function MapElementType(t,e,i,l){this.id=t;this.root=e;this._fieldMeta=i;this.fullPath=this.root+"/"+this.id;this.isShipped=$tw.wiki.getSubTiddler($tm.path.pluginRoot,this.fullPath);this.load(l||this.fullPath)}MapElementType._fieldMeta={description:{},style:{parse:_utils2.default.parseJSON,stringify:JSON.stringify},modified:{},created:{}};MapElementType.prototype.load=function(t){if(!t)return;if(typeof t==="string"){var e=_utils2.default.startsWith(t,this.root);var i=e?t:this.root+"/"+t;this.loadFromTiddler(i)}else if(t instanceof $tw.Tiddler){this.loadFromTiddler(t)}else if((typeof t==="undefined"?"undefined":_typeof(t))==="object"){for(var l in this._fieldMeta){this[l]=t[l]}}};MapElementType.prototype.loadFromTiddler=function(t){var e=_utils2.default.getTiddler(t);if(!e)return;var i=$tw.wiki.getSubTiddler($tm.path.pluginRoot,this.fullPath)||{};var l=$tw.utils.extend({},i.fields,e.fields);for(var s in this._fieldMeta){var r=this._fieldMeta[s].parse;var o=l[s];this[s]=r?r.call(this,o):o}};MapElementType.prototype.exists=function(){return _utils2.default.tiddlerExists(this.fullPath)};MapElementType.prototype.setStyle=function(t,e){if(typeof t==="string"){t=_utils2.default.parseJSON(t)}if((typeof t==="undefined"?"undefined":_typeof(t))==="object"){if(e){_utils2.default.merge(this.style,t)}else{this.style=t}}};MapElementType.prototype.save=function(t,e){if(!t){t=this.fullPath}else if(typeof t!=="string"){return}var i={title:t,text:""};if(!_utils2.default.startsWith(t,this.root)){i.id=this.id}if(e!==true){this.modified=new Date}if(!this.exists()){this.created=this.modified}for(var l in this._fieldMeta){var s=this._fieldMeta[l].stringify;i[l]=s?s.call(this,this[l]):this[l]}$tw.wiki.addTiddler(new $tw.Tiddler(i))};exports.default=MapElementType;
+//# sourceMappingURL=./maps/felixhayashi/tiddlymap/js/graph/MapElementType.js.map

@@ -87,6 +87,7 @@ export const config = {
     singleClickMode: 'false',
     editorMenuBar: {
       showNeighScopeButton: 'true',
+      showRasterMenuButton: 'true',
       showScreenshotButton: 'true'
     }
   }

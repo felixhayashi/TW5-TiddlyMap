@@ -240,38 +240,50 @@ export const getPrettyFilter = expr => {
  * This function will draw a raster on the network canvas that will
  * adjust to the network's current scaling factor and viewport offset.
  *
- * @param {CanvasRenderingContext2D} context - The canvas's context
- *     passed by vis.
+ * @param {CanvasRenderingContext2D} ctx - The canvas's context passed by vis.
  * @param {number} scaleFactor - The current scale factor of the network.
- * @param {Object} viewPosition - Object with x and y that represent the
- *     current central focus point of the view.
+ * @param {Object} viewCenter - Virtual center point of the view.
  * @param {number} rasterSize - The size of the squares that are drawn.
  * @param {string} color - A string parsed as CSS color value.
  */
-export const drawRaster = (context, scaleFactor, viewPosition, rasterSize, color) => {
+export const drawRaster = (ctx, scaleFactor, viewCenter, rasterSize, color = '#D9D9D9') => {
 
-  rasterSize = parseInt(rasterSize) || 10;
+  // from now on the most central raster point
+  const { x: centerX, y: centerY } = basicUtils.getNearestRasterPosition(viewCenter, rasterSize);
 
-  const canvas = context.canvas;
-  const width = canvas.width / scaleFactor;
-  const height = canvas.width / scaleFactor;
-  const offsetLeft = viewPosition.x - (width / 2);
-  const offsetTop = viewPosition.y - (height / 2);
+  const scaledWidth = ctx.canvas.width / scaleFactor;
+  const scaledHeight = ctx.canvas.height / scaleFactor;
+
+  // some extra lines to ensure the canvas is completely filled with lines
+  const extraLines = rasterSize * 2;
+
+  // calculate the space that is required to draw the rasters
+  const hSpace = Math.ceil((scaledWidth / rasterSize) / 2) * rasterSize + extraLines;
+  const vSpace = Math.ceil((scaledHeight / rasterSize) / 2) * rasterSize + extraLines;
+
+  // align the space to the center points and calculate the offsets
+  const left = centerX - hSpace;
+  const right = centerX + hSpace;
+  const top = centerY - vSpace ;
+  const bottom = centerY + vSpace;
+
+  ctx.beginPath();
 
   // draw vertical lines
-  for (let x = offsetLeft; x < width; x += rasterSize) {
-    context.moveTo(x, offsetTop);
-    context.lineTo(x, height);
+  for (let x = left; x < right; x += rasterSize) {
+    ctx.moveTo(x, top);
+    ctx.lineTo(x, bottom);
   }
 
   // draw horizontal lines
-  for (let y = offsetTop; y < height; y += rasterSize) {
-    context.moveTo(offsetLeft, y);
-    context.lineTo(width, y);
+  for (let y = top; y <= bottom; y += rasterSize) {
+    ctx.moveTo(left, y);
+    ctx.lineTo(right, y);
   }
 
-  context.strokeStyle = color || '#D9D9D9';
-  context.stroke();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.stroke();
 
 };
 

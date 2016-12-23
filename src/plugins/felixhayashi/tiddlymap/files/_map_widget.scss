@@ -6,14 +6,14 @@
   padding: 2px;
   color: $tw-text-color;
   display: block; // sometimes tw puts us into a span
-        
+
   &.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) {
     cursor: pointer;
-    
+
     .vis-navigation {
       display: none;
     }
-    
+
     &:hover:before {
       color: gray;
       background: white;
@@ -31,7 +31,7 @@
       background-color: rgba(255,255,255,0.3);
     }
   }
-  
+
   .tmap-loading-bar {
     display: none; //hidden per default
     position: absolute;
@@ -50,105 +50,106 @@
   .tmap-vis-graph {
     height: calc(100% - 35px); // - topbar
   }
-  
+
   &.tmap-no-buttons {
     .vis-navigation {
       display: none;
     }
   }
-  
+
   &.tmap-advanced-editor {
-    
+
     .tmap-topbar {
       background: #d6d9d8;
-      
+
       .tmap-active-button {
         color: #488DCD;
-        
+
         svg {
           fill: #488DCD;
         }
       }
-      
-      .tmap-neigh-scope-button {
+
+      .tmap-unicode-button {
         font-size: 1.5em;
         vertical-align: bottom;
       }
-      
+
     }
   }
-  
+
   .tmap-menu-bar {
     width: 100%;
   }
-  
+
   .tmap-topbar {
     background: #F5F5F5;
     border-bottom: 1px solid lightgray;
     padding: 3px $padding;
     height: $filterbar-height;
     position: relative;
-    
+
     .tmap-view-label {
       width: 100%;
       text-align: center;
       font-weight: bold;
       padding-top: 3px;
     }
-    
+
     .tmap-focus-button {
       position: absolute;
       right: 10px;
-      
+      top: 6px;
+
       input {
         width: $default-input-width;
       }
     }
-    
+
     .tmap-search-dropdown {
       position: relative;
-    
+
       .tc-drop-down {
         position: absolute;
         z-index: 999;
         right: 0px;
       }
     }
-        
+
     [hidden] {
       display: none;
     }
-        
+
     select {
       width: 30%;
       max-width: 200px;
       word-wrap: initial;
       padding: 0px;
     }
-    
+
     button {
       line-height: inherit;
       color: $tw-text-color;
     }
-  
+
      > * {
       display: inline-block; // TODO: this is too rigorous
     }
-    
+
     .tmap-separator:after {
       color: #bdbdbd;
       margin: 3px;
       content: " | ";
     }
-    
+
     .tc-edit-add-tag .tc-add-tag-name input {
       width: 70%;
     }
-    
+
     .tc-sidebar-header {
       text-shadow: none;
     }
-    
+
     .tc-edit-tags {
       border: none;
       padding: inherit;
@@ -164,7 +165,7 @@
   .tmap-vis-graph {
     text-align: center;
     cursor: not-allowed;
-    
+
     &:not(.tmap-graph-placeholder):hover::before {
       box-shadow: 10px 10px 5px lightgray;
       color: gray;
@@ -182,7 +183,7 @@
       padding: 5px;
       pointer-events: none;
     }
-    
+
     &.tmap-graph-placeholder::before {
       content: "No Preview";
       display: block;
@@ -199,11 +200,11 @@
     max-width: 210px;
     padding: $padding;
     margin: 5px 0;
-             
+
     button, a {
       padding: 0 2px;
       text-decoration: none;
-      
+
       &:hover {
         color: #ffffff;
       }
@@ -213,18 +214,18 @@
       }
     }
   }
-  
+
   .tc-block-dropdown {
     width: 370px;
     min-width: 370px;
     padding: $padding;
     margin: 15px 0 0 -370px;
-            
+
       a {
         display: inline;
         padding : 0px;
       }
-    
+
   }
 }
 
@@ -245,40 +246,40 @@
 /*** vis ***********************************************************/
 
 .tmap-widget div.vis-network {
-        
+
   .vis-edit-mode {
     height: 26px;
   }
-  
+
   .vis-manipulation {
     height: 34px;
     border-top: 1px solid #d6d9d8;
     background: rgba(245, 245, 245, 0.7);
-    
+
   }
 
   .vis-navigation .vis-button {
-  
+
     &.tmap-button-enabled {
       right: 15px;
-      
+
       &.tmap-fullscreen-button {
         $tRef: "$:/plugins/felixhayashi/tiddlymap/media/fullscreen.png";
         bottom: 90px;
         background-image: url(datauri($tRef));
-        
+
       }
       &.tmap-halfscreen-button {
         $tRef: "$:/plugins/felixhayashi/tiddlymap/media/halfscreen.png";
         bottom: 130px;
         background-image: url(datauri($tRef));
-        
+
       }
     }
-    
+
     &:hover {
       box-shadow: 0 0 3px 3px rgba(75, 75, 75, 0.3);
-      
+
       &:before {
         background: beige;
         display: block;
@@ -292,41 +293,41 @@
         z-index: 1000;
         text-align: center;
       }
-      
+
       &.vis-up:before {
         left: 30px;
-        content: "Scroll up";              
+        content: "Scroll up";
       }
       &.vis-down:before {
         left: 30px;
-        content: "Scroll down";              
+        content: "Scroll down";
       }
       &.vis-right:before {
         left: 30px;
-        content: "Scroll right";              
+        content: "Scroll right";
       }
       &.vis-left:before {
         left: 30px;
-        content: "Scroll left";              
+        content: "Scroll left";
       }
       &.vis-zoomOut:before {
-        content: "Zoom out";              
+        content: "Zoom out";
       }
       &.vis-zoomIn:before {
-        content: "Zoom in";              
+        content: "Zoom in";
       }
       &.vis-zoomExtends:before {
-        content: "Fit whole graph";              
+        content: "Fit whole graph";
       }
       &.tmap-fullscreen-button:before {
-        content: "Toggle Fullscreen";              
+        content: "Toggle Fullscreen";
       }
       &.tmap-halfscreen-button:before {
-        content: "Toggle Halfscreen";              
+        content: "Toggle Halfscreen";
       }
-      
+
     }
-    
+
   }
 }
 
@@ -336,21 +337,21 @@
   .vis-navigation .tmap-halfscreen-button {
     display: none;
   }
-  
+
   // hide all buttons per default
   &:not(.tmap-fullscreen) .vis-navigation .vis-button {
-    display: none;    
+    display: none;
   }
-  
+
   &:hover .vis-navigation .vis-button {
- 
+
     &.tmap-fullscreen-button {
       display: block;
     }
     &.vis-zoomExtends {
       display: block;
     }
-    
+
   }
 }
 
@@ -367,7 +368,7 @@
   left: 0 !important;
   z-index: 999 !important;
   border: none !important;
-  margin: 0 !important;  
+  margin: 0 !important;
 }
 
 body.tmap-has-fullscreen-widget {
@@ -390,11 +391,11 @@ body.tmap-has-fullscreen-widget {
 }
 
 body.tmap-has-halfscreen-widget {
-  
+
   .tmap-widget.tmap-halfscreen {
     @include fillSpace();
     position: absolute !important;
     border-left: 1px solid lightgray !important;
   }
-  
+
 }

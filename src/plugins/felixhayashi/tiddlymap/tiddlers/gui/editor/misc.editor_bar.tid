@@ -29,7 +29,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
       popup=<<qualify "$:/temp/menu">>
       tooltip="Open the Menu">{{$:/core/images/menu-button}}
   </$button>
-  
+
   <$reveal type="popup" position="below" state=<<qualify "$:/temp/menu">> >
     <div class="tc-drop-down">
       <a href="http://tiddlymap.org#Documentation" target="_blank">
@@ -68,7 +68,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
       </div>
     </div>
   </$reveal>
-  
+
 <!-- === Neighbourhood menu ===================================== -->
 
   <$reveal
@@ -79,10 +79,11 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
     <$button
         class=<<neighScopeBtnClass>>
         tooltip="Change the neighbourhood scope"
-        popup=<<qualify "$:/temp/neighScope">>>☀
+        popup=<<qualify "$:/temp/neighScope">>>
+      ☀
     </$button>
   </$reveal>
-  
+
   <$reveal type="popup" position="below" state=<<qualify "$:/temp/neighScope">> >
     <div class="tc-drop-down">
       <div class="tmap-list-separator">Neighbourhood scope</div>
@@ -115,28 +116,22 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
       <div class="tmap-list-separator">Other</div>
       <$checkbox field="config.show_inter_neighbour_edges"
           checked="true" unchecked="false"> Inter-neighbour edges</$checkbox>
-      
+
     </div>
   </$reveal>
-  
+
 <!-- === Export menu ============================================ -->
-  
+
   <$reveal
       type="match"
       text="true"
-      default=<<tmap "option"
-                     "config.sys.editorMenuBar.showScreenshotButton">>>
-    <$button
-        tooltip="Open the map-export menu"
-        popup=<<qualify "$:/temp/mapExport">>>
+      default=<<tmap "option" "config.sys.editorMenuBar.showScreenshotButton">>>
+    <$button tooltip="Open the map-export menu" popup=<<qualify "$:/temp/mapExport">>>
       {{$:/core/images/download-button}}
     </$button>
   </$reveal>
-  
-  <$reveal
-      type="popup"
-      position="below"
-      state=<<qualify "$:/temp/mapExport">>>
+
+  <$reveal type="popup" position="below" state=<<qualify "$:/temp/mapExport">>>
     <div class="tc-drop-down">
     <$button
         class="tc-btn-invisible"
@@ -156,5 +151,41 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
     </$button>
     </div>
   </$reveal>
-    
+
+<!-- === Raster menu ============================================ -->
+
+  <$reveal
+      type="match"
+      text="true"
+      default=<<tmap "option" "config.sys.editorMenuBar.showRasterMenuButton">>>
+    <$button
+      tooltip="Change the raster of your map"
+      class=<<rasterMenuBtnClass>>
+      popup=<<qualify "$:/temp/rasterMenu">>>
+      ⩩
+    </$button>
+  </$reveal>
+
+  <$reveal type="popup" position="below" state=<<qualify "$:/temp/rasterMenu">>>
+    <div class="tc-drop-down">
+    <$button class="tc-btn-invisible">Disable raster
+      <$action-setfield
+          $tiddler=<<viewRoot>>
+          config.raster="" />
+    </$button>
+    <div class="tmap-list-separator">Raster sizes</div>
+    <$list filter="[[50|50px]]
+                   [[75|75px]]
+                   [[100|100px]]
+                   [[150|150px]]">
+      <$button class="tc-btn-invisible">
+        <<tmap "splitAndSelect" "|" "1">>
+        <$action-setfield
+            $tiddler=<<viewRoot>>
+            config.raster=<<tmap "splitAndSelect" "|" "0">> />
+      </$button>
+    </$list>
+    </div>
+  </$reveal>
+
 </div>

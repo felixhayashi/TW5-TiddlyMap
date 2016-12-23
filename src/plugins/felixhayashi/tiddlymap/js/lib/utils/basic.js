@@ -513,6 +513,50 @@ export const removeDOMChildNodes = el => {
 };
 
 /**
+ * Implementation of the algebraic modulus operation.
+ *
+ * In javascript '%' is really a remainder operator, not a modulus.
+ * Algebraically speaking, a modulus operation always yields
+ * positive results, while '%' in js can yield negative results.
+ *
+ * Note: divident mod divisor
+ *
+ * @param {number} divident
+ * @param {number} divisor
+ * @return {number}
+ */
+export const mod = (divident, divisor) => {
+
+  const remainder = divident % divisor;
+
+  return Math.floor(remainder >= 0 ? remainder : remainder + divisor);
+
+};
+
+/**
+ * Maps a coordinate to the nearest raster coordinate.
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {number} raster
+ * @return {{x: number, y: number}}
+ */
+export const getNearestRasterPosition = ({ x, y }, raster) => {
+
+  const rasterHalf = raster / 2;
+
+  // calculate distances to previous raster lines
+  const distPrevX = mod(x, raster);
+  const distPrevY = mod(y, raster);
+
+  return {
+    x: distPrevX < rasterHalf ? x - distPrevX : x - distPrevX + raster,
+    y: distPrevY < rasterHalf ? y - distPrevY : y - distPrevY + raster
+  };
+
+};
+
+/**
  * Force early binding of functions to this context.
  *
  * @param context the context to bind this function to (typically `this`)

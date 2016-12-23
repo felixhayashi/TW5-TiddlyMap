@@ -1,8 +1,0 @@
-created: 20150327214834947
-description: Automatically assigned to an edge that does not have a type assigned
-modified: 20150620175215432
-show-label: false
-style: {"color":"#f43bb1"}
-title: $:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tmap:unknown
-type: text/vnd.tiddlywiki
-

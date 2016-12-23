@@ -1,0 +1,108 @@
+caption: v0.11.x
+created: 20160110150833987
+modified: 20160205104358983
+tags: ReleaseNote Usability Configurability Performance
+title: Version 0.11.x
+tmap.id: 34976ded-1d7e-4798-b7ef-a12fc5cdaeef
+type: text/x-markdown
+
+General information
+----------------------------
+
+Please read [Upgrading to v0.11.x](#Upgrading to v0.11.x).
+
+Major enhancements
+----------------------------
+
+### v0.11.9
+
+* Resolves #198: Modulized EdgeType handling
+* Resolves #245: Include linting rules
+* Resolves #244: Upgrade to ec6 via babel
+
+### v0.11.5
+
+* Sets layout to fixed-fluid after installation
+
+### v0.11.3
+
+* Resolves #219: Open context menu when user performs right click on
+  elements
+* Resolves #223: Add minor formatting of view hashmap
+
+### v0.11.2
+
+* Added option to search for tiddlers in the toolbar using
+  regular expressions
+
+### v0.11.0
+
+* Resolves #204: Simplify widget notation.
+* Resolves #201: Introduce notation that excludes an edge type from
+  all views per default.
+* Resolves #199: Option to show snippet of tiddler text as tooltip 
+  when hovering over a node.
+* Resolves #203: Simplify edge type notation in edge type filter.
+* Resolves #211: Make incoming / outgoing filter also available
+  in the tiddler toolbar.
+* If a user creates nodes or views without specifying a name,
+  TiddlyMap will take over and invent a cool name for him/her.
+* In the editor menu: The edge-type filter was moved into the view
+  configuration!
+* Resolves #207: Remove the majority of buttons in embedded
+  maps.
+* Introduced the `tw-filter`. Thanks @flibbles!
+* Resolves #130: Use URL parameters to influence how
+  TiddlyMap starts when the page (wiki) is loaded.
+* Improved the default visjs physics configuration.
+* Using tabs now in the configure view and configure tiddlymap dialogs
+* Cleaner flash messages layout.
+* Resolves #214: Better handling of vis configurations.
+
+Important bugfixes
+----------------------------
+
+### v0.11.8
+
+* Fixes problem where wrong json indentation caused wrong values to be
+  written in map.
+
+### v0.11.7
+
+* Fixes #237: broken fields when creating edges due to multilines in fields
+
+### v0.11.6
+
+* Fixes #233: Can't set filter for node type
+
+### v0.11.4
+
+* Bugfix: Part of function name was accidentally deleted :(
+
+### v0.11.3
+
+* Fixes #225: Compatibility Issue with the Newest Tiddlywiki Release (5.1.12)
+
+### v0.11.2
+
+* Fixes #215: Toolbar button search produces wrong results bug
+
+### v0.11.1
+
+* Popup didn't work correctly under Firefox.
+
+### v0.11.0
+
+* Fixed bug that graph showing neighbourhood is not updated when
+  a new neighbour is added and the link is incoming (pointing from
+  the neighbour to an existing node in the graph).
+* Fixes #208: Vis configuration scrolls to top in Chrome when
+  editing an input element.
+
+Other / Internals
+----------------------------
+
+* The edge-type filters are now being found in the view configuration.
+* `$tw.tmap.` became `$tm` and `$tw.tmap.opt` was merged into `$tm`.
+  This is only important for people who started programming with
+  TiddlyMap.

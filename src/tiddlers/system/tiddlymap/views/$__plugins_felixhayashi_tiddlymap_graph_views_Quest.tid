@@ -1,0 +1,8 @@
+config.background_image: map.jpg
+config.vis: {"physics":{"forceAtlas2Based":{"springConstant":0.81}}}
+created: 20151030095244135
+id: 1da51763-3cc8-4819-bcea-07bf0824db04
+isview: true
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/Quest
+type: text/vnd.tiddlywiki
+

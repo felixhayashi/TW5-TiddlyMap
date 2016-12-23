@@ -1,0 +1,13 @@
+created: 20160115124513628
+modified: 20160115124642979
+tags: 
+title: TiddlyWiki filters
+tmap.id: 23a28144-573e-472b-a0cd-6d856aa9a56a
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+Learn more about filters in TiddlyWiki at http://tiddlywiki.com.
+
+* [[Filters|http://tiddlywiki.com/#Filters]]
+* [[Introduction to filter notation|http://tiddlywiki.com/#Introduction%20to%20filter%20notation]].

@@ -1,0 +1,17 @@
+created: 20150113192543022
+modified: 20150418131102390
+rank: 5
+tags: Examples
+title: Making use of the caption field
+tmap.id: 30e39689-af74-4182-99b2-33e1331d9f0f
+type: text/vnd.tiddlywiki
+
+To avoid having your valuable graph space covered by large titles, you can set caption fields in your tiddlers, which are used by ~TiddlyMap as node labels instead of the titles.
+
+To support the semantic of the graph, you can define a description field in your tiddler, which will be displayed as tooltip once you hover a node. If you do not specify a description, the title is used as fallback to be displayed in the tooltip.
+
+It should be highlighted that the caption fields value will be treated as wikitext and rendered as text/plain. So you can add e.g. `<<now>>` as caption text as demonstrated below.
+
+<$tiddlymap view="Caption field example" ></$tiddlymap>
+
+Please active the graph (via a click) and move with your mouse over the nodes. One node doesn't have a description so the title is displayed as tooltip instead. The other node has a description field, which is consequently displayed as tooltip.

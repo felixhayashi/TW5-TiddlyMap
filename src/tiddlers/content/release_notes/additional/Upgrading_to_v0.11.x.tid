@@ -1,0 +1,21 @@
+created: 20160205094715182
+modified: 20160205103824356
+tags: [[Upgrade instructions]]
+title: Upgrading to v0.11.x
+tmap.id: 00d909fc-55da-4e7f-89ff-4c41156547cf
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+{{Only read this if you are already using TiddlyMap.||$:/me/info}}
+
+With v0.11.0 there were slight modifications to the [[Edge-type filters]] mechanism:
+
+!! Edge types starting with an underscore are not displayed per default
+
+This means, in the rare case you prefixed your [[Edge types]] with "`_`", these edges won't be displayed unless you change your filter. For further information see [[Private edge types]] and [[Edge-type filter examples]].
+
+
+!! You are only allowed to use a single colons ("`:`") in your edge-type id
+
+Only a single colon is allowed to specify a namespace; see [[Edge-type namespaces]]. Everything after a second colon is ignored. Use the label field of an edge type if you want exotic naming. When creating edges in the map, there will be an assistent informing you, how TiddlyMap interprets your input.

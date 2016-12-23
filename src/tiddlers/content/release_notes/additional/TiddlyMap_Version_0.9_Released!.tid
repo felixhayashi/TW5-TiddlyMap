@@ -1,0 +1,10 @@
+created: 20150914160618301
+modified: 20150914161832055
+tags: News
+title: TiddlyMap Version 0.9 Released!
+tmap.id: ed134f43-3ab4-4939-a2af-54b8d73d0660
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+TiddlyMap v0.9 just got released. Feel free to test it. Remember to always make backups before upgrading to a new version.

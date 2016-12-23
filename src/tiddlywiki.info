@@ -4,6 +4,7 @@
     "tiddlywiki/markdown",
     "tiddlywiki/highlight",
     "tiddlywiki/googleanalytics",
+    "tiddlywiki/railroad",
     "felixhayashi/topstoryview",
     "felixhayashi/hotzone",
     "felixhayashi/vis",

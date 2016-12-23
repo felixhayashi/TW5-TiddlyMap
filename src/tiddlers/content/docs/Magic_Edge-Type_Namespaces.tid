@@ -1,0 +1,25 @@
+created: 20150630133803178
+list: tw-list tw-field tw-filter
+modified: 20160122195359634
+tags: [[Edge types]]
+title: Magic Edge-Type Namespaces
+tmap.id: 79fa55bc-416e-494a-ac67-785532129910
+type: text/vnd.tiddlywiki
+
+Some edge-type namespaces enable you to do special stuff. That's why they are called "magic" edge-type namespaces. 
+
+For example [[tw-list]] and [[tw-field]] may help you to combine TiddlyMap with other cool [[TiddlyWiki plugins]] because these types enable you to create relations that are directly saved into user defined tw-fields. Consequenly, if you have a plugin installed that works with these fields, you can influence this plugin (and vice versa) just by drawing an edge.
+
+The [[tw-filter]] even allows you define filter rules on which basis edges are virtually created at runtime.
+
+! How to use magic namespaces?
+
+First you need to register a magic edge-type. You can do that by using the [[Edge-type manager]] and create an edge type that starts with one of the following namespaces:
+
+<<toc "$(currentTiddler)$">>
+
+After you specified the namespace prefix string you have to add a colon and define the field name, e.g. `tw-filter:myfield`.
+
+<i class="fa fa-exclamation-triangle"></i> After the magic namespace, you have to enter a [[valid field name|http://tiddlywiki.com/#TiddlerFields]] string!
+
+For detailed examples, open the docs pages of the available magic namespaces listed above.

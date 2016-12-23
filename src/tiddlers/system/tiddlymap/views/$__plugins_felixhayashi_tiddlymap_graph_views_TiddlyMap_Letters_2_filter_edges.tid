@@ -1,0 +1,6 @@
+created: 20150722163443469
+filter: -[prefix[_]] -[[tw-body:link]] -[[tw-list:tags]]
+modified: 20160124112509692
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/TiddlyMap Letters 2/filter/edges
+type: text/vnd.tiddlywiki
+

@@ -1,0 +1,26 @@
+created: 20160125144813466
+modified: 20160125151452026
+tags: Interface
+title: Using URL parameters
+tmap.id: cbe9e2f8-ac97-411f-9d9a-f3d55a970eb7
+type: text/vnd.tiddlywiki
+
+{{This feature is available as of TiddlyMap v0.11.0.||$:/me/info}}
+
+You may use URL parameters to influence how TiddlyMap starts at the time the page (wiki) is loading.
+
+For example, you are hosting your wiki at `mywiki.com` and you want to send your friend Bob a link to a map named `mymap` in your wiki. Moreover, this map should be directly displayed fullscreen. No problemo, just send him the following link:
+
+```
+http://mywiki.com?tmap-enlarged=fullscreen&tmap-view=mymap
+```
+
+! Parameters
+
+These URL parameters are available at the moment:
+
+; tmap-enlarged
+: Either `fullscreen` or `halfscreen`
+; tmap-view
+: A name of an existing view.
+

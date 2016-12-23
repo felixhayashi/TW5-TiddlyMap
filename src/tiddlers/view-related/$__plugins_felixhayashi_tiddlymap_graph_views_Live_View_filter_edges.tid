@@ -1,6 +1,0 @@
-created: 20150630160453292
-filter: [prefix[$:/plugins/felixhayashi/tiddlymap/graph/edgeTypes]] -[suffix[tw-list:list]]
-title: $:/plugins/felixhayashi/tiddlymap/graph/views/Live View/filter/edges
-type: text/vnd.tiddlywiki
-
-

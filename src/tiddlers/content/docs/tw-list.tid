@@ -1,0 +1,26 @@
+created: 20160120122207145
+modified: 20160122204129784
+tags: [[Magic Edge-Type Namespaces]]
+title: tw-list
+tmap.id: fb51e266-f7e8-479f-b10d-e64ae12b6ec8
+type: text/vnd.tiddlywiki
+
+If you create an edge-type (e.g. using the [[Edge-type manager]]) and use the `tw-list` namespace as identifier prefix, the edges will __not__ be stored in the common json-based [[tiddlymap  format|Storage of Edges and their types]]. Instead each outgoing connection to a tiddler is stored by inserting the title the edge is pointing to into a list.
+
+Say you want create a connection between tiddler "Dawna Dozal"  and tiddler "Toney Thacker" and you name the connection `tw-list:friends`. Then a field named "friends" will be created in tiddler "Dawna Dozal" and "Toney Thacker" will be added to this field. Since the title contains spaces, tiddlwiki's double square bracket notation is used to save the title to the list that now looks like this: 
+
+```
+friends: [[Toney Thacker]]`
+```
+
+If you create another connection between "Dawna Dozal" and two tiddler titled "Jack" and "Cathy" using the edge-type identier `tw-list:friends`, then "Jack" and "Cathy" will be added to the list, which now looks like this:
+
+```
+friends: [[Toney Thacker]] Jack Cathey`.
+```
+<i class="fa fa-exclamation-circle" /> You probably know that TiddlyWiki stores titles in the `tags` field in the format described above. This means that you can also use TiddlyMap to create and delete tags by connecting tiddlers using the edge-type `tw-list:tags` when drawing an edge!
+
+<i class="fa fa-exclamation-triangle" /> There are some drawbacks with this technique:
+
+* This method does not use ids and changing tiddler titles will break the specified connection!
+* When using this namespace, only use tiddlywiki [[allowed field-name charactes|http://tiddlywiki.com/#TiddlerFields]] for field names.

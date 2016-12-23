@@ -1,0 +1,14 @@
+created: 20160120133918627
+modified: 20160122201829003
+tags: [[Node and edge-type filters]]
+title: Edge-type filters
+tmap.id: 56511300-f1bf-4e82-9e60-125f49b9bf91
+type: text/vnd.tiddlywiki
+
+In analogy to [[Node filters]], edge-type filters allow you to ensure that only those edges belonging to a certain set of [[Edge types]] are displayed in the map.
+
+Per default, a newly created map imposes no restrictions on which edges are displayed. This means all edges of any type are shown, with the exception of [[Private edge types]], which are always excluded per default.
+
+! Examples
+
+See: [[Edge-type filter examples]].

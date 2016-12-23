@@ -1,0 +1,31 @@
+created: 20150930165724213
+modified: 20161220224841684
+tags: Views
+title: Copy & paste nodes between views
+tmap.id: 171dd7c4-b0e4-4737-9daa-4ada5ecc55de
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+{{This feature is available as of TiddlyMap v0.9.3.||$:/me/info}}
+
+! Selection of nodes
+Select multiple nodes By holding down the control key and clicking on the nodes. Alternatively, you can hold down the left mouse-key on a node for one second to select this node along with other nodes. To select all nodes use <kbd>ctrl</kbd>+<kbd>a</kbd>.
+
+As of v0.12.0, another way to select nodes is to hold down <kbd>ctrl</kbd> and the left mouse button and then draw a selection rectangle.
+
+! Cut or copy nodes
+After selection, press <kbd>ctrl</kbd>+<kbd>x</kbd> to cut nodes or <kbd>ctrl</kbd>+<kbd>c</kbd> to copy nodes from the current view. The nodes will be copied into your clipboard and can be pasted via <kbd>ctrl</kbd>+<kbd>v</kbd> into another graph.
+
+<i class="fa fa-exclamation-triangle" /> When cutting nodes, TiddlyMap will try to remove the nodes from the current view's node filter. This only works, if the nodes have been added one by one to the view via the editor's "add node" button or by having double clicked on the canvas. If nodes were added with a filter (e.g. `[tag[Task]]`) then you need to change the node filter to remove nodes. 
+
+In any case, cutting nodes never removes them from the system, they are only removed from the view's filter. So in case you are worried: The worst thing that can happen is that you lose some styling information, but cutting a node will never result in a loss of data.
+
+! Pasting nodes
+Make sure you click on an empty spot on the canvas before pasting so TiddlyMap knows in which view you want to paste the nodes into.
+
+After pasting, the pasted nodes are all  selected so you can drag all pasted nodes to a suitable area of your map.
+
+! Further information
+
+* Here is a small introductory video on this feature: https://youtu.be/3GbH_xMOYNg

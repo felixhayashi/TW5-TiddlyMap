@@ -1,0 +1,6 @@
+created: 20150722163349516
+filter: -[prefix[_]] -[[tw-body:link]] -[[tw-list:tags]]
+modified: 20160124112509786
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/Caption field example/filter/edges
+type: text/vnd.tiddlywiki
+

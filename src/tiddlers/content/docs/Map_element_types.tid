@@ -1,0 +1,10 @@
+created: 20151106172327746
+modified: 20151106172750653
+tags: [[Basic concepts]]
+title: Map element types
+tmap.id: b550cfc7-cbd3-4a03-8065-950f96478c40
+type: text/vnd.tiddlywiki
+
+A graph consists of nodes and edges. TiddlyMap also introduces the concept of node types and edge types.
+
+See also [[Map Constructs]].

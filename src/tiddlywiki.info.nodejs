@@ -5,6 +5,7 @@
     "tiddlywiki/markdown",
     "tiddlywiki/filesystem",
     "tiddlywiki/highlight",
+    "tiddlywiki/railroad",
     "felixhayashi/topstoryview",
     "felixhayashi/hotzone",
     "felixhayashi/vis",

@@ -1,0 +1,45 @@
+created: 20150711205433243
+modified: 20160122202247482
+tags: 
+title: Version Matrix
+tmap.id: dd0a0883-5ea0-49a9-8f6a-6d510d77b225
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+\define tidFilter() [tag[ReleaseNote]!sort[created]]
+\define tagFilter() [tag[ReleaseNote]tags[]] -[[ReleaseNote]] +[nsort[order.challenges]]
+
+<style type="text/css">
+.cell-true { background: firebrick; }
+.cell-false { background: #FCFCFC; }
+table.matrix { border: none; margin-top: -15px; }
+table.matrix tr td { border: 1px solid #CCCCCC; }
+table.matrix tr th { border: none; background: none; }
+.attribute { height: 140px; white-space: nowrap; }
+.attribute div { transform: translate(19px, 53px) rotate(315deg); width: 25px; text-align: left; }
+.attribute > div > a { display: inline-block; border-bottom: 1px solid #CCCCCC; padding: 2px; width: 100px; }
+</style>
+
+<table class="matrix">
+<tr>
+  <th align="right"><<title>></th>
+  <$list filter=<<tagFilter>> variable="tag">
+  <th class="attribute"><div><$link to=<<tag>>><<tag>></$link></div></th>
+  </$list>
+</tr>
+<$list filter=<<tidFilter>> variable="curTid">
+<tr>
+<th align="right">
+<$link to=<<curTid>>><$view tiddler=<<curTid>> field="caption"><<curTid>></$view></$link>
+</th>
+<$list filter=<<tagFilter>> variable="curTag">
+<$set name="cell-val" filter="[<curTid>tag<curTag>]" value="cell-true" emptyValue="cell-false">
+<td class=<<cell-val>>><div class="entry"></div></td>
+</$set>
+</$list>
+</tr>
+</$list>
+</table>
+
+The above matrix gives a quick overview about which versions affect which critical TiddlyMap aspects. For a more detailed impression have a look at the individual release notes.

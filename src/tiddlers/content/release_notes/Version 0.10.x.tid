@@ -1,0 +1,117 @@
+caption: v0.10.x
+created: 20151026154714816
+modified: 20160102230644028
+tags: ReleaseNote Configurability Integration Usability Performance
+title: Version 0.10.x
+tmap.id: 26976ded-1d7e-4798-b7ef-a12fc5cdaeef
+type: text/x-markdown
+
+Major enhancements
+----------------------------
+
+### v0.10.7
+
+* Improved Fullscreen and halfscreen. Fullscreen doesn't trigger
+  the browser's fullscreen (F11) anymore but simply fills the page's
+  body. This is nicer to work with and also fixes #96.
+  Moreover, halfscreen and fullscreen may be switched immediately,
+  which is a true fix for #157.
+
+### v0.10.6
+
+* Resolves #197: Add more keyboard shortcuts
+* Resolves #134: Shift-drag to create new edge.
+  – ctrl+1,2 can be used to achieve that.
+
+### v0.10.4
+
+* Resolves #192: Allow adding node information (text/tags/fields)
+  when creating a node.
+
+### v0.10.3
+
+* Visjs arrow heads are now acknowledged by TM; Edges may be
+  incoming, outgoing, or bi-directional.
+* Fixes #90: Editor bar dropdown to only show incoming or outgoing
+  edges or both
+* Added statistics to "Configure TiddlyMap" dialog.
+
+### v0.10.0
+
+* Resolves #182: Option to add a background image to a map
+* Resolves #102: Click node to navigate to different map
+* Resolves #166: Trigger views in the live view
+  This is achieved via the live tab, which is disabled
+  by default.
+* Added the possibility to assign icons on a local node level
+* Added the possibility to specify a caption on a local node level
+
+Important Bugfixes
+----------------------------
+
+### v0.10.5
+
+* Fixes that entered text is not saved when adding a newly created
+  node to the map.
+  
+### v0.10.4
+
+* Fixes #195: Hitting delete key in graph triggers multiple dialogs
+* Fixes #190: Make tiddlers clicked in an embedded map open according
+  to TM-configuration.
+
+### v0.10.3
+
+* Fixes selectbox "open view" in local node style not having a 
+  disabled option.
+* Fixes #194: Moving nodes will remove all local node data
+* Live tab is disabled in mobile mode
+* By mistake added setOptions during rebuildGraph in v0.9.15;
+  now removed!
+
+### v0.10.2
+
+* Fixes #189: View data overridden when a super quickly switching
+  views
+
+### v0.10.1
+
+* Fixes #186: "_canonical_uri" images should work as background
+  and node images as well.
+
+### v0.10.0
+
+* Nodes where not removed from view filters when corresponding
+  tiddlers where removed from system.
+* Fixed bug that tmap:neighbour type cannot be assigned a priority
+* Fixed some modal layout issues.
+* Fixed problem that renaming view resulted in inconsistencies.
+  Now when a view is renamed, all places where the user linked the
+  view in the TiddlyMap configurations or fields are updated.
+* Fixed wrong timer code (affected console debugging)
+
+
+Incompatibilities to previous versions
+----------------------------
+
+### v0.10.3
+
+* Single click always disabled in editor mode
+* Double click on edge in editor mode always opens edge-type manager
+* Arrow heads cannot be specified on a global level anymore.
+
+Other
+----------------------------
+
+### v0.10.4
+
+* Instead of reloading vis options, a whole new network instance is
+  created.
+* Refactored `insertNode()`
+* Enhanced DialogManager to read class names specified in template
+* Messed a lot with the css.
+
+### v0.10.3
+
+* Improved speed edge retrieval by factor 15. This speeds up graph
+construction and the tiddler toolbar button.

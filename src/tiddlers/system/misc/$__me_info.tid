@@ -1,0 +1,11 @@
+created: 20151106160729791
+modified: 20160205101355992
+tags: 
+title: $:/me/info
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+<div class="flash-message info">
+   <i class="fa fa-exclamation-circle" /> {{!!title}}
+</div>

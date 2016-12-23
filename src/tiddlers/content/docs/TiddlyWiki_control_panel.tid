@@ -1,0 +1,9 @@
+created: 20151106202812911
+modified: 20151106203416999
+title: TiddlyWiki control panel
+tmap.id: dbe86224-4b82-4f70-a1c8-b217e4188821
+type: text/vnd.tiddlywiki
+
+This is where you configure your TiddlyWiki. Don't confuse this with the [[TiddlyMap configuration dialog|System configuration]]!
+
+To open the TiddlyWiki control paner of the wiki you are currently looking at, click on this icon:  {{$:/core/ui/Buttons/control-panel}}

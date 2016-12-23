@@ -1,0 +1,22 @@
+created: 20141217194700139
+modified: 20160205104600226
+title: Version History
+tmap.edges: {"d50b1a62-304d-4625-8718-2afe4656f155":{"to":"ab10a6d5-103d-4436-b802-677dc26a7c52","type":"demo:suggestion"}}
+tmap.id: BE07716E-E5AB-480A-B228-9E24357EBC88
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+<div>
+{{Version Matrix}}
+</div>
+
+! Release Notes
+
+<$list filter="[tag[ReleaseNote]!sort[created]limit[1]]">
+  <$macrocall $name="tabs"
+                      tabsList="[tag[ReleaseNote]!sort[created]]"
+                      default={{!!title}}
+                      class="tc-vertical"
+                      template="ReleaseTemplate" />
+</$list>

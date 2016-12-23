@@ -1,0 +1,14 @@
+created: 20151013125226177
+modified: 20151013130644457
+tags: [[Styling Nodes]]
+title: Prioritize group styles
+tmap.id: e7758e46-0fac-4f7b-8315-cf886defac0d
+type: text/vnd.tiddlywiki
+
+In TiddlyMap you can use [[group styles|Styling Nodes]] to batch-style nodes. To avoid style conflicts, you can define, which styles have priority over other styles.
+
+!! How to priotize node types and their styles
+
+The image shows a portion of the node-type manager interface where you can see that the //literature// node type has a priority of `#2` and, thus, will be overriden by all node types that have a higher priority assigned `#1`
+
+{{node type prioritisation.png}}

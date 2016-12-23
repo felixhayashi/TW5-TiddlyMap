@@ -1,0 +1,20 @@
+created: 20150402104139269
+modified: 20151220135241957
+tags: [[Basic concepts]]
+title: Discovering the neighbourhood
+tmap.id: dd2651b1-dec0-4388-b16e-de9057c6c2f0
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+{{This feature makes most sense in combination with the [[Live view]].||$:/me/info}}
+
+A TiddlyMap widget will first and foremost display nodes that match the specified [[node filter|Node and edge-type filters]]. These "matches", together with their connections, form the "original graph". In addition, you may configure TiddlyMap to display another set of nodes: "neighbours". 
+
+Neighbours are all nodes that are not part of the original set of nodes but are connected (either outgoing or incoming) to a node of the original set.
+
+On a per-view level, you can define, how big the displayed neighbourhood shall be. The size is measured in a distance unit called "step". A step stands for the traversal of an edge (regardless of it's direction). If e.g. a neighbourhood with the distance of 3 steps is displayed it means, that all nodes that can be reached within 3 steps, starting from the original set, will be displayed.
+
+Just open the neighbourhood drop-down in the editor bar to define the size of the displayed neighbourhood for a view.
+
+{{Selection_579.png}}

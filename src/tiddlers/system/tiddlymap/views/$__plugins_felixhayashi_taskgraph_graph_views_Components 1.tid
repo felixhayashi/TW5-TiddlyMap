@@ -1,0 +1,9 @@
+config.display_neighbours: true
+config.layout.active: user
+created: 20141217211322403
+id: A464D4FC-1605-4A60-8142-9A04576C983D
+isview: true
+modified: 20141222214859807
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/Components
+type: text/vnd.tiddlywiki
+

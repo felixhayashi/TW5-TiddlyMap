@@ -1,0 +1,12 @@
+created: 20160125132707111
+modified: 20160125152400950
+tags: 
+title: $:/beta warning
+type: text/vnd.tiddlywiki
+
+\define plugin() $:/plugins/felixhayashi/tiddlymap
+\define url(branch) [[tiddlymap.org$branch$|http://tiddlymap.org$branch$]]
+
+<$list filter="[<plugin>get[version]regexp[.*-develop.*]]">
+{{''Do not install this.'' You are currently viewing <<url "/develop">>, which is a pre-release demo of TiddlyMap, showing work in progress that will be included in the next version. For an installable release, visit  <<url>> instead.||$:/me/warning}}
+</$list>

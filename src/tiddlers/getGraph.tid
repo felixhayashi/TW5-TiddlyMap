@@ -1,7 +1,0 @@
-created: 20150822172447974
-modified: 20150822172447974
-title: getGraph
-tmap.edges: {"01f655d5-b204-49db-bb6f-218917a3295e":{"to":"e35fd26c-d07c-47fa-b222-4fa7cc0c90b3","type":"demo:uses"},"3ca14996-d9ad-4c84-b606-8d7e108b6948":{"to":"f68f8abf-3097-40f6-8ffb-9e5c2eb2ca01","type":"demo:uses"},"808f31c0-88d7-4d6e-a524-9dc282858c40":{"to":"d8a67756-c338-45b2-aceb-c6bd17de49ce","type":"demo:uses"}}
-tmap.id: 6deef539-edc6-43c8-8598-f3e921ffba39
-type: text/vnd.tiddlywiki
-

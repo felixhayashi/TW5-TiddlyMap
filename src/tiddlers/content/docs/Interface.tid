@@ -1,0 +1,10 @@
+created: 20150401212417078
+modified: 20151106143135866
+tags: Documentation
+title: Interface
+tmap.id: 72b26c54-f150-4a17-93ea-3ac1bcca7fdd
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+TiddlyMap is integrated in many ways into TiddlyWiki and offers various interfaces where the user can interact with the system.

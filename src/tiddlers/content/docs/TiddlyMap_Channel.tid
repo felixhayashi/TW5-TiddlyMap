@@ -1,0 +1,17 @@
+created: 20150910210313771
+modified: 20151220134209422
+title: TiddlyMap Channel
+tmap.fa-icon: f167
+tmap.id: 1748576e-74bb-4165-85bb-0d312e3e4f1f
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+You can check out some TiddlyMap introductory videos here:
+
+"""
+[[Create Concept-Maps in the Browser Using Free Personal-Wiki Software|https://youtu.be/dmeIxuN0L5w]]
+In this video I will show you, how you can setup the free personal web notebook TiddlyWiki and turn it into a full-blown concept- and mind-mapping platform with the help of the TiddlyMap plugin.
+
+[[TiddlyMap Basics – Tutorial for developing a concept map in TiddlyWiki|https://www.youtube.com/playlist?list=PL1Jnk3P6K3KO4EEIlFpzqIWgJOcyN7i61]]
+In this step-by-step tutorial series I will show you how to build a simple concept map with TiddlyMap. The videos in this playlist should be understood as introductory and do not cover all the possibilities that exist with TiddlyMap.

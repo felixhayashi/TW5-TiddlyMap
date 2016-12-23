@@ -1,9 +1,0 @@
-config.neighbourhood_directions: in
-config.neighbourhood_scope: 
-created: 20150904100213025
-id: 110b20a8-c5f7-41b5-82e3-6faa30d27f4b
-isview: true
-modified: 20151229124032964
-title: $:/plugins/felixhayashi/tiddlymap/graph/views/Overview
-type: text/vnd.tiddlywiki
-

@@ -1,0 +1,84 @@
+created: 20160122201118007
+modified: 20160124144839814
+tags: Recipes
+title: Edge-type filter examples
+tmap.id: 08df38ff-cbe0-4c78-91ee-3d5c4c63eb71
+type: text/vnd.tiddlywiki
+
+You will find more examples scattered across the page but here are some examples. Make sure you understood [[TiddlyWiki filters]].
+
+! Only show edges containing the letter "is"
+
+Just use a [[regexp filter|http://tiddlywiki.com/#regexp%20Operator]]:
+
+```
++[regexp[.*is.*]]
+```
+
+! Hide all tag- and link-edges
+
+Say you want to hide all edges based on tags and links in a certain [[view|Views]]. In this case, you need to open the view and in the menu select "edit filters". Then change the edge-type filter into the following:
+
+```
+-[[tw-list:tags]]
+-[[tw-body:link]]
+```
+
+Read more about [[tw-list]] and [[tw-body]] and [[Magic Edge-Type Namespaces]].
+
+! Hide all edge types starting with "my"
+
+If you want to exclude all types that begin with "my", e.g. `myedge1`, `myedge2`, then use the following filter:
+
+```
+-[prefix[my]]
+```
+
+! Allow only edges types starting with "my"
+
+On the contrary, if you want to show only types that begin with "my", e.g. `myedge1`, `myedge2`, then add the following [[prefix filter|http://tiddlywiki.com/#prefix%20Operator]]:
+
+```
++[prefix[my]]
+```
+
+This will deselect all types except the one starting with "my". Generally, it is a good idea to "bundle" certain types by using [[Edge-type namespaces]] or common prefixes. This way, you can quickly enable or disable a whole set of edge-types that is dedicated to a certain topic.
+
+! Show only private edges types starting with "_my"
+
+Just like in the example above, replace your whole filter with:
+
+```
++[prefix[_my]]
+```
+
+For an example, have a look at the "Family Tree" view's edge type filter.
+
+! Hide all private types except those starting with "_my"
+
+Say you want to keep all [[Private edge types]] hidden but make an exception for those prefixed with `_my`, e.g. `_mycooledge1` or `_mycooledge2`. In this case, you need to need to write the following:
+
+```
+-[prefix[_]] [prefix[_my]]
+```
+
+Alternatively, this would also work:
+
+```
+-[prefix[_]!prefix[_my]]
+```
+
+! Show only edges starting with "my" but not ending with "mo"
+
+Combine the prefix filter with a [[suffix filter|http://tiddlywiki.com/#suffix%20Operator]].
+
+```
++[prefix[my]!suffix[mo]]
+```
+
+Alternatively:
+
+```
++[prefix[my]]
+-[suffix[mo]]
+```

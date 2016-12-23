@@ -1,0 +1,13 @@
+created: 20151002100154723
+modified: 20160205130546034
+tags: Challenges
+title: Performance
+tmap.id: 28e3a702-7078-4413-a017-603ddf033f28
+type: text/vnd.tiddlywiki
+
+Making TiddlyMap faster by e.g. 
+
+* writing code that is optimizable by JavaScript engines (like V8),
+* caching results for faster retrieval.
+* using data and storage structures that allow faster access,
+* avoiding bottlenecks

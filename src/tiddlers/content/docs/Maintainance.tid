@@ -1,0 +1,15 @@
+created: 20161218100154723
+modified: 20161220221350361
+tags: Challenges
+title: Maintainance
+tmap.id: 18e9a702-7078-4413-a017-603ddf033f28
+type: text/vnd.tiddlywiki
+
+Keeping the project up-to-date and making it more robust and maintainable through "meta-level" improvements, for example:
+
+* improving build scripts.
+* updating code docu
+* adpoting new javascript syntax
+* writing tests
+* using linting rules
+* re-organizing code folder structures.

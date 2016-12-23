@@ -1,8 +1,0 @@
-created: 20151106172348787
-modified: 20151106173243170
-tags: [[Map element types]]
-title: Node types
-tmap.id: 4babf677-d0ef-48f6-9981-2572e588a7bf
-type: text/vnd.tiddlywiki
-
-Node types can be understood as classes that define how whole groups of nodes look and behave. By defining node types (sometimes also referred to node styles) using the node-type manager, you can style groups of nodes at once.

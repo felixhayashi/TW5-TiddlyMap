@@ -1,0 +1,24 @@
+caption: v0.12.x
+created: 20161221161828921
+modified: 20161221161828921
+tags: ReleaseNote Usability Performance Maintainance Configurability
+title: Version 0.12.x
+tmap.id: 87a6e13e-e5c9-4bdb-9b25-08e8445e9f37
+type: text/x-markdown
+
+Enhancements
+----------------------------
+
+* Resolves #198: Modulized EdgeType handling
+* Resolves #245: Include linting rules
+* Resolves #244: Upgrade to ec6 via babel
+* Resolves #246: Only stabilize graph on initial loading
+* Resolves #231: Pressing enter/esc to confirm/cancel the "add node" dialog
+* Resolves #229: Selecting nodes on the canvas via a selection rectangle
+* Added possibility to re-enable suppressed dialogs in global config
+
+Bugfixes
+----------------------------
+
+* Resolves #248: Use local external images as background image for a view
+* Spawning of nodes matching a filter near center now works correctly

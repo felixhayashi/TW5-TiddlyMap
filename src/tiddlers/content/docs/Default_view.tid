@@ -1,0 +1,10 @@
+created: 20151106162058809
+modified: 20151106162422116
+tags: Views
+title: Default view
+tmap.id: 59fb7371-9436-4644-80d8-820ff0d91bbb
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+The default view is shipped with TiddlyMap and is not removable from TiddlyMap. It has no special meaning, yet, serves as a user's starting point to use TiddlyMap. Also, because it is guaranteed to always exist, it serves as fallback view that is opened when no other view exists.

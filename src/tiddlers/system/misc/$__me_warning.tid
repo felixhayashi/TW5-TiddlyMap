@@ -1,0 +1,9 @@
+created: 20151106170631138
+modified: 20160202205824442
+tags: 
+title: $:/me/warning
+type: text/vnd.tiddlywiki
+
+<div class="flash-message warning">
+   <i class="fa fa-exclamation-triangle" /> {{!!title}}
+</div>

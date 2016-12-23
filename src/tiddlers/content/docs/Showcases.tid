@@ -1,0 +1,16 @@
+created: 20160125154653003
+modified: 20160125155134192
+title: Showcases
+tmap.id: 5d27cdd2-deae-441b-bcfd-4b7f5d805eea
+type: text/vnd.tiddlywiki
+
+Below are some showcases of TiddlyMap in action.
+
+
+<i class="fa fa-exclamation-circle" /> If you have a public wiki using TiddlyMap and you don't mind being listed as showcase, I'd be glad to list you here.
+
+<ul>
+<$list filter="[tag[Showcases]]">
+<li><$link>{{!!title}}</$link></li>
+</$list>
+<ul>

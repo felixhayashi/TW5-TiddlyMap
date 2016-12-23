@@ -1,0 +1,31 @@
+created: 20141219213724182
+id: 5F96C3E8-0A40-44B8-B138-32C70A4D4CC8
+modified: 20161220222318715
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/All Tasks/map
+type: application/json
+
+{
+ "7BEF6C80-B285-48B3-9736-F0845E612A4F": {
+  "x": -461,
+  "y": -82
+ },
+ "E255F767-A447-46D7-865C-494C782FC034": {
+  "x": -220,
+  "y": -164,
+  "node-style": "{}",
+  "label": null,
+  "open-view": "Quest"
+ },
+ "7E692850-2846-41ED-8E7D-F58E7F39680D": {
+  "x": -799,
+  "y": -151
+ },
+ "51CB2809-A6E9-46A7-AFEA-42DEF2228C59": {
+  "x": -651,
+  "y": 4
+ },
+ "F37FE14F-DBCB-40A5-8055-F4020FFB37BB": {
+  "x": -241,
+  "y": 40
+ }
+}

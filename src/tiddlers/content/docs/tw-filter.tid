@@ -1,0 +1,21 @@
+created: 20160120123619985
+modified: 20160120125849149
+tags: [[Magic Edge-Type Namespaces]]
+title: tw-filter
+tmap.id: 2c9248db-2523-4318-9f24-f8211d684c5b
+type: text/vnd.tiddlywiki
+
+{{This feature is available as of TiddlyMap v0.11.0||$:/me/info}}
+{{Do not overuse this feature as it may slow down your wiki at some point.||$:/me/warning}}
+
+The idea behind this magic edge-type namespace is that you do not statically define to which tiddlers a tiddler is connected to, like you would normally do when creating an edge, but instead you use [[TiddlyWiki filters]] to define the targets of the edge.
+
+! Example
+
+Say you want to connect the tiddler "Me" with all tiddlers that have the relationship "is friend". Normally, you would create a link to each tiddler, using the [[TiddlyMap Toolbar Button]] or by drawing the edges in the [[Sidebar map editor]].
+
+With the `tw-filter` edge-type namespace you could instead do the following (this simple example assumes that you tagged all tiddlers with "friends"):
+
+# Create the edge-type `tw-filter:friend` in the [[Edge-type manager]].
+# create a field `friend` in the tiddler "Me" and enter the following filter expression: `[tag[Friend]]`.
+# Now if "Me" is automatically linked with all tiddlers that have a field `Friend`. Also if new tiddlers with this tag are added, they will be connected to "Me" automatically!

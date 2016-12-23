@@ -1,0 +1,9 @@
+created: 20151015121815747
+modified: 20151015122038563
+title: Local images
+tmap.id: 0935bf6e-436b-4b97-b439-75a898ec6d2d
+type: text/vnd.tiddlywiki
+
+Local images are either [[images that are shipped with TiddlyWiki|TiddlyWiki images as node icons]] or any image that you yourself added to your wiki (e.g. via drag & drop).
+
+* Further reading [[Images in WikiText|http://tiddlywiki.com/#Images%20in%20WikiText]]

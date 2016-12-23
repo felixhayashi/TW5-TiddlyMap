@@ -1,0 +1,14 @@
+caption: v0.1.0
+created: 20141217193358930
+modified: 20150712181600372
+released: 20141027
+tags: ReleaseNote [[Map Constructs]] Integration
+title: Version 0.1.0
+tmap.edges: {"1986C2A3-28C5-458E-8AAB-E243DE21EABF":{"to":"3F023113-895B-4ACE-83BF-A882EAC1932C","type":"then"}}
+tmap.id: AA8C320C-CF07-4C45-9E82-0E0FE6E06269
+type: text/vnd.tiddlywiki
+
+# Integration into the TW-GUI
+# Change node titles when tiddler title changes
+# open a node via double-click
+# redraw on resize

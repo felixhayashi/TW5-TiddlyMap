@@ -1,9 +1,0 @@
-created: 20151106170631138
-modified: 20151106170642704
-tags: 
-title: $:/me/warning
-type: text/vnd.tiddlywiki
-
-<div class="tmap-flash-message tmap-warning">
-   <i class="fa fa-exclamation-triangle"></i> {{!!title}}
-</div>

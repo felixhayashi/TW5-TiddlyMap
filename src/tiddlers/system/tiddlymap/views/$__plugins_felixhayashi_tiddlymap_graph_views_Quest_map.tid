@@ -1,0 +1,38 @@
+created: 20151030101009258
+modified: 20161220222318682
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/Quest/map
+type: text/vnd.tiddlywiki
+
+{
+ "8044e455-d507-432e-bbc7-0d0308d29516": {
+  "x": 409,
+  "y": 170
+ },
+ "ecfbe4b8-fa35-40ec-94e6-ed859a4c8f0f": {
+  "x": 763,
+  "y": 320
+ },
+ "80f69421-1bc0-4ea2-8eed-b9df6caac6a6": {
+  "x": 331,
+  "y": 458
+ },
+ "67942477-eb7b-43c0-a9f9-7cc0d46664ca": {
+  "x": 664,
+  "y": 132
+ },
+ "ed61cb00-8e20-4c5f-a3ee-fe7417b6b08b": {
+  "x": 94,
+  "y": 314
+ },
+ "eeea9c37-3335-41b6-a9e3-47b44438d0d5": {
+  "x": 266,
+  "y": 107
+ },
+ "1b678c21-fc88-46c8-9a96-b3fbe22ecef0": {
+  "x": 527,
+  "y": 444,
+  "node-style": "{}",
+  "label": null,
+  "open-view": "All Tasks"
+ }
+}

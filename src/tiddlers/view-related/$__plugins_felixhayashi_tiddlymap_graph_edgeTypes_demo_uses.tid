@@ -1,7 +1,0 @@
-created: 20150330201139545
-description: A component imports or calls a function of another component, it "uses" the component
-modified: 20150331152154856
-style: {"color":"#d44132"}
-title: $:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/demo:uses
-type: text/vnd.tiddlywiki
-

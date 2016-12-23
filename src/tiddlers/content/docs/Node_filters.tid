@@ -1,0 +1,29 @@
+created: 20160115114631947
+modified: 20160115131951034
+tags: [[Node and edge-type filters]]
+title: Node filters
+tmap.id: c542f539-c09e-48e4-9588-153283a47598
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+Just like you would usually filter a set of tiddlers in your wiki, you can use a node filter to delimit the set of nodes that should be displayed in a graph.
+
+For example the following TiddlyWiki filter-expression adds tiddlers to the map that are tagged with `School` or possess a field named `info`.
+
+```
+[tag[School]]
+[has[info]]
+```
+
+In addition to the filter described above, the filter below adds an restriction, i.e. only tiddlers whose title starts with `Teacher` are considered.
+
+```
+[tag[School]]
+[has[info]]
++[prefix[Teacher]]
+```
+
+! Further reading
+
+{{TiddlyWiki filters}}

@@ -1,0 +1,14 @@
+created: 20160120122428712
+modified: 20160120132646599
+tags: [[Magic Edge-Type Namespaces]]
+title: tw-field
+tmap.id: 880ad851-c29a-4d6e-9fd9-9ee31fabd1ee
+type: text/vnd.tiddlywiki
+
+Similar to the [[tw-list]] magic type you can use the `tw-field` namespace to save an edge into a field. E.g. creating an edge between the tiddlers "Betsy" and "Dave" with the type `tw-field:husband` will create a field "husband" inside the "Betsy" tiddler and set "Dave" as value.
+
+<i class="fa fa-exclamation-triangle" /> There are some drawbacks with this technique:
+
+* This method does not use ids and changing tiddler titles will break the specified connection! 
+* You cannot store multiple edges using this technique. If you want to store multiple edges, use the `tw-list` namespace.
+* When using this namespace, only use tiddlywiki [[allowed field-name charactes|http://tiddlywiki.com/#TiddlerFields]] for field names.

@@ -1,9 +1,0 @@
-config.neighbourhood_scope: 0
-config.vis: {"edges":{"smooth":{"type":"continuous","enabled":false}}}
-created: 20141219210906101
-id: 54BF62C7-C1C8-49EF-885F-99CFC4373524
-isview: true
-modified: 20150402110615837
-title: $:/plugins/felixhayashi/tiddlymap/graph/views/All Tasks
-type: text/vnd.tiddlywiki
-

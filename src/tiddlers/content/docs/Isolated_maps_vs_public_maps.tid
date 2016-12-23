@@ -1,0 +1,44 @@
+created: 20150201132115819
+modified: 20160125144136403
+tags: Recipes
+title: Isolated maps vs public maps
+tmap.id: 04f1dd6d-79a9-4d6e-91be-b8322dd0d0be
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+{{$:/me/docs/outdated}}
+
+! Introduction
+
+In a classical mind- or concept-map program, you create isolated maps for different topics (''Use case 2''). However, because you are inside a wiki it makes much sense that nodes and relations defined in one map, (partly) reappear in other maps as well (''Use case 1'').
+
+Now how to achieve both at the same time? Some suggestions are found below:
+
+! Use case 1 -- Global topic linking
+
+''Purpose:'' Turning your wiki into a network of information
+
+TiddlyMap can be used to express the overall structure of your information contained in your wiki. On a top level, you want to show how each tiddler is related to all the other tiddlers in your wiki. With TiddlyMap, you may globally link your pieces of information in your wiki, thus creating a big holistic network of linked tiddlers.
+
+''Howto:'' Global topic linking is the default mode of TiddlyMap and doesn't need further adjustments.
+
+! Use case 2 -- Independent maps
+
+''Purpose:'' To create (almost) isolated concept or mind maps
+
+When creating concept or mind maps, you may want only a narrow set of edge-types and nodes to be displayed in the current view.
+
+''Howto:''
+
+1. Prevent other edges from showing up:
+
+In this case it is best to prefix all edge types that you create with a certain [[namespace|Edge-type namespaces]] (domain) and change the view's filter to only include edge types with this prefix. For example the "Family tree" view at this website uses the `family:` namespace to only include edges that start with this namespace, e.g. `family:mother of` or `family:brother of`. You can also set the default prefix for edges created inside a certain view via the view configuration menu.
+
+2. Prevent edges from leaking out:
+
+Some relationships only make sense in a certain view and shall not be displayed somewhere else. For this task, use [[Private edge types]].
+
+3. Only show a subset of nodes:
+
+You can add nodes one by one to the view to ensure, only a subset of nodes is displayed in the graph. Alternatively, specify a dedicated tag for all nodes that should appear in the graph and change the node filter of the view accordingly.

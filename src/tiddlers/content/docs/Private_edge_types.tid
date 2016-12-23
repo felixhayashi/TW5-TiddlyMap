@@ -1,0 +1,78 @@
+created: 20160120140745491
+modified: 20160125144903528
+tags: [[Edge types]]
+title: Private edge types
+tmap.id: ee154482-3169-4ee5-b0c5-df8014988c6b
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+{{This feature is available as of TiddlyMap v0.11.0.||$:/me/info}}
+
+In a classical mind-map or concept-map program, you create isolated maps for different topics, where edges defined in one map, are not visible in another map. In TiddlyMap, however, relations defined in one map automatically reappear ("leak") in other maps as well, which may be annoying.
+
+To solve this issue, TiddlyMap allows you to define "private" or (or "non-default") [[Edge types]] that are not displayed in any [[view|Views]] unless the [[edge-type filter|Edge-type filters]] is explicitly set to allow them.
+
+! How to mark an edge type as private?
+
+In order to mark an edge type as private, you need to simply prefix the name of the edge-type with an underscore symbol "`_`".
+
+Now edges of this type will never show up unless you added them to the filter (as described in the example below). Of course the underscore "`_`" is not displayed in the graph.
+
+! Quick start
+
+For some short examples and code snippets, have a look at: [[Edge-type filter examples]]. Also experiment with the "Family Tree" view on this demo site.
+
+! A scenario
+
+Dave installed TiddlyMap and created three views named "My Family", "Vacation" and "Tasks". Now he adds nodes to the views and draws relationships between them.
+
+It happens that the views all share the nodes "Bob" and "Susanne":
+
+* ''In view "Family":'' Bob – married to – Susanne
+* ''In view "Vacation":'' Bob – travels with – Susanne
+* ''In view "Tasks":'' Bob – still owing money to – Susanne
+
+Because Dave did not add any [[Edge-type filters]] yet to his views, the relationships between the nodes are displayed in all views.
+
+Now in some cases this may be desired, in some cases it is certainly not. In this example, we want to achieve the following:
+
+# The relation `still owing money` is considered to be highly important and shall stay visible everywhere (in every view).
+# The relation `travels with` shall only be visible in the view "Vacation" and nowhere else (in no other view).
+# The relation `married to` shall only be visible in the views "Vacation" and "Tasks".
+
+To achieve this, we first need to open the [[Edge-type manager]] and and change the id of the edge type "married to" into "_married to" and the edge-type id "travels with" into "_travels with" (in both cases note the underscore).
+
+Now looking at the maps, we will see that the formerly present edges `married to` and `travels with` have been removed from all maps. This is because these edges belong to //private// edge types now, which are not displayed unless included in the filter.
+
+So let's add the edge types again where appropriate:
+
+''In view "Vacation":'' Open the [[edge-type filter|Edge-type filters]] and add the following line:
+
+```
+[[_married to]] [[_travels with]]
+```
+
+''In view "Tasks":'' Open the [[edge-type filter|Edge-type filters]] and add the following line:
+
+```
+[[_travels with]]
+```
+
+The private edges become visible again in the two views because they have been explicitly added.
+
+Now Dave wants to draw more private edges in the map "Vacation". Does he need to edit the edge-type filter for every private edge he creates as described above?
+
+No. He can invent a a common prefix-scheme for edges that are private to `Vacation`, e.g. `_vaca` and use the following edge-type filter in his view: `+[prefix[_vaca:]]`. This will make sure that only private edge types starting with `_vaca` are displayed in the view and nothing else.
+
+Moreover, Dave can create a dedicated namespace for his "Vacation" view to automatically prefix edges with a namespace `_vaca` when they are added.
+
+For this, he opens the view configuration of `Vacation`, goes to the namespace section and enters
+
+```
+_vaca
+```
+
+Next time he adds an edge in "Vacation" from "Bob" to "Susanne" named `buys ticket for`, TiddlyMap will add the namespace and create an edge type named `_vaca:buys ticket`. Consequently, this connection will be visible only in "Vacation" as it matches the filter. Note that the namespace is only added if the edge type of the added edge doesn't contain a namespace or doesn't exist yet.
+
+Happy coding.

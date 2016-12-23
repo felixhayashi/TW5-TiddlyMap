@@ -1,0 +1,7 @@
+created: 20150627125908877
+modified: 20161220221953050
+tags: 
+title: $:/plugins/felixhayashi/tiddlymap/config/vis/user
+type: application/json
+
+{"edges":{"color":{"color":"#B22222"},"arrows":{"to":true,"middle":{"enabled":false},"from":{"enabled":false}}},"nodes":{"font":{"size":15,"color":"#FFFFFF"},"color":{"background":"rgba(178,34,34,1)","border":"rgba(111,109,112,1)"}},"physics":{"forceAtlas2Based":{"springLength":0}}}

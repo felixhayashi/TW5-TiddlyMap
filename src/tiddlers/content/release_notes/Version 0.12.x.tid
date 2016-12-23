@@ -9,6 +9,8 @@ type: text/x-markdown
 Enhancements
 ----------------------------
 
+### v0.12.0
+
 * Resolves #198: Modulized EdgeType handling
 * Resolves #245: Include linting rules
 * Resolves #244: Upgrade to ec6 via babel
@@ -19,6 +21,17 @@ Enhancements
 
 Bugfixes
 ----------------------------
+
+### v0.12.2
+
+* Fixed mistake in implementation of v0.12.1
+* Resolves #243: TiddlyMap destroys tiddler body content
+
+### v0.12.1
+
+* Resolves #222: Duplicate ID renaming can cause data loss on node.js hosted wiki
+
+### v0.12.0
 
 * Resolves #248: Use local external images as background image for a view
 * Spawning of nodes matching a filter near center now works correctly

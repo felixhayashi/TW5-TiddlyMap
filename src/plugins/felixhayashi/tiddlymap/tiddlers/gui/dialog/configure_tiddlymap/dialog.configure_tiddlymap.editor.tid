@@ -5,11 +5,15 @@ caption: Editor
 
 <table class="tmap-config-table">
   <<tmap-row type:"input-checkbox"
-      title:"Show Neighbour&shy;hood button"
-      field:"config.sys.editorMenuBar.showNeighScopeButton" 
-      descr:"Show or hide the neighbourhood scope button from the menu.">>
+      title:"Show Neighbour&shy;hood menu"
+      field:"config.sys.editorMenuBar.showNeighScopeButton"
+      descr:"Show or hide the neighbourhood menu button.">>
   <<tmap-row type:"input-checkbox"
-      title:"Show Screen&shy;shot button"
-      field:"config.sys.editorMenuBar.showScreenshotButton" 
-      descr:"Show or hide the screenshot button.">>
-</table>   
+      title:"Show Screen&shy;shot menu"
+      field:"config.sys.editorMenuBar.showScreenshotButton"
+      descr:"Show or hide the screenshot menu button.">>
+  <<tmap-row type:"input-checkbox"
+      title:"Show Raster&shy; menu"
+      field:"config.sys.editorMenuBar.showScreenshotButton"
+      descr:"Show or hide the raster menu button.">>
+</table>

@@ -460,9 +460,11 @@ class MapWidget extends Widget {
    */
   rebuildEditorBar() {
 
-    // register variables
+    // register dialog variables
 
-    const view = this.view;
+    const { view } = this;
+    const unicodeBtnClass = 'tmap-unicode-button';
+    const activeUnicodeBtnClass = `${unicodeBtnClass} tmap-active-button`;
     const variables = {
       widgetQualifier: this.getStateQualifier(),
       widgetTempPath: this.widgetTempPath,
@@ -473,10 +475,8 @@ class MapWidget extends Widget {
       viewHolder: this.getViewHolderRef(),
       edgeTypeFilter: view.getPaths().edgeTypeFilter,
       allEdgesFilter: $tm.selector.allEdgeTypes,
-      neighScopeBtnClass: 'tmap-neigh-scope-button'
-                          + (view.isEnabled('neighbourhood_scope')
-                             ? ' ' + 'tmap-active-button'
-                             : '')
+      neighScopeBtnClass: view.isEnabled('neighbourhood_scope') ? activeUnicodeBtnClass : unicodeBtnClass,
+      rasterMenuBtnClass: view.isEnabled('raster') ? activeUnicodeBtnClass : unicodeBtnClass,
     };
 
     for (let name in variables) {
@@ -977,6 +977,8 @@ class MapWidget extends Widget {
   handleCanvasMouseMove(ev) {
 
     const { network } = this;
+
+    console.log(ev.ctrlKey, ev.buttons);
 
     if (!(ev.ctrlKey && ev.buttons)) {
 
@@ -2197,6 +2199,7 @@ class MapWidget extends Widget {
   /**
    * Called by vis when the dragging of a node(s) has ended.
    * Vis passes an object containing event-related information.
+   *
    * @param {Array<Id>} nodes - Array of ids of the nodes
    *     that were being dragged.
    */
@@ -2206,36 +2209,83 @@ class MapWidget extends Widget {
       return;
     }
 
+    if (nodes.length === 1 && this.view.isEnabled('raster')) {
+      const pos = this.network.getPositions()[nodes[0]];
+      this.graphData.nodes.update({
+        id: nodes[0],
+        ...utils.getNearestRasterPosition(pos, parseInt(this.view.getConfig('raster'))),
+      });
+    }
+
+    // reset store
+    this.draggedNode = null;
+
     // fix node again and store positions
     // if in static mode, fixing will be ignored
     this.setNodesMoveable(nodes, false);
 
   }
 
+  /**
+   *
+   * @param context2d
+   */
   handleVisBeforeDrawing(context2d) {
 
-    if (this.backgroundImage) {
-      //utils.drawRaster(context2d, this.network.getScale(), this.network.getViewPosition());
-      context2d.drawImage(this.backgroundImage, 0, 0);
+    const { view, network, backgroundImage } = this;
+
+    if (backgroundImage) {
+      context2d.drawImage(backgroundImage, 0, 0);
+    }
+
+    if (view.isEnabled('raster')) {
+      utils.drawRaster(
+        context2d,
+        network.getScale(),
+        network.getViewPosition(),
+        parseInt(view.getConfig('raster'))
+      );
     }
 
   }
 
+  /**
+   *
+   * @param context2d
+   */
   handleVisAfterDrawing(context2d) {
 
     if (this.selectRect) {
 
       const rect = this.selectRect.getRect();
 
-      // fill
+      context2d.beginPath();
       context2d.globalAlpha = 0.5;
       context2d.fillStyle = '#EAFFEF';
       context2d.fillRect(...rect);
 
-      // stroke
+      context2d.beginPath();
       context2d.globalAlpha = 1;
       context2d.strokeStyle = '#B4D9BD';
       context2d.strokeRect(...rect);
+
+    }
+
+    if (this.draggedNode && this.view.isEnabled('raster')) {
+
+      const pos = this.network.getPositions()[this.draggedNode];
+      const rPos = utils.getNearestRasterPosition(pos, parseInt(this.view.getConfig('raster')));
+
+      context2d.strokeStyle = 'green';
+      context2d.fillStyle = 'green';
+
+      context2d.beginPath();
+      context2d.moveTo(pos.x, pos.y);
+      context2d.lineTo(rPos.x, rPos.y);
+      context2d.stroke();
+      context2d.beginPath();
+      context2d.arc(rPos.x, rPos.y, 5, 0, Math.PI * 2);
+      context2d.fill();
 
     }
 
@@ -2359,6 +2409,10 @@ class MapWidget extends Widget {
       this.hidePopups(0, true);
       this.assignActiveStyle(nodes);
       this.setNodesMoveable(nodes, true);
+
+      if (nodes.length === 1) {
+        this.draggedNode = nodes[0];
+      }
 
     }
 

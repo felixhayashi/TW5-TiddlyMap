@@ -507,9 +507,11 @@ const registerChangeListener = callbackManager => {
         continue;
       }
 
-      updates.changedTiddlers[tRef] = changedTiddlers[tRef];
+      const isHandled = handleTiddlerChange(tRef, tObj, updates);
 
-      handleTiddlerChange(tRef, tObj, updates);
+      if (isHandled) {
+        updates.changedTiddlers[tRef] = changedTiddlers[tRef];
+      }
     }
 
     dispatchUpdates(updates);
@@ -550,11 +552,20 @@ const handleTiddlerChange = (tRef, tObj, updates) => {
         $tm.logger('warn', '[System change]', path);
         rebuilders[path]();
         updates[path] = true;
-        return;
+        break;
       }
     }
 
   } else if (tObj) { // created or modified
+
+    if (!tObj.fields.text === undefined) { // sic; '' is ok
+      // to make sure that the tiddler's body is fully loaded
+      // we postpone the handling of the tiddler
+      // see https://github.com/felixhayashi/TW5-TiddlyMap/issues/222#issuecomment-268978764
+      $tw.wiki.dispatchEvent('lazyLoad', tRef);
+
+      return false;
+    }
 
     checkForClone(tObj);
 
@@ -567,7 +578,7 @@ const handleTiddlerChange = (tRef, tObj, updates) => {
     const id = $tm.tracker.getIdByTiddler(tRef);
 
     if (!id) { // ignore tiddler without id
-      return;
+      return false;
     }
 
     const tRefWithId = utils.getTiddlerWithField('tmap.id', id);
@@ -584,6 +595,8 @@ const handleTiddlerChange = (tRef, tObj, updates) => {
 
     }
   }
+
+  return true;
 
 };
 

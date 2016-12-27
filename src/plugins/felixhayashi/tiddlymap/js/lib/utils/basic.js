@@ -420,7 +420,9 @@ export const getRandomLabel = (options = {}) => {
 
 const _merge = (dest, src) => {
 
-  if (typeof dest !== 'object') { dest = {}; }
+  if (typeof dest !== 'object') {
+    dest = {};
+  }
 
   for (let p in src) {
     if (src.hasOwnProperty(p)) {

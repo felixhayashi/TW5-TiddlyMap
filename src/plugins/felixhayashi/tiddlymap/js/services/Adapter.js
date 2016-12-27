@@ -703,21 +703,17 @@ class Adapter {
       const tRef = this.getTiddlerById(id);
       const tObj = this.wiki.getTiddler(tRef);
       const fields = tObj.fields;
-
       const node = nodes[id];
-      let faIcon = null;
-      let twIcon = null;
+      let icon;
 
       // == group styles ==
 
-      // will add local and global group styles
-      if (inheritedStyles[tRef]) {
+      const inheritedStyle = inheritedStyles[tRef];
 
-        if (inheritedStyles[tRef].style) {
-          utils.merge(node, inheritedStyles[tRef].style);
-        }
-        faIcon = inheritedStyles[tRef]['fa-icon'];
-        twIcon = inheritedStyles[tRef]['tw-icon'];
+      if (inheritedStyle) {
+
+        utils.merge(node, inheritedStyle.style);
+        icon = getIcon(inheritedStyle['fa-icon'], inheritedStyle['tw-icon']);
       }
 
       // == global node styles ==
@@ -732,16 +728,17 @@ class Adapter {
         utils.merge(node, utils.parseJSON(fields['tmap.style']));
       }
 
-      faIcon = fields['tmap.fa-icon'] || faIcon;
-      twIcon = fields['icon'] || twIcon;
+      icon = getIcon(fields['tmap.fa-icon'], fields['icon']) || icon;
 
       // == local node styles ==
 
       // local node style and positions
 
-      if (viewNodeData[id]) {
+      const nodeData = viewNodeData[id];
 
-        utils.merge(node, viewNodeData[id]);
+      if (nodeData) {
+
+        utils.merge(node, nodeData);
         if (isStaticMode) {
           // fix x if x-position is set; same for y
           node.fixed = {
@@ -750,15 +747,12 @@ class Adapter {
           };
         }
 
-        faIcon = viewNodeData[id]['fa-icon'] || faIcon;
-
-        twIcon = viewNodeData[id]['tw-icon'] || twIcon;
+        icon = getIcon(nodeData['fa-icon'], nodeData['tw-icon']) || icon;
       }
 
       // == tweaks ==
 
-      const isColorObject = (node.color !== null
-      && typeof node.color === 'object');
+      const isColorObject = (node.color !== null && typeof node.color === 'object');
       // color/border-color may be undefined
       const color = (isColorObject ? node.color.background : node.color);
 
@@ -768,7 +762,7 @@ class Adapter {
       };
 
       // ATTENTION: this function needs to be called after color is assigned
-      addNodeIcon(node, faIcon, twIcon);
+      addNodeIcon(node, icon);
 
       // determine font color if not defined via a group- or node-style;
       // in case of global and local default styles, the user is responsible
@@ -964,7 +958,6 @@ class Adapter {
  *
  * @param str FontAwesome id
  * @return {string}
- * @private
  */
 const getFAdigits = (str) => (str.length === 4 ? str : str.substr(3, 4));
 
@@ -972,21 +965,24 @@ const getFAdigits = (str) => (str.length === 4 ? str : str.substr(3, 4));
  * Adds an icon to the specified node.
  *
  * @param {Node} node
- * @param {string} faIcon
- * @param {string} twIcon
- * @private
+ * @param {Object} icon
  */
-const addNodeIcon = (node, faIcon, twIcon) => {
+const addNodeIcon = (node, icon) => {
+
+  if (!icon) {
+    return;
+  }
 
   // Font Awesome style
 
-  if (faIcon) {
+  if (icon.fa) {
+
     node.shape = 'icon';
     node.icon = {
       shape: 'icon',
       face: 'FontAwesome',
       color: node.color,
-      code: String.fromCharCode('0x' + getFAdigits(faIcon))
+      code: String.fromCharCode('0x' + getFAdigits(icon.fa))
     };
 
     return;
@@ -994,20 +990,24 @@ const addNodeIcon = (node, faIcon, twIcon) => {
 
   // TiddlyWiki stored icons
 
-  if (twIcon) {
+  if (icon.tw) {
 
-    const imgTObj = utils.getTiddler(twIcon);
-    if (!imgTObj) return;
+    const imgTObj = utils.getTiddler(icon.tw);
+
+    if (!imgTObj) {
+      return;
+    }
 
     if (imgTObj.fields['_canonical_uri']) { // image is a url address
+
       node.image = imgTObj.fields['_canonical_uri'];
       node.shape = 'image';
 
     } else if (imgTObj.fields.text) {
+
       node.image = utils.getDataUri(imgTObj);
       node.shape = 'image';
     }
-
   }
 
 };
@@ -1017,7 +1017,6 @@ const addNodeIcon = (node, faIcon, twIcon) => {
  *
  * @param {Object<string, Node>} nodes
  * @param {ViewAbstraction|string} view
- * @private
  */
 const removeObsoleteViewData = (nodes, view) => {
 
@@ -1062,6 +1061,8 @@ const addStyleToEdge = (edge, type) => {
   }
 
 };
+
+const getIcon = (faIcon, twIcon) => faIcon && { fa: faIcon } || twIcon && { tw: twIcon };
 
 /*** Exports *******************************************************/
 

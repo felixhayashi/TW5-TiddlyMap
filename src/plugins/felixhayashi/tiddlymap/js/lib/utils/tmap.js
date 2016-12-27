@@ -323,7 +323,7 @@ export const refreshDataSet = (ds, ltNew) => {
 
     }
 
-    if (!ltNew[id].x) {
+    if (ltNew[id].x === undefined) {
       withoutPosition.push(id);
     }
 

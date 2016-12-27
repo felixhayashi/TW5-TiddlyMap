@@ -172,6 +172,7 @@ class MapWidget extends Widget {
         // add type to edge
         edge.type = type.id;
         $tm.adapter.insertEdge(edge);
+        this.ignoreNextViewModification = true;
 
         if (!this.view.isEdgeTypeVisible(type.id)) {
 
@@ -460,6 +461,8 @@ class MapWidget extends Widget {
    */
   rebuildEditorBar() {
 
+    this.removeChildDomNodes();
+
     // register dialog variables
 
     const { view } = this;
@@ -473,7 +476,7 @@ class MapWidget extends Widget {
       viewRoot: view.getRoot(),
       viewLabel: view.getLabel(),
       viewHolder: this.getViewHolderRef(),
-      edgeTypeFilter: view.getPaths().edgeTypeFilter,
+      edgeTypeFilter: view.edgeTypeFilterTRef,
       allEdgesFilter: $tm.selector.allEdgeTypes,
       neighScopeBtnClass: view.isEnabled('neighbourhood_scope') ? activeUnicodeBtnClass : unicodeBtnClass,
       rasterMenuBtnClass: view.isEnabled('raster') ? activeUnicodeBtnClass : unicodeBtnClass,
@@ -548,26 +551,25 @@ class MapWidget extends Widget {
     const changedTiddlers = updates.changedTiddlers;
 
     let rebuildEditorBar = false;
-    let rebuildGraph = false;
-    let reinitNetwork = false;
     let rebuildGraphOptions = {};
 
     // check for callback changes
     this.callbackManager.refresh(changedTiddlers);
 
-    if (this.isViewSwitched(changedTiddlers)
-       || this.hasChangedAttributes()
-       || updates[$tm.path.options]
-       || updates[$tm.path.nodeTypes]
-       || changedTiddlers[this.view.getRoot()]) {
+    if (this.isViewSwitched(changedTiddlers) // use changed view
+       || this.hasChangedAttributes() // widget html code changed
+       || updates[$tm.path.options] // global options changed
+       || updates[$tm.path.nodeTypes] // node types were reindexed
+       || changedTiddlers[this.view.getRoot()] // view's main config changed
+    ) {
 
-      this.logger('warn', 'View switched (or main config change)');
+      this.logger('warn', 'View switched config changed');
 
       this.view = this.getView(true);
-      this.reloadRefreshTriggers();
 
-      rebuildEditorBar = true;
-      reinitNetwork = true;
+      this.reloadRefreshTriggers();
+      this.rebuildEditorBar();
+      this.initAndRenderGraph(this.graphDomNode);
 
     } else { // view has not been switched
 
@@ -578,42 +580,26 @@ class MapWidget extends Widget {
 
         this.logger('warn', 'View components modified');
 
+        this.rebuildEditorBar();
         this.reloadBackgroundImage();
-        rebuildEditorBar = true;
-        rebuildGraph = true;
-        rebuildGraphOptions.resetEdgeTypeWL = true;
+        this.rebuildGraph({
+          resetEdgeTypeWL: true,
+          resetFocus: { delay: 0, duration: 0 }
+        });
 
       } else { // neither view switch or view modification
 
         if (updates[$tm.path.nodeTypes]) {
-          rebuildGraph = true;
+          this.rebuildGraph(rebuildGraphOptions);
 
         } else if (this.hasChangedElements(changedTiddlers)) {
-          rebuildGraph = true;
+          this.rebuildGraph(rebuildGraphOptions);
         }
 
+        // give children a chance to update themselves
+        this.refreshChildren(changedTiddlers);
+
       }
-    }
-
-    if (reinitNetwork) {
-      this.initAndRenderGraph(this.graphDomNode);
-      this.hidePopups(0, true);
-
-    } else if (rebuildGraph) {
-      this.rebuildGraph(rebuildGraphOptions);
-      this.hidePopups(0, true);
-    }
-
-    if (rebuildEditorBar) {
-
-      this.removeChildDomNodes();
-      this.rebuildEditorBar();
-
-    } else {
-
-      // give children a chance to update themselves
-      this.refreshChildren(changedTiddlers);
-
     }
 
     // reset this again
@@ -677,10 +663,13 @@ class MapWidget extends Widget {
   rebuildGraph({ resetFocus } = {}) {
 
     if (utils.isPreviewed(this)) {
+
       return;
     }
 
     this.logger('debug', 'Rebuilding graph');
+
+    this.hidePopups(0, true);
 
     // always reset to allow handling of stabilized-event!
     this.hasNetworkStabilized = false;
@@ -1492,8 +1481,10 @@ class MapWidget extends Widget {
     const viewname = this.view.getLabel();
 
     if (this.view.isLocked()) {
+
       $tm.notify('Forbidden!');
       return;
+
     }
 
     // regex is non-greedy
@@ -1783,7 +1774,7 @@ class MapWidget extends Widget {
       const idsOfNodesWithoutPosition = [];
 
       for (let id in nodes) {
-        if (!nodes[id].x) {
+        if (nodes[id].x === undefined) {
           idsOfNodesWithoutPosition.push(id);
         }
       }
@@ -1850,7 +1841,9 @@ class MapWidget extends Widget {
     const fit = () => {
 
       // happens when widget is removed after stabilize but before fit
-      if (this.isZombieWidget()) return;
+      if (this.isZombieWidget()) {
+        return;
+      }
 
       // fixes #97
       this.network.redraw();
@@ -1878,6 +1871,7 @@ class MapWidget extends Widget {
     this.dialogManager.open('addNodeToMap', {}, (isConfirmed, outTObj) => {
 
       if (!isConfirmed) {
+
         return;
       }
 
@@ -1889,12 +1883,12 @@ class MapWidget extends Widget {
         if (utils.isMatch(tRef, this.view.getNodeFilter('compiled'))) {
 
           $tm.notify('Node already exists');
-          return;
 
         } else {
 
           node = $tm.adapter.makeNode(tRef, node);
           this.view.addNode(node);
+          this.ignoreNextViewModification = true;
 
         }
 
@@ -1904,7 +1898,6 @@ class MapWidget extends Widget {
 
         node.label = tRef;
         $tm.adapter.insertNode(node, this.view, tObj);
-
       }
 
     });
@@ -2034,16 +2027,19 @@ class MapWidget extends Widget {
 
     if (properties.nodes.length || properties.edges.length) {
 
-      if (this.editorMode
-         || !utils.isTrue($tm.config.sys.singleClickMode)) {
+      if (this.editorMode || !utils.isTrue($tm.config.sys.singleClickMode)) {
+
         this.handleOpenMapElementEvent(properties);
+
       }
 
 
     } else { // = clicked on an empty spot
+
       if (this.editorMode) {
         this.handleInsertNode(properties.pointer.canvas);
       }
+
     }
 
   }

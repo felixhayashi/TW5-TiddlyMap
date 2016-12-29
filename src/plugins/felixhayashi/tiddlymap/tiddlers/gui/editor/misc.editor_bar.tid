@@ -56,9 +56,6 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
         <$button class="tc-btn-invisible" message="tmap:tm-edit-view">
           {{$:/core/images/options-button}} Configure view
         </$button>
-        <$button class="tc-btn-invisible" message="tmap:tm-store-position">
-          {{$:/core/images/globe}} Save positions
-        </$button>
         <$button class="tc-btn-invisible" message="tmap:tm-rename-view">
           {{$:/core/images/tag-button}} Rename view
         </$button>

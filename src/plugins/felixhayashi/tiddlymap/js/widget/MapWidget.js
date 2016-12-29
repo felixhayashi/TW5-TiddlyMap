@@ -11,7 +11,6 @@ module-type: widget
 
 /*** Imports *******************************************************/
 
-import DialogManager        from '$:/plugins/felixhayashi/tiddlymap/js/DialogManager';
 import CallbackManager      from '$:/plugins/felixhayashi/tiddlymap/js/CallbackManager';
 import ViewAbstraction      from '$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction';
 import EdgeType             from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
@@ -20,6 +19,7 @@ import vis                  from '$:/plugins/felixhayashi/vis/vis.js';
 import { widget as Widget } from '$:/core/modules/widgets/widget.js';
 import utils                from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 import SelectionRectangle   from '$:/plugins/felixhayashi/tiddlymap/js/lib/SelectionRectangle';
+import * as env             from '$:/plugins/felixhayashi/tiddlymap/js/lib/environment';
 
 /*** Code **********************************************************/
 
@@ -55,7 +55,6 @@ class MapWidget extends Widget {
 
     // instanciate managers
     this.callbackManager = new CallbackManager();
-    this.dialogManager = new DialogManager(this.callbackManager, this);
 
     // make the html attributes available to this widget
     this.computeAttributes();
@@ -75,7 +74,6 @@ class MapWidget extends Widget {
         'tmap:tm-delete-view': this.handleDeleteView,
         'tmap:tm-delete-element': this.handleDeleteElement,
         'tmap:tm-edit-view': this.handleEditView,
-        'tmap:tm-store-position': this.handleStorePositions,
         'tmap:tm-generate-widget': this.handleGenerateWidget,
         'tmap:tm-toggle-central-topic': this.handleSetCentralTopic,
         'tmap:tm-save-canvas': this.handleSaveCanvas
@@ -141,6 +139,8 @@ class MapWidget extends Widget {
    *
    * Once the user confirmed the dialog, the edge is persisted.
    *
+   * Note: this should not trigger a zoom.
+   *
    * @param {Edge} edge - A javascript object that contains at least
    *    the properties 'from' and 'to'
    * @param {function} [callback] - A function with the signature
@@ -157,7 +157,7 @@ class MapWidget extends Widget {
       eTyFilter: eTyFilter.raw
     };
 
-    this.dialogManager.open('getEdgeType', param, (isConfirmed, outTObj) => {
+    $tm.dialogManager.open('getEdgeType', param, (isConfirmed, outTObj) => {
 
       if (isConfirmed) {
 
@@ -167,16 +167,20 @@ class MapWidget extends Widget {
         const type = new EdgeType(utils.getText(outTObj), null, options);
 
         // persist the type if it doesn't exist
-        if (!type.exists()) type.save();
+        if (!type.exists()) {
+          type.save();
+        }
 
         // add type to edge
         edge.type = type.id;
         $tm.adapter.insertEdge(edge);
-        this.ignoreNextViewModification = true;
+
+        // prevent zoom
+        this.isPreventZoomOnNextUpdate = true;
 
         if (!this.view.isEdgeTypeVisible(type.id)) {
 
-          this.dialogManager.open('edgeNotVisible', {
+          $tm.dialogManager.open('edgeNotVisible', {
             type: type.id,
             view: this.view.getLabel(),
             eTyFilter: eTyFilter.pretty
@@ -206,7 +210,7 @@ class MapWidget extends Widget {
 
     utils.setEntry($tm.ref.sysMeta, 'showWelcomeMessage', false);
 
-    this.dialogManager.open('welcome', {}, (isConfirmed, outTObj) => {
+    $tm.dialogManager.open('welcome', {}, (isConfirmed, outTObj) => {
 
       if (utils.tiddlerExists('$:/plugins/felixhayashi/topstoryview')) {
 
@@ -241,7 +245,7 @@ class MapWidget extends Widget {
   openStandardConfirmDialog(callback, message) {
 
     const param = { message : message };
-    this.dialogManager.open('getConfirmation', param, callback);
+    $tm.dialogManager.open('getConfirmation', param, callback);
 
   }
 
@@ -548,52 +552,42 @@ class MapWidget extends Widget {
       return;
     }
 
-    const changedTiddlers = updates.changedTiddlers;
-
-    let rebuildEditorBar = false;
-    let rebuildGraphOptions = {};
+    const { changedTiddlers } = updates;
 
     // check for callback changes
     this.callbackManager.refresh(changedTiddlers);
 
     if (this.isViewSwitched(changedTiddlers) // use changed view
        || this.hasChangedAttributes() // widget html code changed
-       || updates[$tm.path.options] // global options changed
-       || updates[$tm.path.nodeTypes] // node types were reindexed
+       || updates[env.path.options] // global options changed
        || changedTiddlers[this.view.getRoot()] // view's main config changed
     ) {
 
       this.logger('warn', 'View switched config changed');
 
+      this.isPreventZoomOnNextUpdate = false;
       this.view = this.getView(true);
-
       this.reloadRefreshTriggers();
       this.rebuildEditorBar();
       this.initAndRenderGraph(this.graphDomNode);
 
     } else { // view has not been switched
 
-      // give the view a chance to refresh its components
+      // give the view a chance to refresh itself
       const isViewUpdated = this.view.update(updates);
 
-      if (isViewUpdated && !this.ignoreNextViewModification) {
+      if (isViewUpdated) {
 
         this.logger('warn', 'View components modified');
 
         this.rebuildEditorBar();
         this.reloadBackgroundImage();
-        this.rebuildGraph({
-          resetEdgeTypeWL: true,
-          resetFocus: { delay: 0, duration: 0 }
-        });
+        this.rebuildGraph({ resetFocus: { delay: 1000, duration: 1000 }});
 
       } else { // neither view switch or view modification
 
-        if (updates[$tm.path.nodeTypes]) {
-          this.rebuildGraph(rebuildGraphOptions);
-
-        } else if (this.hasChangedElements(changedTiddlers)) {
-          this.rebuildGraph(rebuildGraphOptions);
+        if (updates[env.path.nodeTypes] || this.hasChangedElements(changedTiddlers)) {
+          this.rebuildGraph();
         }
 
         // give children a chance to update themselves
@@ -601,9 +595,6 @@ class MapWidget extends Widget {
 
       }
     }
-
-    // reset this again
-    this.ignoreNextViewModification = false;
 
   }
 
@@ -678,6 +669,7 @@ class MapWidget extends Widget {
 
     if (changes.changedNodes.withoutPosition.length) {
 
+      // force resetFocus
       resetFocus = resetFocus || { delay: 1000, duration: 1000 };
 
       if (!this.view.isEnabled('physics_mode')) {
@@ -699,11 +691,16 @@ class MapWidget extends Widget {
     }
 
     if (resetFocus) {
-      // see https://github.com/almende/vis/issues/987#issuecomment-113226216
-      // see https://github.com/almende/vis/issues/939
-      this.network.stabilize();
 
-      this.resetFocus = resetFocus;
+      if (!this.isPreventZoomOnNextUpdate) {
+
+        // see https://github.com/almende/vis/issues/987#issuecomment-113226216
+        // see https://github.com/almende/vis/issues/939
+        this.network.stabilize();
+        this.resetFocus = resetFocus;
+      }
+
+      this.isPreventZoomOnNextUpdate = false;
 
     }
 
@@ -806,10 +803,12 @@ class MapWidget extends Widget {
     for (let tRef in changedTiddlers) {
 
       if (utils.isSystemOrDraft(tRef)) {
+
         continue;
       }
 
       if (inGraph[$tm.adapter.getId(tRef)] || isShowNeighbourhood) {
+
         return true;
       }
 
@@ -823,8 +822,8 @@ class MapWidget extends Widget {
 
       const nodeFilter = this.view.getNodeFilter('compiled');
       const matches = utils.getMatches(nodeFilter, maybeMatches);
-      return !!matches.length;
 
+      return !!matches.length;
     }
 
   }
@@ -1179,6 +1178,9 @@ class MapWidget extends Widget {
       }
     }
 
+    // prevent zoom
+    this.isPreventZoomOnNextUpdate = true;
+
   }
 
   /**
@@ -1268,16 +1270,17 @@ class MapWidget extends Widget {
       view: this.view.getLabel()
     };
 
-    this.dialogManager.open('createView', args, (isConfirmed, outTObj) => {
+    $tm.dialogManager.open('createView', args, (isConfirmed, outTObj) => {
 
       if (!isConfirmed) return;
 
       const label = utils.getField(outTObj, 'name');
       const isClone = utils.getField(outTObj, 'clone', false);
-      const view = new ViewAbstraction(label);
 
-      if (view.exists()) {
+      if (ViewAbstraction.exists(label)) {
+
         $tm.notify('Forbidden! View already exists!');
+
         return;
       }
 
@@ -1309,26 +1312,32 @@ class MapWidget extends Widget {
     const references = this.view.getOccurrences();
 
     const args = {
-      count : references.length.toString(),
-      filter : utils.joinAndWrap(references, '[[', ']]')
+      count: references.length.toString(),
+      refFilter: utils.joinAndWrap(references, '[[', ']]')
     };
 
-    this.dialogManager.open('renameView', args, (isConfirmed, outTObj) => {
+    $tm.dialogManager.open('renameView', args, (isConfirmed, outTObj) => {
 
-      if (!isConfirmed) return;
+      if (!isConfirmed) {
+
+        return;
+      }
 
       const label = utils.getText(outTObj);
-      const view = new ViewAbstraction(label);
 
       if (!label) {
+
         $tm.notify('Invalid name!');
 
-      } else if (view.exists()) {
+      } else if (ViewAbstraction.exists(label)) {
+
         $tm.notify('Forbidden! View already exists!');
 
       } else {
+
         this.view.rename(label);
         this.setView(this.view);
+
       }
     });
   }
@@ -1356,9 +1365,11 @@ class MapWidget extends Widget {
       }
     };
 
-    this.dialogManager.open('configureView', args, (isConfirmed, outTObj) => {
+    $tm.dialogManager.open('configureView', args, (isConfirmed, outTObj) => {
 
-      if (!isConfirmed) return;
+      if (!isConfirmed) {
+        return;
+      }
 
       const config = utils.getPropertiesByPrefix(outTObj.fields, 'config.', true);
 
@@ -1369,7 +1380,7 @@ class MapWidget extends Widget {
       if (config['physics_mode'] && !this.view.isEnabled('physics_mode')) {
         // when not in physics mode, store positions
         // to prevent floating afterwards
-        this.handleStorePositions();
+        this.view.saveNodePositions(this.network.getPositions());
       }
 
       const curBg = this.view.getConfig('background_image');
@@ -1408,7 +1419,7 @@ class MapWidget extends Widget {
       }
     };
 
-    this.dialogManager.open('saveCanvas', args, (isConfirmed, outTObj) => {
+    $tm.dialogManager.open('saveCanvas', args, (isConfirmed, outTObj) => {
       if (!isConfirmed) return;
 
       // allow the user to override the default name or if name is
@@ -1493,11 +1504,11 @@ class MapWidget extends Widget {
     if (references.length) {
 
       const fields = {
-        count : references.length.toString(),
-        filter : utils.joinAndWrap(references, '[[', ']]')
+        count: references.length.toString(),
+        refFilter: utils.joinAndWrap(references, '[[', ']]')
       };
 
-      this.dialogManager.open('cannotDeleteViewDialog', fields);
+      $tm.dialogManager.open('cannotDeleteViewDialog', fields);
 
       return;
 
@@ -1593,9 +1604,7 @@ class MapWidget extends Widget {
    * from the graph. The nodes may be removed from the filter (if possible)
    * or from the system.
    *
-   * This action represents a direct graph manipulation by the user,
-   * which means it will prevent a graph fitting (viewport adjusting)
-   * in the course of the next rebuild.
+   * Note: this should not trigger a zoom.
    */
   handleRemoveNodes(nodeIds) {
 
@@ -1610,11 +1619,18 @@ class MapWidget extends Widget {
       }
     };
 
-    this.dialogManager.open('deleteNodeDialog', params, (isConfirmed, outTObj) => {
+    $tm.dialogManager.open('deleteNodeDialog', params, (isConfirmed, outTObj) => {
 
       if (!isConfirmed) return;
 
       let deletionCount = 0;
+
+      for (let i = nodeIds.length; i--;) {
+        const success = this.view.removeNode(nodeIds[i]);
+        if (success) {
+          deletionCount++;
+        }
+      }
 
       if (outTObj.fields['delete-from'] === 'system') {
 
@@ -1622,16 +1638,10 @@ class MapWidget extends Widget {
         $tm.adapter.deleteNodes(nodeIds);
         deletionCount = nodeIds.length; // we just say so ;)
 
-      } else {
-
-        for (let i = nodeIds.length; i--;) {
-          const success = this.view.removeNode(nodeIds[i]);
-          if (success) {
-            deletionCount++;
-          }
-        }
-
       }
+
+      // prevent zoom
+      this.isPreventZoomOnNextUpdate = true;
 
       $tm.notify(`
         Removed ${deletionCount}
@@ -1726,28 +1736,6 @@ class MapWidget extends Widget {
     }
 
     this.view.setCentralTopic(nodeId);
-
-  }
-
-  handleStorePositions(withNotify) {
-
-    const data = this.view.getNodeData();
-    const positions = this.network.getPositions();
-
-    for (let id in positions) {
-
-      data[id] = data[id] || {};
-      data[id].x = positions[id].x;
-      data[id].y = positions[id].y;
-
-    }
-
-    this.view.saveNodeData(data);
-    this.ignoreNextViewModification = true;
-
-    if (withNotify) {
-      $tm.notify('positions stored');
-    }
 
   }
 
@@ -1868,7 +1856,7 @@ class MapWidget extends Widget {
    */
   handleInsertNode(node) {
 
-    this.dialogManager.open('addNodeToMap', {}, (isConfirmed, outTObj) => {
+    $tm.dialogManager.open('addNodeToMap', {}, (isConfirmed, outTObj) => {
 
       if (!isConfirmed) {
 
@@ -1884,11 +1872,12 @@ class MapWidget extends Widget {
 
           $tm.notify('Node already exists');
 
+          return;
+
         } else {
 
           node = $tm.adapter.makeNode(tRef, node);
           this.view.addNode(node);
-          this.ignoreNextViewModification = true;
 
         }
 
@@ -1899,6 +1888,9 @@ class MapWidget extends Widget {
         node.label = tRef;
         $tm.adapter.insertNode(node, this.view, tObj);
       }
+
+      // prevent zoom
+      this.isPreventZoomOnNextUpdate = true;
 
     });
 
@@ -1970,7 +1962,7 @@ class MapWidget extends Widget {
       'tmap.open-view'
     ]);
 
-    this.dialogManager.open('editNode', args, (isConfirmed, outTObj) => {
+    $tm.dialogManager.open('editNode', args, (isConfirmed, outTObj) => {
 
       if (!isConfirmed) return;
 
@@ -1995,6 +1987,8 @@ class MapWidget extends Widget {
       }
 
       this.view.saveNodeStyle(node.id, data);
+
+      this.isPreventZoomOnNextUpdate = true;
 
     });
 
@@ -2447,7 +2441,7 @@ class MapWidget extends Widget {
    */
   openTiddlerWithId(id) {
 
-    const tRef = $tm.tracker.getTiddlerById(id)
+    const tRef = $tm.tracker.getTiddlerById(id);
 
     this.logger('debug', 'Opening tiddler', tRef, 'with id', id);
 
@@ -2466,7 +2460,7 @@ class MapWidget extends Widget {
 
       const args = { draftTRef, originalTRef: tRef };
 
-      this.dialogManager.open('fullscreenTiddlerEditor', args, (isConfirmed, outTObj) => {
+      $tm.dialogManager.open('fullscreenTiddlerEditor', args, (isConfirmed, outTObj) => {
 
         if (isConfirmed) {
 
@@ -2584,11 +2578,12 @@ class MapWidget extends Widget {
    */
   setView(view, viewHolderRef) {
 
-    view = new ViewAbstraction(view);
+    if (!ViewAbstraction.exists(view)) {
 
-    if (!view.exists()) {
       return;
     }
+
+    view = new ViewAbstraction(view);
 
     const viewLabel = view.getLabel();
     viewHolderRef = viewHolderRef || this.viewHolderRef;
@@ -2621,14 +2616,21 @@ class MapWidget extends Widget {
     const viewHolderRef = this.getViewHolderRef();
 
     // transform into view object
-    const text = utils.getText(viewHolderRef);
-    let view = new ViewAbstraction(text);
+    const ref = utils.getText(viewHolderRef);
 
     this.logger('debug', 'Retrieved view from holder');
 
-    if (!view.exists()) {
-      this.logger('debug', `Warning: View "${text}" doesn't exist. Default is used instead.`);
+    let view;
+
+    if (ViewAbstraction.exists(ref)) {
+
+      view = new ViewAbstraction(ref);
+
+    } else {
+
+      this.logger('debug', `Warning: View "${ref}" doesn't exist. Default is used instead.`);
       view = new ViewAbstraction('Default');
+
     }
 
     return view;
@@ -2723,8 +2725,6 @@ class MapWidget extends Widget {
       return;
     }
 
-    //~ this.network.storePositions();
-
     const updates = [];
     const isFixed = !isMoveable;
     for (let i = nodeIds.length; i--;) {
@@ -2743,7 +2743,9 @@ class MapWidget extends Widget {
       this.logger('debug', 'Fixing', updates.length, 'nodes');
 
       // if we fix nodes in static mode then we also store the positions
-      this.handleStorePositions();
+      this.view.saveNodePositions(this.network.getPositions());
+      // prevent zoom
+      this.isPreventZoomOnNextUpdate = true;
     }
 
   }

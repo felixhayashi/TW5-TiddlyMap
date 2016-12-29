@@ -61,7 +61,17 @@ export const startsWith = (str, prefix) => str.substring(0, prefix.length) === p
  * @param obj
  * @return string
  */
-export const identity = obj => JSON.stringify(Object.keys(obj).sort().map(key => [ key, obj[key] ]));
+export const identity = obj =>
+  (typeof obj === 'object' && obj !== null
+    ?  JSON.stringify(Object.keys(obj).sort().map(key => [ key, obj[key] ]))
+    : null);
+
+/**
+ * Returns true if both objects have the same properties
+ * @param obj1
+ * @param obj2
+ */
+export const isEqual = (obj1, obj2) => identity(obj1) === identity(obj2);
 
 /**
  *
@@ -573,10 +583,3 @@ export const bindTo = (context, fnNames) => {
   }
 
 };
-
-/**
- * Returns true if both objects have the same properties
- * @param obj1
- * @param obj2
- */
-export const isEqual = (obj1, obj2) => identity(obj1) === identity(obj2);

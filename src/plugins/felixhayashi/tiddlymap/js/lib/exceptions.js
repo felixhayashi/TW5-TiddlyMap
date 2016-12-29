@@ -62,9 +62,15 @@ export class MissingOverrideError extends TiddlyMapError {
  * in the system.
  */
 export class ResourceNotFoundException extends TiddlyMapError {
+
+  /**
+   * @param {string} resourceType
+   * @param {*} payload
+   */
   constructor(resourceType, ...payload) {
     super(`Cannot resolve ${resourceType}`, payload);
   };
+
 }
 
 /**

@@ -173,7 +173,7 @@ const handleGenerateWidget = ({paramObject = {}}) => {
   const options = {
     dialog: {
       preselects: {
-        view: (paramObject.view || $tm.misc.defaultViewLabel)
+        'var.view': (paramObject.view || $tm.misc.defaultViewLabel)
       }
     }
   };

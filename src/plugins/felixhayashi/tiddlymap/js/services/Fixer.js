@@ -143,11 +143,12 @@ class Fixer {
      */
     this.executeUpgrade('0.7.32', meta.dataStructureState, () => {
 
-      const liveView = new ViewAbstraction('Live View');
+      if (!ViewAbstraction.exists('Live View')) {
 
-      if (!liveView.exists()) {
         return;
       }
+
+      const liveView = new ViewAbstraction('Live View');
 
       // Only listen to the current tiddler of the history list
       liveView.setNodeFilter('[field:title{$:/temp/tmap/currentTiddler}]', true);

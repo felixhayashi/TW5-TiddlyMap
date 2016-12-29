@@ -10,7 +10,7 @@ body .tc-page-container-wrapper.tc-modal-displayed {
 
 body .tc-modal-wrapper {
   z-index: 1010;
-  
+
   .tc-modal-header {
     svg {
       vertical-align: sub;
@@ -19,7 +19,7 @@ body .tc-modal-wrapper {
       line-height: 10px;
     }
   }
-  
+
   .tc-modal-body {
     min-height: 250px; // tw doesn't have a minheight
     max-height: 70vh; // tw uses 60vh
@@ -27,7 +27,7 @@ body .tc-modal-wrapper {
     padding-bottom: 0px; // tw uses 15px
     overflow: auto;
   }
-  
+
   .tc-modal-footer {
     padding: 8px;
     .tmap-dialog-button {

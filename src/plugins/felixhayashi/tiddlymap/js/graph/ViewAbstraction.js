@@ -31,10 +31,11 @@ class ViewAbstraction {
   /**
    *
    * @param {string|ViewAbstraction|Tiddler} view - The view
-   * @param {boolean} [isCreate] - True if the view should be created and override
+   * @param {Object} options
+   * @param {boolean} [options.isCreate] - True if the view should be created and override
    *     any existing view, false otherwise.
    */
-  constructor(view, { isCreate = false } = {}) {
+  constructor(view, options = {}) {
 
     if (view instanceof ViewAbstraction) {
 
@@ -45,16 +46,20 @@ class ViewAbstraction {
 
     this._registerPaths(view);
 
-    if (isCreate) {
+    if (options.isCreate) {
+
+      if (!this.configTRef) {
+
+        const name = utils.getRandomLabel({plural: true});
+        this.configTRef = $tw.wiki.generateNewTitle(`${$tm.path.views}/${name}`);
+
+      }
 
       this._createView(options);
 
-    } else if (!this.exists()) { // no valid config path
+    } else if (!ViewAbstraction.exists(this.getRoot())) { // no valid config path
 
-      // if the view doesn't exist, then we return a dummy object
-      // whose sole purpose is to tell the world that this
-      // view doesn't exist.
-      return { exists: () => false };
+      throw new ResourceNotFoundException('ViewAbstraction', view);
 
     }
 
@@ -79,13 +84,13 @@ class ViewAbstraction {
    * Gives the view a chance to rebuild its properties cache.
    *
    * @param {Updates} updates
-   * @return {boolean} True if the view updated itself, false if the view didn't change.
+   * @return {boolean} True if changes affect parts of the view.
    */
   update(updates) {
 
-    const changedTiddlers = updates.changedTiddlers;
+    const { changedTiddlers } = updates;
 
-    if (updates[env.path.edgeTypes] || utils.hasKeyWithPrefix(changedTiddlers, this.configTRef)) {
+    if (updates[env.path.edgeTypes] || utils.hasKeyWithPrefix(changedTiddlers, this.getRoot())) {
 
       this._rebuildCache();
 
@@ -112,11 +117,13 @@ class ViewAbstraction {
   /**
    * A view exists if the the view's root exists as tiddler in the store.
    *
+   * @deprecated
+   *
    * @return {boolean}
    */
   exists() {
 
-    return utils.tiddlerExists(this.configTRef);
+    return ViewAbstraction.exists(this);
 
   }
 
@@ -215,7 +222,7 @@ class ViewAbstraction {
 
     // update references
 
-    if ($tm.path.config.sys.defaultView === oldLabel) {
+    if ($tm.config.sys.defaultView === oldLabel) {
       utils.setEntry($tm.ref.sysUserConf, 'defaultView', newLabel);
     }
 
@@ -230,16 +237,14 @@ class ViewAbstraction {
         // update global node data fields referencing this view
         utils.setField(tRef, 'tmap.open-view', newLabel);
 
-      } else if (utils.startsWith(tRef, $tm.path.views)) {
+        return;
+
+      }
+
+      if (ViewAbstraction.exists(tRef)) {
 
         // update all local node data referencing this view
         const view = new ViewAbstraction(tRef);
-
-        if (!view.exists()) {
-
-          return;
-        }
-
         const nodes = view.getNodeData();
 
         for (let id in nodes) {
@@ -483,17 +488,21 @@ class ViewAbstraction {
    * @return {boolean} True if node was removed, false otherwise.
    *     Note: false is also returned if the node did not exist before.
    */
-  removeNode(node) {
+  removeNode(nodeId) {
 
-    if (!this._isNodeIncludedById(node)) {
+    if (!this._isNodeIncludedById(nodeId)) {
 
       return false;
     }
 
-    const part = ViewAbstraction._getNodeIdFilterPart(node);
+    const part = ViewAbstraction._getNodeIdFilterPart(nodeId);
     const f = this.getNodeFilter('raw').replace(part, '');
 
     this.setNodeFilter(f);
+
+    if (this.nodeData[nodeId]) {
+      this.saveNodeData(nodeId, null);
+    }
 
     return true;
 
@@ -502,6 +511,9 @@ class ViewAbstraction {
   /**
    * Method will return a tiddlywiki edge-type filter that is used to
    * decide which edge types are displayed by the graph.
+   *
+   * Note: needs to be recalculated if the collection of edge types changed
+   * in the wiki.
    *
    * @param {("raw"|"pretty"|"matches"|"whitelist")} [type]
    *     Use this param to control the output type.
@@ -620,19 +632,15 @@ class ViewAbstraction {
    */
   equals(view) {
 
-    if (view === this) {
-
-      return true;
-    }
-
-    view = new ViewAbstraction(view);
-
-    return (view.exists() && this.getRoot() === view.getRoot());
+    return view === this
+      || (ViewAbstraction.exists(view) && (new ViewAbstraction(view)).getRoot() === this.getRoot());
 
   }
 
   /**
    * This function will merge the given data in the view's node store.
+   *
+   * If a property is set to null, it will be removed.
    *
    * If two arguments are provided, the first parameter is assumed
    * to be a node id and the second to be the data object. The data
@@ -656,8 +664,7 @@ class ViewAbstraction {
 
         if (args[1] === null) {
 
-          // we use undefined to signal the garbage collector thedeletion of the item
-          data[args[0]] = undefined;
+          delete data[args[0]];
 
         } else {
 
@@ -690,10 +697,31 @@ class ViewAbstraction {
    */
   saveNodePosition(node) {
 
-    if (node.id && node.x && node.y) {
+    if (node.id && node.x != null && node.y != null) {
       // only pass coordinates to prevent other data from being stored!
       this.saveNodeData(node.id, { x: node.x, y: node.y });
     }
+
+  }
+
+  /**
+   * Saves a node's position to the store
+   *
+   * @param {Object} positions
+   */
+  saveNodePositions(positions) {
+
+    const { nodeData } = this;
+
+    for (let id in positions) {
+
+      nodeData[id] = nodeData[id] || {};
+      nodeData[id].x = positions[id].x;
+      nodeData[id].y = positions[id].y;
+
+    }
+
+    this.saveNodeData(nodeData);
 
   }
 
@@ -727,7 +755,7 @@ class ViewAbstraction {
 
     // tabula rasa! delete all previous properties
     for (let p in data) {
-      data[p] = undefined;
+      delete data[p];
     }
 
     // save new style
@@ -745,7 +773,7 @@ class ViewAbstraction {
    * @private
    * @params {ViewAbstraction|string} view
    */
-  _registerPaths(view) {
+  _registerPaths(view, isCreate) {
 
     // main config is stored here
     this.configTRef = ViewAbstraction._getRootPath(view);
@@ -770,7 +798,7 @@ class ViewAbstraction {
   _createView({ isForce, protoView, isHidden } = {}) {
 
     // destroy any former view that existed in this path
-    if (this.exists()) {
+    if (ViewAbstraction.exists(this)) {
 
       if (!isForce) {
 
@@ -781,10 +809,8 @@ class ViewAbstraction {
       this.destroy();
     }
 
-    protoView = new ViewAbstraction(protoView);
-
-    if (protoView.exists()) {
-      utils.cp(protoView.getRoot(), this.configTRef, true);
+    if (ViewAbstraction.exists(protoView)) {
+      utils.cp((new ViewAbstraction(protoView)).getRoot(), this.configTRef, true);
     }
 
     // create new view
@@ -810,6 +836,7 @@ class ViewAbstraction {
    * This method will rebuild the cache.
    *
    * @private
+   * @return {boolean} true if the cache was dirty, false if cache was up-to-date and did
    */
   _rebuildCache() {
 
@@ -841,21 +868,12 @@ class ViewAbstraction {
   /**
    * Will return the path to the config tiddler of this view, aka the view's root.
    *
-   * If the view doesn't exist yet, a path is returned that features a randomly
-   * generated view name, e.g. 'My cool topics'.
-   *
    * @private
    *
    * @param {*} view - The constructor param to abstract or create the view.
-   * @result {string} The view config path.
+   * @result {string|undefined} The view config path.
    */
   static _getRootPath(view) {
-
-    if (view instanceof $tw.Tiddler) { // is a tiddler object
-
-      return view.fields.title;
-
-    }
 
     if (view instanceof ViewAbstraction) {
 
@@ -863,24 +881,52 @@ class ViewAbstraction {
 
     }
 
+    if (view instanceof $tw.Tiddler) { // is a tiddler object
+
+      view  = view.fields.title;
+
+    }
+
     if (typeof view === 'string') {
 
       // remove prefix and slash
-      view = utils.getWithoutPrefix(view, `${$tm.path.views}/`);
+      const label = utils.getWithoutPrefix(view, `${$tm.path.views}/`);
 
-      if (view && !utils.hasSubString(view, '/')) {
+      // a valid label must not contain any slashes
+      if (label && !utils.hasSubString(label, '/')) {
 
-        // a valid label must not contain any slashes
-        return `${$tm.path.views}/${view}`; // add prefix (again)
+        return `${$tm.path.views}/${label}`;
 
       }
     }
 
-    const name = utils.getRandomLabel({ plural: true });
+  }
 
-    return $tw.wiki.generateNewTitle(`${$tm.path.views}/${name}`);
+  /**
+   * A view exists if the the view's root exists as tiddler in the store.
+   *
+   * @return {ViewAbstraction|string}
+   */
+  static exists(view) {
+
+    if (!view) {
+
+      return false;
+    }
+
+    if (view instanceof ViewAbstraction) {
+
+      view = view.configTRef;
+
+    } else {
+
+      view = ViewAbstraction._getRootPath(view);
+    }
+
+    return utils.tiddlerExists(view);
 
   }
+
 }
 
 /*** Exports *******************************************************/

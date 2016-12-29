@@ -213,11 +213,11 @@ class Adapter {
     // having been included in the original set, or by having been
     // recorded as neighbour during the discovery.
     const visited = utils.getArrayValuesAsHashmapKeys(matches);
-    const view = new ViewAbstraction(opts.view);
+    const view = ViewAbstraction.exists(opts.view) ? new ViewAbstraction(opts.view) : null;
     const allEdgesLeadingToNeighbours = utils.makeHashMap();
     const allNeighbours = utils.makeHashMap();
     const maxSteps = (parseInt(steps) > 0 ? steps : 1);
-    const direction = (opts.direction || (view.exists() && view.getConfig('neighbourhood_directions')));
+    const direction = (opts.direction || (view && view.getConfig('neighbourhood_directions')));
     const isWalkBoth = (!direction || direction === 'both');
     const isWalkIn = (isWalkBoth || direction === 'in');
     const isWalkOut = (isWalkBoth || direction === 'out');
@@ -332,10 +332,10 @@ class Adapter {
 
     $tm.start('Assembling Graph');
 
-    view = new ViewAbstraction(view);
-    const matches = utils.getMatches(filter || (view.exists() && view.getNodeFilter('compiled')));
-    const neighScope = parseInt(neighbourhoodScope || (view.exists() && view.getConfig('neighbourhood_scope')));
-    const typeWL = (edgeTypeWL || (view.exists() && view.getEdgeTypeFilter('whitelist')));
+    view = ViewAbstraction.exists(view) ? new ViewAbstraction(view) : null;
+    const matches = utils.getMatches(filter || (view && view.getNodeFilter('compiled')));
+    const neighScope = parseInt(neighbourhoodScope || (view && view.getConfig('neighbourhood_scope')));
+    const typeWL = (edgeTypeWL || (view && view.getEdgeTypeFilter('whitelist')));
     const toWL = utils.getArrayValuesAsHashmapKeys(matches);
 
     const graph = {
@@ -360,7 +360,7 @@ class Adapter {
       Object.assign(graph.nodes, neighbours.nodes);
       Object.assign(graph.edges, neighbours.edges);
 
-      if (view.exists() && view.isEnabled('show_inter_neighbour_edges')) {
+      if (view && view.isEnabled('show_inter_neighbour_edges')) {
         const nodeTRefs = this.getTiddlersByIds(neighbours.nodes);
         // this time we need a whitelist based on the nodeTRefs
         const toWL = utils.getArrayValuesAsHashmapKeys(nodeTRefs);
@@ -691,12 +691,11 @@ class Adapter {
    */
   attachStylesToNodes(nodes, view) {
 
-    view = new ViewAbstraction(view);
+    view = ViewAbstraction.exists(view) ? new ViewAbstraction(view) : null;
 
     const inheritedStyles = this.getInheritedNodeStyles(nodes);
-
-    const viewNodeData = view.exists() ? view.getNodeData() : utils.makeHashMap();
-    const isStaticMode = view.exists() && !view.isEnabled('physics_mode');
+    const viewNodeData = view ? view.getNodeData() : utils.makeHashMap();
+    const isStaticMode = view && !view.isEnabled('physics_mode');
 
     for (let id in nodes) {
 
@@ -781,7 +780,7 @@ class Adapter {
 
     }
 
-    if (view.exists()) {
+    if (view) {
       const node = nodes[view.getConfig('central-topic')];
       if (node) {
         utils.merge(node, this.indeces.glNTyById['tmap:central-topic'].style);
@@ -805,7 +804,9 @@ class Adapter {
    */
   deleteNode(node) {
 
-    if (!node) return;
+    if (!node) {
+      return;
+    }
 
     const id = (typeof node === 'object' ? node.id : node);
     const tRef = this.getTiddlerById(id);
@@ -825,9 +826,6 @@ class Adapter {
     for (let i = viewRefs.length; i--;) {
       const view = new ViewAbstraction(viewRefs[i]);
       view.removeNode(id);
-      if (view.getNodeData(id)) {
-        view.saveNodeData(id, null);
-      }
     }
 
     // remove obsolete connected edges
@@ -866,21 +864,6 @@ class Adapter {
   }
 
   /**
-   * Public API function; will store the positions into the sprecified view.
-   *
-   * @param {object} positions A hashmap ids as keys and x, y properties as values
-   * @param {ViewAbstraction|Tiddler|string} view
-   */
-  storePositions(positions, view) {
-
-    view = new ViewAbstraction(view);
-    if (!view.exists()) return;
-
-    view.saveNodeData(positions);
-
-  }
-
-  /**
    * Create a new tiddler that gets a non-existant title and is opened
    * for edit. If a view is registered, the fields of the tiddler match
    * the current view. If arguments network and position are specified,
@@ -914,9 +897,8 @@ class Adapter {
 
     node = this.makeNode(tObj, node);
 
-    view = new ViewAbstraction(view);
-    if (view.exists()) {
-      view.addNode(node);
+    if (ViewAbstraction.exists(view)) {
+      (new ViewAbstraction(view)).addNode(node);
     }
 
     return node;
@@ -1020,8 +1002,11 @@ const addNodeIcon = (node, icon) => {
  */
 const removeObsoleteViewData = (nodes, view) => {
 
+  if (!ViewAbstraction.exists(view) || !nodes) {
+    return;
+  }
+
   view = new ViewAbstraction(view);
-  if (!view.exists() || !nodes) return;
 
   const data = view.getNodeData();
 

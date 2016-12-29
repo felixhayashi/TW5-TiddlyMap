@@ -130,11 +130,11 @@ class DialogManager {
     dialog = utils.flatten(dialog);
     param = utils.flatten(param);
 
-    const fn = (t) => {
+    const fn = tRef => {
 
       DialogManager.getElement('hidden-close-button').click();
 
-      const triggerTObj = $tw.wiki.getTiddler(t);
+      const triggerTObj = $tw.wiki.getTiddler(tRef);
       const isConfirmed = triggerTObj.fields.text;
 
       let outputTObj = null;

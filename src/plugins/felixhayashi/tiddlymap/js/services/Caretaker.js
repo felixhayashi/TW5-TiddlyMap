@@ -633,8 +633,8 @@ const prepareFullscreenStart = view => {
 
   utils.setSidebarTab(mainEditor);
 
-  view = new ViewAbstraction(view);
-  if (view.exists()) {
+  if (ViewAbstraction.exists(view)) {
+    view = new ViewAbstraction(view);
     utils.setField(defaultViewHolder, 'text', view.getLabel());
   }
 

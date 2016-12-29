@@ -964,8 +964,12 @@ const addNodeIcon = (node, icon) => {
       shape: 'icon',
       face: 'FontAwesome',
       color: node.color,
-      code: String.fromCharCode('0x' + getFAdigits(icon.fa))
+      code: String.fromCharCode('0x' + getFAdigits(icon.fa)),
     };
+
+    if (node.size) {
+      node.icon.size = node.size;
+    }
 
     return;
   }

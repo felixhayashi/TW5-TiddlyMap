@@ -10,7 +10,7 @@ subtitle: {{$:/core/images/tag-button}} Please specify a view name
 Note that ''<<count>>'' tiddlers are referencing this view.
 
 <$reveal type="nomatch" text="0" default=<<count>>>
-  
+
 Renaming the view will cause the reference to be invalid.
 It is recommended to first remove the tiddlymap widgets in
 the tiddlers listed below or change their view attributes
@@ -19,9 +19,9 @@ accordingly.
 ''References''
 
 <ul>
-<$list filter=<<filter>> variable="item">
+<$list filter=<<refFilter>> variable="item">
   <li><$text text=<<item>> /></li>
 </$list>
 </ul>
-  
+
 </$reveal>

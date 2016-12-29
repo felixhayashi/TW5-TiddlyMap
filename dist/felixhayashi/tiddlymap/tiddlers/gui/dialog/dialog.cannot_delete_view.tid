@@ -11,7 +11,7 @@ widgets in the tiddlers listed below or change their view attributes.
 ''References''
 
 <ul>
-<$list filter=<<filter>> variable="item">
+<$list filter=<<refFilter>> variable="item">
   <li><$link><<item>></$link></li>
 </$list>
 </ul>

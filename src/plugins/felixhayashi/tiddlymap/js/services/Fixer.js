@@ -47,7 +47,7 @@ class Fixer {
         type = 'tmap:unknown';
       }
 
-      type = new EdgeType(type);
+      type = EdgeType.getInstance(type);
 
       if (!type.exists()) {
         type.save();
@@ -175,7 +175,7 @@ class Fixer {
 
       if (typeof userConf.groups === 'object') {
 
-        const type = new NodeType('tmap:neighbour');
+        const type = NodeType.getInstance('tmap:neighbour');
         type.setStyle(userConf.groups[ 'neighbours' ]);
         type.save();
 

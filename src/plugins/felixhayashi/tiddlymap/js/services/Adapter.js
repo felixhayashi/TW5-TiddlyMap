@@ -119,7 +119,7 @@ class Adapter {
     }
 
     const tObj = utils.getTiddler(fromTRef);
-    const type = this.indeces.allETy[edge.type] || new EdgeType(edge.type);
+    const type = this.indeces.allETy[edge.type] || EdgeType.getInstance(edge.type);
     const handlers = this.edgeTypeSubscriberRegistry.getAllForType(type);
     const fn = `${action}Edge`;
 
@@ -434,7 +434,7 @@ class Adapter {
         continue;
       }
 
-      const type = allETy[edge.type] || new EdgeType(edge.type);
+      const type = allETy[edge.type] || EdgeType.getInstance(edge.type);
       addStyleToEdge(edges[id], type);
 
       edges[id] = edge;
@@ -471,7 +471,7 @@ class Adapter {
   selectEdgesByType(type) {
 
     const typeWL = utils.makeHashMap({
-      [new EdgeType(type).id]: true,
+      [EdgeType.getInstance(type).id]: true,
     });
 
     return this.getEdgesForSet(this.getAllPotentialNodes(), null, typeWL);
@@ -497,7 +497,7 @@ class Adapter {
    */
   _processEdgesWithType(type, { action, newName }) {
 
-    type = new EdgeType(type);
+    type = EdgeType.getInstance(type);
 
     $tm.logger('debug', 'Processing edges', type, action);
 
@@ -507,7 +507,7 @@ class Adapter {
     if (action === 'rename') {
 
       // clone type first to prevent auto-creation
-      const newType = new EdgeType(newName);
+      const newType = EdgeType.getInstance(newName);
       newType.load(type);
       newType.save();
 
@@ -596,7 +596,7 @@ class Adapter {
    */
   removeNodeType(type) {
 
-    type = new NodeType(type);
+    type = NodeType.getInstance(type);
     this.wiki.deleteTiddler(type.fullPath);
 
   }

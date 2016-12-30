@@ -153,7 +153,7 @@ class MapWidget extends Widget {
     const param = {
       fromLabel: $tm.adapter.selectNodeById(edge.from).label,
       toLabel: $tm.adapter.selectNodeById(edge.to).label,
-      viewNS: this.view.getConfig('edge_type_namespace'),
+      view: this.view.getLabel(),
       eTyFilter: eTyFilter.raw
     };
 
@@ -161,10 +161,16 @@ class MapWidget extends Widget {
 
       if (isConfirmed) {
 
-        const options = {
-          namespace: this.view.getConfig('edge_type_namespace')
-        };
-        const type = new EdgeType(utils.getText(outTObj), null, options);
+        const str = utils.getText(outTObj);
+        let type = EdgeType.getInstance(str);
+
+        if (!type.namespace) {
+
+          const { marker, name } = EdgeType.getIdParts(type.id);
+          const namespace = this.view.getConfig('edge_type_namespace');
+          type = EdgeType.getInstance(EdgeType.getId(marker, namespace, name));
+
+        }
 
         // persist the type if it doesn't exist
         if (!type.exists()) {
@@ -178,7 +184,7 @@ class MapWidget extends Widget {
         // prevent zoom
         this.isPreventZoomOnNextUpdate = true;
 
-        if (!this.view.isEdgeTypeVisible(type.id)) {
+        if (!this.view.isEdgeTypeVisible(type)) {
 
           $tm.dialogManager.open('edgeNotVisible', {
             type: type.id,

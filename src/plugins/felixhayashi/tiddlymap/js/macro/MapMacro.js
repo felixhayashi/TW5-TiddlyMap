@@ -11,8 +11,9 @@ module-type: macro
 
 /*** Imports *******************************************************/
 
-import EdgeType from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
-import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
+import EdgeType        from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
+import ViewAbstraction from '$:/plugins/felixhayashi/tiddlymap/js/ViewAbstraction';
+import utils           from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 
 /*** Code **********************************************************/
 
@@ -142,23 +143,41 @@ command.regRepl = function() {
 command.halfOfString = function() {
 
   var str = this.substVarRefs(arguments[0]);
-  if (!str) return '';
+
+  if (!str) {
+    return '';
+  }
 
   return str.substr(0, Math.ceil(str.length / 2));
 
 };
 
-command.isETyVisible = function(viewNS, eTyFilter, id) {
+command.isETyVisible = function(view, userInput) {
 
-  id = command.getETyId.call(this, viewNS, id);
-  return '' + utils.isEdgeTypeMatch(id, eTyFilter);
+  view = new ViewAbstraction(view);
+
+  const id = command.getETyId.call(this, view, userInput);
+
+  return '' + view.isEdgeTypeVisible(id);
 
 };
 
-command.getETyId = function(viewNS, id) {
+command.getETyId = function(view, userInput) {
 
-  id = id || this.getVariable('currentTiddler');
-  return (new EdgeType(id, null, { namespace: viewNS })).id;
+  view = new ViewAbstraction(view);
+
+  let type = EdgeType.getInstance(userInput || this.getVariable('currentTiddler'));
+
+  if (!type.namespace) {
+
+    const { marker, name } = EdgeType.getIdParts(type.id);
+    const namespace = view.getConfig('edge_type_namespace');
+
+    type = EdgeType.getInstance(EdgeType.getId(marker, namespace, name));
+
+  }
+
+  return type.id;
 
 };
 

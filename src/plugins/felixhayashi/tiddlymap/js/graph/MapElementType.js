@@ -16,19 +16,185 @@ import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 /*** Code **********************************************************/
 
 /**
- * @constructor
  * @abstract
  */
-function MapElementType(id, root, fieldMeta, data) {
+class MapElementType {
 
-  this.id = id;
-  this.root = root;
-  this._fieldMeta = fieldMeta;
-  this.fullPath = this.root + '/' + this.id;
-  this.isShipped = $tw.wiki.getSubTiddler($tm.path.pluginRoot, this.fullPath);
-  // finally get the data
-  this.load(data || this.fullPath);
+  constructor(id, root, fieldMeta, data) {
 
+    this.id = id;
+    this.root = root;
+    this._fieldMeta = fieldMeta;
+    this.fullPath = `${this.root}/${this.id}`;
+    this.isShipped = $tw.wiki.getSubTiddler($tm.path.pluginRoot, this.fullPath);
+
+    // finally get the data
+    this.load(data || this.fullPath);
+
+  }
+
+  /**
+   * Load the type's data. Depending on the constructor arguments,
+   * the data source can be a tiddler, a type store
+   *
+   * @constructor
+   */
+  load(data) {
+
+    if (!data) {
+
+      return;
+    }
+
+    if (typeof data === 'string') { // assume id or full path
+
+      const isFullPath = utils.startsWith(data, this.root);
+      const tRef = (isFullPath ? data : `${this.root}/${data}`);
+      this.loadFromTiddler(tRef);
+
+    } else if (data instanceof $tw.Tiddler) {
+
+      this.loadFromTiddler(data);
+
+    } else if (typeof data === 'object') { // = type or a data object
+
+      for (let field in this._fieldMeta) {
+        this[field] = data[field];
+      }
+    }
+
+  }
+
+  /**
+   * Retrieve all data from the tiddler provided. If a shadow tiddler
+   * with the same id exists, its data is merged during the load
+   * process.
+   */
+  loadFromTiddler(tiddler) {
+
+    const tObj = utils.getTiddler(tiddler);
+
+    if (!tObj) {
+
+      return;
+    }
+
+    const shadowTObj = $tw.wiki.getSubTiddler($tm.path.pluginRoot, this.fullPath) || {};
+
+    // copy object to allow manipulation of the data
+    const rawData = $tw.utils.extend({}, shadowTObj.fields, tObj.fields);
+    // allow parsers to transform the raw field data
+    for (let field in this._fieldMeta) {
+
+      const parser = this._fieldMeta[field].parse;
+      const rawVal = rawData[field];
+
+      this[field] = (parser ? parser.call(this, rawVal) : rawVal);
+    }
+
+  }
+
+  /**
+   * Method to determine whether or not this type exists. A type
+   * exists if a tiddler with the type's id can be found below
+   * the type's root path.
+   *
+   * @return {boolean} True if the type exists, false otherwise.
+   */
+  exists() {
+
+    return utils.tiddlerExists(this.fullPath);
+
+  }
+
+  setStyle(style, isMerge) {
+
+    // preprocessing: try to turn string into json
+    if (typeof style === 'string') {
+
+      style = utils.parseJSON(style);
+
+    }
+
+    // merge or override
+    if (typeof style === 'object') {
+
+      if (isMerge) {
+
+        utils.merge(this.style, style);
+
+      } else {
+
+        this.style = style;
+
+      }
+    }
+
+  }
+
+  /**
+   * Store the type object as tiddler in the wiki. If the `tRef`
+   * property is not provided, the default type path prefix
+   * will be used with the type id appended. Stringifiers provided in
+   * the field meta object (that was passed to the constructor) are
+   * called.
+   *
+   * @param {string} [tRef] - If `tRef` is provided, the type
+   *     data will be written into this tiddler and the id property
+   *     is added as extra field value. Only do this is only for
+   *     dumping purposes!
+   * @param {boolean} [silently=false] do not update the modification date
+   */
+  save(tRef, silently) {
+
+    if (!tRef) {
+
+      tRef = this.fullPath;
+
+    } else if (typeof tRef !== 'string') {
+
+      return;
+
+    }
+
+    // also add an empty text field to guard against
+    // https://github.com/Jermolene/TiddlyWiki5/issues/2025
+    const fields = {
+      title: tRef,
+      text: ''
+    };
+
+    if (!utils.startsWith(tRef, this.root)) {
+
+      // = not the standard path for storing this type!
+      // in this case we add the id to the output.
+      fields.id = this.id;
+
+    }
+
+    if (silently !== true) {
+      // add modification date to the output;
+      this.modified = new Date();
+    }
+
+    if (!this.exists()) { // newly created
+      // add a creation field as well
+      this.created = this.modified;
+    }
+
+    // allow parsers to transform the raw field data
+    for (let field in this._fieldMeta) {
+
+      const stringify = this._fieldMeta[field].stringify;
+
+      fields[field] = (stringify
+        ? stringify.call(this, this[field])
+        : this[field]);
+    }
+
+    $tw.wiki.addTiddler(new $tw.Tiddler(fields));
+
+  }
 }
 
 /**
@@ -39,7 +205,8 @@ function MapElementType(id, root, fieldMeta, data) {
  * This object resembles tw's field modules that are used by
  * `boot.js` to decide how fields are parsed and stringified again.
  */
-MapElementType._fieldMeta = {
+MapElementType.fieldMeta = {
+
   'description': {},
   'style': {
     parse: utils.parseJSON,
@@ -47,153 +214,8 @@ MapElementType._fieldMeta = {
   },
   'modified': {}, // translation handled by TW's core
   'created': {} // translation handled by TW's core
-};
-
-/**
- * Load the type's data. Depending on the constructor arguments,
- * the data source can be a tiddler, a type store
- */
-MapElementType.prototype.load = function(data) {
-
-  if (!data) return;
-
-  if (typeof data === 'string') { // assume id or full path
-
-    var isFullPath = utils.startsWith(data, this.root);
-    var tRef = (isFullPath ? data : this.root + '/' + data);
-    this.loadFromTiddler(tRef);
-
-  } else if (data instanceof $tw.Tiddler) {
-    this.loadFromTiddler(data);
-
-  } else if (typeof data === 'object') { // = type or a data object
-    for (var field in this._fieldMeta) {
-
-      this[field] = data[field];
-    }
-  }
 
 };
-
-
-/**
- * Retrieve all data from the tiddler provided. If a shadow tiddler
- * with the same id exists, its data is merged during the load
- * process.
- */
-MapElementType.prototype.loadFromTiddler = function(tiddler) {
-
-  var tObj = utils.getTiddler(tiddler);
-  if (!tObj) return;
-
-  var shadowTObj = $tw.wiki.getSubTiddler($tm.path.pluginRoot,
-                                          this.fullPath) || {};
-
-  // copy object to allow manipulation of the data
-  var rawData = $tw.utils.extend({}, shadowTObj.fields, tObj.fields);
-  // allow parsers to transform the raw field data
-  for (var field in this._fieldMeta) {
-
-    var parser = this._fieldMeta[field].parse;
-
-    var rawVal = rawData[field];
-
-    this[field] = (parser ? parser.call(this, rawVal) : rawVal);
-  }
-
-};
-
-/**
- * Method to determine whether or not this type exists. A type
- * exists if a tiddler with the type's id can be found below
- * the type's root path.
- *
- * @return {boolean} True if the type exists, false otherwise.
- */
-MapElementType.prototype.exists = function() {
-
-  return utils.tiddlerExists(this.fullPath);
-
-};
-
-MapElementType.prototype.setStyle = function(style, isMerge) {
-
-  // preprocessing: try to turn string into json
-  if (typeof style === 'string') {
-    style = utils.parseJSON(style);
-  }
-
-  // merge or override
-  if (typeof style === 'object') {
-    if (isMerge) {
-      utils.merge(this.style, style);
-    } else {
-      this.style = style;
-    }
-  }
-
-};
-
-/**
- * Store the type object as tiddler in the wiki. If the `tRef`
- * property is not provided, the default type path prefix
- * will be used with the type id appended. Stringifiers provided in
- * the field meta object (that was passed to the constructor) are
- * called.
- *
- * @param {string} [tRef] - If `tRef` is provided, the type
- *     data will be written into this tiddler and the id property
- *     is added as extra field value. Only do this is only for
- *     dumping purposes!
- */
-MapElementType.prototype.save = function(tRef, silently) {
-
-  if (!tRef) {
-    tRef = this.fullPath;
-  } else if (typeof tRef !== 'string') {
-    return;
-  }
-
-  // also add an empty text field to guard against
-  // https://github.com/Jermolene/TiddlyWiki5/issues/2025
-  var fields = {
-    title: tRef,
-    text: ''
-  };
-
-  if (!utils.startsWith(tRef, this.root)) {
-
-    // = not the standard path for storing this type!
-    // in this case we add the id to the output.
-    fields.id = this.id;
-
-  }
-
-  if (silently !== true) {
-    // add modification date to the output;
-    this.modified = new Date();
-  }
-
-  if (!this.exists()) { // newly created
-    // add a creation field as well
-    this.created = this.modified;
-  }
-
-  // allow parsers to transform the raw field data
-  for (var field in this._fieldMeta) {
-
-    var stringify = this._fieldMeta[field].stringify;
-
-    fields[field] = (stringify
-                     ? stringify.call(this, this[field])
-                     : this[field]);
-  }
-
-  $tw.wiki.addTiddler(new $tw.Tiddler(fields));
-
-
-};
-
 
 /*** Exports *******************************************************/
 

@@ -268,8 +268,8 @@ const handleLoadTypeForm = ({paramObject}) => {
   const outTRef = paramObject.output;
 
   const type = (paramObject.mode === 'manage-edge-types'
-    ? new EdgeType(paramObject.id)
-    : new NodeType(paramObject.id));
+    ? EdgeType.getInstance(paramObject.id)
+    : NodeType.getInstance(paramObject.id));
 
   // inject all the type data as fields into the dialog output
   type.save(outTRef);
@@ -307,7 +307,7 @@ const handleSaveTypeForm = ({paramObject}) => {
 
   const id = tObj.fields.id;
   const mode = paramObject.mode;
-  const type = (mode === 'manage-edge-types' ? new EdgeType(id) : new NodeType(id));
+  const type = (mode === 'manage-edge-types' ? EdgeType.getInstance(id) : NodeType.getInstance(id));
 
   if (utils.isTrue(tObj.fields['temp.deleteType'], false)) {
     deleteType(mode, type, tObj);
@@ -356,7 +356,7 @@ const saveType = (mode, type, dialogOutput) => {
 
     } else {
 
-      const newType = new NodeType(newId);
+      const newType = NodeType.getInstance(newId);
       newType.load(type);
       newType.save();
       $tw.wiki.deleteTiddler(type.fullPath);
@@ -378,8 +378,9 @@ const handleCreateType = ({paramObject}) => {
 
   const id = paramObject.id || 'New type';
   const type = (paramObject.mode === 'manage-edge-types'
-    ? new EdgeType(id)
-    : new NodeType(id));
+    ? EdgeType.getInstance(id)
+    : nNodeType.getInstance(id));
+
   type.save();
 
   handleLoadTypeForm({

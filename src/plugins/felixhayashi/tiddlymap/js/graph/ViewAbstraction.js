@@ -554,16 +554,12 @@ class ViewAbstraction {
   /**
    * Whether or not this EdgeType is visible in this view.
    *
-   * @param {EdgeType|string} type
+   * @param {EdgeType|string} id
    * @return {*}
    */
-  isEdgeTypeVisible(type) {
+  isEdgeTypeVisible(id) {
 
-    type = new EdgeType(type, null, {
-      namespace: this.getConfig('edge_type_namespace')
-    });
-
-    return utils.isEdgeTypeMatch(type.id, this.edgeTypeFilter.raw);
+    return utils.isEdgeTypeMatch(EdgeType.getInstance(id).id, this.edgeTypeFilter.raw);
 
   }
 

@@ -222,7 +222,7 @@ var updateNodeTypesIndeces = function(parent) {
 
   $tw.wiki.eachTiddlerPlusShadows(function(tObj, tRef) {
     if (utils.startsWith(tRef, typePath)) {
-      var type = new NodeType(tRef);
+      var type = NodeType.getInstance(tRef);
       glNTyById[type.id] = type;
       glNTy.push(type);
     }
@@ -245,7 +245,7 @@ var updateEdgeTypesIndeces = function(parent) {
 
     if (utils.startsWith(tRef, typePath)) {
 
-      var et = new EdgeType(tRef);
+      var et = EdgeType.getInstance(tRef);
       allETy[et.id] = et;
 
     }

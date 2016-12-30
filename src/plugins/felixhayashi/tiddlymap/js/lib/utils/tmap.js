@@ -166,7 +166,7 @@ export const getEdgeTypeMatches = (filter = '', titles) => {
 };
 
 export const isEdgeTypeMatch = (title, filter = '') =>
-  wikiUtils.isMatch(title, eTyFiltAutoPrefix + (filter));
+  wikiUtils.isMatch(title, eTyFiltAutoPrefix + filter);
 
 /**
  *

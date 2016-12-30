@@ -21,10 +21,12 @@ import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 class Edge {
 
   constructor(from, to, type, id) {
+
     this.from = from;
     this.to = to;
     this.type = type;
     this.id = (id || utils.genUUID());
+
   }
 
 }

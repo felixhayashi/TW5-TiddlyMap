@@ -234,8 +234,6 @@ gulp.task('Javascript validation', () => {
  */
 gulp.task('create docs', (cb) => {
 
-  if (!argv.production) { cb(); return; }
-
   // use require to load the jsdoc config;
   // note the extension is discarted when loading json with require!
   const config = require('./src/jsdoc/config');

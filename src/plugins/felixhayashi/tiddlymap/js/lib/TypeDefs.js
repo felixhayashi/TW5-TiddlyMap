@@ -131,3 +131,13 @@
  * @property {Object<string, boolean>} paths
  *    a list of root paths in which tiddler changes occured.
  */
+
+/**
+ * @typedef {string} EdgeTypeId
+ *
+ * An edge-type id string consists of the following parts of which the
+ * first two are optional: `[marker][namespace:]name`
+ *
+ * Note: The colon is not considered to be part of the namespace but is required
+ * if a namespace exists.
+ */

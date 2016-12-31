@@ -507,9 +507,7 @@ class Adapter {
     if (action === 'rename') {
 
       // clone type first to prevent auto-creation
-      const newType = EdgeType.getInstance(newName);
-      newType.load(type);
-      newType.save();
+      (new EdgeType(newName, type)).save();
 
     }
 

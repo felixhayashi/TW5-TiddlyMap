@@ -29,7 +29,7 @@ class MapElementType {
     this.isShipped = $tw.wiki.getSubTiddler($tm.path.pluginRoot, this.fullPath);
 
     // finally get the data
-    this.load(data || this.fullPath);
+    this._load(data || this.fullPath);
 
   }
 
@@ -37,9 +37,9 @@ class MapElementType {
    * Load the type's data. Depending on the constructor arguments,
    * the data source can be a tiddler, a type store
    *
-   * @constructor
+   * @private
    */
-  load(data) {
+  _load(data) {
 
     if (!data) {
 
@@ -50,11 +50,11 @@ class MapElementType {
 
       const isFullPath = utils.startsWith(data, this.root);
       const tRef = (isFullPath ? data : `${this.root}/${data}`);
-      this.loadFromTiddler(tRef);
+      this._loadFromTiddler(tRef);
 
     } else if (data instanceof $tw.Tiddler) {
 
-      this.loadFromTiddler(data);
+      this._loadFromTiddler(data);
 
     } else if (typeof data === 'object') { // = type or a data object
 
@@ -69,8 +69,10 @@ class MapElementType {
    * Retrieve all data from the tiddler provided. If a shadow tiddler
    * with the same id exists, its data is merged during the load
    * process.
+   *
+   * @private
    */
-  loadFromTiddler(tiddler) {
+  _loadFromTiddler(tiddler) {
 
     const tObj = utils.getTiddler(tiddler);
 
@@ -172,24 +174,21 @@ class MapElementType {
 
     }
 
-    if (silently !== true) {
-      // add modification date to the output;
-      this.modified = new Date();
-    }
-
-    if (!this.exists()) { // newly created
-      // add a creation field as well
-      this.created = this.modified;
-    }
-
     // allow parsers to transform the raw field data
     for (let field in this._fieldMeta) {
 
       const stringify = this._fieldMeta[field].stringify;
 
-      fields[field] = (stringify
-        ? stringify.call(this, this[field])
-        : this[field]);
+      fields[field] = (stringify ? stringify.call(this, this[field]) : this[field]);
+    }
+
+    if (!this.exists()) { // newly created
+      Object.assign(fields, $tw.wiki.getCreationFields());
+    }
+
+    if (silently !== true) {
+      // add modification date to the output;
+      Object.assign(fields, $tw.wiki.getModificationFields());
     }
 
     $tw.wiki.addTiddler(new $tw.Tiddler(fields));
@@ -206,7 +205,6 @@ class MapElementType {
  * `boot.js` to decide how fields are parsed and stringified again.
  */
 MapElementType.fieldMeta = {
-
   'description': {},
   'style': {
     parse: utils.parseJSON,
@@ -214,7 +212,6 @@ MapElementType.fieldMeta = {
   },
   'modified': {}, // translation handled by TW's core
   'created': {} // translation handled by TW's core
-
 };
 
 /*** Exports *******************************************************/

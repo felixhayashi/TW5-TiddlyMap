@@ -261,22 +261,21 @@ const handleOpenTypeManager = ({type, paramObject = {}}) => {
 };
 
 /**
- * @param {Object} paramObject - event.paramObject
+ * @param {string} id - The id of a {@link MapElementType}
+ * @param {('manage-edge-types'|'manage-node-types')} mode
+ * @param {TiddlerReference} output
  */
-const handleLoadTypeForm = ({paramObject}) => {
+const handleLoadTypeForm = ({ paramObject: { mode, id, output } }) => {
 
-  const outTRef = paramObject.output;
-
-  const type = (paramObject.mode === 'manage-edge-types'
-    ? EdgeType.getInstance(paramObject.id)
-    : NodeType.getInstance(paramObject.id));
+  const outTRef = output;
+  const type = (mode === 'manage-edge-types' ? EdgeType.getInstance(id) : NodeType.getInstance(id));
 
   // inject all the type data as fields into the dialog output
-  type.save(outTRef);
+  type.save(outTRef, true);
 
   // fields that need preprocessing
 
-  if (paramObject.mode === 'manage-edge-types') {
+  if (mode === 'manage-edge-types') {
     const usage = $tm.adapter.selectEdgesByType(type);
     const count = Object.keys(usage).length;
     utils.setField(outTRef, 'temp.usageCount', count);
@@ -307,17 +306,18 @@ const handleSaveTypeForm = ({paramObject}) => {
 
   const id = tObj.fields.id;
   const mode = paramObject.mode;
-  const type = (mode === 'manage-edge-types' ? EdgeType.getInstance(id) : NodeType.getInstance(id));
 
   if (utils.isTrue(tObj.fields['temp.deleteType'], false)) {
-    deleteType(mode, type, tObj);
+    deleteType(mode, id, tObj);
   } else {
-    saveType(mode, type, tObj);
+    saveType(mode, id, tObj);
   }
 
 };
 
-const deleteType = (mode, type, dialogOutput) => {
+const deleteType = (mode, id, dialogOutput) => {
+
+  const type = (mode === 'manage-edge-types' ? EdgeType.getInstance(id) : NodeType.getInstance(id));
 
   $tm.logger('debug', 'Deleting type', type);
 
@@ -335,12 +335,18 @@ const deleteType = (mode, type, dialogOutput) => {
 
 };
 
-const saveType = (mode, type, dialogOutput) => {
+/**
+ * @param {string} id - The id of a {@link MapElementType}
+ * @param {('manage-edge-types'|'manage-node-types')} mode
+ * @param {TiddlerReference} output
+ */
+const saveType = (mode, id, output) => {
 
-  const tObj = utils.getTiddler(dialogOutput);
+  const tObj = utils.getTiddler(output);
 
   // update the type with the form data
-  type.loadFromTiddler(tObj);
+  const Type = (mode === 'manage-edge-types' ? EdgeType : NodeType);
+  const type = new Type(id, tObj);
   type.save();
 
   const newId = tObj.fields['temp.newId'];
@@ -356,9 +362,7 @@ const saveType = (mode, type, dialogOutput) => {
 
     } else {
 
-      const newType = NodeType.getInstance(newId);
-      newType.load(type);
-      newType.save();
+      (new NodeType(newId, type)).save();
       $tw.wiki.deleteTiddler(type.fullPath);
 
     }
@@ -372,24 +376,17 @@ const saveType = (mode, type, dialogOutput) => {
 };
 
 /**
- * @param {Object} paramObject - event.paramObject
+ * @param {string} id - The id of a {@link MapElementType}
+ * @param {('manage-edge-types'|'manage-node-types')} mode
+ * @param {TiddlerReference} output
  */
-const handleCreateType = ({paramObject}) => {
+const handleCreateType = ({ paramObject: { mode, id = 'New type', output } }) => {
 
-  const id = paramObject.id || 'New type';
-  const type = (paramObject.mode === 'manage-edge-types'
-    ? EdgeType.getInstance(id)
-    : nNodeType.getInstance(id));
+  const type = (mode === 'manage-edge-types' ? new EdgeType(id) : new NodeType(id));
 
   type.save();
 
-  handleLoadTypeForm({
-    paramObject: {
-      id: type.id,
-      mode: paramObject.mode,
-      output: paramObject.output
-    }
-  });
+  handleLoadTypeForm({ paramObject: { id: type.id, mode, output } });
 
 };
 

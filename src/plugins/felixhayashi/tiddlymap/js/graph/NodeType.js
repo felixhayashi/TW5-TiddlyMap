@@ -18,6 +18,8 @@ import utils          from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 
 /**
  * Used to define the type of a node.
+ *
+ * Note: NodeType instances are immutable (frozen).
  */
 class NodeType extends MapElementType {
 
@@ -29,6 +31,8 @@ class NodeType extends MapElementType {
 
     // call the parent constructor
     super(id, $tm.path.nodeTypes, NodeType.fieldMeta, data);
+
+    Object.freeze(this);
 
   }
 

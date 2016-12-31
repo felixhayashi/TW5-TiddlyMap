@@ -12,8 +12,8 @@ subtitle: {{$:/plugins/felixhayashi/tiddlymap/icon}} Edge type specification
 
 \define badges()
 <$tiddler tiddler={{!!text}}>
-<$set name="id" value=<<tmap "getETyId" "$(viewNS)$">>>
-<$set name="isVisible" value=<<tmap "isETyVisible" "$(viewNS)$" "$(eTyFilter)$">>>
+<$set name="id" value=<<tmap "getETyId" "$(view)$">>>
+<$set name="isVisible" value=<<tmap "isETyVisible" "$(view)$">>>
 <div class="tmap-badges">
   <span
       style="background: darkslategray"

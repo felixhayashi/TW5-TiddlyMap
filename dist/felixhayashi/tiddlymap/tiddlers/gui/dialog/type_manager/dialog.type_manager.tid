@@ -5,7 +5,7 @@ classes: tmap-remove-top-space
 
 \rules except wikilink
 
-\define defaultTab() 
+\define defaultTab()
 $:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/overview
 \end
 
@@ -43,14 +43,15 @@ $(searchSelector)$
                      +[!is[tiddler]!is[shadow]]">
       <$button tooltip="Create a new type of this name">
       {{$:/core/images/new-button}}
-        <$action-setfield $tiddler="$:/temp/tmap/MapElementTypeSearch" text="" />
         <$action-sendmessage
             $message="tmap:tm-create-type"
-            mode=<<mode>> id={{$:/temp/tmap/MapElementTypeSearch}}
+            mode=<<mode>>
+            id={{$:/temp/tmap/MapElementTypeSearch}}
             output=<<output>> />
+        <$action-setfield $tiddler="$:/temp/tmap/MapElementTypeSearch" text="" />
       </$button>
       </$list>
-          
+
     </div>
     <ul>
       <$list

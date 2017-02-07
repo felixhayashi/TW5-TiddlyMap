@@ -44,14 +44,12 @@ class AbstractMagicEdgeTypeSubscriber extends AbstractRefEdgeTypeSubscriber {
    *
    * @interface
    * @param {Tiddler} tObj - the tiddler that holds the references.
+   * @param {String} fieldName - the name of the field to get the reference from.
    * @param {Object<TiddlerReference, boolean>} toWL - a whitelist of tiddlers that are allowed to
    *     be included in the result.
-   * @param {Object<id, EdgeType>} [typeWL] - a whitelist that defines that only Tiddlers that are linked
-   *     via a type specified in the list may be included in the result. If typeWL is not passed it means
-   *     all types are included.
    * @return {Object<Id, Edge>|null}
    */
-  getReferencesFromField(tObj, toWL, typeWL) {
+  getReferencesFromField(tObj, fieldName, toWL) {
 
     throw new MissingOverrideError(this, 'getReferencesFromField');
 

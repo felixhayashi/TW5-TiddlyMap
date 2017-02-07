@@ -52,7 +52,7 @@ class FieldEdgeTypeSubscriber extends AbstractMagicEdgeTypeSubscriber {
   /**
    * @override
    */
-  getReferencesFromField(tObj, fieldName) {
+  getReferencesFromField(tObj, fieldName, toWL) {
 
     // wrap in array
     return [ tObj.fields[fieldName] ];

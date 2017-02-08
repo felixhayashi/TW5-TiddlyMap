@@ -44,7 +44,7 @@ class FilterEdgeTypeSubstriber extends AbstractMagicEdgeTypeSubscriber {
   /**
    * @override
    */
-  getReferencesFromField(tObj, fieldName) {
+  getReferencesFromField(tObj, fieldName, toWL) {
 
     const filter = tObj.fields[fieldName];
     //noinspection UnnecessaryLocalVariableJS

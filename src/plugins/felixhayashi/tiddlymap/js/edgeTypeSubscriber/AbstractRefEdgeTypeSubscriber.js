@@ -84,7 +84,7 @@ class AbstractRefEdgeTypeSubscriber extends AbstractEdgeTypeSubscriber {
    */
   getReferences(tObj, toWL, typeWL) {
 
-    throw new MissingOverrideError(this, 'getReferencesFromField');
+    throw new MissingOverrideError(this, 'getReferences');
 
   }
 }

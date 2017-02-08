@@ -53,7 +53,7 @@ class ListEdgeTypeSubscriber extends AbstractMagicEdgeTypeSubscriber {
   /**
    * @override
    */
-  getReferencesFromField(tObj, fieldName) {
+  getReferencesFromField(tObj, fieldName, toWL) {
 
     return $tw.utils.parseStringArray(tObj.fields[fieldName]);
 

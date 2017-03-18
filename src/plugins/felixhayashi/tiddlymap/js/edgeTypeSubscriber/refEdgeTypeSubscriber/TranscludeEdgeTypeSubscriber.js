@@ -35,7 +35,7 @@ class TranscludeEdgeTypeSubscriber extends AbstractRefEdgeTypeSubscriber {
    */
   canHandle(edgeType) {
 
-    return edgeType.id === 'tw-body:link';
+    return edgeType.id === 'tw-body:transclude';
 
   }
 

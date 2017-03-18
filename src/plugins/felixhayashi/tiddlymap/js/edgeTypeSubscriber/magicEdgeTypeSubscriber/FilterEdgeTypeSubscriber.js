@@ -44,7 +44,7 @@ class FilterEdgeTypeSubstriber extends AbstractMagicEdgeTypeSubscriber {
   /**
    * @override
    */
-  getReferencesFromField(tObj, fieldName) {
+  getReferencesFromField(tObj, fieldName, toWL) {
 
     const filter = tObj.fields[fieldName];
     //noinspection UnnecessaryLocalVariableJS
@@ -53,6 +53,36 @@ class FilterEdgeTypeSubstriber extends AbstractMagicEdgeTypeSubscriber {
     return toRefs;
 
   }
+
+  /**
+   * Stores and maybe overrides an edge in this tiddler
+   */
+  insertEdge(tObj, edge, type) {
+
+    if (!edge.to) {
+      return;
+    }
+
+    // get the name without the private marker or the namespace
+    const name = type.name;
+    const currentFilter = tObj.fields[name] || "";
+    const toTRef = this.tracker.getTiddlerById(edge.to);
+    // by treating the toTRef as a list of one, we can make
+    // it safe to append to any filter.
+    // "tiddler" -> "tiddler"
+    // "tiddler with spaces" -> "[[tiddler with spaces]]"
+    var safe_toTRef = $tw.utils.stringifyList([toTRef]);
+
+    if (currentFilter.length > 0) {
+      safe_toTRef = " " + safe_toTRef;
+    }
+
+    // save
+    utils.setField(tObj, name, currentFilter + safe_toTRef);
+
+    return edge;
+
+  };
 }
 
 /*** Exports *******************************************************/

@@ -115,6 +115,7 @@ class MapWidget extends Widget {
       'keyup': [ this.handleCanvasKeyup, true ],
       'keydown': [ this.handleCanvasKeydown, true ],
       'mousewheel': [ this.handleCanvasScroll, true ],
+      'DOMMouseScroll': [ this.handleCanvasScroll, true ],
       'contextmenu': [ this.handleContextMenu, true ],
     };
 
@@ -868,6 +869,7 @@ class MapWidget extends Widget {
     // after vis.Network has been instantiated, we fetch a reference to
     // the canvas element
     this.canvas = parent.getElementsByTagName('canvas')[0];
+    this.networkDomNode = utils.getFirstElementByClassName('vis-network', parent, true);
     // just to be sure
     this.canvas.tabIndex = 0;
 
@@ -1025,19 +1027,26 @@ class MapWidget extends Widget {
   //https://github.com/almende/vis/blob/111c9984bc4c1870d42ca96b45d90c13cb92fe0a/lib/network/modules/InteractionHandler.js
   handleCanvasScroll(ev) {
 
-    const zoomView = !!(ev.ctrlKey || this.isInSidebar || this.enlargedMode);
+    const isZoomAllowed = !!(
+      this.isInSidebar || // e.g. the map editor in the sidebar
+      ev.ctrlKey ||
+      this.enlargedMode ||
+      (this.clickToUse && this.networkDomNode.classList.contains('vis-active'))
+    );
 
-    if (zoomView) {
+    const { interaction } = this.visOptions;
+    const isVisSettingInSync = isZoomAllowed === interaction.zoomView;
+
+    if (isZoomAllowed || !isVisSettingInSync) {
       ev.preventDefault();
     }
 
-    if (zoomView !== this.visOptions.interaction.zoomView) {
-
-      ev.preventDefault();
+    if (!isVisSettingInSync) {
+      // prevent visjs from reacting to this event as we first need to sync states
       ev.stopPropagation();
 
-      this.visOptions.interaction.zoomView = zoomView;
-      this.network.setOptions({ interaction: { zoomView }});
+      interaction.zoomView = isZoomAllowed;
+      this.network.setOptions({ interaction: { zoomView: isZoomAllowed }});
 
       return false;
     }

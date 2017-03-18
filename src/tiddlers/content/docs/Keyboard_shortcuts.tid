@@ -46,7 +46,7 @@ For more details see: [[Fullscreen and halfscreen]].
 
 For more details see: [[Copy & paste nodes between views]].
 
-* Hold down <kbd>ctrl</kbd> as well as the left mouse button and move your mouse to select nodes in the current map.
+* Hold down <kbd>ctrl</kbd> as well as the right (or left) mouse button and move your mouse to select nodes in the current map.
 * Press <kbd>ctrl</kbd> + <kbd>a</kbd> to select all nodes in the current map.
 * Press <kbd>ctrl</kbd> + <kbd>c</kbd> to copy selected nodes.
 * Press <kbd>ctrl</kbd> + <kbd>x</kbd> to cut all selected nodes.

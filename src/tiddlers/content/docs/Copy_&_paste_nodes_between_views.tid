@@ -12,7 +12,7 @@ type: text/vnd.tiddlywiki
 ! Selection of nodes
 Select multiple nodes By holding down the control key and clicking on the nodes. Alternatively, you can hold down the left mouse-key on a node for one second to select this node along with other nodes. To select all nodes use <kbd>ctrl</kbd>+<kbd>a</kbd>.
 
-As of v0.12.0, another way to select nodes is to hold down <kbd>ctrl</kbd> and the left mouse button and then draw a selection rectangle.
+As of v0.12.0, another way to select nodes is to hold down <kbd>ctrl</kbd> and the right (or left) mouse button and then draw a selection rectangle.
 
 ! Cut or copy nodes
 After selection, press <kbd>ctrl</kbd>+<kbd>x</kbd> to cut nodes or <kbd>ctrl</kbd>+<kbd>c</kbd> to copy nodes from the current view. The nodes will be copied into your clipboard and can be pasted via <kbd>ctrl</kbd>+<kbd>v</kbd> into another graph.

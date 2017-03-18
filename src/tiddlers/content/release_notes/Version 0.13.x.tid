@@ -1,0 +1,52 @@
+caption: v0.13.x
+created: 20161225010054686
+modified: 20161229192042320
+tags: Maintainance ReleaseNote Usability
+title: Version 0.13.x
+tmap.id: 93d8d26f-a906-4183-b60d-014cff3a8317
+type: text/x-markdown
+
+Enhancements
+----------------------------
+
+### v0.13.0
+
+* Resolves #94: Draw raster lines on canvas for snapping nodes
+
+Bugfixes
+----------------------------
+
+### v0.13.3
+
+* Fixed bug that context menu did not open in Firefox
+* Various EdgeTypeSubscriber bugfixes (thanks @flibbles)
+* Fixes #260: Zooming map via mousewheel didn't work with FF and clickToUse mode.
+* Fixes #257: Tiddlymap on Node.js seems to cause problems when trying to export to static.
+
+### v0.13.2
+
+* When creating new types in the type manager, the name
+  was not correctly copied.
+* Shape size did not apply to icons.
+* Modified date was reset everytime a type was opened
+  in the type manager
+
+### v0.13.1
+
+* Fixed issue where a node with an x coordinate equal zero was
+  treated as if no positions were assigned
+* Tiddler icon did not correctly override group or global fa-icon
+* Fixed issue where tw's global filter macro interfered with
+  a tiddlymap dialog's 'filter' variable
+* Widget generator did not set current view as default
+
+Refactorings
+----------------------------
+
+### v0.13.2
+
+* Refactored MapElements (EdgeType, NoteType)
+
+### v0.13.1
+
+* Refactored ViewAbstraction

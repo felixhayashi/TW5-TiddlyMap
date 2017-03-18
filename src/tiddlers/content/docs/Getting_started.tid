@@ -1,6 +1,6 @@
 created: 20141217161104178
 creator: @felixhayashi
-modified: 20161220215551558
+modified: 20161225013005908
 modifier: @felixhayashi
 title: Getting started
 tmap.edges: {"30af4ba7-306f-4e68-9e32-d0342d64a717":{"to":"6159DA1A-73F2-451D-B55F-8744480BA7AC","type":"demo:suggestion"}}
@@ -16,8 +16,6 @@ type: text/vnd.tiddlywiki
 {{$:/beta warning}}
 
 <$tiddler tiddler="$(plugin)$">
-
-{{v0.12.0 just got released! For more details read the <<releaseNotes>>.||$:/me/info}}
 
 |!Version |{{!!version}} |
 |!Build date |{{!!released}} |

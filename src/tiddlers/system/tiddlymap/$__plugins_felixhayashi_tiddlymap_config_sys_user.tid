@@ -1,5 +1,5 @@
 created: 20150202231339398
-modified: 20161220221953067
+modified: 20161225013508697
 tags: 
 title: $:/plugins/felixhayashi/tiddlymap/config/sys/user
 type: application/x-tiddler-dictionary
@@ -24,6 +24,7 @@ jsonIndentation: 1
 editNodeOnCreate: false
 singleClickMode: false
 editorMenuBar.showNeighScopeButton: true
+editorMenuBar.showRasterMenuButton: true
 editorMenuBar.showScreenshotButton: true
 raster: 
 defaultView: Overview

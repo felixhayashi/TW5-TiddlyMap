@@ -1,0 +1,20 @@
+created: 20161225012554071
+modified: 20161225014916791
+rank: 30
+tags: Home Examples
+title: Using the Map Raster
+tmap.id: 8a135c88-5565-4c86-b720-cf28608a9140
+type: text/vnd.tiddlywiki
+
+\rules except wikilink
+
+In TiddlyWiki you can align your nodes on a raster. Just click on the raster button to activate and adjust your raster setting.
+
+"""
+Check out this video for a short introduction to this feature:
+https://youtu.be/gT-3rfrwNgE
+"""
+
+Here is an example of a map that has the raster enabled:
+
+<$tmap view="Family Tree" editor="advanced" height="350px" ></$tmap>

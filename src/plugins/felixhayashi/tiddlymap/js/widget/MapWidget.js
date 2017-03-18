@@ -1054,7 +1054,7 @@ class MapWidget extends Widget {
 
     const { network } = this;
 
-    this.tooltip.hide(0, true);
+    this.hidePopups(0, true);
 
     const nodeId = network.getNodeAt({ x: ev.offsetX, y: ev.offsetY });
     if (!nodeId) return;
@@ -2143,7 +2143,9 @@ class MapWidget extends Widget {
 
     }
 
-    this.contextMenu.hide(0, true);
+    if (evt.button !== 2) { // not the right button
+      this.contextMenu.hide(0, true);
+    }
 
   }
 

@@ -8,7 +8,6 @@ module-type: macro
 
 \*/
 
-
 /*** Imports *******************************************************/
 
 import EdgeType        from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';

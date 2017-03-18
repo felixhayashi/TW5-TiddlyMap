@@ -66,7 +66,7 @@ const init = () => {
 
   // all graphs need to register here. @see routineWalk()
   $tm.registry = [];
-  window.setInterval(routineCheck, 5000);
+  setInterval(routineCheck, 5000);
 
   // AT THE VERY END: register change listener with the callback manager
   registerChangeListener($tm.callbackManager);

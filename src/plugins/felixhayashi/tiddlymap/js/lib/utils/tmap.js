@@ -132,7 +132,7 @@ export const getDataUri = (tiddler, type, isForceBase64) => {
 
   if (isForceBase64 && encoding !== 'base64') {
     encoding = 'base64';
-    body = window.btoa(body);
+    body = basicUtils.base64(body);
   }
 
   return `data:${type};${encoding},${body}`;

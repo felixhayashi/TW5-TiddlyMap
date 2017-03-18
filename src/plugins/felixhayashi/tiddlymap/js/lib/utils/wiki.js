@@ -197,36 +197,6 @@ export const moveFieldValues = (oldName, newName, isRemoveOldField, isIncludeSys
 
 };
 
-export const getDataUri = (tiddler, type, isForceBase64) => {
-
-  type = type || imgTObj.fields.type || 'image/svg+xml';
-
-  const imgTObj = getTiddler(tiddler);
-  let body = imgTObj.fields.text;
-  let encoding = $tw.config.contentTypeInfo[type].encoding;
-
-  if (type === 'image/svg+xml') {
-
-    // see http://stackoverflow.com/questions/10768451/inline-svg-in-css
-    body = body.replace(/\r?\n|\r/g, ' ');
-
-    if (!basicUtils.hasSubString('xmlns', body)) {
-      // @tiddlywiki it is bad to remove the xmlns attribute!
-      body = body.replace(/<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-    }
-
-  }
-
-  if (isForceBase64 && encoding !== 'base64') {
-    encoding = 'base64';
-    body = window.btoa(body);
-  }
-
-  return `data:${type};${encoding},${body}`;
-
-};
-
-
 /**
  * This function facilitates to check whether a list of tiddlers
  * matches a certain filter. If the tiddler does not exist, it is not

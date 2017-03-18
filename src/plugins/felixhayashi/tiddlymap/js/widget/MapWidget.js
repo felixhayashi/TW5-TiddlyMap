@@ -1839,7 +1839,7 @@ class MapWidget extends Widget {
   fitGraph(delay = 0, duration = 0) {
 
     // clear any existing fitting attempt
-    window.clearTimeout(this.activeFitTimeout);
+    clearTimeout(this.activeFitTimeout);
 
     const fit = () => {
 
@@ -1860,7 +1860,7 @@ class MapWidget extends Widget {
 
     };
 
-    this.activeFitTimeout = window.setTimeout(fit, delay);
+    this.activeFitTimeout = setTimeout(fit, delay);
 
   }
 

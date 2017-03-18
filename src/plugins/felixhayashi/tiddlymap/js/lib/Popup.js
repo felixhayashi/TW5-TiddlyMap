@@ -246,7 +246,7 @@ Popup.prototype.show = function(signature, text, delay) {
   delay = (utils.isInteger(delay) ? delay : this._showDelay);
 
   // start a new timeout
-  this._timeoutShow = window.setTimeout(this._show, delay, signature, text);
+  this._timeoutShow = setTimeout(this._show, delay, signature, text);
 
 };
 
@@ -266,7 +266,7 @@ Popup.prototype.hide = function(delay, isForce) {
   if (isForce || delay === 0) { // @TODO is this really correct?
     this._hide(isForce);
   } else {
-    this._timeoutHide = window.setTimeout(this._hide, delay, isForce);
+    this._timeoutHide = setTimeout(this._hide, delay, isForce);
   }
 
 };
@@ -284,10 +284,8 @@ Popup.prototype.isShown = function() {
 
 Popup.prototype._clearTimeouts = function() {
 
-  //~ console.log("_clearTimeouts", this._timeoutShow, this._timeoutHide);
-
-  window.clearTimeout(this._timeoutShow);
-  window.clearTimeout(this._timeoutHide);
+  clearTimeout(this._timeoutShow);
+  clearTimeout(this._timeoutHide);
 
   this._timeoutShow = undefined;
   this._timeoutHide = undefined;

@@ -53,6 +53,17 @@ export const getBasename = (path, separator = '/') => path.substring(path.lastIn
  */
 export const startsWith = (str, prefix) => str.substring(0, prefix.length) === prefix;
 
+/**
+ * Converts a string to base64 encoding.
+ *
+ * To do so, we either choose the native btoa browser function or the Buffer class
+ * received via scope.
+ *
+ * @param {string} str
+ */
+export const base64 = typeof window === 'undefined'
+  ? (str => (new Buffer(str)).toString('base64'))
+  : window.btoa.bind(window);
 
 /**
  * If two objects have the same properties, with the same values

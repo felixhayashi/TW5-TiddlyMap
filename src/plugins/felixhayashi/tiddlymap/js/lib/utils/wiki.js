@@ -85,11 +85,9 @@ export const tiddlerExists = tiddler => {
 
 export const setSidebarTab = tRef => {
 
-  setText(getTiddlersByPrefix('$:/state/tab/sidebar-')[0], mainEditor);
+  setText(getTiddlersByPrefix('$:/state/tab/sidebar-')[0], tRef);
 
 };
-
-
 
 /**
  * Set a tiddler field to a given value.

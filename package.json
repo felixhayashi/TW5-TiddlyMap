@@ -1,6 +1,6 @@
 {
   "name": "tiddlymap",
-  "version": "0.13.3",
+  "version": "0.13.4",
   "author": "Felix Küppers <felix.kueppers@outlook.com>",
   "description": "TiddlyMap is a TiddlyWiki plugin that turns your favorite personal note taking software in a wiki-concept-map hybrid!",
   "license": "BSD-2-Clause",
@@ -23,19 +23,8 @@
     "url": "https://github.com/felixhayashi/TW5-TiddlyMap/issues"
   },
   "keywords": [
-    "tiddlywiki",
-    "tw5",
-    "wiki",
-    "mind map",
-    "concept mapt",
-    "visjs",
-    "vis",
-    "wiki",
-    "visualization",
-    "network",
-    "graph",
-    "knowledge management",
-    "browser"
+    "tiddlywiki", "tw5", "wiki", "mind map", "concept mapt", "visjs", "vis",
+    "wiki", "visualization", "network", "graph", "knowledge management", "browser"
   ],
   "devDependencies": {
     "async": "^2.1.4",

@@ -209,7 +209,7 @@ export const moveFieldValues = (oldName, newName, isRemoveOldField, isIncludeSys
  *     selected. Shadows are *not* included.
  * @return {Array.<TiddlerReference>}
  */
-export const getMatches = (filter, tiddlers) => {
+export const getMatches = (filter, tiddlers, widget) => {
 
   // use wiki as default source
   let source = undefined;
@@ -237,7 +237,7 @@ export const getMatches = (filter, tiddlers) => {
 
   }
 
-  return filter.call(wiki, source);
+  return filter.call(wiki, source, widget);
 
 };
 

@@ -13,6 +13,7 @@ module-type: tmap.edgetypehandler
 
 import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 import AbstractMagicEdgeTypeSubscriber from '$:/plugins/felixhayashi/tiddlymap/js/AbstractMagicEdgeTypeSubscriber';
+import Widget from "$:/core/modules/widgets/widget.js";
 
 /*** Code **********************************************************/
 
@@ -47,8 +48,13 @@ class FilterEdgeTypeSubstriber extends AbstractMagicEdgeTypeSubscriber {
   getReferencesFromField(tObj, fieldName, toWL) {
 
     const filter = tObj.fields[fieldName];
+
+    // Solves https://github.com/felixhayashi/TW5-TiddlyMap/issues/278
+    const parentWidget = new Widget.widget({});
+    parentWidget.setVariable("currentTiddler", tObj.fields.title);
+    const widget = new Widget.widget({}, {"parentWidget": parentWidget});
     //noinspection UnnecessaryLocalVariableJS
-    const toRefs = utils.getMatches(filter, toWL);
+    const toRefs = utils.getMatches(filter, toWL, widget);
 
     return toRefs;
 

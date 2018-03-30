@@ -49,6 +49,7 @@ class FilterEdgeTypeSubstriber extends AbstractMagicEdgeTypeSubscriber {
 
     const filter = tObj.fields[fieldName];
 
+    // Solves https://github.com/felixhayashi/TW5-TiddlyMap/issues/278
     const parentWidget = new Widget.widget({});
     parentWidget.setVariable("currentTiddler", tObj.fields.title);
     const widget = new Widget.widget({}, {"parentWidget": parentWidget});

@@ -468,11 +468,17 @@ class ViewAbstraction {
 
     if (!this._isNodeIncludedById(node)) {
 
-      const part = ViewAbstraction._getNodeIdFilterPart(node);
-      const separator = ' ';
-      this.setNodeFilter(this.getNodeFilter('raw') + separator + part);
+      // @see https://github.com/felixhayashi/TW5-TiddlyMap/issues/285
+      if (utils.isTrue($tm.config.sys.alwaysAddNodeIdToViewFilter) || this.getNodeFilter('compiled')().indexOf(node.label) == -1) {
+
+        const part = ViewAbstraction._getNodeIdFilterPart(node);
+        const separator = ' ';
+        this.setNodeFilter(this.getNodeFilter('raw') + separator + part);
+
+      }
 
       this.saveNodePosition(node);
+
     }
 
   }

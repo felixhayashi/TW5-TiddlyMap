@@ -83,6 +83,7 @@ export const config = {
       height: '140px'
     },
     jsonIndentation: '1',
+    alwaysAddNodeIdToViewFilter: 'true',
     editNodeOnCreate: 'false',
     singleClickMode: 'false',
     editorMenuBar: {

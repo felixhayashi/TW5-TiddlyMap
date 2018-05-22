@@ -88,7 +88,7 @@ class FieldEdgeTypeSubscriber extends AbstractMagicEdgeTypeSubscriber {
     }
 
     // only use the name without the private marker or the namespace
-    utils.setField(tObj, type.name, '');
+    utils.setField(tObj, type.name, undefined);
 
     return edge;
 

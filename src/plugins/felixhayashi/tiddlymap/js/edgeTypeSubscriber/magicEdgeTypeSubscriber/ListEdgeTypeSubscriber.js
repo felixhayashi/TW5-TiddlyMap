@@ -108,8 +108,13 @@ class ListEdgeTypeSubscriber extends AbstractMagicEdgeTypeSubscriber {
       list.splice(index, 1);
     }
 
+    // @see https://github.com/felixhayashi/TW5-TiddlyMap/issues/288
+    let stringList;
+    if (list.length > 0) {
+      stringList = $tw.utils.stringifyList(list);
+    }
     // save
-    utils.setField(tObj, type.name, $tw.utils.stringifyList(list));
+    utils.setField(tObj, type.name, stringList);
 
     return edge;
 

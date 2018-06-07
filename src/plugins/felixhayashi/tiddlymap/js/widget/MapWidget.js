@@ -581,7 +581,7 @@ class MapWidget extends Widget {
     } else { // view has not been switched
 
       // give the view a chance to refresh itself
-      const isViewUpdated = this.view.update(updates);
+      const isViewUpdated = this.view.hasUpdated(updates);
 
       if (isViewUpdated) {
 
@@ -1931,8 +1931,10 @@ class MapWidget extends Widget {
 
     const viewLabel = this.view.getLabel();
 
-    // we do not used the cashed version since we need a new object!
-    const nodeData = this.view.getNodeData(node.id, true) || {};
+    // we copy the object since we intend to modify it.
+    // NOTE: A deep copy would be needed if a nested property were modified
+    //       In that case, use $tw.utils.deepCopy.
+    const nodeData = { ...this.view.getNodeData(node.id) };
     // we need to delete the positions so they are not reset when a user
     // resets the style…
     delete nodeData.x;

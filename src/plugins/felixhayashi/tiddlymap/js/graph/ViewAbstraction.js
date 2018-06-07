@@ -63,9 +63,6 @@ class ViewAbstraction {
 
     }
 
-    // force complete rebuild
-    this._rebuildCache();
-
   }
 
   /**
@@ -81,23 +78,17 @@ class ViewAbstraction {
   }
 
   /**
-   * Gives the view a chance to rebuild its properties cache.
+   * This does nothing, but its return value specifies whether the view
+   * is expected to be different given the set of updates.
    *
    * @param {Updates} updates
-   * @return {boolean} True if changes affect parts of the view.
+   * @return {boolean} True if changes would affect parts of the view.
    */
-  update(updates) {
+  hasUpdated(updates) {
 
     const { changedTiddlers } = updates;
 
-    if (updates[env.path.edgeTypes] || utils.hasKeyWithPrefix(changedTiddlers, this.getRoot())) {
-
-      this._rebuildCache();
-
-      return true;
-    }
-
-    return false;
+    return (updates[env.path.edgeTypes] || utils.hasKeyWithPrefix(changedTiddlers, this.getRoot()));
 
   }
 
@@ -260,7 +251,6 @@ class ViewAbstraction {
     });
 
     this._registerPaths(newLabel);
-    this._rebuildCache();
 
   }
 
@@ -284,24 +274,17 @@ class ViewAbstraction {
    * @param {string} [name] - Instead of all configurations being returned,
    *     only the configuration named name is returned. The initial "config."
    *     may be omitted.
-   * @param {boolean} [isRebuild] - True if to rebuild the cache, false otherwise.
    * @result {string|Object} If `type` is not specified an object containing
    *     all configurations is returned, otherwise a single value will be returned.
    */
-  getConfig(name, isRebuild) {
+  getConfig(name) {
 
-    let config;
-
-    if (!isRebuild && this.config) {
-
-      config = this.config;
-
-    } else {
+    const config = $tw.wiki.getCacheForTiddler(this.configTRef, "tmap-config", () => {
 
       const fields = utils.getTiddler(this.configTRef).fields;
-      config = utils.getPropertiesByPrefix(fields, 'config.');
+      return utils.getPropertiesByPrefix(fields, 'config.');
 
-    }
+    });
 
     const prefixlessName = name && utils.startsWith(name, 'config.') ? name : `config.${name}`;
 
@@ -343,10 +326,12 @@ class ViewAbstraction {
         return;
       }
 
+      const config = this.getConfig();
+
       if (val === null) {
 
         $tm.logger('debug', 'Removing config', prop);
-        delete this.config[`config.${prop}`];
+        delete config[`config.${prop}`];
 
       } else {
 
@@ -358,20 +343,19 @@ class ViewAbstraction {
       }
 
       $tm.logger('log', 'Setting config', prop, val);
-      this.config[`config.${prop}`] = val;
+      config[`config.${prop}`] = val;
 
+      // save
+      $tw.wiki.addTiddler(new $tw.Tiddler(
+        utils.getTiddler(this.configTRef),
+        config
+      ));
 
     } else { // not allowed
 
       throw new InvalidArgumentException(...args);
 
     }
-
-    // save
-    $tw.wiki.addTiddler(new $tw.Tiddler(
-      utils.getTiddler(this.configTRef),
-      this.config
-    ));
 
   }
 
@@ -430,9 +414,6 @@ class ViewAbstraction {
 
     $tm.logger('debug', 'Node filter set to', expr);
 
-    // this register new filter
-    this.nodeFilter = this.getNodeFilter(null, true);
-
   }
 
   /**
@@ -452,9 +433,6 @@ class ViewAbstraction {
     utils.setField(this.edgeTypeFilterTRef, 'filter', expr);
 
     $tm.logger('debug', 'Edge filter set to', expr);
-
-    // this register new filter
-    this.edgeTypeFilter = this.getEdgeTypeFilter(null, true);
 
   }
 
@@ -506,7 +484,7 @@ class ViewAbstraction {
 
     this.setNodeFilter(f);
 
-    if (this.nodeData[nodeId]) {
+    if (this.getNodeData(nodeId)) {
       this.saveNodeData(nodeId, null);
     }
 
@@ -523,7 +501,6 @@ class ViewAbstraction {
    *
    * @param {("raw"|"pretty"|"matches"|"whitelist")} [type]
    *     Use this param to control the output type.
-   * @param {boolean} [isRebuild] - True if to rebuild the cache, false otherwise.
    * @result {*}
    *     Depends on the type param:
    *     - raw: the original filter string
@@ -531,27 +508,23 @@ class ViewAbstraction {
    *     - matches: {Array<string>} all matches
    *     - whitelist: A lookup table where all matches are true
    */
-  getEdgeTypeFilter(type, isRebuild) {
+  getEdgeTypeFilter(type) {
 
-    let filter;
-
-    if (!isRebuild && this.edgeTypeFilter) {
-
-      filter = this.edgeTypeFilter;
-
-    } else {
+    const filter = $tw.wiki.getCacheForTiddler(this.edgeTypeFilterTRef, "tmap-edgeTypeFilter", () => {
 
       const allETy = $tm.indeces.allETy;
       const src = Object.keys(allETy);
       const tObj = $tw.wiki.getTiddler(this.edgeTypeFilterTRef);
 
-      filter = {};
+      let filter = {};
       filter.raw = (tObj && tObj.fields.filter || '');
       filter.pretty = utils.getPrettyFilter(filter.raw);
       filter.matches = utils.getEdgeTypeMatches(filter.raw, allETy);
       filter.whitelist = utils.getLookupTable(filter.matches);
 
-    }
+      return filter;
+
+    });
 
     return (type ? filter[type] : filter);
 
@@ -565,7 +538,7 @@ class ViewAbstraction {
    */
   isEdgeTypeVisible(id) {
 
-    return utils.isEdgeTypeMatch(EdgeType.getInstance(id).id, this.edgeTypeFilter.raw);
+    return utils.isEdgeTypeMatch(EdgeType.getInstance(id).id, this.getEdgeTypeFilter("raw"));
 
   }
 
@@ -574,31 +547,26 @@ class ViewAbstraction {
    * decide which nodes are displayed by the graph.
    *
    * @param {("raw"|"pretty"|"compiled")} [type] - Use this param to control the output type.
-   * @param {boolean} [isRebuild=false] - True if to rebuild the cache, false otherwise.
    * @result {*}
    *     Depends on the type param:
    *     - raw: the original filter string
    *     - pretty: the prettyfied filter string for usage in textareas
    *     - compiled: {Array<string>} all matches
    */
-  getNodeFilter(type, isRebuild = false) {
+  getNodeFilter(type) {
 
-    let filter;
+    const filter = $tw.wiki.getCacheForTiddler(this.nodeFilterTRef, "tmap-nodeFilter", () => {
 
-    if (!isRebuild && this.nodeFilter) {
-
-      filter = this.nodeFilter;
-
-    } else {
-
-      filter = utils.makeHashMap();
+      let filter = utils.makeHashMap();
       const tObj = $tw.wiki.getTiddler(this.nodeFilterTRef);
 
       filter.raw = (tObj && tObj.fields.filter) || '';
       filter.pretty = utils.getPrettyFilter(filter.raw);
       filter.compiled = $tw.wiki.compileFilter(filter.raw);
 
-    }
+      return filter;
+
+    });
 
     return (type ? filter[type] : filter);
 
@@ -610,14 +578,11 @@ class ViewAbstraction {
    * @todo When to delete obsolete data?
    *
    * @param {string} nodeId
-   * @param {boolean} [isRebuild] - True if to rebuild the cache, false otherwise.
    * @result {Hashmap<Id, Object>} A Hashmap with node data.
    */
-  getNodeData(nodeId, isRebuild) {
+  getNodeData(nodeId) {
 
-    const data = (!isRebuild && this.nodeData
-      ? this.nodeData
-      : utils.parseFieldData(this.mapTRef, 'text', {}));
+    const data = $tw.wiki.getCacheForTiddler(this.mapTRef, "tmap-map", () => utils.parseFieldData(this.mapTRef, 'text', {}));
 
     return (nodeId ? data[nodeId] : data);
 
@@ -687,9 +652,6 @@ class ViewAbstraction {
 
     utils.writeFieldData(this.mapTRef, 'text', data, $tm.config.sys.jsonIndentation);
 
-    // register new values
-    this.nodeData = data;
-
   }
 
   /**
@@ -713,7 +675,7 @@ class ViewAbstraction {
    */
   saveNodePositions(positions) {
 
-    const { nodeData } = this;
+    const nodeData = this.getNodeData();
 
     for (let id in positions) {
 
@@ -831,21 +793,6 @@ class ViewAbstraction {
     ));
 
     this.setEdgeTypeFilter(env.filter.defaultEdgeTypeFilter);
-
-  }
-
-  /**
-   * This method will rebuild the cache.
-   *
-   * @private
-   * @return {boolean} true if the cache was dirty, false if cache was up-to-date and did
-   */
-  _rebuildCache() {
-
-    this.config = this.getConfig(null, true);
-    this.nodeData = this.getNodeData(null, true);
-    this.nodeFilter = this.getNodeFilter(null, true);
-    this.edgeTypeFilter = this.getEdgeTypeFilter(null, true);
 
   }
 

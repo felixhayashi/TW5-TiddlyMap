@@ -101,6 +101,8 @@ class DialogManager {
       text: utils.getText($tm.path.dialogs)
     };
 
+    utils.touch(dialog.output);
+
     if (param.dialog) {
 
       if (param.dialog.preselects) {

@@ -207,10 +207,16 @@ class DialogManager {
         const buttonName = matches[1];
         const key = matches[2];
         const buttonElement = DialogManager.getElement(buttonName);
-        if (!buttonElement) continue;
-        keys.bind(key, function () {
-          this.click();
-        }.bind(buttonElement));
+        if (!buttonElement) {
+          continue;
+        }
+        keys.bind(key, () => {
+          if (document.getElementsByClassName(classNames[j]).length) {
+            // only click button if trigger is active (i.e. still in focus)
+            // see https://github.com/felixhayashi/TW5-TiddlyMap/issues/280
+            buttonElement.click();
+          }
+        });
       }
     }
 

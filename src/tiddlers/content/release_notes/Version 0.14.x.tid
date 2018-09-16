@@ -1,0 +1,39 @@
+caption: v0.14.x
+created: 20180916142501189
+modified: 20180916142501189
+tags: [[Code Improvements]] Configurability ReleaseNote
+title: Version 0.14.x
+tmap.id: d42702ca-b9bb-11e8-84be-6f3af0f86644
+type: text/x-markdown
+
+Enhancements
+----------------------------
+
+### v0.14.0
+
+* Resolves #293:
+  Making nodes not draggable if not in editor mode
+* Resolves #272:
+  Opt-out checkboxes for TiddlyMap optimizations when installing TiddlyMap
+
+Bugfixes
+----------------------------
+
+### v0.14.0
+
+* Fixes #288:
+  Deleting edges leave empty garbage fields
+  (thanks @flibbles)
+* Fixes #285:
+  Don't update View's node filter if unnecessary
+  (thanks @flibbles)
+* Fixes #278:
+  Corrected filter edge types not handling currentTiddler references
+  (thanks @flibbles)
+
+Refactorings
+----------------------------
+
+* Resolves #290:
+  Utilizing tiddlywiki's native caching in ViewAbstraction
+  (thanks @flibbles)

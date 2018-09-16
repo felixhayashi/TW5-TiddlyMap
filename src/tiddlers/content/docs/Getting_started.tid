@@ -19,7 +19,7 @@ type: text/vnd.tiddlywiki
 
 |!Version |{{!!version}} |
 |!Build date |{{!!released}} |
-|!TW5 compatibility |{{!!core-version}}  (preferred: v5.1.14) |
+|!TW5 compatibility |{{!!core-version}} |
 
 </$tiddler>
 
@@ -38,12 +38,3 @@ TiddlyMap is currently in its late beta-phase. If you want to use it in your wik
     width="80px"
     height="20px"
     style="float: left; margin-right: 5px;"></iframe>
-
-<!--
-<iframe
-    src="//www.facebook.com/plugins/like.php?href=https%3A%2F%2Fwww.facebook.com%2Ftiddlymap &send=false&layout=button&width=200&show_faces=false&action=like&colorscheme=light&font&height=21"
-    scrolling="no"
-    frameborder="0" 
-    style="height: 21px; float: left;" 
-    allowTransparency="true"></iframe>
--->

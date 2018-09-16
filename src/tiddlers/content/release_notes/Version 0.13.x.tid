@@ -16,6 +16,10 @@ Enhancements
 Bugfixes
 ----------------------------
 
+### v0.13.4
+
+* Fixes #267; url params did not work (e.g. starting in fullscreen)
+
 ### v0.13.3
 
 * Fixed bug that context menu did not open in Firefox

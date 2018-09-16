@@ -217,25 +217,47 @@ class MapWidget extends Widget {
 
     utils.setEntry($tm.ref.sysMeta, 'showWelcomeMessage', false);
 
-    $tm.dialogManager.open('welcome', {}, (isConfirmed, outTObj) => {
+    const args = {
+      dialog: {
+        preselects: {
+          "config.storyview": "true",
+          "config.navigation": "true",
+          "config.sidebar": "true",
+          "config.demo": "true",
+        }
+      }
+    };
 
-      if (utils.tiddlerExists('$:/plugins/felixhayashi/topstoryview')) {
+    $tm.dialogManager.open('welcome', args, (isConfirmed, outTObj) => {
 
+      const config = utils.getPropertiesByPrefix(outTObj.fields, 'config.', true);
+
+      if (config['storyview'] && utils.tiddlerExists('$:/plugins/felixhayashi/topstoryview')) {
         utils.setText('$:/view', 'top');
-        utils.setText('$:/config/Navigation/openLinkFromInsideRiver', 'above');
-        utils.setText('$:/config/Navigation/openLinkFromOutsideRiver', 'top');
-        utils.setText('$:/themes/tiddlywiki/vanilla/options/sidebarlayout', 'fixed-fluid');
-
-        // trigger a save and reload message
-        utils.touch('$:/plugins/felixhayashi/topstoryview');
       }
 
-      const view = $tm.misc.defaultViewLabel;
+      if (config['navigation']) {
+        utils.setText('$:/config/Navigation/openLinkFromInsideRiver', 'above');
+        utils.setText('$:/config/Navigation/openLinkFromOutsideRiver', 'top');
+      }
 
-      const n1 = $tm.adapter.insertNode({ label: 'Have fun with', x: 0, y: 0 }, view);
-      const n2 = $tm.adapter.insertNode({ label: 'TiddlyMap!!', x: 100, y: 100 }, view);
+      if (config['sidebar']) {
+        utils.setText('$:/themes/tiddlywiki/vanilla/options/sidebarlayout', 'fixed-fluid');
+      }
 
-      $tm.adapter.insertEdge({ from: n1.id, to: n2.id });
+      if (config['demo']) {
+        const view = $tm.misc.defaultViewLabel;
+
+        const n1 = $tm.adapter.insertNode({ label: 'Have fun with', x: 0, y: 0 }, view);
+        const n2 = $tm.adapter.insertNode({ label: 'TiddlyMap!!', x: 100, y: 100 }, view);
+
+        $tm.adapter.insertEdge({ from: n1.id, to: n2.id });
+      }
+
+      if (Object.keys(config).length) {
+        // trigger a save and reload message
+        utils.touch('$:/plugins/felixhayashi/tiddlymap');
+      }
 
     });
 
@@ -1334,7 +1356,6 @@ class MapWidget extends Widget {
     $tm.dialogManager.open('renameView', args, (isConfirmed, outTObj) => {
 
       if (!isConfirmed) {
-
         return;
       }
 
@@ -1874,7 +1895,6 @@ class MapWidget extends Widget {
     $tm.dialogManager.open('addNodeToMap', {}, (isConfirmed, outTObj) => {
 
       if (!isConfirmed) {
-
         return;
       }
 

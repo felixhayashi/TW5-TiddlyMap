@@ -2162,9 +2162,19 @@ class MapWidget extends Widget {
 
   handleVisSelectNode({ nodes }) {
 
+    if (!this.isDraggingAllowed(nodes)) {
+      return;
+    }
+
     // assign selected style
     this.assignActiveStyle(nodes);
 
+  }
+
+  isDraggingAllowed({ nodes }) {
+    return (
+      this.editorMode || this.view.isEnabled('physics_mode')
+    );
   }
 
   /**
@@ -2411,18 +2421,22 @@ class MapWidget extends Widget {
    */
   handleVisDragStart({ nodes }) {
 
-    if (nodes.length) {
-
-      this.hidePopups(0, true);
-      this.assignActiveStyle(nodes);
-      this.setNodesMoveable(nodes, true);
-
-      if (nodes.length === 1) {
-        this.draggedNode = nodes[0];
-      }
-
+    if (
+      !nodes.length ||
+      // we do not allow nodes to be dragged if not in editor mode
+      // except cases physics is enabled
+      !this.isDraggingAllowed(nodes)
+    ) {
+      return;
     }
 
+    this.hidePopups(0, true);
+    this.assignActiveStyle(nodes);
+    this.setNodesMoveable(nodes, true);
+
+    if (nodes.length === 1) {
+      this.draggedNode = nodes[0];
+    }
   }
 
   /**

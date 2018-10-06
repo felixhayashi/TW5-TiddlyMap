@@ -7,6 +7,18 @@ type: text/vnd.tiddlywiki
 
 \rules except wikilink
 
+!! Installing for TiddlyDesktop
+
+In order to use TiddlyMap for TiddlyDesktop you cannot simply dragndrop the plugins
+as described in the installation routine. Instead do this:
+
+# For each plugin:
+## click on the plugins' link (the plugin tiddler will open)
+## click on the more actions symbol
+## select "export tiddler" then "JSON file"
+## download the file to your local filesystem
+# For each downloaded file dragndrop it into your TiddlyDesktop wiki.
+
 !! Widget's closing tag
 
 Please do not use the following shortcut to close the widget as it often causes conflicts with the widget rendering.

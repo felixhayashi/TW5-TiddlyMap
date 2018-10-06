@@ -133,6 +133,9 @@ gulp.task('perform cleanup', () => {
  * Override the version of the plugin specified in the plugin.info
  * file. If `isIncrBuild` is true, then the build number is
  * incremented as well.
+ *
+ * The source of truth for major.minor.patch version is the plugin.info file.
+ * The package.json will be synced.
  */
 gulp.task('bump version', (cb) => {
 

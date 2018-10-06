@@ -1232,7 +1232,7 @@ var MapWidget = function (_Widget) {
     key: 'handlePasteNodesFromClipboard',
     value: function handlePasteNodesFromClipboard() {
 
-      if (!this.editorMode || this.view.isLiveView()) {
+      if (!this.editorMode) {
         $tm.notify('Map is read only!');
         return;
       }

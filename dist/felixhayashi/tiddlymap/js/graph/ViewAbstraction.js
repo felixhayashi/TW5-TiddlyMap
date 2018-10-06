@@ -453,13 +453,6 @@ var ViewAbstraction = function () {
         return;
       }
 
-      if (this.isLiveView() && !force) {
-
-        $tm.notify('You must not change the live view\'s node filter!');
-
-        return;
-      }
-
       _utils2.default.setField(this.nodeFilterTRef, 'filter', expr);
 
       $tm.logger('debug', 'Node filter set to', expr);

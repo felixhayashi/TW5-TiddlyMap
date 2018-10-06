@@ -213,6 +213,13 @@ command.mergeFields = function() {
 
 command.option = function(path, unit) {
 
+  if (typeof $tm == "undefined") {
+    // this macro is referenced from css which means we cannot
+    // expect $tm to exist, e.g when rendering static css
+    // @see https://github.com/felixhayashi/TW5-TiddlyMap/issues/257#issuecomment-427343226
+    return '';
+  }
+
   var prop = $tm;
   var propertyPath = path.split('.');
 

@@ -19,11 +19,16 @@ Enhancements
 Bugfixes
 ----------------------------
 
+### v0.14.2
+
+* Fixes #294:
+  Tiddlymap in fullscreen mode not compatible with Jeremy's new comments plugin
+
 ### v0.14.1
 
 * Fixes #294:
   TiddlyMap is now less strict about changing live-view filter
-* Fixes #294:
+* Fixes #257:
   Problem with compiling tiddlywiki to static css
 
 ### v0.14.0

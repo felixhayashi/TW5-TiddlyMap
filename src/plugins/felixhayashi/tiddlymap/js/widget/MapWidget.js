@@ -1159,7 +1159,7 @@ class MapWidget extends Widget {
 
   handlePasteNodesFromClipboard() {
 
-    if (!this.editorMode || this.view.isLiveView()) {
+    if (!this.editorMode) {
       $tm.notify('Map is read only!');
       return;
     }

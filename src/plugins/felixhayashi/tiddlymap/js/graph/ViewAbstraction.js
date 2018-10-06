@@ -403,13 +403,6 @@ class ViewAbstraction {
       return;
     }
 
-    if (this.isLiveView() && !force) {
-
-      $tm.notify('You must not change the live view\'s node filter!');
-
-      return;
-    }
-
     utils.setField(this.nodeFilterTRef, 'filter', expr);
 
     $tm.logger('debug', 'Node filter set to', expr);

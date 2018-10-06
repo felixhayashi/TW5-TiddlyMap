@@ -1,6 +1,6 @@
 caption: v0.14.x
 created: 20180916142501189
-modified: 20180916142501189
+modified: 20181007142501189
 tags: [[Code Improvements]] Configurability ReleaseNote
 title: Version 0.14.x
 tmap.id: d42702ca-b9bb-11e8-84be-6f3af0f86644
@@ -18,6 +18,13 @@ Enhancements
 
 Bugfixes
 ----------------------------
+
+### v0.14.1
+
+* Fixes #294:
+  TiddlyMap is now less strict about changing live-view filter
+* Fixes #294:
+  Problem with compiling tiddlywiki to static css
 
 ### v0.14.0
 

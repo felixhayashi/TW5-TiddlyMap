@@ -19,6 +19,11 @@ Enhancements
 Bugfixes
 ----------------------------
 
+### v0.14.3
+
+* Fixes #295:
+  Now clearing view caches again
+
 ### v0.14.2
 
 * Fixes #294:

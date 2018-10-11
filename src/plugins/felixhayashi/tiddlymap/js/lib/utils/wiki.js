@@ -196,10 +196,7 @@ export const moveFieldValues = (oldName, newName, isRemoveOldField, isIncludeSys
 };
 
 /**
- * This function facilitates to check whether a list of tiddlers
- * matches a certain filter. If the tiddler does not exist, it is not
- * returned as match. If no list is specified, all tiddlers in
- * the wiki are considered.
+ * This function returns all tiddlers that match the filter.
  *
  * @Todo: skip drafts! Or not?
  *

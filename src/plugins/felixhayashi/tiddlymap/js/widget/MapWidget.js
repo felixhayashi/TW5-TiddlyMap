@@ -603,7 +603,7 @@ class MapWidget extends Widget {
     } else { // view has not been switched
 
       // give the view a chance to refresh itself
-      const isViewUpdated = this.view.hasUpdated(updates);
+      const isViewUpdated = this.view.update(updates);
 
       if (isViewUpdated) {
 

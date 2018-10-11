@@ -655,7 +655,7 @@ var MapWidget = function (_Widget) {
         // view has not been switched
 
         // give the view a chance to refresh itself
-        var isViewUpdated = this.view.hasUpdated(updates);
+        var isViewUpdated = this.view.update(updates);
 
         if (isViewUpdated) {
 

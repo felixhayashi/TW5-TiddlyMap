@@ -103,20 +103,25 @@ var ViewAbstraction = function () {
     }
 
     /**
-     * This does nothing, but its return value specifies whether the view
-     * is expected to be different given the set of updates.
+     * Gives the view a chance to rebuild its properties cache.
      *
      * @param {Updates} updates
-     * @return {boolean} True if changes would affect parts of the view.
+     * @return {boolean} True if changes affect parts of the view.
      */
 
   }, {
-    key: 'hasUpdated',
-    value: function hasUpdated(updates) {
+    key: 'update',
+    value: function update(updates) {
       var changedTiddlers = updates.changedTiddlers;
 
 
-      return updates[env.path.edgeTypes] || _utils2.default.hasKeyWithPrefix(changedTiddlers, this.getRoot());
+      if (updates[env.path.edgeTypes] || _utils2.default.hasKeyWithPrefix(changedTiddlers, this.getRoot())) {
+        this._clearCaches();
+
+        return true;
+      }
+
+      return false;
     }
 
     /**
@@ -292,6 +297,7 @@ var ViewAbstraction = function () {
       });
 
       this._registerPaths(newLabel);
+      this._clearCaches();
     }
 
     /**
@@ -820,6 +826,22 @@ var ViewAbstraction = function () {
       this.edgeTypeFilterTRef = this.configTRef + '/filter/edges';
 
       this.snapshotTRef = this.getRoot() + '/snapshot';
+    }
+
+    /**
+     * This will clear all cached tiddlers related to this view.
+     *
+     * @private
+     * @return {boolean} true if the cache was dirty, false if cache was up-to-date and did
+     */
+
+  }, {
+    key: '_clearCaches',
+    value: function _clearCaches() {
+      // clear all tiddler-caches below this path
+      _utils2.default.getMatches('[prefix[' + this.configTRef + ']]').forEach(function (tRef) {
+        $tw.wiki.clearCache(tRef);
+      });
     }
 
     /**

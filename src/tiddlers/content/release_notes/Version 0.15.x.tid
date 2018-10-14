@@ -1,0 +1,15 @@
+caption: v0.15.x
+created: 20181014003042831
+modified: 20181014003042831
+tags: Configurability ReleaseNote
+title: Version 0.15.x
+tmap.id: d42702ca-b9bb-11e8-84be-6f3af0f86644
+type: text/x-markdown
+
+Enhancements
+----------------------------
+
+### v0.15.0
+
+* Resolves #294:
+  Added new config to make TiddlyMap apply node-filter to neighbourhood.

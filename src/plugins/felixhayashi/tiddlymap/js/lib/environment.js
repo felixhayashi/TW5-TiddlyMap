@@ -86,6 +86,7 @@ export const config = {
     alwaysAddNodeIdToViewFilter: 'true',
     editNodeOnCreate: 'false',
     singleClickMode: 'false',
+    nodeFilterNeighbours: 'false',
     editorMenuBar: {
       showNeighScopeButton: 'true',
       showRasterMenuButton: 'true',

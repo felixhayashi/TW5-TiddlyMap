@@ -222,12 +222,26 @@ class Adapter {
     const isWalkIn = (isWalkBoth || direction === 'in');
     const isWalkOut = (isWalkBoth || direction === 'out');
 
+    // in order to apply the node-filter also to neighbours we need to make it
+    // include all tiddlers in the filter's source (e.g. a tiddler and a few neighbours)
+    // and then apply the filter – which now has the chance to take away tiddlers
+    // a few filters from the set
+    const neighFilter = view && `[all[]] ${view.getNodeFilter('raw')}`;
+
     // adjacency receives whitelists through opts
     const adjList = this.getAdjacencyList('to', opts);
 
     const addAsNeighbour = (edge, role, neighboursOfThisStep) => {
       allEdgesLeadingToNeighbours[edge.id] = edge;
       const tRef = this.getTiddlerById(edge[role]);
+
+      if (
+        view
+        && utils.isTrue($tm.config.sys.nodeFilterNeighbours)
+        && !utils.isMatch(tRef, neighFilter)) {
+        return;
+      }
+
       if (!visited[tRef]) {
         visited[tRef] = true;
         const node = this.makeNode(tRef, addProperties);

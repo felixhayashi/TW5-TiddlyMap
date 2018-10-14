@@ -53,6 +53,12 @@ caption: Interaction & behaviour
       selectFilter:"[[|disabled]] [[5|5px]] [[10|10px]] [[15|15px]] [[20|20px]] [[30|30px]] [[40|40px]]"
       descr:"Snap nodes to an invisible raster of the given size after drag'n'drop."
       note:"Only works when the view is not in floating mode">>
+  <<tmap-row type:"input-checkbox"
+      title:"Apply node-filter to neighbours"
+      field:"config.sys.nodeFilterNeighbours"
+      descr:"If checked, neighbours displayed in the map will be filtered
+      by the view's node-filter. Otherwise the node-filter will only be used
+      to filter the original set of nodes in the map">>
 </table>
 
 !! Suppressed dialogs

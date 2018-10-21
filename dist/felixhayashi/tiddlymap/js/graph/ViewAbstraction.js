@@ -296,8 +296,9 @@ var ViewAbstraction = function () {
         }
       });
 
-      this._registerPaths(newLabel);
+      // clear caches registered to previous root before registering new paths
       this._clearCaches();
+      this._registerPaths(newLabel);
     }
 
     /**
@@ -839,7 +840,7 @@ var ViewAbstraction = function () {
     key: '_clearCaches',
     value: function _clearCaches() {
       // clear all tiddler-caches below this path
-      _utils2.default.getMatches('[prefix[' + this.configTRef + ']]').forEach(function (tRef) {
+      _utils2.default.getMatches('[prefix[' + this.getRoot() + ']]').forEach(function (tRef) {
         $tw.wiki.clearCache(tRef);
       });
     }

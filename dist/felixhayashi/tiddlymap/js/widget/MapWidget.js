@@ -47,6 +47,8 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -638,8 +640,7 @@ var MapWidget = function (_Widget) {
 
       this.callbackManager.refresh(changedTiddlers);
 
-      if (this.isViewSwitched(changedTiddlers) // use changed view
-      || this.hasChangedAttributes() // widget html code changed
+      if (this.isViewSwitched(changedTiddlers) || this.hasChangedAttributes() // widget html code changed
       || updates[env.path.options] // global options changed
       || changedTiddlers[this.view.getRoot()] // view's main config changed
       ) {
@@ -842,13 +843,15 @@ var MapWidget = function (_Widget) {
 
     /**
      * A view is switched, if the holder was changed.
+     * Also if a view suddenly doesn't exist anymore we consider this
+     * a trigger for a view change.
      */
 
   }, {
     key: 'isViewSwitched',
     value: function isViewSwitched(changedTiddlers) {
 
-      return changedTiddlers[this.getViewHolderRef()];
+      return !_ViewAbstraction2.default.exists(this.view) || changedTiddlers[this.getViewHolderRef()];
     }
 
     /**
@@ -2733,9 +2736,11 @@ var MapWidget = function (_Widget) {
         text: viewLabel
       }));
 
-      // WARNING: Never set this.view to the new view state at this point.
-      // e.g. via `this.view = this.getView(true)` This would produce a
-      // race condition!
+      // we don't wait til next render-cycle (which would leave tiddlymap in
+      // a rather undefined state) but update immediately.
+      this.update({
+        changedTiddlers: _defineProperty({}, viewHolderRef, true)
+      });
     }
 
     /**

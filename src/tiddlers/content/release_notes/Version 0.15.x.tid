@@ -13,3 +13,11 @@ Enhancements
 
 * Resolves #294:
   Added new config to make TiddlyMap apply node-filter to neighbourhood.
+
+Bugfixes
+----------------------------
+
+### v0.15.1
+
+* Fixes #298:
+  Deleting a view throws an error

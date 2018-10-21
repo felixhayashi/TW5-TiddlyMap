@@ -586,7 +586,8 @@ class MapWidget extends Widget {
     // check for callback changes
     this.callbackManager.refresh(changedTiddlers);
 
-    if (this.isViewSwitched(changedTiddlers) // use changed view
+    if (
+       this.isViewSwitched(changedTiddlers)
        || this.hasChangedAttributes() // widget html code changed
        || updates[env.path.options] // global options changed
        || changedTiddlers[this.view.getRoot()] // view's main config changed
@@ -788,10 +789,15 @@ class MapWidget extends Widget {
 
   /**
    * A view is switched, if the holder was changed.
+   * Also if a view suddenly doesn't exist anymore we consider this
+   * a trigger for a view change.
    */
   isViewSwitched(changedTiddlers) {
 
-    return changedTiddlers[this.getViewHolderRef()];
+    return (
+      !ViewAbstraction.exists(this.view)
+      || changedTiddlers[this.getViewHolderRef()]
+    );
 
   }
 
@@ -2646,10 +2652,13 @@ class MapWidget extends Widget {
       text : viewLabel
     }));
 
-    // WARNING: Never set this.view to the new view state at this point.
-    // e.g. via `this.view = this.getView(true)` This would produce a
-    // race condition!
-
+    // we don't wait til next render-cycle (which would leave tiddlymap in
+    // a rather undefined state) but update immediately.
+    this.update({
+      changedTiddlers: {
+        [viewHolderRef]: true
+      }
+    });
   }
 
   /**

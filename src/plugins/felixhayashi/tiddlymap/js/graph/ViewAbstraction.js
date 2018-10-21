@@ -254,8 +254,9 @@ class ViewAbstraction {
 
     });
 
-    this._registerPaths(newLabel);
+    // clear caches registered to previous root before registering new paths
     this._clearCaches();
+    this._registerPaths(newLabel);
 
   }
 
@@ -760,7 +761,7 @@ class ViewAbstraction {
   _clearCaches() {
     // clear all tiddler-caches below this path
     utils
-      .getMatches(`[prefix[${this.configTRef}]]`)
+      .getMatches(`[prefix[${this.getRoot()}]]`)
       .forEach(tRef => { $tw.wiki.clearCache(tRef); });
   }
 

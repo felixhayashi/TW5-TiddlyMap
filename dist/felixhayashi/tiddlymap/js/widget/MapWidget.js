@@ -382,7 +382,7 @@ var MapWidget = function (_Widget) {
 
       $tw.utils.addClass(this.graphDomNode, 'tmap-vis-graph');
 
-      if (_utils2.default.isPreviewed(this) || this.domNode.isTiddlyWikiFakeDom) {
+      if (_utils2.default.isPreviewed(this)) {
 
         $tw.utils.addClass(this.domNode, 'tmap-static-mode');
         this.renderPreview(this.graphBarDomNode, this.graphDomNode);

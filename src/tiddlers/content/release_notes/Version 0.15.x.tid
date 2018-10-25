@@ -17,6 +17,11 @@ Enhancements
 Bugfixes
 ----------------------------
 
+### v0.15.2
+
+* Fixes #283:
+  Exporting tiddler as HTML that contains a map will throw an error
+
 ### v0.15.1
 
 * Fixes #298:

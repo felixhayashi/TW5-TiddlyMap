@@ -341,15 +341,20 @@ export const notify = message => {
  * in preview or not.
  */
 export const isPreviewed = widget => {
-
   if (!widget) {
     return false;
+  }
+
+  // TODO: in the wiki utils we should not know about TiddlyMap domNode property!
+  if (widget.domNode.isTiddlyWikiFakeDom) {
+    return true;
   }
 
   if (widget.getVariable('tv-tiddler-preview')) {
     return true;
   } else { // fallback for < v5.1.9
     const cls = 'tc-tiddler-preview-preview';
+    // TODO: in the wiki utils we should not know about TiddlyMap domNode property!
     return !!basicUtils.getAncestorWithClass(widget.parentDomNode, cls);
   }
 

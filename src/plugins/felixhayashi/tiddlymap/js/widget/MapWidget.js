@@ -334,7 +334,7 @@ class MapWidget extends Widget {
 
     $tw.utils.addClass(this.graphDomNode, 'tmap-vis-graph');
 
-    if (utils.isPreviewed(this) || this.domNode.isTiddlyWikiFakeDom) {
+    if (utils.isPreviewed(this)) {
 
       $tw.utils.addClass(this.domNode, 'tmap-static-mode');
       this.renderPreview(this.graphBarDomNode, this.graphDomNode);

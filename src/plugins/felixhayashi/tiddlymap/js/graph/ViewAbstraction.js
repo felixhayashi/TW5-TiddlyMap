@@ -105,7 +105,7 @@ class ViewAbstraction {
    */
   addPlaceholder(tiddler) {
 
-    utils.cp(utils.getTiddler(tiddler), this.snapshotTRef, true);
+    utils.cp(utils.getTiddlerRef(tiddler), this.snapshotTRef, true);
 
   }
 

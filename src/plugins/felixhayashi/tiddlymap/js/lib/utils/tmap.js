@@ -482,4 +482,4 @@ export const getArrayValuesAsHashmapKeys = getLookupTable;
  * @param type
  */
 export const getSnapshotTitle = (viewLabel, type) =>
-  `Snapshot – ${viewLabel} (${new Date().toDateString()}). ${type || 'png'}`;
+  `Snapshot – ${viewLabel} (${new Date().toDateString()}).${type || 'png'}`;

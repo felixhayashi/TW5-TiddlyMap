@@ -651,6 +651,7 @@ var MapWidget = function (_Widget) {
           this.view = this.getView(true);
           this.reloadRefreshTriggers();
           this.rebuildEditorBar();
+          this.reloadBackgroundImage();
           this.initAndRenderGraph(this.graphDomNode);
         } else {
         // view has not been switched
@@ -661,9 +662,6 @@ var MapWidget = function (_Widget) {
         if (isViewUpdated) {
 
           this.logger('warn', 'View components modified');
-
-          this.rebuildEditorBar();
-          this.reloadBackgroundImage();
           this.rebuildGraph({ resetFocus: { delay: 1000, duration: 1000 } });
         } else {
           // neither view switch or view modification
@@ -2799,9 +2797,6 @@ var MapWidget = function (_Widget) {
         // only now set the backgroundImage to the img object!
         _this17.backgroundImage = img;
         _this17.repaintGraph();
-        if (msg) {
-          $tm.notify(msg);
-        }
       };
 
       if (imgTObj) {

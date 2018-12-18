@@ -500,6 +500,6 @@ var getArrayValuesAsHashmapKeys = exports.getArrayValuesAsHashmapKeys = getLooku
  * @param type
  */
 var getSnapshotTitle = exports.getSnapshotTitle = function getSnapshotTitle(viewLabel, type) {
-  return 'Snapshot \u2013 ' + viewLabel + ' (' + new Date().toDateString() + '). ' + (type || 'png');
+  return 'Snapshot \u2013 ' + viewLabel + ' (' + new Date().toDateString() + ').' + (type || 'png');
 };
 //# sourceMappingURL=./maps/felixhayashi/tiddlymap/js/lib/utils/tmap.js.map

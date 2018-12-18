@@ -136,7 +136,7 @@ var ViewAbstraction = function () {
     key: 'addPlaceholder',
     value: function addPlaceholder(tiddler) {
 
-      _utils2.default.cp(_utils2.default.getTiddler(tiddler), this.snapshotTRef, true);
+      _utils2.default.cp(_utils2.default.getTiddlerRef(tiddler), this.snapshotTRef, true);
     }
 
     /**

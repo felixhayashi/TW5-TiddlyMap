@@ -599,6 +599,7 @@ class MapWidget extends Widget {
       this.view = this.getView(true);
       this.reloadRefreshTriggers();
       this.rebuildEditorBar();
+      this.reloadBackgroundImage();
       this.initAndRenderGraph(this.graphDomNode);
 
     } else { // view has not been switched
@@ -609,9 +610,6 @@ class MapWidget extends Widget {
       if (isViewUpdated) {
 
         this.logger('warn', 'View components modified');
-
-        this.rebuildEditorBar();
-        this.reloadBackgroundImage();
         this.rebuildGraph({ resetFocus: { delay: 1000, duration: 1000 }});
 
       } else { // neither view switch or view modification
@@ -2713,9 +2711,6 @@ class MapWidget extends Widget {
       // only now set the backgroundImage to the img object!
       this.backgroundImage = img;
       this.repaintGraph();
-      if (msg) {
-        $tm.notify(msg);
-      }
     };
 
     if (imgTObj) { // try loading from tiddler

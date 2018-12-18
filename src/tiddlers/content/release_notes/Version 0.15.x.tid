@@ -17,6 +17,11 @@ Enhancements
 Bugfixes
 ----------------------------
 
+### v0.15.3
+
+* Fixes #302:
+  Using background image forces update for every adjustment 
+
 ### v0.15.2
 
 * Fixes #283:

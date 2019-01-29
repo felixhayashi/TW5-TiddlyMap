@@ -633,11 +633,17 @@ class Adapter {
     // note: assignId() will not assign an id if the tiddler already has one
     node.id = this.assignId(tObj);
 
+    // backreference to tiddler;
+    // https://github.com/felixhayashi/TW5-TiddlyMap/issues/304
+    node.tRef = tObj.fields.title;
+
     // add label
     const label = tObj.fields[$tm.field.nodeLabel];
-    node.label = (label && $tm.field.nodeLabel !== 'title'
-      ? this.wiki.renderText('text/plain', 'text/vnd-tiddlywiki', label)
-      : tObj.fields.title);
+    node.label = (
+      label && $tm.field.nodeLabel !== 'title'
+        ? this.wiki.renderText('text/plain', 'text/vnd-tiddlywiki', label)
+        : tObj.fields.title
+    ).replace('\\n', '\n');
 
     return node;
 

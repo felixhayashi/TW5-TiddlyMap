@@ -20,6 +20,7 @@ import * as basicUtils      from '$:/plugins/felixhayashi/tiddlymap/js/lib/utils
 import * as wikiUtils       from '$:/plugins/felixhayashi/tiddlymap/js/lib/utils/wiki';
 
 /**
+ * TODO: this method does not seem to be used!
  * @param {Tiddler} tiddler
  * @param {string} aliasField - A tiddler field that contains an
  *     alternative title (e.g. "caption").
@@ -29,7 +30,12 @@ import * as wikiUtils       from '$:/plugins/felixhayashi/tiddlymap/js/lib/utils
  */
 export const getLabel = (tiddler, aliasField) => {
   const tObj = wikiUtils.getTiddler(tiddler);
-  return (tObj && tObj.fields[aliasField]? tObj.fields[aliasField] : tObj.fields.title);
+  return (
+    tObj &&
+    tObj.fields[aliasField]
+      ? tObj.fields[aliasField]
+      : tObj.fields.title
+  ).replace('\\n', '\n');
 };
 
 /**

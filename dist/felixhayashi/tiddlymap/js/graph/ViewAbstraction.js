@@ -502,7 +502,7 @@ var ViewAbstraction = function () {
       if (!this._isNodeIncludedById(node)) {
 
         // @see https://github.com/felixhayashi/TW5-TiddlyMap/issues/285
-        if (_utils2.default.isTrue($tm.config.sys.alwaysAddNodeIdToViewFilter) || this.getNodeFilter('compiled')().indexOf(node.label) == -1) {
+        if (_utils2.default.isTrue($tm.config.sys.alwaysAddNodeIdToViewFilter) || !_utils2.default.isMatch(node.tRef, this.getNodeFilter('compiled'))) {
 
           var part = ViewAbstraction._getNodeIdFilterPart(node);
           var separator = ' ';

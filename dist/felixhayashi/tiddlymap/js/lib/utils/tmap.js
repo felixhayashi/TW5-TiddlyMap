@@ -37,6 +37,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
+ * TODO: this method does not seem to be used!
  * @param {Tiddler} tiddler
  * @param {string} aliasField - A tiddler field that contains an
  *     alternative title (e.g. "caption").
@@ -46,7 +47,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 var getLabel = exports.getLabel = function getLabel(tiddler, aliasField) {
   var tObj = wikiUtils.getTiddler(tiddler);
-  return tObj && tObj.fields[aliasField] ? tObj.fields[aliasField] : tObj.fields.title;
+  return (tObj && tObj.fields[aliasField] ? tObj.fields[aliasField] : tObj.fields.title).replace('\\n', '\n');
 };
 
 /**

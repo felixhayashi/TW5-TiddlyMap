@@ -17,6 +17,11 @@ Enhancements
 Bugfixes
 ----------------------------
 
+### v0.15.4
+
+* Fixes #304:
+  Allow labels with linebreaks
+
 ### v0.15.3
 
 * Fixes #302:

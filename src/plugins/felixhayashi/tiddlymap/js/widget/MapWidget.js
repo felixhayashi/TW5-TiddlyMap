@@ -117,6 +117,8 @@ class MapWidget extends Widget {
       'mousewheel': [ this.handleCanvasScroll, true ],
       'DOMMouseScroll': [ this.handleCanvasScroll, true ],
       'contextmenu': [ this.handleContextMenu, true ],
+      // Solves: https://github.com/felixhayashi/TW5-TiddlyMap/issues/306
+      'MozMousePixelScroll': [ this.handleExtraCanvasScroll, true ],
     };
 
     this.widgetDomListeners = {
@@ -1077,6 +1079,15 @@ class MapWidget extends Widget {
       return false;
     }
 
+  }
+
+  /**
+   * This handles the extraneous event fired by Firefox whenever a
+   * DOMMouseScroll event occurs. We just want to swallow it.
+   * Solves: https://github.com/felixhayashi/TW5-TiddlyMap/issues/306
+   */
+  handleExtraCanvasScroll(ev) {
+    ev.preventDefault();
   }
 
   /**

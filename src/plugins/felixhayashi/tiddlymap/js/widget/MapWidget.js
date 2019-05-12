@@ -978,9 +978,18 @@ class MapWidget extends Widget {
 
   handleCanvasKeydown(ev) {
 
-    if (ev.keyCode === 46) { // delete
+    if (ev.altKey || ev.metaKey) {
       ev.preventDefault();
-      this.handleRemoveElements(this.network.getSelection());
+
+      if (ev.keyCode >= 48 && ev.keyCode <= 57) { // 0 through 9
+        const scopeStr = String.fromCharCode(ev.keyCode);
+        this.view.setConfig('neighbourhood_scope', scopeStr);
+      }
+    } else {
+      if (ev.keyCode === 46) { // delete
+        ev.preventDefault();
+        this.handleRemoveElements(this.network.getSelection());
+      }
     }
 
   }

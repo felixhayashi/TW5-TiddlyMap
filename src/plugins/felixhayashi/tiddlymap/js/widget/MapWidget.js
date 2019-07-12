@@ -1529,9 +1529,9 @@ class MapWidget extends Widget {
     $tw.wiki.addTiddler(new $tw.Tiddler({
       title: tRef,
       type: 'image/png',
-      text: this.getSnapshot(true),
-      modified: new Date()
-    }));
+      text: this.getSnapshot(true)
+    }, $tw.wiki.getCreationFields(),
+       $tw.wiki.getModificationFields()));
 
     return tRef;
 

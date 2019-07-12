@@ -767,6 +767,12 @@ export const addTiddler = (tiddler, isForce) => {
 
 };
 
-export const touch = tRef => {
-  setField(tRef, 'modified', new Date());
+export const touch = tiddler => {
+  if (!tiddler) {
+    return;
+  }
+  let tObj = $tw.wiki.getTiddler(tiddler);
+  tObj = new $tw.Tiddler(tObj, $tw.wiki.getModificationFields());
+
+  $tw.wiki.addTiddler(tObj);
 };

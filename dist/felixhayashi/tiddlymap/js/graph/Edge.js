@@ -1,16 +1,4 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _utils = require('$:/plugins/felixhayashi/tiddlymap/js/utils');
-
-var _utils2 = _interopRequireDefault(_utils);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } } // @preserve
+"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _utils=require("$:/plugins/felixhayashi/tiddlymap/js/utils");var _utils2=_interopRequireDefault(_utils);function _interopRequireDefault(e){return e&&e.__esModule?e:{default:e}}function _classCallCheck(e,t){if(!(e instanceof t)){throw new TypeError("Cannot call a class as a function")}}/* @preserve TW-Guard */
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/Edge
@@ -20,24 +8,5 @@ module-type: library
 @preserve
 
 \*/
-
-/*** Imports *******************************************************/
-
-/*** Code **********************************************************/
-
-/**
- * @constructor
- */
-var Edge = function Edge(from, to, type, id) {
-  _classCallCheck(this, Edge);
-
-  this.from = from;
-  this.to = to;
-  this.type = type;
-  this.id = id || _utils2.default.genUUID();
-};
-
-/*** Exports *******************************************************/
-
-exports.default = Edge;
+/* @preserve TW-Guard */var Edge=function e(t,i,s,l){_classCallCheck(this,e);this.from=t;this.to=i;this.type=s;this.id=l||_utils2.default.genUUID()};exports.default=Edge;
 //# sourceMappingURL=./maps/felixhayashi/tiddlymap/js/graph/Edge.js.map

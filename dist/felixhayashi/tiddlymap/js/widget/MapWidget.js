@@ -154,7 +154,9 @@ var MapWidget = function (_Widget) {
       'keydown': [_this.handleCanvasKeydown, true],
       'mousewheel': [_this.handleCanvasScroll, true],
       'DOMMouseScroll': [_this.handleCanvasScroll, true],
-      'contextmenu': [_this.handleContextMenu, true]
+      'contextmenu': [_this.handleContextMenu, true],
+      // Solves: https://github.com/felixhayashi/TW5-TiddlyMap/issues/306
+      'MozMousePixelScroll': [_this.handleExtraCanvasScroll, true]
     };
 
     _this.widgetDomListeners = {
@@ -1044,10 +1046,20 @@ var MapWidget = function (_Widget) {
     key: 'handleCanvasKeydown',
     value: function handleCanvasKeydown(ev) {
 
-      if (ev.keyCode === 46) {
-        // delete
+      if (ev.altKey || ev.metaKey) {
         ev.preventDefault();
-        this.handleRemoveElements(this.network.getSelection());
+
+        if (ev.keyCode >= 48 && ev.keyCode <= 57) {
+          // 0 through 9
+          var scopeStr = String.fromCharCode(ev.keyCode);
+          this.view.setConfig('neighbourhood_scope', scopeStr);
+        }
+      } else {
+        if (ev.keyCode === 46) {
+          // delete
+          ev.preventDefault();
+          this.handleRemoveElements(this.network.getSelection());
+        }
       }
     }
   }, {
@@ -1145,6 +1157,18 @@ var MapWidget = function (_Widget) {
 
         return false;
       }
+    }
+
+    /**
+     * This handles the extraneous event fired by Firefox whenever a
+     * DOMMouseScroll event occurs. We just want to swallow it.
+     * Solves: https://github.com/felixhayashi/TW5-TiddlyMap/issues/306
+     */
+
+  }, {
+    key: 'handleExtraCanvasScroll',
+    value: function handleExtraCanvasScroll(ev) {
+      ev.preventDefault();
     }
 
     /**
@@ -1582,9 +1606,8 @@ var MapWidget = function (_Widget) {
       $tw.wiki.addTiddler(new $tw.Tiddler({
         title: tRef,
         type: 'image/png',
-        text: this.getSnapshot(true),
-        modified: new Date()
-      }));
+        text: this.getSnapshot(true)
+      }, $tw.wiki.getCreationFields(), $tw.wiki.getModificationFields()));
 
       return tRef;
     }

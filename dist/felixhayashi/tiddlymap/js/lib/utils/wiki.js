@@ -753,7 +753,13 @@ var addTiddler = exports.addTiddler = function addTiddler(tiddler, isForce) {
   return tObj;
 };
 
-var touch = exports.touch = function touch(tRef) {
-  setField(tRef, 'modified', new Date());
+var touch = exports.touch = function touch(tiddler) {
+  if (!tiddler) {
+    return;
+  }
+
+  var tObj = new $tw.Tiddler(getTiddler(tiddler), $tw.wiki.getModificationFields());
+
+  $tw.wiki.addTiddler(tObj);
 };
 //# sourceMappingURL=./maps/felixhayashi/tiddlymap/js/lib/utils/wiki.js.map

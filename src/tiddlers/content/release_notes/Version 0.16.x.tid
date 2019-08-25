@@ -1,0 +1,31 @@
+caption: v0.16.x
+created: 20190825211653109
+modified: 20190825212918981
+tags: Usability Maintainance ReleaseNote
+title: Version 0.16.x
+tmap.id: 75397938-a1d0-426d-95d8-b476d286633a
+type: text/x-markdown
+
+Enhancements
+----------------------------
+
+### v0.16.0
+
+* Add hotkey cmd/alt + num to change neighbourhood_scope (thanks @hemu)
+* Upgraded to gulp4 and updated other dev dependencies
+* Resolves #316:
+  Respect Tiddlywiki timestamp setting (thanks @flibbles)
+
+Bugfixes
+----------------------------
+
+### v0.16.1
+
+* Fixes broken tmap due to stripped uglify comments
+
+### v0.16.0
+
+* Fixes #306:
+  Corrected Firefox scroll issue when zooming (thanks @flibbles)
+* Fixes #305:
+  Remove npm-check-updates package

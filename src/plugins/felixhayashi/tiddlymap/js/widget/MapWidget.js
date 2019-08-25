@@ -1526,12 +1526,17 @@ class MapWidget extends Widget {
   createAndSaveSnapshot(title) {
 
     const tRef = title || this.view.getRoot() + '/snapshot';
-    $tw.wiki.addTiddler(new $tw.Tiddler({
-      title: tRef,
-      type: 'image/png',
-      text: this.getSnapshot(true)
-    }, $tw.wiki.getCreationFields(),
-       $tw.wiki.getModificationFields()));
+    $tw.wiki.addTiddler(
+      new $tw.Tiddler(
+        {
+          title: tRef,
+          type: 'image/png',
+          text: this.getSnapshot(true)
+        },
+        $tw.wiki.getCreationFields(),
+        $tw.wiki.getModificationFields()
+      )
+    );
 
     return tRef;
 

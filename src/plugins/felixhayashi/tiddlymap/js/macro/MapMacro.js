@@ -1,4 +1,4 @@
-// @preserve
+/* @preserve TW-Guard */
 /*\
 title: $:/plugins/felixhayashi/tiddlymap/js/macro/tmap
 type: application/javascript
@@ -7,6 +7,7 @@ module-type: macro
 @preserve
 
 \*/
+/* @preserve TW-Guard */
 
 /*** Imports *******************************************************/
 

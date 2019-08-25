@@ -1,4 +1,4 @@
-// @preserve
+/* @preserve TW-Guard */
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/EdgeTypeSubscriberRegistry
@@ -8,6 +8,7 @@ module-type: library
 @preserve
 
 \*/
+/* @preserve TW-Guard */
 
 /**
  * Registry to store and retrieve EdgeTypeSubcriber modules that are responsible

@@ -1,4 +1,4 @@
-// @preserve
+/* @preserve TW-Guard */
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/widget/MapConfigWidget
@@ -8,6 +8,7 @@ module-type: widget
 @preserve
 
 \*/
+/* @preserve TW-Guard */
 
 import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 import vis from '$:/plugins/felixhayashi/vis/vis.js';

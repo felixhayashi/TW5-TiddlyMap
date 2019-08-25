@@ -1,4 +1,4 @@
-// @preserve
+/* @preserve TW-Guard *//* @preserve TW-Guard */
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/AbstractEdgeTypeSubscriber
@@ -8,6 +8,8 @@ module-type: library
 @preserve
 
 \*/
+/* @preserve TW-Guard */
+/* @preserve TW-Guard */
 
 import EdgeType from '$:/plugins/felixhayashi/tiddlymap/js/EdgeType';
 import { MissingOverrideError } from '$:/plugins/felixhayashi/tiddlymap/js/exception';

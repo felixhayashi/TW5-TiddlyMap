@@ -1,4 +1,4 @@
-// @preserve
+/* @preserve TW-Guard */
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/config/vis
@@ -8,6 +8,7 @@ module-type: library
 @preserve
 
 \*/
+/* @preserve TW-Guard */
 
 const visConfig = {
 

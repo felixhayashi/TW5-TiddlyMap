@@ -1,4 +1,4 @@
-// @preserve
+/* @preserve TW-Guard */
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/modules/edge-type-handler/field
@@ -8,6 +8,7 @@ module-type: tmap.edgetypehandler
 @preserve
 
 \*/
+/* @preserve TW-Guard */
 
 import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 import AbstractMagicEdgeTypeSubscriber from '$:/plugins/felixhayashi/tiddlymap/js/AbstractMagicEdgeTypeSubscriber';

@@ -78,7 +78,7 @@ import gulpif from 'gulp-if';
 import babel from 'gulp-babel';
 import sass from 'gulp-sass';
 import replace from 'gulp-replace';
-import uglify from 'gulp-uglify';
+import terser from 'gulp-terser';
 import jsdoc from 'gulp-jsdoc3';
 import esprima from 'gulp-esprima';
 import debug from 'gulp-debug';
@@ -202,7 +202,9 @@ gulp.task('compile and move scripts', () => {
 
   const uglifyOpts = {
     compress: false, // no further optimization
-    preserveComments: 'some',
+    output: {
+      comments: 'some',
+    }
   };
 
   const sourceMapOpts = {
@@ -213,7 +215,7 @@ gulp.task('compile and move scripts', () => {
   return gulp.src(pluginSrc + '/**/*.js')
     .pipe(sourcemaps.init())
     .pipe(babel())
-    .pipe(gulpif (argv.production, uglify(uglifyOpts)))
+    .pipe(gulpif (argv.production, terser(uglifyOpts)))
     .pipe(sourcemaps.write('./maps', sourceMapOpts))
     .pipe(gulp.dest(outPath.dist));
 

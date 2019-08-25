@@ -1,4 +1,4 @@
-// @preserve
+/* @preserve TW-Guard */
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/AbstractMagicEdgeTypeSubscriber
@@ -8,6 +8,7 @@ module-type: library
 @preserve
 
 \*/
+/* @preserve TW-Guard */
 
 import utils from '$:/plugins/felixhayashi/tiddlymap/js/utils';
 import Edge from '$:/plugins/felixhayashi/tiddlymap/js/Edge';

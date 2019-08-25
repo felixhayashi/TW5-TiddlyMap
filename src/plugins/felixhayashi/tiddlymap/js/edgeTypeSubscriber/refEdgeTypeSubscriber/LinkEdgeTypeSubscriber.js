@@ -1,4 +1,4 @@
-// @preserve
+/* @preserve TW-Guard */
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/modules/edge-type-handler/body/link
@@ -8,6 +8,7 @@ module-type: tmap.edgetypehandler
 @preserve
 
 \*/
+/* @preserve TW-Guard */
 
 import AbstractRefEdgeTypeSubscriber from '$:/plugins/felixhayashi/tiddlymap/js/AbstractRefEdgeTypeSubscriber';
 

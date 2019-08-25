@@ -1,6 +1,6 @@
 {
   "name": "tiddlymap",
-  "version": "0.16.0",
+  "version": "0.16.1",
   "author": "Felix Küppers <felix.kueppers@outlook.com>",
   "description": "TiddlyMap is a TiddlyWiki plugin that turns your favorite personal note taking software in a wiki-concept-map hybrid!",
   "license": "BSD-2-Clause",
@@ -55,7 +55,7 @@
     "gulp-replace": "^1.0.0",
     "gulp-sass": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
-    "gulp-uglify": "^3.0.2",
+    "gulp-terser": "^1.2.0",
     "gulp-util": "^3.0.8",
     "ink-docstrap": "^1.3.0",
     "is-there": "^4.3.1",

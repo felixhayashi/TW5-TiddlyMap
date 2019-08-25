@@ -1,4 +1,4 @@
-// @preserve
+/* @preserve TW-Guard */
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/lib/environment
@@ -8,6 +8,7 @@ type: application/javascript
 @preserve
 
 \*/
+/* @preserve TW-Guard */
 
 /*** Code **********************************************************/
 

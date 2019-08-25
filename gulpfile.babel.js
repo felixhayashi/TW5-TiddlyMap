@@ -72,7 +72,6 @@ import { argv } from 'yargs';
 import del from 'del';
 import exists from 'is-there'; // why on earth is fs.exists depreciated anyway by node?
 import SemVer from 'semver';
-import runSequence from 'run-sequence'; // once gulp 4.0 is out: remove runSequence and update
 import beep from 'beepbeep';
 import gulp from 'gulp';
 import gulpif from 'gulp-if';
@@ -293,20 +292,18 @@ gulp.task('bundle the plugin', (cb) => {
 /**
  * Execute the default task.
  */
-gulp.task('default', (cb) => {
-
-  runSequence(
+gulp.task(
+  'default',
+  gulp.series(
     'Javascript validation',
     'perform cleanup',
     'bump version',
-    [
+    gulp.parallel(
       'create docs',
       'copy vanilla files',
       'compile and move styles',
       'compile and move scripts'
-    ],
+    ),
     'bundle the plugin',
-    cb
-  );
-
-});
+  )
+);

@@ -1,0 +1,30 @@
+caption: v0.17.x
+created: 20200510140319751
+modified: 20200510140321521
+tags: Usability Maintainance ReleaseNote Configurability
+title: Version 0.17.x
+tmap.id: 158e4a3a-df4e-45fd-8d00-cd0b4ad88fce
+type: text/x-markdown
+
+Enhancements
+----------------------------
+
+### v0.17.0
+
+* Resolves #349: Option to trace paths of clicked neighbouring nodes
+* Resolves #348: Enable hierarchical layouts 
+* Improve editor menubar button styling
+* Resolves #314: Hide tmap.id field
+* Resolves #345: Keep initial node position when in "Floating nodes" mode
+
+Bugfixes
+----------------------------
+
+### v0.17.1
+
+Remove obsolete code
+
+### v0.17.0
+
+* Fix broken node styling for neighbour nodes
+* Fixes #327: Tiddlymap crashes if node filter has duplicates

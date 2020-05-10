@@ -1,0 +1,18 @@
+created: 20200510154016141
+modified: 20200510154827117
+tags: [[Discovering the neighbourhood]]
+title: Tracing node clicks
+tmap.id: 25c7ae13-2853-47e7-8cae-04d74d43a11a
+
+{{This feature is available since v0.17.0 and requires the neighbouring scope to be active||$:/me/info}}
+
+Sometimes you want to create an interactive map for other people to use in the sense that the user explores the map by clicking on neighbouring nodes which then again lead to new nodes being displayed in the view.
+
+This is possible by activating the neighbourhood scope and then activating "tracing" in the menu:
+
+{{tracing.png}}
+
+Here are some inspirational videos about what you can achieve with tracing:
+
+* D&D Quest with TiddlyMap: https://www.youtube.com/watch?v=etjq_u3o1kU
+* Creating an interactive decision tree https://www.youtube.com/watch?v=hge3PGnJM_A

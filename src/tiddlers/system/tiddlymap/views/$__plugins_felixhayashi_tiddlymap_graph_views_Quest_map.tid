@@ -5,8 +5,8 @@ type: text/vnd.tiddlywiki
 
 {
  "8044e455-d507-432e-bbc7-0d0308d29516": {
-  "x": 409,
-  "y": 170
+  "x": 430,
+  "y": 184
  },
  "ecfbe4b8-fa35-40ec-94e6-ed859a4c8f0f": {
   "x": 763,
@@ -25,8 +25,8 @@ type: text/vnd.tiddlywiki
   "y": 314
  },
  "eeea9c37-3335-41b6-a9e3-47b44438d0d5": {
-  "x": 266,
-  "y": 107
+  "x": 270,
+  "y": 85
  },
  "1b678c21-fc88-46c8-9a96-b3fbe22ecef0": {
   "x": 527,
@@ -34,5 +34,13 @@ type: text/vnd.tiddlywiki
   "node-style": "{}",
   "label": null,
   "open-view": "All Tasks"
+ },
+ "31dc039c-f2ff-48f8-bca3-af12f44bb135": {
+  "x": 464,
+  "y": 39
+ },
+ "4f125d3e-40f1-4199-a147-5adcd40ec7f9": {
+  "x": 81,
+  "y": 76
  }
 }

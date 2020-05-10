@@ -1,5 +1,5 @@
 created: 20151030095147579
-filter: [field:tmap.id[8044e455-d507-432e-bbc7-0d0308d29516]] [field:tmap.id[ecfbe4b8-fa35-40ec-94e6-ed859a4c8f0f]] [field:tmap.id[80f69421-1bc0-4ea2-8eed-b9df6caac6a6]] [field:tmap.id[67942477-eb7b-43c0-a9f9-7cc0d46664ca]] [field:tmap.id[ed61cb00-8e20-4c5f-a3ee-fe7417b6b08b]] [field:tmap.id[eeea9c37-3335-41b6-a9e3-47b44438d0d5]] [field:tmap.id[1b678c21-fc88-46c8-9a96-b3fbe22ecef0]]
+filter: [field:tmap.id[8044e455-d507-432e-bbc7-0d0308d29516]] [field:tmap.id[ecfbe4b8-fa35-40ec-94e6-ed859a4c8f0f]] [field:tmap.id[80f69421-1bc0-4ea2-8eed-b9df6caac6a6]] [field:tmap.id[67942477-eb7b-43c0-a9f9-7cc0d46664ca]] [field:tmap.id[ed61cb00-8e20-4c5f-a3ee-fe7417b6b08b]] [field:tmap.id[eeea9c37-3335-41b6-a9e3-47b44438d0d5]] [field:tmap.id[1b678c21-fc88-46c8-9a96-b3fbe22ecef0]] [field:tmap.id[31dc039c-f2ff-48f8-bca3-af12f44bb135]] [field:tmap.id[4f125d3e-40f1-4199-a147-5adcd40ec7f9]]
 title: $:/plugins/felixhayashi/tiddlymap/graph/views/Quest/filter/nodes
 type: text/vnd.tiddlywiki
 

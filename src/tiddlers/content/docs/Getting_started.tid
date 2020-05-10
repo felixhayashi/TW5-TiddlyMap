@@ -15,7 +15,7 @@ type: text/vnd.tiddlywiki
 
 {{$:/beta warning}}
 
-<$tiddler tiddler="$(plugin)$">
+<$tiddler tiddler=<<plugin>>>
 
 |!Version |{{!!version}} |
 |!Build date |{{!!released}} |
@@ -27,14 +27,8 @@ Hi, this is the official demo site of TiddlyMap.
 
 The [[motivation|TiddlyMap]] behind TiddlyMap is to combine the strengths of wikis and concept maps in the realms of personal knowledge management in a single application.
 
-See the [[version history|Version History]] for a list of existing features, check out the [[docs|Documentation]] to discover what TiddlyMap can do for you or scroll down for some example. Use a double-click on the nodes to [[navigate|Navigation]] to the corresponding content. The visualization runs most smoothly in [[Chrome|http://www.google.com/chrome/]]. TiddlyMap is designed to be used on large desktop screens. Here is an impression how it should look like: [[Screenshot|https://upload.wikimedia.org/wikipedia/commons/1/13/TiddlyMap_Demo_Site_-_0.7.24.png]].
+See the [[version history|Version History]] for a list of existing features, check out the [[docs|Documentation]] to discover what TiddlyMap can do for you or scroll down for some example. Use a double-click on the nodes to [[navigate|Navigation]] to the corresponding content. TiddlyMap is designed to be used on large desktop screens. Here is an impression of how it should look like: [[Screenshot|https://upload.wikimedia.org/wikipedia/commons/1/13/TiddlyMap_Demo_Site_-_0.7.24.png]].
 
 TiddlyMap is currently in its late beta-phase. If you want to use it in your wiki, check out the [[installation instructions|Installation]]. Many [[thanks|Special Thanks]] to everybody who made this project possible. 
 
-<iframe
-    src="https://ghbtns.com/github-btn.html?user=felixhayashi&repo=TW5-TiddlyMap&type=star&count=true" 
-    frameborder="0"
-    scrolling="0"
-    width="80px"
-    height="20px"
-    style="float: left; margin-right: 5px;"></iframe>
+<iframe src="https://ghbtns.com/github-btn.html?user=felixhayashi&repo=TW5-TiddlyMap&type=star&count=true" frameborder="0" scrolling="0" height="20px"></iframe>

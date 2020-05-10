@@ -1,0 +1,12 @@
+config.central-topic: fa94a9d5-5f1d-449d-9538-0b68d1f0df1d
+config.neighbourhood_scope: 1
+config.neighbourhood_focus_newly_traced_node: true
+config.neighbourhood_trace_clicks: true
+config.neighbourhood_include_traced_node_neighbours: true
+config.vis: {"edges":{"smooth":{"type":"straightCross"}},"layout":{"hierarchical":true}}
+created: 20200507191818851
+id: 1838e3fe-7308-4dc4-a12c-6fe1aa6349b8
+isview: true
+modified: 20200510115134304
+title: $:/plugins/felixhayashi/tiddlymap/graph/views/Decision Tree
+

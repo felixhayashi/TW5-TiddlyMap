@@ -27,6 +27,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
 
   <$button
       popup=<<qualify "$:/temp/menu">>
+      class="tmap-unicode-button"
       tooltip="Open the Menu">{{$:/core/images/menu-button}}
   </$button>
 
@@ -77,7 +78,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
         class=<<neighScopeBtnClass>>
         tooltip="Change the neighbourhood scope"
         popup=<<qualify "$:/temp/neighScope">>>
-      ☀
+      {{$:/core/images/preview-open}}
     </$button>
   </$reveal>
 
@@ -106,14 +107,69 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
             $tiddler=<<viewRoot>>
             config.neighbourhood_scope="100" />
       </$button>
+
       <div class="tmap-list-separator">Neighbourhood traversal</div>
+
       <$radio field="config.neighbourhood_directions" value="in"> Incoming</$radio><br />
       <$radio field="config.neighbourhood_directions" value="out"> Outgoing</$radio><br />
       <$radio field="config.neighbourhood_directions" value=""> Both</$radio>
+
       <div class="tmap-list-separator">Other</div>
+
       <$checkbox field="config.show_inter_neighbour_edges"
           checked="true" unchecked="false"> Inter-neighbour edges</$checkbox>
 
+    </div>
+  </$reveal>
+
+<!-- === Tracing ===================================== -->
+
+  <$reveal
+      type="match"
+      text="true"
+      default=<<isShowNeighbourhood>>>
+    <$button
+        class=<<tracingBtnClass>>
+        tooltip="Trace your clicks on neighbouring nodes."
+        popup=<<qualify "$:/temp/tmap-tracing">>>
+      {{$:/core/images/timestamp-on}}
+    </$button>
+  </$reveal>
+
+  <$reveal type="popup" position="below" state=<<qualify "$:/temp/tmap-tracing">> >
+    <div class="tc-drop-down">
+      <$button message="tmap:tm-neighbourhood-reset-trace">
+        {{$:/core/images/erase}} Restart
+      </$button>
+      <span
+        title="
+          Enable this option to trace your clicks on neighbouring nodes.
+          Traced neighbours are temporarily added to the map (until the map is closed)
+          as if they where regular nodes of the map"
+      >
+        <$checkbox
+          field="config.neighbourhood_trace_clicks"
+          checked="true"
+          unchecked="false"
+        >
+          Trace clicked nodes
+        </$checkbox>
+      </span>
+      <br />
+      <span title="Will focus an zoom on the latest traced node">
+        <$checkbox
+          field="config.neighbourhood_focus_newly_traced_node"
+          checked="true"
+          unchecked="false"
+        >
+          Focus traced nodes
+        </$checkbox>
+      </span>
+      <br />
+      <span title="Per default, only neighbours of nodes matching the node filter are displayed. Enable this option to also show neighbours of traced nodes.">
+        <$checkbox field="config.neighbourhood_include_traced_node_neighbours"
+            checked="true" unchecked="false"> Show neighbours of all traced nodes</$checkbox>
+      </span>
     </div>
   </$reveal>
 
@@ -123,7 +179,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
       type="match"
       text="true"
       default=<<tmap "option" "config.sys.editorMenuBar.showScreenshotButton">>>
-    <$button tooltip="Open the map-export menu" popup=<<qualify "$:/temp/mapExport">>>
+    <$button class="tmap-unicode-button" tooltip="Open the map-export menu" popup=<<qualify "$:/temp/mapExport">>>
       {{$:/core/images/download-button}}
     </$button>
   </$reveal>
@@ -157,9 +213,9 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/advancedEditorBar
       default=<<tmap "option" "config.sys.editorMenuBar.showRasterMenuButton">>>
     <$button
       tooltip="Change the raster of your map"
-      class=<<rasterMenuBtnClass>>
+      class="tmap-unicode-button"
       popup=<<qualify "$:/temp/rasterMenu">>>
-      ⩩
+      {{$:/core/images/line-width}}
     </$button>
   </$reveal>
 

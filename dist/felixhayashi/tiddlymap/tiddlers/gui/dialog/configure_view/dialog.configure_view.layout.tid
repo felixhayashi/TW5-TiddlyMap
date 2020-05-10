@@ -6,12 +6,12 @@ caption: Layout
 <table class="tmap-config-table">
   <<tmap-row type:"input-checkbox"
       title:"Floating nodes"
-      field:"config.physics_mode" 
+      field:"config.physics_mode"
       descr:"Set this to true if you want your nodes to freely
              swirl around.">>
   <<tmap-row type:"input-text"
       title:"Background image"
-      field:"config.background_image" 
+      field:"config.background_image"
       descr:"The title of an image tiddler to be used as background
              in the view."
       note:"You can also use an image url directly, however, the

@@ -77,7 +77,6 @@ class MapWidget extends Widget {
         'tmap:tm-edit-view': this.handleEditView,
         'tmap:tm-generate-widget': this.handleGenerateWidget,
         'tmap:tm-toggle-central-topic': this.handleSetCentralTopic,
-        'tmap:tm-remove-other-nodes': this.handleRemoveOtherNodes,
         'tmap:tm-save-canvas': this.handleSaveCanvas
       }, this, this);
     }
@@ -1855,15 +1854,6 @@ class MapWidget extends Widget {
 
     this.view.setCentralTopic(nodeId);
 
-  }
-
-  handleRemoveOtherNodes({ paramObject }) {
-
-    let nodeId = paramObject.id || this.network.getSelectedNodes()[0];
-
-    Object.keys(this.graphData.nodesById)
-      .filter(id => id !== nodeId)
-      .forEach(id => this.view.removeNode(id))
   }
 
   /**

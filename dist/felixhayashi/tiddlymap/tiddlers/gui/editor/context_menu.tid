@@ -3,8 +3,6 @@ title: $:/plugins/felixhayashi/tiddlymap/editor/contextMenu/node
 \define single()
   <$list filter="
       [[tmap:tm-toggle-central-topic, $:/core/images/star-filled, Toggle central topic]]
-      [[tmap:tm-remove-other-nodes, $:/core/images/close-all-button, Remove other nodes (only from view)]]
-      [[tmap:tm-add-node-to-view, $:/core/images/close-all-button, add node to view]]
       [[tmap:tm-delete-element, $:/core/images/delete-button, Delete node]]">
     <$button class="tc-btn-invisible">
       <$action-sendmessage $message=<<tmap "splitAndSelect" ", " "0">> />

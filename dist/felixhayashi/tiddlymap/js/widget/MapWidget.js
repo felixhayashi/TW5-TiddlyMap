@@ -115,7 +115,6 @@ var MapWidget = function (_Widget) {
         'tmap:tm-edit-view': _this.handleEditView,
         'tmap:tm-generate-widget': _this.handleGenerateWidget,
         'tmap:tm-toggle-central-topic': _this.handleSetCentralTopic,
-        'tmap:tm-remove-other-nodes': _this.handleRemoveOtherNodes,
         'tmap:tm-save-canvas': _this.handleSaveCanvas
       }, _this, _this);
     }
@@ -1910,22 +1909,6 @@ var MapWidget = function (_Widget) {
 
       this.view.setCentralTopic(nodeId);
     }
-  }, {
-    key: 'handleRemoveOtherNodes',
-    value: function handleRemoveOtherNodes(_ref5) {
-      var _this14 = this;
-
-      var paramObject = _ref5.paramObject;
-
-
-      var nodeId = paramObject.id || this.network.getSelectedNodes()[0];
-
-      Object.keys(this.graphData.nodesById).filter(function (id) {
-        return id !== nodeId;
-      }).forEach(function (id) {
-        return _this14.view.removeNode(id);
-      });
-    }
 
     /**
      * Called by vis when the graph has stabilized itself.
@@ -1982,8 +1965,8 @@ var MapWidget = function (_Widget) {
 
   }, {
     key: 'handleFocusNode',
-    value: function handleFocusNode(_ref6) {
-      var tRef = _ref6.param;
+    value: function handleFocusNode(_ref5) {
+      var tRef = _ref5.param;
 
 
       this.network.focus($tm.adapter.getId(tRef), {
@@ -2020,7 +2003,7 @@ var MapWidget = function (_Widget) {
   }, {
     key: 'fitGraph',
     value: function fitGraph() {
-      var _this15 = this;
+      var _this14 = this;
 
       var delay = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
       var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
@@ -2032,14 +2015,14 @@ var MapWidget = function (_Widget) {
       var fit = function fit() {
 
         // happens when widget is removed after stabilize but before fit
-        if (_this15.isZombieWidget()) {
+        if (_this14.isZombieWidget()) {
           return;
         }
 
         // fixes #97
-        _this15.network.redraw();
+        _this14.network.redraw();
 
-        _this15.network.fit({ // v4: formerly zoomExtent
+        _this14.network.fit({ // v4: formerly zoomExtent
           animation: {
             duration: duration,
             easingFunction: 'easeOutQuart'
@@ -2059,7 +2042,7 @@ var MapWidget = function (_Widget) {
   }, {
     key: 'handleInsertNode',
     value: function handleInsertNode(node) {
-      var _this16 = this;
+      var _this15 = this;
 
       $tm.dialogManager.open('addNodeToMap', {}, function (isConfirmed, outTObj) {
 
@@ -2072,7 +2055,7 @@ var MapWidget = function (_Widget) {
         if (_utils2.default.tiddlerExists(tRef)) {
 
           // Todo: use graphData and test if node is match (!=neighbour)
-          if (_utils2.default.isMatch(tRef, _this16.view.getNodeFilter('compiled'))) {
+          if (_utils2.default.isMatch(tRef, _this15.view.getNodeFilter('compiled'))) {
 
             $tm.notify('Node already exists');
 
@@ -2080,18 +2063,18 @@ var MapWidget = function (_Widget) {
           } else {
 
             node = $tm.adapter.makeNode(tRef, node);
-            _this16.view.addNode(node);
+            _this15.view.addNode(node);
           }
         } else {
 
           var tObj = new $tw.Tiddler(outTObj, { 'draft.title': null });
 
           node.label = tRef;
-          $tm.adapter.insertNode(node, _this16.view, tObj);
+          $tm.adapter.insertNode(node, _this15.view, tObj);
         }
 
         // prevent zoom
-        _this16.isPreventZoomOnNextUpdate = true;
+        _this15.isPreventZoomOnNextUpdate = true;
       });
     }
 
@@ -2102,7 +2085,7 @@ var MapWidget = function (_Widget) {
   }, {
     key: 'handleEditNode',
     value: function handleEditNode(node) {
-      var _this17 = this;
+      var _this16 = this;
 
       var tRef = $tm.tracker.getTiddlerById(node.id);
       var tObj = _utils2.default.getTiddler(tRef);
@@ -2181,9 +2164,9 @@ var MapWidget = function (_Widget) {
           data[_p] = local[_p] || undefined;
         }
 
-        _this17.view.saveNodeStyle(node.id, data);
+        _this16.view.saveNodeStyle(node.id, data);
 
-        _this17.isPreventZoomOnNextUpdate = true;
+        _this16.isPreventZoomOnNextUpdate = true;
       });
     }
 
@@ -2229,11 +2212,11 @@ var MapWidget = function (_Widget) {
     }
   }, {
     key: 'handleOpenMapElementEvent',
-    value: function handleOpenMapElementEvent(_ref7) {
-      var _this18 = this;
+    value: function handleOpenMapElementEvent(_ref6) {
+      var _this17 = this;
 
-      var nodes = _ref7.nodes,
-          edges = _ref7.edges;
+      var nodes = _ref6.nodes,
+          edges = _ref6.edges;
 
 
       if (nodes.length) {
@@ -2246,7 +2229,7 @@ var MapWidget = function (_Widget) {
 
           if (this.view.isEnabled('neighbourhood_focus_newly_traced_node')) {
             setTimeout(function () {
-              _this18.network.focus(node.id, {
+              _this17.network.focus(node.id, {
                 scale: 1,
                 animation: true
               });
@@ -2354,8 +2337,8 @@ var MapWidget = function (_Widget) {
     }
   }, {
     key: 'handleVisSelectNode',
-    value: function handleVisSelectNode(_ref8) {
-      var nodes = _ref8.nodes;
+    value: function handleVisSelectNode(_ref7) {
+      var nodes = _ref7.nodes;
 
 
       if (!this.isDraggingAllowed(nodes)) {
@@ -2367,8 +2350,8 @@ var MapWidget = function (_Widget) {
     }
   }, {
     key: 'isDraggingAllowed',
-    value: function isDraggingAllowed(_ref9) {
-      var nodes = _ref9.nodes;
+    value: function isDraggingAllowed(_ref8) {
+      var nodes = _ref8.nodes;
 
       return this.editorMode || this.view.isEnabled('physics_mode');
     }
@@ -2420,8 +2403,8 @@ var MapWidget = function (_Widget) {
 
   }, {
     key: 'handleVisDragEnd',
-    value: function handleVisDragEnd(_ref10) {
-      var nodes = _ref10.nodes;
+    value: function handleVisDragEnd(_ref9) {
+      var nodes = _ref9.nodes;
 
 
       if (!nodes.length) {
@@ -2591,9 +2574,9 @@ var MapWidget = function (_Widget) {
     }
   }, {
     key: 'handleVisLoading',
-    value: function handleVisLoading(_ref11) {
-      var total = _ref11.total,
-          iterations = _ref11.iterations;
+    value: function handleVisLoading(_ref10) {
+      var total = _ref10.total,
+          iterations = _ref10.iterations;
 
 
       // we only start to show the progress bar after a while
@@ -2622,8 +2605,8 @@ var MapWidget = function (_Widget) {
 
   }, {
     key: 'handleVisDragStart',
-    value: function handleVisDragStart(_ref12) {
-      var nodes = _ref12.nodes;
+    value: function handleVisDragStart(_ref11) {
+      var nodes = _ref11.nodes;
 
 
       if (!nodes.length ||
@@ -2683,7 +2666,7 @@ var MapWidget = function (_Widget) {
   }, {
     key: 'openTiddlerWithId',
     value: function openTiddlerWithId(id) {
-      var _this19 = this;
+      var _this18 = this;
 
       var tRef = $tm.tracker.getTiddlerById(id);
 
@@ -2708,7 +2691,7 @@ var MapWidget = function (_Widget) {
           if (isConfirmed) {
 
             var _type = 'tm-save-tiddler';
-            _this19.dispatchEvent({ type: _type, tiddlerTitle: draftTRef });
+            _this18.dispatchEvent({ type: _type, tiddlerTitle: draftTRef });
           } else if (!wasInDraftAlready) {
 
             // also removes the draft from the river before deletion!
@@ -2717,7 +2700,7 @@ var MapWidget = function (_Widget) {
 
           // in any case, remove the original tiddler from the river
           var type = 'tm-close-tiddler';
-          _this19.dispatchEvent({ type: type, tiddlerTitle: tRef });
+          _this18.dispatchEvent({ type: type, tiddlerTitle: tRef });
         });
       } else {
 
@@ -2881,7 +2864,7 @@ var MapWidget = function (_Widget) {
   }, {
     key: 'reloadBackgroundImage',
     value: function reloadBackgroundImage(msg) {
-      var _this20 = this;
+      var _this19 = this;
 
       this.backgroundImage = null;
 
@@ -2895,8 +2878,8 @@ var MapWidget = function (_Widget) {
       };
       img.onload = function () {
         // only now set the backgroundImage to the img object!
-        _this20.backgroundImage = img;
-        _this20.repaintGraph();
+        _this19.backgroundImage = img;
+        _this19.repaintGraph();
       };
 
       if (imgTObj) {

@@ -336,7 +336,7 @@ MapConfigWidget.prototype.getOptionFilter = function(mode) {
       tooltipDelay: true
     },
     layout: {
-      hierarchical: false
+      hierarchical: true
     },
     manipulation: {
       initiallyActive: true

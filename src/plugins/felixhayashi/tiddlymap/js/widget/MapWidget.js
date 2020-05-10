@@ -77,6 +77,7 @@ class MapWidget extends Widget {
         'tmap:tm-edit-view': this.handleEditView,
         'tmap:tm-generate-widget': this.handleGenerateWidget,
         'tmap:tm-toggle-central-topic': this.handleSetCentralTopic,
+        'tmap:tm-remove-other-nodes': this.handleRemoveOtherNodes,
         'tmap:tm-save-canvas': this.handleSaveCanvas
       }, this, this);
     }
@@ -84,7 +85,8 @@ class MapWidget extends Widget {
     // register listeners that are available in any case
     utils.addTWlisteners({
       'tmap:tm-focus-node': this.handleFocusNode,
-      'tmap:tm-reset-focus': this.repaintGraph
+      'tmap:tm-reset-focus': this.repaintGraph,
+      'tmap:tm-neighbourhood-reset-trace': () => { this.initAndRenderGraph(this.graphDomNode); }
     }, this, this);
 
     // Visjs handlers
@@ -414,14 +416,14 @@ class MapWidget extends Widget {
     // *first* inject the bar
     this.rebuildEditorBar(header);
 
+    // if any refresh-triggers exist, register them
+    this.reloadRefreshTriggers();
+
     // *second* initialise graph variables and render the graph
     this.initAndRenderGraph(body);
 
     // register this graph at the caretaker's graph registry
     $tm.registry.push(this);
-
-    // if any refresh-triggers exist, register them
-    this.reloadRefreshTriggers();
 
     // maybe display a welcome message
     this.checkForFreshInstall();
@@ -437,7 +439,6 @@ class MapWidget extends Widget {
       }
 
     }
-
   }
 
   /**
@@ -514,6 +515,8 @@ class MapWidget extends Widget {
       viewHolder: this.getViewHolderRef(),
       edgeTypeFilter: view.edgeTypeFilterTRef,
       allEdgesFilter: $tm.selector.allEdgeTypes,
+      isShowNeighbourhood: String(view.isEnabled('neighbourhood_scope')),
+      tracingBtnClass: view.isEnabled('neighbourhood_trace_clicks') ? activeUnicodeBtnClass : unicodeBtnClass,
       neighScopeBtnClass: view.isEnabled('neighbourhood_scope') ? activeUnicodeBtnClass : unicodeBtnClass,
       rasterMenuBtnClass: view.isEnabled('raster') ? activeUnicodeBtnClass : unicodeBtnClass,
     };
@@ -596,11 +599,14 @@ class MapWidget extends Widget {
        || changedTiddlers[this.view.getRoot()] // view's main config changed
     ) {
 
-      this.logger('warn', 'View switched config changed');
+      this.logger('warn', 'View switched or config changed');
 
       this.isPreventZoomOnNextUpdate = false;
       this.view = this.getView(true);
       this.reloadRefreshTriggers();
+
+      this.trace = utils.makeHashMap();
+
       this.rebuildEditorBar();
       this.reloadBackgroundImage();
       this.initAndRenderGraph(this.graphDomNode);
@@ -669,7 +675,6 @@ class MapWidget extends Widget {
                                this.handleTriggeredRefresh,
                                false);
     }
-
   }
 
   /**
@@ -722,16 +727,22 @@ class MapWidget extends Widget {
     }
 
     if (resetFocus) {
+      const preventZoom = this.isPreventZoomOnNextUpdate == null
+        ? false
+        : typeof this.isPreventZoomOnNextUpdate === 'number'
+          ? this.isPreventZoomOnNextUpdate > Date.now()
+          : this.isPreventZoomOnNextUpdate;
 
-      if (!this.isPreventZoomOnNextUpdate) {
-
+      if (!preventZoom) {
         // see https://github.com/almende/vis/issues/987#issuecomment-113226216
         // see https://github.com/almende/vis/issues/939
         this.network.stabilize();
         this.resetFocus = resetFocus;
       }
 
-      this.isPreventZoomOnNextUpdate = false;
+      if (typeof this.isPreventZoomOnNextUpdate !== 'number') {
+        this.isPreventZoomOnNextUpdate = false;
+      }
 
     }
 
@@ -754,7 +765,23 @@ class MapWidget extends Widget {
 
     $tm.start('Reloading Network');
 
-    const graph = $tm.adapter.getGraph({ view: this.view });
+
+    // only show neihbours for selected node
+
+    const originalMatches = utils.getMatches(this.view.getNodeFilter('compiled'));
+    const clickPathMatches = Object.keys(this.trace);
+    const combinedMatches = [
+      ...originalMatches.filter(tRef => !this.trace[tRef]),
+      ...clickPathMatches,
+    ];
+
+    const graph = $tm.adapter.getGraph({
+      view: this.view,
+      matches: combinedMatches,
+      includeNeighboursOf: this.view.isEnabled("neighbourhood_include_traced_node_neighbours")
+        ? tRef => combinedMatches.includes(tRef)
+        : tRef => originalMatches.includes(tRef)
+    });
 
     const changedNodes = utils.refreshDataSet(
       this.graphData.nodes, // dataset
@@ -893,7 +920,7 @@ class MapWidget extends Widget {
     };
 
     this.tooltip.setEnabled(utils.isTrue($tm.config.sys.popups.enabled, true));
-
+    this.trace = utils.makeHashMap();
     this.network = new vis.Network(parent, this.graphData, this.visOptions);
     // after vis.Network has been instantiated, we fetch a reference to
     // the canvas element
@@ -917,8 +944,14 @@ class MapWidget extends Widget {
     this.rebuildGraph({
       resetFocus: { delay: 0, duration: 0 },
     });
+
     this.handleResizeEvent();
     this.canvas.focus();
+
+    if (this.view.isLiveView()) {
+      // directly trigger refresh so we add  currently focussed as traced node
+      this.trace[utils.getText(this.refreshTriggers[0])] = true;
+    }
 
   }
 
@@ -1257,8 +1290,26 @@ class MapWidget extends Widget {
 
     // merge options
     const globalOptions = $tm.config.vis;
-    const localOptions = utils.parseJSON(this.view.getConfig('vis'));
-    const options = utils.merge({}, globalOptions, localOptions);
+    const localOptions = utils.parseJSON(this.view.getConfig('vis')) || {};
+
+    const { hierarchical } = (localOptions.layout || {})
+    const corrections = {
+      layout: {
+        hierarchical: {
+          enabled: (
+            hierarchical === undefined || hierarchical === null
+              ? false
+              : typeof hierarchical === 'boolean'
+                ? hierarchical
+                : hierarchical.enabled !== false
+          )
+        }
+      }
+    };
+
+    // we need to first merge local options with corrections to prevent that
+    // global options are overridden by e.g. "hierarchical" being a non-object
+    const options = utils.merge({}, globalOptions, utils.merge(localOptions, corrections));
 
     options.clickToUse = this.clickToUse;
     options.manipulation.enabled = !!this.editorMode;
@@ -1613,10 +1664,11 @@ class MapWidget extends Widget {
 
     this.logger('log', trigger, 'Triggered a refresh');
 
+    const curTiddler = utils.getTiddler(utils.getText(trigger));
     // special case for the live tab
     if (this.id === 'live_tab') {
-      const curTiddler = utils.getTiddler(utils.getText(trigger));
       if (curTiddler) {
+        this.trace[curTiddler.fields.title] = true;
         const view = (curTiddler.fields['tmap.open-view'] || $tm.config.sys.liveTab.fallbackView);
         if (view && view !== this.view.getLabel()) {
           this.setView(view);
@@ -1803,6 +1855,15 @@ class MapWidget extends Widget {
 
     this.view.setCentralTopic(nodeId);
 
+  }
+
+  handleRemoveOtherNodes({ paramObject }) {
+
+    let nodeId = paramObject.id || this.network.getSelectedNodes()[0];
+
+    Object.keys(this.graphData.nodesById)
+      .filter(id => id !== nodeId)
+      .forEach(id => this.view.removeNode(id))
   }
 
   /**
@@ -2085,31 +2146,35 @@ class MapWidget extends Widget {
    * click event.
    */
   handleVisDoubleClickEvent(properties) {
-
     if (properties.nodes.length || properties.edges.length) {
-
       if (this.editorMode || !utils.isTrue($tm.config.sys.singleClickMode)) {
-
         this.handleOpenMapElementEvent(properties);
-
       }
-
-
     } else { // = clicked on an empty spot
-
       if (this.editorMode) {
         this.handleInsertNode(properties.pointer.canvas);
       }
-
     }
-
   }
 
   handleOpenMapElementEvent({ nodes, edges }) {
 
     if (nodes.length) { // clicked on a node
-
       const node = this.graphData.nodesById[nodes[0]];
+      if (this.view.isEnabled('neighbourhood_trace_clicks')) {
+        this.trace[$tm.adapter.getTiddlerById(node.id)] = true;
+        this.isPreventZoomOnNextUpdate = Date.now() + 500;
+        this.rebuildGraph();
+
+        if (this.view.isEnabled('neighbourhood_focus_newly_traced_node')) {
+          setTimeout(() => {
+            this.network.focus(node.id, {
+              scale: 1,
+              animation: true
+            });
+          }, 1500);
+        }
+      }
       if (node['open-view']) {
         $tm.notify('Switching view');
         this.setView(node['open-view']);

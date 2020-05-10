@@ -69,6 +69,19 @@ const visConfig = {
       }
     }
   },
+  layout: {
+    hierarchical:{
+      enabled: false,
+      levelSeparation: 200,
+      nodeSpacing: 170,
+      treeSpacing: 230,
+      sortMethod: 'directed',
+      parentCentralization: true,
+      edgeMinimization: true,
+      blockShifting:true,
+      direction: 'UD'
+    },
+  },
   physics: {
     forceAtlas2Based: {
       // <- more repulsion between nodes - 0 - more attraction between nodes ->
@@ -81,6 +94,13 @@ const visConfig = {
       centralGravity: 0.015, // default: 0.01
       // kinetic energy reduction
       damping: 0.4
+    },
+    hierarchicalRepulsion: {
+      nodeDistance: 120 ,
+      centralGravity:	0.0,
+      springLength:	100,
+      springConstant:	0.01,
+      damping: 0.09,
     },
     solver: 'forceAtlas2Based',
     stabilization: {

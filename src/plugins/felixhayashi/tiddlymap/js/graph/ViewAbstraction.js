@@ -386,7 +386,7 @@ class ViewAbstraction {
    * @param {Node} node
    * @return {string}
    */
-  _isNodeIncludedById(node) {
+  isNodeIncludedById(node) {
 
     const regex = $tw.utils.escapeRegExp(ViewAbstraction._getNodeIdFilterPart(node));
 
@@ -444,7 +444,7 @@ class ViewAbstraction {
    */
   addNode(node) {
 
-    if (!this._isNodeIncludedById(node)) {
+    if (!this.isNodeIncludedById(node)) {
 
       // @see https://github.com/felixhayashi/TW5-TiddlyMap/issues/285
       if (
@@ -477,7 +477,7 @@ class ViewAbstraction {
    */
   removeNode(nodeId) {
 
-    if (!this._isNodeIncludedById(nodeId)) {
+    if (!this.isNodeIncludedById(nodeId)) {
 
       return false;
     }
@@ -487,9 +487,9 @@ class ViewAbstraction {
 
     this.setNodeFilter(f);
 
-    if (this.getNodeData(nodeId)) {
-      this.saveNodeData(nodeId, null);
-    }
+    // if (this.getNodeData(nodeId)) {
+    //   this.saveNodeData(nodeId, null);
+    // }
 
     return true;
 

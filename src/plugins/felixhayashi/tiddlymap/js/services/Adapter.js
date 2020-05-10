@@ -327,14 +327,6 @@ class Adapter {
    *
    * @param {string|ViewAbstraction} [view] - The view in which
    *     the graph will be displayed.
-   * @param {string|ViewAbstraction} [filter] - If supplied,
-   *     this will act as node filter that defines which nodes
-   *     are to be displayed in the graph; a possible view node filter
-   *     would be ignored.
-   * @param {Hashmap} [edgeTypeWL] - A whitelist lookup-table
-   *     that restricts which edges are travelled to reach a neighbour.
-   * @param {number} [neighbourhoodScope] - An integer value that
-   *     specifies the scope of the neighbourhood in steps.
    *     See {@link Adapter#getNeighbours}
    * @return {Object} An object of the form:
    *     {
@@ -343,14 +335,14 @@ class Adapter {
    *     }
    *     Neighbours will be receive the 'tmap:neighbour' type.
    */
-  getGraph({ view, filter, edgeTypeWL, neighbourhoodScope } = {}) {
+  getGraph({ view, matches, includeNeighboursOf }) {
 
     $tm.start('Assembling Graph');
 
-    view = ViewAbstraction.exists(view) ? new ViewAbstraction(view) : null;
-    const matches = utils.getMatches(filter || (view && view.getNodeFilter('compiled')));
-    const neighScope = parseInt(neighbourhoodScope || (view && view.getConfig('neighbourhood_scope')));
-    const typeWL = (edgeTypeWL || (view && view.getEdgeTypeFilter('whitelist')));
+    view =  new ViewAbstraction(view);
+    matches = matches || utils.getMatches(view.getNodeFilter('compiled'));
+    const neighScope = parseInt(view.getConfig('neighbourhood_scope'));
+    const typeWL = view.getEdgeTypeFilter('whitelist');
     const toWL = utils.getArrayValuesAsHashmapKeys(matches);
 
     const graph = {
@@ -362,12 +354,15 @@ class Adapter {
     };
 
     if (neighScope) {
-      const neighbours = this.getNeighbours(matches, {
+      const neighboutMatches = includeNeighboursOf
+        ? matches.filter(includeNeighboursOf)
+        : matches;
+      const neighbours = this.getNeighbours(neighboutMatches, {
         steps: neighScope,
         view: view,
         typeWL: typeWL,
         addProperties: {
-          group: 'tmap:neighbour'
+          type: 'tmap:neighbour'
         }
       });
 
@@ -384,7 +379,7 @@ class Adapter {
     }
 
     // this is pure maintainance!
-    removeObsoleteViewData(graph.nodes, view);
+    // removeObsoleteViewData(graph.nodes, view);
 
     // add styles to nodes
     this.attachStylesToNodes(graph.nodes, view);
@@ -669,7 +664,7 @@ class Adapter {
       if (type.id === 'tmap:neighbour') { // special case
         for (let id in nodes) {
 
-          if (nodes[id].group === 'tmap:neighbour') {
+          if (nodes[id].type === 'tmap:neighbour') {
 
             inheritors.push(this.getTiddlerById(id));
           }

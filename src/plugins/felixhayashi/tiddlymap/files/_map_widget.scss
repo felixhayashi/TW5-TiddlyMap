@@ -73,6 +73,12 @@
       .tmap-unicode-button {
         font-size: 1.5em;
         vertical-align: bottom;
+        height: 28px;
+        fill: #555555;
+
+        svg {
+          vertical-align: baseline;
+        }
       }
 
     }
@@ -125,6 +131,7 @@
       max-width: 200px;
       word-wrap: initial;
       padding: 0px;
+      height: 28px;
     }
 
     button {
@@ -197,7 +204,6 @@
 
   .tc-drop-down {
     min-width: 170px;
-    max-width: 210px;
     padding: $padding;
     margin: 5px 0;
 

@@ -20,9 +20,14 @@ Enhancements
 Bugfixes
 ----------------------------
 
+### v0.17.2
+
+* Fix broken url params
+
+
 ### v0.17.1
 
-Remove obsolete code
+* Remove obsolete code
 
 ### v0.17.0
 

@@ -433,7 +433,7 @@ class MapWidget extends Widget {
       if (url && url.query['tmap-enlarged']) {
 
         this.toggleEnlargedMode(url.query['tmap-enlarged']);
-        //~ this.setView(url.query['tmap-view']);
+        this.setView(url.query['tmap-view']);
 
       }
 

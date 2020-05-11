@@ -20,10 +20,13 @@ Enhancements
 Bugfixes
 ----------------------------
 
+### v0.17.3
+
+* fixes #351: Enable hierarchical layouts issues if other layout loaded first
+
 ### v0.17.2
 
 * Fix broken url params
-
 
 ### v0.17.1
 

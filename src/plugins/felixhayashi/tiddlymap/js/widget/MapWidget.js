@@ -1665,8 +1665,8 @@ class MapWidget extends Widget {
     this.logger('log', trigger, 'Triggered a refresh');
 
     const curTiddler = utils.getTiddler(utils.getText(trigger));
-    // special case for the live tab
-    if (this.id === 'live_tab') {
+
+    if (this.view.isLiveView()) {
       if (curTiddler) {
         if (this.view.isEnabled('neighbourhood_trace_clicks')) {
           this.trace[curTiddler.fields.title] = true;

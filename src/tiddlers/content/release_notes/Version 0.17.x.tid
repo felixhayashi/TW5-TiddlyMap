@@ -20,6 +20,10 @@ Enhancements
 Bugfixes
 ----------------------------
 
+### v0.17.4
+
+* Fix not tracing clicks on triggered refresh in live view in main editor
+
 ### v0.17.3
 
 * fixes #351: Enable hierarchical layouts issues if other layout loaded first

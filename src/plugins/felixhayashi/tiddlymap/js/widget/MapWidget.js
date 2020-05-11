@@ -764,23 +764,24 @@ class MapWidget extends Widget {
 
     $tm.start('Reloading Network');
 
+    const params = {
+      view: this.view
+    };
 
-    // only show neihbours for selected node
-
-    const originalMatches = utils.getMatches(this.view.getNodeFilter('compiled'));
-    const clickPathMatches = Object.keys(this.trace);
-    const combinedMatches = [
-      ...originalMatches.filter(tRef => !this.trace[tRef]),
-      ...clickPathMatches,
-    ];
-
-    const graph = $tm.adapter.getGraph({
-      view: this.view,
-      matches: combinedMatches,
-      includeNeighboursOf: this.view.isEnabled("neighbourhood_include_traced_node_neighbours")
+    if (this.view.isEnabled('neighbourhood_trace_clicks')) {
+      const originalMatches = utils.getMatches(this.view.getNodeFilter('compiled'));
+      const clickPathMatches = Object.keys(this.trace);
+      const combinedMatches = [
+        ...originalMatches.filter(tRef => !this.trace[tRef]),
+        ...clickPathMatches,
+      ];
+      params.matches = combinedMatches;
+      params.includeNeighboursOf = this.view.isEnabled('neighbourhood_include_traced_node_neighbours')
         ? tRef => combinedMatches.includes(tRef)
-        : tRef => originalMatches.includes(tRef)
-    });
+        : tRef => originalMatches.includes(tRef);
+    }
+
+    const graph = $tm.adapter.getGraph(params);
 
     const changedNodes = utils.refreshDataSet(
       this.graphData.nodes, // dataset
@@ -947,7 +948,7 @@ class MapWidget extends Widget {
     this.handleResizeEvent();
     this.canvas.focus();
 
-    if (this.view.isLiveView()) {
+    if (this.view.isLiveView() && this.view.isEnabled('neighbourhood_trace_clicks')) {
       // directly trigger refresh so we add  currently focussed as traced node
       this.trace[utils.getText(this.refreshTriggers[0])] = true;
     }
@@ -1667,7 +1668,9 @@ class MapWidget extends Widget {
     // special case for the live tab
     if (this.id === 'live_tab') {
       if (curTiddler) {
-        this.trace[curTiddler.fields.title] = true;
+        if (this.view.isEnabled('neighbourhood_trace_clicks')) {
+          this.trace[curTiddler.fields.title] = true;
+        }
         const view = (curTiddler.fields['tmap.open-view'] || $tm.config.sys.liveTab.fallbackView);
         if (view && view !== this.view.getLabel()) {
           this.setView(view);

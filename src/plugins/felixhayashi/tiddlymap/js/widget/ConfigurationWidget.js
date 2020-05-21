@@ -85,13 +85,12 @@ MapConfigWidget.prototype.render = function(parent, nextSibling) {
     var fieldName = this.inheritedFields[i];
     var style = utils.parseFieldData(this.pipeTRef, fieldName, {});
 
-    // maybe the inherited options also come without a top level property
-    // so we do the same here to…
-    // TODO looks clumsy; do it in a more generic way…
+    // inherited options for nodes/edges come without a top level property
+    // so we need to wrap these options
     if (this.mode === 'manage-edge-types') {
-      if (!style.edges) { style = { edges: style }; }
+      style = { edges: style };
     } else if (this.mode === 'manage-node-types') {
-      if (!style.nodes) { style = { nodes: style }; }
+      style = { nodes: style };
     }
 
     this.inherited = utils.merge(this.inherited, style);

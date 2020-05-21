@@ -1464,7 +1464,7 @@ class MapWidget extends Widget {
     const preselects = {
       'filter.prettyNodeFltr': this.view.getNodeFilter('pretty'),
       'filter.prettyEdgeFltr': this.view.getEdgeTypeFilter('pretty'),
-      'vis-inherited': visInherited
+      'inherited-style': visInherited
     };
 
     const args = {
@@ -2022,27 +2022,27 @@ class MapWidget extends Widget {
 
     const tRef = $tm.tracker.getTiddlerById(node.id);
     const tObj = utils.getTiddler(tRef);
-    const globalDefaults = JSON.stringify($tm.config.vis);
-    const localDefaults = this.view.getConfig('vis');
+    const globalDefaultNodeStyle = $tm.config.vis.nodes;
+    const localDefaultNodeStyle = utils.parseJSON(this.view.getConfig('vis'), {}).nodes;
     const nodes = {};
     nodes[node.id] = node;
     const nodeStylesByTRef = $tm.adapter.getInheritedNodeStyles(nodes);
-    const groupStyles = JSON.stringify(nodeStylesByTRef[tRef]);
-    const globalNodeStyle = JSON.stringify(utils.merge(
+    const groupNodeStyles = nodeStylesByTRef[tRef];
+    const globalIndividualNodeStyle = utils.merge(
                             {},
                             { color: tObj.fields['color'] },
-                            utils.parseJSON(tObj.fields['tmap.style'])));
+                            utils.parseJSON(tObj.fields['tmap.style']));
 
     const viewLabel = this.view.getLabel();
 
     // we copy the object since we intend to modify it.
     // NOTE: A deep copy would be needed if a nested property were modified
     //       In that case, use $tw.utils.deepCopy.
-    const nodeData = { ...this.view.getNodeData(node.id) };
+    const localIndividualStyle = { ...this.view.getNodeData(node.id) };
     // we need to delete the positions so they are not reset when a user
     // resets the style…
-    delete nodeData.x;
-    delete nodeData.y;
+    delete localIndividualStyle.x;
+    delete localIndividualStyle.y;
 
     const args = {
       'view': viewLabel,
@@ -2053,11 +2053,12 @@ class MapWidget extends Widget {
       'tidIconField': `global.${$tm.field.nodeIcon}`,
       dialog: {
         preselects: {
-          'inherited-global-default-style': globalDefaults,
-          'inherited-local-default-style': localDefaults,
-          'inherited-group-styles': groupStyles,
-          'global.tmap.style': globalNodeStyle,
-          'local-node-style': JSON.stringify(nodeData)
+          'inherited-global-default-style': JSON.stringify(globalDefaultNodeStyle),
+          'inherited-local-default-style': JSON.stringify(localDefaultNodeStyle),
+          'inherited-group-styles': JSON.stringify(groupNodeStyles),
+          // careful: "global." is parsed later so don't change name
+          'global.tmap.style': JSON.stringify(globalIndividualNodeStyle),
+          'local-individual-node-style': JSON.stringify(localIndividualStyle)
         }
       }
     };
@@ -2071,7 +2072,7 @@ class MapWidget extends Widget {
     };
 
     // local values are retrieved from the view's node data store
-    addToPreselects('local', nodeData, [
+    addToPreselects('local', localIndividualStyle, [
       'label', 'tw-icon', 'fa-icon', 'open-view'
     ]);
 
@@ -2099,9 +2100,9 @@ class MapWidget extends Widget {
       // save local individual data (style + config)
       const local = utils.getPropertiesByPrefix(fields, 'local.', true);
 
-      // CAREFUL: Never change 'local-node-style' to 'local.node-style'
+      // CAREFUL: Never change 'local-individual-node-style' to 'local.node-style'
       // (with a dot) because it will get included in the loop!
-      const data = utils.parseJSON(fields['local-node-style'], {});
+      const data = utils.parseJSON(fields['local-individual-node-style'], {});
 
       for (let p in local) {
         data[p] = local[p] || undefined;

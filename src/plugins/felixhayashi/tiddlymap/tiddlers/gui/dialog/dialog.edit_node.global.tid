@@ -10,7 +10,7 @@ classes: tmap-remove-top-space
   individual appearance and behaviour in all views.
 </div>
 <<maybeShowTidColorWarning>>
-    
+
 <$macrocall $name="sharedSettings"
     twIconField=<<tidIconField>>
     faIconField="global.tmap.fa-icon"

@@ -20,6 +20,10 @@ Enhancements
 Bugfixes
 ----------------------------
 
+### v0.17.5
+
+* Fixes #347: "Edit Node" brings Internal JavaScript Error
+
 ### v0.17.4
 
 * Fix not tracing clicks on triggered refresh in live view in main editor

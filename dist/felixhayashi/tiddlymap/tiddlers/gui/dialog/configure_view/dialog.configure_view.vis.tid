@@ -15,5 +15,5 @@ caption: Graph
 </div>
 <$tmap-config
     mode="manage-config"
-    inherited="vis-inherited"
+    inherited="inherited-style"
     extension="config.vis" />

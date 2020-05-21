@@ -3,9 +3,9 @@ caption: Local node style
 classes: tmap-remove-top-space
 
 \rules except wikilink
-    
+
 <div class="tmap-flash-message tmap-info">
-  The ''local node configuration'' 
+  The ''local node configuration''
   (also referred to as //view-specific node configuration//)
   overrides the //global individual configuration// and only affects
   the node's appearance and behaviour in the current view.
@@ -30,10 +30,10 @@ classes: tmap-remove-top-space
     twIconField="local.tw-icon"
     faIconField="local.fa-icon"
     labelField="local.label" />
-                         
+
 <$macrocall $name="visConfiguration"
     mode="manage-node-types"
-    extensionField="local-node-style"
+    extensionField="local-individual-node-style"
     styleName="node's local style"
     inheritedList="[[inherited-global-default-style]]
                    [[inherited-local-default-style]]

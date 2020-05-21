@@ -39,6 +39,6 @@ caption: Styling
   </div>
   <$tmap-config
       mode=<<mode>>
-      inherited="vis-inherited"
+      inherited="inherited-style"
       extension="style" />
 </fieldset>

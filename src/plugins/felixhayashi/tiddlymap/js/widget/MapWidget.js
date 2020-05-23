@@ -1982,7 +1982,7 @@ class MapWidget extends Widget {
         return;
       }
 
-      const tRef = utils.getField(outTObj, 'draft.title');
+      const tRef = utils.getField(outTObj, 'draft.title').trim();
 
       if (utils.tiddlerExists(tRef)) {
 

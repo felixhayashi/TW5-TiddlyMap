@@ -1,7 +1,7 @@
 caption: v0.17.x
 created: 20200510140319751
 modified: 20200510140321521
-tags: Usability Maintainance ReleaseNote Configurability
+tags: Usability Maintainance ReleaseNote Configurability Integration
 title: Version 0.17.x
 tmap.id: 158e4a3a-df4e-45fd-8d00-cd0b4ad88fce
 type: text/x-markdown
@@ -16,9 +16,15 @@ Enhancements
 * Improve editor menubar button styling
 * Resolves #314: Hide tmap.id field
 * Resolves #345: Keep initial node position when in "Floating nodes" mode
+* Resolves #353: Now breaking titles into multi line after 160px
 
 Bugfixes
 ----------------------------
+
+### v0.17.6
+
+* Fix compatibility issues with TiddlyWiki resulting from not-trimmed titles
+* Fix #355: Canonical_uri referenced local images are not displayed correctly as backgrounds
 
 ### v0.17.5
 

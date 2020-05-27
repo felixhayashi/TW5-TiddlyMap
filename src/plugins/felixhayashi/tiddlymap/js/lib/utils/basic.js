@@ -366,29 +366,6 @@ export const hasKeyWithPrefix = (obj, prefix) => {
  */
 export const pickRandom = arr => arr[getRandomInt(0, arr.length-1)];
 
-/**
- * Loads the image from web and passes it to the callback as
- * object url.
- */
-export const getImgFromWeb = (imgUri, callback) => {
-
-  if (!imgUri || typeof callback !== 'function') return;
-
-  const xhr = new XMLHttpRequest();
-  xhr.open('GET', imgUri, true);
-  xhr.responseType = 'blob';
-  xhr.onerror = function(e) { console.log(e); };
-  xhr.onload = function(e) {
-    if (this.readyState === 4 && (this.status===200 || (this.status === 0 && this.response.size > 0))) {
-      const blob = this.response;
-      callback(window.URL.createObjectURL(blob));
-    }
-  };
-
-  try { xhr.send();  } catch (e) { console.log(e); }
-
-};
-
 //~ utils.getNestedProperty = function(obj, propPath) {
 //~
   //~ propPath = propPath.split(".");

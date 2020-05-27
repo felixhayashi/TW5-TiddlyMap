@@ -2791,7 +2791,6 @@ class MapWidget extends Widget {
     if (!imgTObj && !bgFieldValue) return;
 
     const img = new Image();
-    const ajaxCallback = function(b64) { img.src = b64; };
     img.onload = () => {
       // only now set the backgroundImage to the img object!
       this.backgroundImage = img;
@@ -2801,14 +2800,12 @@ class MapWidget extends Widget {
     if (imgTObj) { // try loading from tiddler
       const urlField = imgTObj.fields['_canonical_uri'];
       if (urlField) { // try loading by uri field
-        utils.getImgFromWeb(urlField, ajaxCallback);
+        img.src = urlField;
       } else if (imgTObj.fields.text) { // try loading from base64
         img.src = $tw.utils.makeDataUri(imgTObj.fields.text, imgTObj.fields.type);
       }
-
     } else if (bgFieldValue) { // try loading directly from reference
-      utils.getImgFromWeb(bgFieldValue, ajaxCallback);
-
+      img.src = bgFieldValue;
     }
 
   }

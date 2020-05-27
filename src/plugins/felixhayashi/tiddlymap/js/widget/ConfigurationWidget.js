@@ -299,13 +299,15 @@ MapConfigWidget.prototype.getOptionFilter = function(mode) {
     nodes: {
       borderWidth: true,
       borderWidthSelected: true,
+      widthConstraint: true,
+      heightConstraint: true,
       color: {
         background: true,
         border: true
       },
       font: {
         color: true,
-        size: true
+        size: true,
       },
       icon: true,
       labelHighlightBold: false,

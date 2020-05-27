@@ -47,6 +47,12 @@ const visConfig = {
   },
   nodes: {
     shape: 'box',
+    widthConstraint: {
+      maximum: 160
+    },
+    heightConstraint: {
+      valign: 'center',
+    },
     shadow: {
       enabled: false
     },

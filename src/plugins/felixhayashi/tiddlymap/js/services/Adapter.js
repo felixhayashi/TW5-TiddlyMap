@@ -788,8 +788,15 @@ class Adapter {
         node.font.color = getContrastColour(color, color, 'black', 'white');
       }
 
-      if (node.shape === 'icon' && typeof node.icon === 'object') {
-        node.icon.color = color;
+      if (node.shape === 'icon') {
+        // prefixing with a newline symbol as a hack to keep
+        // visjs' "widthConstraint" working for icons and to prevent
+        // text being too close to fontawesome icons
+        node.label = '\n' + node.label;
+
+        if (typeof node.icon === 'object') {
+          node.icon.color = color;
+        }
       }
 
     }

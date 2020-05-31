@@ -616,10 +616,16 @@ const cleanup = () => {
  */
 const loadDefaultView = defaultView => {
 
-  if (defaultView) {
-    utils.setText(env.ref.defaultViewHolder, $tm.config.sys.defaultView);
+  if (!defaultView) {
+    return;
   }
 
+  var tObj = utils.getTiddler(env.ref.defaultViewHolder);
+  if (tObj.fields.text === $tm.config.sys.defaultView) {
+    return;
+  }
+
+  utils.setText(env.ref.defaultViewHolder, $tm.config.sys.defaultView);
 };
 
 /**

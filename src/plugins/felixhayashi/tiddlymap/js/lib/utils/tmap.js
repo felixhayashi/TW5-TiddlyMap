@@ -486,11 +486,3 @@ export const getLookupTable = (col, lookupKey) => {
  * Alias for {@link getLookupTable}
  */
 export const getArrayValuesAsHashmapKeys = getLookupTable;
-
-/**
- *
- * @param viewLabel
- * @param type
- */
-export const getSnapshotTitle = (viewLabel, type) =>
-  `Snapshot – ${viewLabel} (${new Date().toDateString()}).${type || 'png'}`;

@@ -16,11 +16,12 @@ table.tmap-table {
 
 .tmap-save-canvas-preview {
   text-align: center;
+  background: lightgray;
   img {
     background-color: white;
-    border: 1px solid lightgray;
     max-width: 100%;
     max-height: 100px;
+    border: 1px solid red;
   }
 }
 
@@ -45,7 +46,7 @@ html { // used to increase css importance
 
   .tmap-link { // for buttons and links
     color: #5778D8;
-    
+
     &:hover {
       color: white;
       background: #5778D8;
@@ -58,19 +59,19 @@ html { // used to increase css importance
     max-height: 9em;
     display: block;
   }
-  
+
   .tmap-smaller-list {
     @extend .tmap-small-list;
     max-height: 7em;
   }
-  
+
   .tmap-very-small-list {
     @extend .tmap-small-list;
     max-height: 5empx;
   }
-  
+
   .tc-tiddler-controls {
-  
+
     button.tmap-active-button {
       svg {
         fill: #888888;
@@ -92,9 +93,9 @@ html { // used to increase css importance
       font-size: 11px;
       font-family: "Courier New", Courier, monospace;
     }
-          
+
   }
-  
+
 }
 
 @media (max-width: __breakpoint__) {
@@ -114,17 +115,17 @@ html { // used to increase css importance
 
   .tc-modal-wrapper {
     z-index: 1010; // fix this in core?
-      
+
     .tc-modal {
       boder: 1px solid #999999;
       left: calc(50% - 400px);
       width: 802px;
     }
-        
+
     .tc-modal-body { // add this to tw
       left: calc(50% - 400px);
       width: 800px;
     }
   }
-  
+
 }

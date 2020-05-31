@@ -6,7 +6,7 @@ caption: General
 \define manage-edge-types()
   <<tmap-row type:"input-text"
       title:"Label"
-      field:"label" 
+      field:"label"
       descr:"An optional alias used as edge-label.">>
   <<tmap-row type:"input-checkbox"
       title:"Show label"
@@ -18,12 +18,12 @@ caption: General
   <$list filter="[<currentTiddler>!regexp:id[tmap:]]">
   <<tmap-row type:"input-textarea"
       title:"Scope"
-      field:"scope" 
+      field:"scope"
       descr:"A filter expression that defines, which nodes inherit
              this node-type and its style.">>
   </$list>
   <$macrocall type="input-select"
-      $name="tmap-row" 
+      $name="tmap-row"
       title="Priority"
       field="priority"
       selectFilter=<<tmap "scale" "100">>

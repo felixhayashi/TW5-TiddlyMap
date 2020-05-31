@@ -347,6 +347,10 @@ class MapWidget extends Widget {
 
       // render the full widget
       this.renderFullWidget(this.domNode, this.graphBarDomNode, this.graphDomNode);
+      const downloadCanvas = this.document.createElement('canvas');
+      $tw.utils.addClass(downloadCanvas, 'tmap-download-canvas');
+
+      this.domNode.appendChild(downloadCanvas);
 
     }
 
@@ -357,7 +361,7 @@ class MapWidget extends Widget {
    */
   renderPreview(header, body) {
 
-    const snapshotTRef = this.view.getRoot() + '/snapshot';
+    const snapshotTRef = this.view.snapshotTRef;
     const snapshotTObj = utils.getTiddler(snapshotTRef);
 
     const label = this.document.createElement('span');
@@ -368,8 +372,10 @@ class MapWidget extends Widget {
     if (snapshotTObj) {
 
       // Construct child widget tree
-      const placeholder = this.makeChildWidget(utils.getTranscludeNode(snapshotTRef), true);
-      placeholder.renderChildren(body, null);
+      const tree = utils.getTiddlerNode(this.view.getRoot());
+      tree.children.push(utils.getTranscludeNode(snapshotTRef));
+      this.makeChildWidgets([ tree ]);
+      this.renderChildren(body, body.firstChild);
 
     } else {
 
@@ -1516,17 +1522,18 @@ class MapWidget extends Widget {
   handleSaveCanvas() {
 
     const tempImagePath = '$:/temp/tmap/snapshot';
-    this.createAndSaveSnapshot(tempImagePath);
-    let defaultName = utils.getSnapshotTitle(this.view.getLabel(), 'png');
+    this.createAndSaveSnapshot(100, 100, tempImagePath);
+    let imageName = `${this.view.getLabel()}.png`;
 
     const args = {
       dialog: {
         snapshot: tempImagePath,
-        width: this.canvas.width.toString(),
-        height: this.canvas.height.toString(),
+        view: this.view.getLabel(),
         preselects: {
-          name: defaultName,
-          action: 'download'
+          width: this.canvas.width.toString(),
+          height: this.canvas.height.toString(),
+          name: imageName,
+          action: 'download',
         }
       }
     };
@@ -1534,24 +1541,28 @@ class MapWidget extends Widget {
     $tm.dialogManager.open('saveCanvas', args, (isConfirmed, outTObj) => {
       if (!isConfirmed) return;
 
+      const width = outTObj.fields.width || args.dialog.preselects.width;
+      const height = outTObj.fields.height || args.dialog.preselects.height;
+
+      // save the image with the new sizes defined by the user in the dialog
+      this.createAndSaveSnapshot(width, height, tempImagePath);
+
       // allow the user to override the default name or if name is
       // empty use the original default name
-      defaultName = outTObj.fields.name || defaultName;
-
+      const title = outTObj.fields.name || args.dialog.preselects.imageName;
       const action = outTObj.fields.action;
 
       if (action === 'download') {
-        this.handleDownloadSnapshot(defaultName);
+        this.handleDownloadSnapshot(width, height, title);
 
       } else if (action === 'wiki') {
-        utils.cp(tempImagePath, defaultName, true);
+        utils.cp(tempImagePath, title, true);
         this.dispatchEvent({
-          type: 'tm-navigate', navigateTo: defaultName
+          type: 'tm-navigate', navigateTo: title
         });
 
       } else if (action === 'placeholder') {
         this.view.addPlaceholder(tempImagePath);
-
       }
 
       // in any case
@@ -1561,12 +1572,12 @@ class MapWidget extends Widget {
 
   }
 
-  handleDownloadSnapshot(title) {
+  handleDownloadSnapshot(width, height, title) {
 
     const a = this.document.createElement('a');
     const label = this.view.getLabel();
-    a.download = title || utils.getSnapshotTitle(label, 'png');
-    a.href = this.getSnapshot();
+    a.download = title;
+    a.href = this.getCanvasAsBase64({ size: { width, height }});
 
     // we cannot simply call click() on <a>; chrome is cool with it but
     // firefox requires us to create a mouse event…
@@ -1575,15 +1586,13 @@ class MapWidget extends Widget {
 
   }
 
-  createAndSaveSnapshot(title) {
-
-    const tRef = title || this.view.getRoot() + '/snapshot';
+  createAndSaveSnapshot(width, height, tRef, title) {
     $tw.wiki.addTiddler(
       new $tw.Tiddler(
         {
-          title: tRef,
+          title: title || tRef,
           type: 'image/png',
-          text: this.getSnapshot(true)
+          text: this.getCanvasAsBase64({ size: { width, height }, withoutPreamble: true })
         },
         $tw.wiki.getCreationFields(),
         $tw.wiki.getModificationFields()
@@ -1594,11 +1603,25 @@ class MapWidget extends Widget {
 
   }
 
-  getSnapshot(stripPreamble) {
+  getCanvasAsBase64({ withoutPreamble, size } = {}) {
+
+    const oldWidth = this.graphDomNode.style.width;
+    const oldHeight = this.graphDomNode.style.height;
+    if (size) {
+      this.graphDomNode.style.width = `${size.width}px`;
+      this.graphDomNode.style.height = `${size.height}px`;
+      this.network.redraw();
+    }
 
     const data = this.canvas.toDataURL('image/png');
 
-    return (stripPreamble
+    if (size) {
+      this.graphDomNode.style.width = oldWidth;
+      this.graphDomNode.style.height = oldHeight;
+      this.network.redraw();
+    }
+
+    return (withoutPreamble
             ? utils.getWithoutPrefix(data, 'data:image/png;base64,')
             : data);
 

@@ -9,6 +9,10 @@ type: text/x-markdown
 Enhancements
 ----------------------------
 
+### v0.17.7
+
+* Resolves #358: Allow user to specify image size of exported map png-image
+
 ### v0.17.0
 
 * Resolves #349: Option to trace paths of clicked neighbouring nodes
@@ -20,6 +24,11 @@ Enhancements
 
 Bugfixes
 ----------------------------
+
+### v0.17.7
+
+* Fix #299: Creating placeholder images for maps is broken
+* Fix #342: "defaultViewHolder" is always saved on startup despite reference being the same
 
 ### v0.17.6
 

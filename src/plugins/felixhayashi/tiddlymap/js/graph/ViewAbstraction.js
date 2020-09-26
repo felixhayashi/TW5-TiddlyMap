@@ -367,17 +367,6 @@ class ViewAbstraction {
   }
 
   /**
-   * Whether this view represents the 'live view'
-   *
-   * @return {boolean}
-   */
-  isLiveView() {
-
-    return (this.getLabel() === $tm.misc.liveViewLabel);
-
-  }
-
-  /**
    * Whether the node is already explicitly contained in the view's node filter,
    * i.e. whether it is explicitly referenced by its title.
    *

@@ -954,7 +954,7 @@ class MapWidget extends Widget {
     this.handleResizeEvent();
     this.canvas.focus();
 
-    if (this.view.isLiveView() && this.view.isEnabled('neighbourhood_trace_clicks')) {
+    if (this.isLiveView() && this.view.isEnabled('neighbourhood_trace_clicks')) {
       // directly trigger refresh so we add  currently focussed as traced node
       this.trace[utils.getText(this.refreshTriggers[0])] = true;
     }
@@ -1380,6 +1380,17 @@ class MapWidget extends Widget {
   }
 
   /**
+   * Whether this view represents the 'live view'
+   *
+   * @return {boolean}
+   */
+  isLiveView() {
+
+    return this.id === 'live_tab';
+
+  }
+
+  /**
    * Create an empty view. A dialog is opened that asks the user how to
    * name the view. The view is then registered as current view.
    */
@@ -1403,7 +1414,7 @@ class MapWidget extends Widget {
         return;
       }
 
-      if (isClone && this.view.isLiveView()) {
+      if (isClone && this.isLiveView()) {
         $tm.notify('Forbidden to clone the live view!');
         return;
       }
@@ -1689,7 +1700,7 @@ class MapWidget extends Widget {
 
     const curTiddler = utils.getTiddler(utils.getText(trigger));
 
-    if (this.view.isLiveView()) {
+    if (this.isLiveView()) {
       if (curTiddler) {
         if (this.view.isEnabled('neighbourhood_trace_clicks')) {
           this.trace[curTiddler.fields.title] = true;

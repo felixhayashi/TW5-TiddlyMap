@@ -2195,9 +2195,9 @@ class MapWidget extends Widget {
       if (node['open-view']) {
         $tm.notify('Switching view');
         this.setView(node['open-view']);
-      } else {
-        this.openTiddlerWithId(nodes[0]);
       }
+
+      this.openTiddlerWithId(nodes[0]);
 
     } else if (edges.length) { // clicked on an edge
 

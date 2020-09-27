@@ -7,6 +7,10 @@
   color: $tw-text-color;
   display: block; // sometimes tw puts us into a span
 
+  .tmap-download-canvas {
+    display: none;
+  }
+
   &.tmap-click-to-use:not(.tmap-fullscreen) .vis-network:not(.vis-active) {
     cursor: pointer;
 

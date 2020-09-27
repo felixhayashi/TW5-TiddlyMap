@@ -771,11 +771,12 @@ class MapWidget extends Widget {
     $tm.start('Reloading Network');
 
     const params = {
-      view: this.view
+      view: this.view,
+      matches: utils.getMatches(this.view.getNodeFilter('compiled'))
     };
 
     if (this.view.isEnabled('neighbourhood_trace_clicks')) {
-      const originalMatches = utils.getMatches(this.view.getNodeFilter('compiled'));
+      const originalMatches = params.matches;
       const clickPathMatches = Object.keys(this.trace);
       const combinedMatches = [
         ...originalMatches.filter(tRef => !this.trace[tRef]),

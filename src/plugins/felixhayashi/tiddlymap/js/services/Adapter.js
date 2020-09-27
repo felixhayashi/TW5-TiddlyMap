@@ -344,9 +344,17 @@ class Adapter {
     const neighScope = parseInt(view.getConfig('neighbourhood_scope'));
     const typeWL = view.getEdgeTypeFilter('whitelist');
     const toWL = utils.getArrayValuesAsHashmapKeys(matches);
+    const edges = this.getEdgesForSet(matches, toWL, typeWL);
+
+    let nodeIdWL;
+    if (view.isEnabled('filter_nodes_by_edge_types')) {
+      nodeIdWL = new Set();
+      Object.values(edges)
+        .forEach(edge => { nodeIdWL.add(edge.from); nodeIdWL.add(edge.to); });
+    }
 
     const graph = {
-      edges: this.getEdgesForSet(matches, toWL, typeWL),
+      edges,
       nodes: this.selectNodesByReferences(matches, {
         view: view,
         outputType: 'hashmap'
@@ -376,6 +384,13 @@ class Adapter {
         const toWL = utils.getArrayValuesAsHashmapKeys(nodeTRefs);
         Object.assign(graph.edges, this.getEdgesForSet(nodeTRefs, toWL));
       }
+    }
+
+    if (nodeIdWL) {
+      const nodesFilteredByEdges = utils.makeHashMap();
+      Object.values(graph.nodes)
+        .forEach(node => { if (nodeIdWL.has(node.id)) { nodesFilteredByEdges[node.id] = node; } })
+      graph.nodes = nodesFilteredByEdges;
     }
 
     // this is pure maintainance!

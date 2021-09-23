@@ -47,6 +47,7 @@ class MapWidget extends Widget {
       'handleCanvasKeyup',
       'handleCanvasKeydown',
       'handleCanvasScroll',
+      'handleExtraCanvasScroll',
       'handleCanvasMouseMove',
       'handleWidgetKeyup',
       'handleWidgetKeydown',
@@ -1137,7 +1138,11 @@ class MapWidget extends Widget {
    * Solves: https://github.com/felixhayashi/TW5-TiddlyMap/issues/306
    */
   handleExtraCanvasScroll(ev) {
-    ev.preventDefault();
+
+    // Solves: https://github.com/felixhayashi/TW5-TiddlyMap/issues/409
+    if (this.isInSidebar) {
+      ev.preventDefault();
+    }
   }
 
   /**

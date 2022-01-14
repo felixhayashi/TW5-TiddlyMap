@@ -1,15 +1,16 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/deleteNodeDialog
 subtitle: {{$:/core/images/delete-button}} You are about to delete <<count>> nodes
 
+\whitespace trim
 \rules except wikilink
 
 ''Please choose an option or abort:''
 
 <$radio tiddler=<<output>> field="delete-from" value="system">
-  Delete nodes from system <sup>[1]</sup>
+  Delete nodes from system&#32;<sup>[1]</sup>
 </$radio><br />
 <$radio tiddler=<<output>> field="delete-from" value="filter">
-  Delete nodes from graph's filter <sup>[2]</sup>
+  Delete nodes from graph's filter&#32;<sup>[2]</sup>
 </$radio>
 
 The following nodes will be deleted:
@@ -23,6 +24,8 @@ The following nodes will be deleted:
 ---
 
 <sup>[1]</sup>
+&#32;
 <small>This will delete all nodes, their corresponding tiddlers and all connected edges.</small><br/>
 <sup>[2]</sup>
-<small>''Important:'' Removing a node from the graph's filter only works, if the node has been added in the map editor per double click or via "Add Node". If the node hasn't been added as mentioned above, you need to change the underlying tiddler in a way that it doesn't match your filter anymore, if you don't want it to be displayed in the graph.</small>
+&#32;
+<small>''Important:''&#32;Removing a node from the graph's filter only works, if the node has been added in the map editor per double click or via "Add Node". If the node hasn't been added as mentioned above, you need to change the underlying tiddler in a way that it doesn't match your filter anymore, if you don't want it to be displayed in the graph.</small>

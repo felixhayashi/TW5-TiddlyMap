@@ -2,6 +2,7 @@ title: $:/plugins/felixhayashi/tiddlymap/dialog/dublicateIdInfo
 subtitle: {{$:/core/images/info-button}} Dublicate id detected
 buttons: ok_suppress
 
+\whitespace trim
 \rules except wikilink
 
 TiddlyMap requires the value of the id field ("tmap.id") to be

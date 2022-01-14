@@ -1,5 +1,6 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialogFooter/element_type_manager
 
+\whitespace trim
 \rules except wikilink
 
 <$button
@@ -10,6 +11,7 @@ title: $:/plugins/felixhayashi/tiddlymap/dialogFooter/element_type_manager
       mode=<<mode>>
       output=<<output>> />
 </$button>
+&#32;
 <$button
     class="tmap-dialog-button tmap-cancel-button"
     tooltip="Cancel the most resent changes and exit">Quit

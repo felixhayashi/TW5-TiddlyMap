@@ -1,6 +1,7 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/overview
 caption: Overview
 
+\whitespace trim
 \rules except wikilink
 
 \define date(f) <$view field=$f$ format="date" template="DDth mmm hh:mm:ss"/>

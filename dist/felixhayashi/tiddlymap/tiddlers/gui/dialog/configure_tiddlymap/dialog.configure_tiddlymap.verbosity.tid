@@ -1,9 +1,11 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/globalConfig/verbosity
 caption: Verbosity
 
+\whitespace trim
 \rules except wikilink
 
 <div class="tmap-flash-message tmap-plain">
+  &#32;
   Here you can restrict the system's talkativeness.
 </div>
 

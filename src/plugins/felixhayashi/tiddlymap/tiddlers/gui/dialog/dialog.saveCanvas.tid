@@ -1,9 +1,11 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/saveCanvas
 subtitle: {{$:/core/images/options-button}} Save a snapshot image of view "<<view>>"
 
+\whitespace trim
 \rules except wikilink
 
 \define preview()
+\whitespace trim
 <div class="tmap-save-canvas-preview">
   <$transclude tiddler=<<snapshot>> /><br />
 </div>

@@ -1,6 +1,7 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/fullscreenTiddlerEditor/original
 caption: Current Version
 
+\whitespace trim
 \rules except wikilink
 
 <div class="tmap-modal-editor">

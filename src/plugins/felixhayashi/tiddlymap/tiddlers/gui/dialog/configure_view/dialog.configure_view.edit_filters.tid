@@ -1,16 +1,20 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/configureView/editFilters
 caption: Edit filters
 
+\whitespace trim
 \rules except wikilink
 
 <div class="tmap-flash-message tmap-info">
+  &#32;
   Completely new to filters? Please read
+  &#32;
   [[Introduction to filter notation|http://tiddlywiki.com/#Introduction%20to%20filter%20notation]]
+  &#32;
   first.
 </div>
 
 <fieldset>
-  <legend>Filters <sup>[1]</sup></legend>
+  <legend>Filters&#32;<sup>[1]</sup></legend>
   <table class="tmap-config-table tmap-large-input">
     <<tmap-row type:"input-textarea"
         title:"Node filter"
@@ -27,8 +31,13 @@ caption: Edit filters
 
 ---
 
-<sup>[1]</sup> In the editors above, a new line is equivalent to a space symbol.<br />
-<sup>[2]</sup> It is suggested to read
+<sup>[1]</sup>&#32;In the editors above, a new line is equivalent to a space symbol.<br />
+<sup>[2]</sup>&#32;It is suggested to read
+&#32;
 [[Node and edge-type filters|http://tiddlymap.org#Node%20and%20edge-type%20filters]]
-and [[Edge-type namespaces|http://tiddlymap.org#Node%20and%20edge-type%20filters]]
+&#32;
+and
+&#32;
+[[Edge-type namespaces|http://tiddlymap.org#Node%20and%20edge-type%20filters]]
+&#32;
 before using Tiddlymap's filter editor.

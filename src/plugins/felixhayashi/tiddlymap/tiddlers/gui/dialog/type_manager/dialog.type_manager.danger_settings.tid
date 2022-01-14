@@ -1,10 +1,11 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/deleteType
 caption: Removal
 
+\whitespace trim
 \rules except wikilink
 
 \define manage-edge-types()
-  <$macrocall $name="tmap-row"
+<$macrocall $name="tmap-row"
       type="input-checkbox"
       title="Delete type"
       field="temp.deleteType"
@@ -17,7 +18,7 @@ caption: Removal
 \end
 
 \define manage-node-types()
-  <$macrocall $name="tmap-row"
+<$macrocall $name="tmap-row"
       type="input-checkbox"
       title="Delete type"
       field="temp.deleteType"

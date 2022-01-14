@@ -1,6 +1,7 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/globalConfig/interaction
 caption: Interaction & behaviour
 
+\whitespace trim
 \rules except wikilink
 
 <table class="tmap-config-table">
@@ -26,13 +27,13 @@ caption: Interaction & behaviour
       title:"Popup width"
       field:"config.sys.popups.width"
       descr:"The default max-width of the popup."
-      note:"Make sure you added the desired unit (e.g. `px`).
+      note:"Make sure you added the desired unit (e.g.&#32;`px`).
             Requires a wiki refresh.">>
   <<tmap-row type:"input-text"
       title:"Popup height"
       field:"config.sys.popups.height"
       descr:"The default max-height of the popup."
-      note:"Make sure you added desired the unit (e.g.  `px`).
+      note:"Make sure you added desired the unit (e.g.&#32;`px`).
             Requires a wiki refresh.">>
   </$list>
   <<tmap-row type:"input-checkbox"
@@ -64,6 +65,7 @@ caption: Interaction & behaviour
 !! Suppressed dialogs
 
 <div class="tmap-flash-message tmap-plain">
+  &#32;
   Dialogs that you decided to suppress in the past are listed here.
   Remove the checkmark to enable dialogs again.
 </div>

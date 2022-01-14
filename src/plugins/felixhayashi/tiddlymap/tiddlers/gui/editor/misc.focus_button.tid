@@ -4,6 +4,7 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/focusButton
 \define concat(str) $str$
 
 \define state() $(widgetPopupsPath)$/focus
+\whitespace trim
 
 <div class="tmap-focus-button">
   <$reveal type="match" state=<<state>> text="">
@@ -29,7 +30,8 @@ title: $:/plugins/felixhayashi/tiddlymap/misc/focusButton
             type="text"
             tag="input"
             default="" />
-        <small><$count filter=<<filter>> /> results</small>
+        &#32;
+        <small><$count filter=<<filter>> />&#32;results</small>
         <hr />
         <div class="tmap-very-small-list">
           <$list filter=<<filter>>

@@ -2,10 +2,12 @@ caption: Map
 tags: $:/tags/SideBar
 title: $:/plugins/felixhayashi/tiddlymap/hook/editor
 
+\whitespace trim
 \define width() calc(100% - 15px)
 
 <div class="tmap-mobile-editor">
   <div class="tmap-flash-message tmap-warning">
+    &#32;
     The editor is not displayed in mobile mode.
   </div>
 </div>

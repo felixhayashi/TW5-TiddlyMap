@@ -2,6 +2,7 @@ title: $:/plugins/felixhayashi/tiddlymap/dialog/globalConfig
 subtitle: {{$:/core/images/options-button}} Global configuration of TiddlyMap
 classes: tmap-remove-top-space
 
+\whitespace trim
 \rules except wikilink
 
 <$macrocall $name="tabs"

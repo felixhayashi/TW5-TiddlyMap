@@ -9,4 +9,3 @@ module-type: tmap.edgetypehandler
 
 \*/
 /* @preserve TW-Guard */var TranscludeEdgeTypeSubscriber=function(e){_inherits(r,e);function r(e){var t=arguments.length>1&&arguments[1]!==undefined?arguments[1]:{};_classCallCheck(this,r);return _possibleConstructorReturn(this,(r.__proto__||Object.getPrototypeOf(r)).call(this,e,_extends({priority:20,ignore:typeof $tw.wiki.getTiddlerTranscludes!=="function"},t)))}_createClass(r,[{key:"canHandle",value:function e(r){return r.id==="tw-body:transclude"}},{key:"getReferences",value:function e(r,t,n){if(n&&!n["tw-body:transclude"]){return}var i=$tw.wiki.getTiddlerTranscludes(r.fields.title);if(!i||!i.length){return}return{"tw-body:transclude":i}}}]);return r}(_AbstractRefEdgeTypeSubscriber2.default);exports.TranscludeEdgeTypeSubscriber=TranscludeEdgeTypeSubscriber;
-//# sourceMappingURL=./maps/felixhayashi/tiddlymap/js/edgeTypeSubscriber/refEdgeTypeSubscriber/TranscludeEdgeTypeSubscriber.js.map

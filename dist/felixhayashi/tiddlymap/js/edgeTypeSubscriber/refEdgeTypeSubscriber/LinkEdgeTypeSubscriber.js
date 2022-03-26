@@ -9,4 +9,3 @@ module-type: tmap.edgetypehandler
 
 \*/
 /* @preserve TW-Guard */var LinkEdgeTypeSubscriber=function(e){_inherits(t,e);function t(e){var r=arguments.length>1&&arguments[1]!==undefined?arguments[1]:{};_classCallCheck(this,t);return _possibleConstructorReturn(this,(t.__proto__||Object.getPrototypeOf(t)).call(this,e,_extends({priority:20},r)))}_createClass(t,[{key:"canHandle",value:function e(t){return t.id==="tw-body:link"}},{key:"getReferences",value:function e(t,r,n){if(n&&!n["tw-body:link"]){return}var i=$tw.wiki.getTiddlerLinks(t.fields.title);if(!i||!i.length){return}return{"tw-body:link":i}}}]);return t}(_AbstractRefEdgeTypeSubscriber2.default);exports.LinkEdgeTypeSubscriber=LinkEdgeTypeSubscriber;
-//# sourceMappingURL=./maps/felixhayashi/tiddlymap/js/edgeTypeSubscriber/refEdgeTypeSubscriber/LinkEdgeTypeSubscriber.js.map

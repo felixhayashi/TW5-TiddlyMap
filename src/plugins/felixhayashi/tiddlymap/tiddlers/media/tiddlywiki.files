@@ -1,0 +1,26 @@
+{
+  "directories": [
+    {
+      "path": ".",
+      "filesRegExp": "^.*\\.png",
+      "isTiddlerFile": false,
+      "fields": {
+        "title": {
+          "source": "filename",
+          "prefix": "$:/plugins/felixhayashi/tiddlymap/media/"
+        },
+        "type": "image/png"
+      }
+    }
+  ],
+  "tiddlers": [
+    {
+      "file": "icon.svg",
+      "fields": {
+        "title": "$:/plugins/felixhayashi/tiddlymap/icon",
+        "tags": [ "$:/tags/Image" ]
+      },
+      "prefix": "\\whitespace trim\n"
+    }
+  ]
+}

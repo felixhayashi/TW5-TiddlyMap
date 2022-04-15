@@ -1,7 +1,3 @@
-tags: $:/tags/Image
-title: $:/plugins/felixhayashi/tiddlymap/icon
-
-\whitespace trim
 <svg
    xmlns="http://www.w3.org/2000/svg"
    class="tc-image-tiddlymap-button tc-image-button"

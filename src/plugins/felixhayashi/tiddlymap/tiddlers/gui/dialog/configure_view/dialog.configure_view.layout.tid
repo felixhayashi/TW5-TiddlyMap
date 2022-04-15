@@ -1,6 +1,7 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/configureView/layout
 caption: Layout
 
+\whitespace trim
 \rules except wikilink
 
 <table class="tmap-config-table">

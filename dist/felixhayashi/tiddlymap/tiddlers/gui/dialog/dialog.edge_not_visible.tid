@@ -2,10 +2,13 @@ title: $:/plugins/felixhayashi/tiddlymap/dialog/edgeNotVisible
 subtitle: {{$:/core/images/info-button}} Edge will not be visible in view "<<view>>"
 buttons: ok_suppress
 
+\whitespace trim
 \rules except wikilink
 
 You just created an edge of type
-<code><$text text=<<type>> /></code> that will not be
+&#32;
+<code><$text text=<<type>> /></code>
+&#32;that will not be
 visible in this view because it doesn't match your
 edge-type filter settings.
 
@@ -21,6 +24,7 @@ Some suggestions:
 <ul>
   <li>
     Explicitly add the type to the filter:
+    &#32;
     <code><$text text="[[" /><$text text=<<type>> /><$text text="]]" /></code>
   </li>
   <li>
@@ -29,11 +33,12 @@ Some suggestions:
       name="prefix"
       emptyValue=<<tmap halfOfString "$(type)$">>>
   Add a filter rule (e.g. a prefix filter) that will match
-  your type: <code>[prefix[<<prefix>>]]</code>
+  your type:&#32;<code>[prefix[<<prefix>>]]</code>
   </$set>
   </li>
   <li>Make your current view-filter less restrictive.</li>
 </ul>
 
 For further information, please see:
+&#32;
 [[Node and edge-type filters|http://tiddlymap.org#Node%20and%20edge-type%20filters]].

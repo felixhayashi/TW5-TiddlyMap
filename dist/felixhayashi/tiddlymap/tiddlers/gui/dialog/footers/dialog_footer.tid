@@ -1,5 +1,6 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialogFooter
 
+\whitespace trim
 \rules except wikilink
 
 \define footer() $:/plugins/felixhayashi/tiddlymap/dialogFooter/$(buttons)$

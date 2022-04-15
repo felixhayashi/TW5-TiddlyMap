@@ -1,5 +1,6 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialogFooter/close
 
+\whitespace trim
 \rules except wikilink
 
 <$button class="tmap-dialog-button tmap-close-button" tooltip="Close this dialog">Close

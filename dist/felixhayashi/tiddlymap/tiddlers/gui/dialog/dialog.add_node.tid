@@ -2,14 +2,16 @@ title: $:/plugins/felixhayashi/tiddlymap/dialog/addNodeToMap
 subtitle: {{$:/core/images/tag-button}} Add node
 classes: tmap-modal-add-node
 
+\whitespace trim
 \rules except wikilink
 
 \define backButtonText() back to list
 \define outputAndTemplate() [[$(output)$]] [[$(template)$]]
 
 \define editor()
+\whitespace trim
   <$button class="tmap-go-back tc-btn-invisible">
-    {{$:/core/images/chevron-left}} <<backButtonText>>
+    {{$:/core/images/chevron-left}}&#32;<<backButtonText>>
     <$action-deletefield $tiddler=<<temp>> more template />
     <$action-sendmessage
         $message="tmap:tm-clear-tiddler"
@@ -19,6 +21,7 @@ classes: tmap-modal-add-node
 
   <$list filter="[<output>get[draft.title]is[tiddler]]">
   <div class="tmap-flash-message tmap-warning">
+   &#32;
    Tiddler already exists! Use another title or click
    "<<backButtonText>>" to cancel your edit.
   </div>
@@ -63,6 +66,7 @@ classes: tmap-modal-add-node
 \end
 
 \define search()
+\whitespace trim
 <p>Add an existing tiddler to the map or create a new one.</p>
 <table id="tmap-search-table">
   <tr>
@@ -84,7 +88,7 @@ classes: tmap-modal-add-node
                    before it is added to the map">
         {{$:/core/images/edit-button}}
         <$action-setfield $tiddler=<<temp>> more="true" />
-      </$button> <sup>[1]</sup>
+      </$button>&#32;<sup>[1]</sup>
       </$list>
     </td>
   </tr>
@@ -110,6 +114,7 @@ classes: tmap-modal-add-node
 <$list filter="[<output>get[draft.title]!is[tiddler]]">
 <hr />
 <sup>[1]</sup>
+&#32;
 <small>
   The tiddler does not exist yet and you may edit it
   before it is added to the map

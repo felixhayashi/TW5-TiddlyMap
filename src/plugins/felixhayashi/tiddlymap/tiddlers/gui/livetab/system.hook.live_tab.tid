@@ -1,10 +1,12 @@
 title: $:/plugins/felixhayashi/tiddlymap/hook/liveTab
 caption: Live
 
+\whitespace trim
 \define width() calc(100% - 15px)
 
 <div class="tmap-mobile-editor">
   <div class="tmap-flash-message tmap-warning">
+    &#32;
     The live tab is not displayed in mobile mode.
   </div>
 </div>

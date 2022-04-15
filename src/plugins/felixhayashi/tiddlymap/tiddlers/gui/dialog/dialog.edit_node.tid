@@ -5,8 +5,10 @@ classes: tmap-remove-top-space
 \rules except wikilink
 
 \define maybeShowTidColorWarning()
+\whitespace trim
   <$list filter="[<tidColor>regexp[.+]]">
   <div class="tmap-flash-message tmap-warning">
+    &#32;
     You have set the tiddler's color
     field to "<<tidColor>>". This value will be completely ignored
     when you change node's color properties in the vis editor below.
@@ -15,6 +17,7 @@ classes: tmap-remove-top-space
 \end
 
 \define iconSettings(twIconField, faIconField)
+\whitespace trim
   <fieldset>
     <legend>Icon Settings</legend>
     <table class="tmap-config-table">
@@ -33,6 +36,7 @@ classes: tmap-remove-top-space
 \end
 
 \define sharedSettings(twIconField, faIconField, labelField)
+\whitespace trim
   <fieldset>
     <legend>General Settings</legend>
     <table class="tmap-config-table">

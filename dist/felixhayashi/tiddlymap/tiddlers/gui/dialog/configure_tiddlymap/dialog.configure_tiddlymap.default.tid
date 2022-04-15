@@ -1,10 +1,15 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/globalConfig/default
 caption: Overview
 
+\whitespace trim
 \rules except wikilink
 
 <div class="tmap-flash-message tmap-plain">
-  Please visit the [[online docs|http://tiddlymap.org/Documentation]]
+  &#32;
+  Please visit the
+  &#32;
+  [[online docs|http://tiddlymap.org/Documentation]]
+  &#32;
   for more information about the available global options.
 </div>
 <table class="tmap-key-value-table">

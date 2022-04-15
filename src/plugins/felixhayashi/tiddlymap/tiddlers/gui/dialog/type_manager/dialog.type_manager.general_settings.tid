@@ -1,9 +1,11 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/generalSettings
 caption: General
 
+\whitespace trim
 \rules except wikilink
 
 \define manage-edge-types()
+\whitespace trim
   <<tmap-row type:"input-text"
       title:"Label"
       field:"label"
@@ -15,6 +17,7 @@ caption: General
       descr:"If unchecked, no edge label will be displayed.">>
 \end
 \define manage-node-types()
+\whitespace trim
   <$list filter="[<currentTiddler>!regexp:id[tmap:]]">
   <<tmap-row type:"input-textarea"
       title:"Scope"

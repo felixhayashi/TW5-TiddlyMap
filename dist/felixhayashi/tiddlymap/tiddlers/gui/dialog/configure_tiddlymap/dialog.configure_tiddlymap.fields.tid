@@ -1,6 +1,7 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/globalConfig/fields
 caption: Field settings
 
+\whitespace trim
 \rules except wikilink
 
 <table class="tmap-config-table">
@@ -18,4 +19,3 @@ caption: Field settings
       descr:"Field used as tooltip when hovering over a node in a graph."
       note:"It is prohibited to use the text field here.">>
 </table>   
-

@@ -1,5 +1,6 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog
 
+\whitespace trim
 \rules except wikilink
 
 <div class=<<classes>>>

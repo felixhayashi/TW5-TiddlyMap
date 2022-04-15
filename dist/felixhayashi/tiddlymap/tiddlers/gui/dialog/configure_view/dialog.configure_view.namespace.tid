@@ -1,6 +1,7 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/configureView/namespace
 caption: Namespace
 
+\whitespace trim
 \rules except wikilink
 
 <table class="tmap-config-table tmap-small-input">

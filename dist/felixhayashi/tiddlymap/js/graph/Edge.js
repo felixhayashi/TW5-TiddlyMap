@@ -9,4 +9,3 @@ module-type: library
 
 \*/
 /* @preserve TW-Guard */var Edge=function e(t,i,s,l){_classCallCheck(this,e);this.from=t;this.to=i;this.type=s;this.id=l||_utils2.default.genUUID()};exports.default=Edge;
-//# sourceMappingURL=./maps/felixhayashi/tiddlymap/js/graph/Edge.js.map

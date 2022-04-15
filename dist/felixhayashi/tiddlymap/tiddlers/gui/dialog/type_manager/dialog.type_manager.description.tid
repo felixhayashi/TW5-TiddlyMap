@@ -1,10 +1,11 @@
 title: $:/plugins/felixhayashi/tiddlymap/dialog/MapElementTypeManager/description
 caption: Description
 
+\whitespace trim
 \rules except wikilink
 
 \define manage-edge-types()
-  <<tmap-row type:"input-textarea"
+<<tmap-row type:"input-textarea"
       title:"Description"
       field:"description"
       descr:"An optional description for this type. The
@@ -13,7 +14,7 @@ caption: Description
 \end
 
 \define manage-node-types()
-  <<tmap-row type:"input-textarea"
+<<tmap-row type:"input-textarea"
       title:"Description"
       field:"description" 
       descr:"An optional description for this type.">>

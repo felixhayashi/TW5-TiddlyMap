@@ -3,6 +3,7 @@ subtitle: {{$:/core/images/tag-button}} <<topic>>
 buttons: element_type_manager
 classes: tmap-remove-top-space
 
+\whitespace trim
 \rules except wikilink
 
 \define defaultTab()
@@ -37,6 +38,7 @@ $(searchSelector)$
           type="text"
           tag="input"
           default="" />
+      &#32;
       <$list filter="[{$:/temp/tmap/MapElementTypeSearch}regexp[.+]]
                      +[addprefix[/]]
                      +[addprefix<typeRootPath>]
@@ -60,8 +62,9 @@ $(searchSelector)$
           variable="id">
       <li>
         <span class="tmap-ranking tmap-node-type-specific">
-          # <$view tiddler=<<typePath>> field="priority">1</$view>
+          #&#32;<$view tiddler=<<typePath>> field="priority">1</$view>
         </span>
+        &#32;
         <$button class="tc-btn-invisible tmap-link"><<id>>
           <$action-setfield
               $tiddler=<<qualify "$:/state/tabs/MapElementTypeManager">>
@@ -86,10 +89,12 @@ $(searchSelector)$
     </$reveal>
     <$reveal type="match" text="" default={{!!id}} >
       <div class="tmap-flash-message tmap-info">
+        &#32;
         Please select a type from the list or create a new one by
         entering the type name in the search field on the left.
       </div>
       <div class="tmap-flash-message tmap-info tmap-node-type-specific">
+        &#32;
         The number next to the node-type label represents it's priority.
       </div>
     </$reveal>

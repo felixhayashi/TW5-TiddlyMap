@@ -83,7 +83,6 @@ import jsdoc from 'gulp-jsdoc3';
 import esprima from 'gulp-esprima';
 import debug from 'gulp-debug';
 import bump from 'gulp-bump';
-import sourcemaps from 'gulp-sourcemaps';
 
 /**** Preprocessing ************************************************/
 
@@ -207,16 +206,9 @@ gulp.task('compile and move scripts', () => {
     }
   };
 
-  const sourceMapOpts = {
-    destPath: outPath.maps,
-    sourceMappingURLPrefix: '.'
-  };
-
   return gulp.src(pluginSrc + '/**/*.js')
-    .pipe(sourcemaps.init())
     .pipe(babel())
     .pipe(gulpif (argv.production, terser(uglifyOpts)))
-    .pipe(sourcemaps.write('./maps', sourceMapOpts))
     .pipe(gulp.dest(outPath.dist));
 
 });

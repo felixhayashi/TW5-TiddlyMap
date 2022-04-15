@@ -1,27 +1,33 @@
 title: $:/plugins/felixhayashi/tiddlymap/editor/contextMenu/node
 
 \define single()
+\whitespace trim
   <$list filter="
       [[tmap:tm-toggle-central-topic, $:/core/images/star-filled, Toggle central topic]]
       [[tmap:tm-delete-element, $:/core/images/delete-button, Delete node]]">
     <$button class="tc-btn-invisible">
       <$action-sendmessage $message=<<tmap "splitAndSelect" ", " "0">> />
       <$transclude tiddler=<<tmap "splitAndSelect" ", " "1">> />
+      &#32;
       <<tmap "splitAndSelect" ", " "2">>
     </$button>
   </$list>
 \end
 
 \define multi()
+\whitespace trim
   <$list filter="
       [[tmap:tm-delete-element, $:/core/images/delete-button, Delete selected nodes]]">
     <$button class="tc-btn-invisible">
       <$action-sendmessage $message=<<tmap "splitAndSelect" ", " "0">> />
       <$transclude tiddler=<<tmap "splitAndSelect" ", " "1">> />
+      &#32;
       <<tmap "splitAndSelect" ", " "2">>
     </$button>
   </$list>
 \end
+
+\whitespace trim
 
 <div class="tc-drop-down">
   <$macrocall $name=<<mode>> />

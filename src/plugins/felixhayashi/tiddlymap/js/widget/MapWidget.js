@@ -414,7 +414,8 @@ class MapWidget extends Widget {
     });
 
     // register
-    this.sidebar = utils.getFirstElementByClassName('tc-sidebar-scrollable');
+    // fixes #422: sidebar isn't always there depending on installed plugins
+    this.sidebar = utils.getFirstElementByClassName('tc-sidebar-scrollable', undefined, false);
     this.isInSidebar = (this.sidebar
                                  && !this.domNode.isTiddlyWikiFakeDom
                                  && this.sidebar.contains(this.domNode));

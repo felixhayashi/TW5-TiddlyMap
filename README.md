@@ -57,14 +57,14 @@ This method requires you to have TiddlyWiki running as server using [Node.js](ht
 
   * [TiddlyMap](https://github.com/felixhayashi/TW5-TiddlyMap)
     * This is the core TiddlyMap plugin.
-  * [TW5-Vis.js](https://github.com/felixhayashi/TW5-Vis.js)
-    * This plugin will install vis.js which is required for the graph's rendering.
+  * [tw5-vis-network](https://github.com/flibbles/tw5-vis-network)
+    * This plugin will install vis-network which is required for the graph's rendering.
   * [TW5-HotZone](https://github.com/felixhayashi/TW5-HotZone)
     * This plugin is necessary when you want to use the live view.
   * [TW5-TopStoryView](https://github.com/felixhayashi/TW5-TopStoryView)
     * Unless you are using the zoomin or stacked story view, install this plugin to achieve a better live view experience.
 
-1. For every zip file, open the file and copy everything that lies in the zip's `dist/` path into `tiddlywiki/plugins/` (or create symlinks).
+1. For every zip file, open the file and copy everything that lies in the zip's `dist/` path (or `plugins/` path for vis-network) into `tiddlywiki/plugins/` (or create symlinks).
 
 Now in every wiki you want TiddlyMap to appear in, you need to update the plugin section of your wiki's `tiddlywiki.info` file, which resides in the root of your wiki, to contain the following:
 
@@ -72,9 +72,9 @@ Now in every wiki you want TiddlyMap to appear in, you need to update the plugin
 {
   "plugins": [
     "felixhayashi/tiddlymap",
-    "felixhayashi/vis",
     "felixhayashi/hotzone",
-    "felixhayashi/topstoryview"
+    "felixhayashi/topstoryview",
+    "flibbles/vis-network"
   ]
 }
 ```

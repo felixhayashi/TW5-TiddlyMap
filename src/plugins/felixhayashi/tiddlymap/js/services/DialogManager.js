@@ -172,8 +172,6 @@ class DialogManager {
       paramObject: dialogTiddler.fields
     });
 
-    DialogManager.addKeyBindings();
-
     return dialogTiddler;
 
   };
@@ -181,47 +179,6 @@ class DialogManager {
   static getElement(name) {
 
     return utils.getFirstElementByClassName('tmap-' + name);
-
-  }
-
-  /**
-   * This method will search for form elements that have the class
-   * `tmap-trigger-field` set, which means that TiddlyMap shall
-   * perform a button press when a key combo occurs while the field
-   * has focus. To know which button to press on what key event,
-   * it looks for classes of the form: tmap-triggers-BUTTONNAME-on-KEYCOMBO.
-   */
-  static addKeyBindings() {
-
-    const keys = $tm.keycharm({
-      container: utils.getFirstElementByClassName('tc-modal')
-    });
-
-    const re = /tmap-triggers-(.+?)-on-(.+?)(?:\s|$)/;
-    const triggers = document.getElementsByClassName('tmap-trigger-field');
-
-    for (let i = triggers.length; i--;) {
-      const classNames = triggers[i].className.split(' ');
-      for (let j = classNames.length; j--;) {
-        const matches = classNames[j].match(re);
-        if (!matches) { // don't care
-          continue;
-        }
-        const buttonName = matches[1];
-        const key = matches[2];
-        const buttonElement = DialogManager.getElement(buttonName);
-        if (!buttonElement) {
-          continue;
-        }
-        keys.bind(key, () => {
-          if (document.getElementsByClassName(classNames[j]).length) {
-            // only click button if trigger is active (i.e. still in focus)
-            // see https://github.com/felixhayashi/TW5-TiddlyMap/issues/280
-            buttonElement.click();
-          }
-        });
-      }
-    }
 
   }
 }

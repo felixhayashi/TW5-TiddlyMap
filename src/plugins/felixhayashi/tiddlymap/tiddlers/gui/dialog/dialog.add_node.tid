@@ -78,10 +78,7 @@ classes: tmap-modal-add-node
           focus="true"
           type="text"
           tag="input"
-          default=""
-          class="tmap-trigger-field
-                 tmap-triggers-ok-button-on-enter
-                 tmap-triggers-cancel-button-on-esc" />
+          default="" />
       <$list filter="[<output>get[draft.title]!is[tiddler]]">
       <$button
           tooltip="The tiddler does not exist yet and you may edit it
@@ -122,5 +119,9 @@ classes: tmap-modal-add-node
 </$list>
 \end
 
+<$keyboard key="enter" actions="<$action-setfield $tiddler=<<result>> text='1' />">
+<$keyboard key="escape" actions="<$action-setfield $tiddler=<<result>> text='' />">
 <$list filter="[<temp>!has[more]]" variable="item"><<search>></$list>
 <$list filter="[<temp>has[more]]" variable="item"><<editor>></$list>
+</$keyboard>
+</$keyboard>

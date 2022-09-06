@@ -7,7 +7,7 @@ title: $:/plugins/felixhayashi/tiddlymap/dialogFooter/ok_suppress
 
 <$checkbox field="suppress" checked="1" unchecked="0" default="0"> Do not show this dialog again</$checkbox>
 &#32;
-<$button class="tmap-dialog-button tmap-ok-button" tooltip="Confirm this dialog">OK
+<$button class="tmap-dialog-button" tooltip="Confirm this dialog">OK
 
   <!-- trigger dialog callback -->
   <$action-setfield $tiddler=<<result>> text="1" />

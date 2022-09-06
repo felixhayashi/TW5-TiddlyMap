@@ -60,10 +60,7 @@ subtitle: {{$:/plugins/felixhayashi/tiddlymap/icon}} Edge type specification
           field="text"
           type="text"
           tag="input"
-          default=""
-          class="tmap-trigger-field
-                 tmap-triggers-ok-button-on-enter
-                 tmap-triggers-cancel-button-on-esc" />
+          default="" />
       <<badges>>
     </td>
   </tr>
@@ -89,4 +86,8 @@ subtitle: {{$:/plugins/felixhayashi/tiddlymap/icon}} Edge type specification
 </table>
 \end
 
+<$keyboard key="enter" actions="<$action-setfield $tiddler=<<result>> text='1' />">
+<$keyboard key="escape" actions="<$action-setfield $tiddler=<<result>> text='' />">
 <$list filter="[<temp>!has[more]]" variable="item"><<search>></$list>
+</$keyboard>
+</$keyboard>

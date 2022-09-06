@@ -3,9 +3,12 @@ subtitle: {{$:/core/images/tag-button}} Please specify a view name
 
 \rules except wikilink
 
+<$keyboard key="enter" actions="<$action-setfield $tiddler=<<result>> text='1' />">
+
+<$keyboard key="escape" actions="<$action-setfield $tiddler=<<result>> text='' />">
+
 ''Name:''
-<$edit-text focus="true" tiddler=<<output>> field="text" type="text" tag="input" default=""
-            class="tmap-trigger-field tmap-triggers-ok-button-on-enter" />
+<$edit-text focus="true" tiddler=<<output>> field="text" type="text" tag="input" default="" />
 
 Note that ''<<count>>'' tiddlers are referencing this view.
 
@@ -25,3 +28,5 @@ accordingly.
 </ul>
 
 </$reveal>
+</$keyboard>
+</$keyboard>

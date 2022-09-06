@@ -142,7 +142,7 @@ command.regRepl = function() {
 
 command.halfOfString = function() {
 
-  var str = this.substVarRefs(arguments[0]);
+  var str = this.substVarRefs(arguments[0], {});
 
   if (!str) {
     return '';

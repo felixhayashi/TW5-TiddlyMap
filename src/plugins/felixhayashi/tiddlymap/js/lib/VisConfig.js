@@ -12,7 +12,7 @@ module-type: library
 
 const visConfig = {
 
-  locale: 'en_EN',
+  locale: 'en',
   clickToUse: false,
   autoResize: false,
   height: '100%',

@@ -1,0 +1,9 @@
+title: $:/plugins/felixhayashi/tiddlymap/templates/nodeLabel
+
+\import [[$:/core/ui/PageMacros]] [all[shadows+tiddlers]tag[$:/tags/Macro]!has[draft.of]]
+
+<$transclude field=<<nodeLabel>> mode="inline">
+
+<$view field="title"/>
+
+</$transclude>

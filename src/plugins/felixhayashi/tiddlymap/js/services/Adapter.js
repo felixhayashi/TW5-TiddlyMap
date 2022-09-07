@@ -649,14 +649,22 @@ class Adapter {
     node.tRef = tObj.fields.title;
 
     // add label
-    const label = tObj.fields[$tm.field.nodeLabel];
-    node.label = (
-      label && $tm.field.nodeLabel !== 'title'
-        ? this.wiki.renderText('text/plain', 'text/vnd-tiddlywiki', label)
-        : tObj.fields.title
-    ).replace('\\n', '\n');
+    node.label = this.makeLabel(tObj);
 
     return node;
+
+  }
+
+  makeLabel(tObj) {
+
+    const label = tObj.fields[$tm.field.nodeLabel];
+
+    return (
+      label && $tm.field.nodeLabel !== 'title'
+        ? this.wiki.renderTiddler('text/plain', '$:/plugins/felixhayashi/tiddlymap/templates/nodeLabel', {
+            variables: {currentTiddler: tObj.fields.title, nodeLabel: $tm.field.nodeLabel}}).replace(/\\n/g, '\n')
+        : tObj.fields.title
+    )
 
   }
 

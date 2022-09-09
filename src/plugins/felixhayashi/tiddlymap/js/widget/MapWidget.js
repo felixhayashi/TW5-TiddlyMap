@@ -2490,6 +2490,8 @@ class MapWidget extends Widget {
 
         utils.registerTransclude(this, 'tooltipWidget', tRef);
         this.tooltipWidget.setVariable('tv-tiddler-preview', 'yes');
+        // Solves: https://github.com/felixhayashi/TW5-TiddlyMap/issues/365
+        this.tooltipWidget.setVariable('currentTiddler', tRef);
         this.tooltipWidget.render(div);
 
       } else {

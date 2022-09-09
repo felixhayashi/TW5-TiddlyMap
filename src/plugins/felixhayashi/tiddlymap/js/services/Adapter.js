@@ -661,7 +661,7 @@ class Adapter {
 
     return (
       label && $tm.field.nodeLabel !== 'title'
-        ? this.wiki.renderTiddler('text/plain', '$:/plugins/felixhayashi/tiddlymap/templates/nodeLabel', {
+        ? this.wiki.renderTiddler('text/plain', env.path.nodeLabel, {
             variables: {currentTiddler: tObj.fields.title, nodeLabel: $tm.field.nodeLabel}}).replace(/\\n/g, '\n')
         : tObj.fields.title
     )

@@ -32,6 +32,7 @@ export const path = {
   options:         '$:/plugins/felixhayashi/tiddlymap/config',
   dialogs:         '$:/plugins/felixhayashi/tiddlymap/dialog',
   footers:         '$:/plugins/felixhayashi/tiddlymap/dialogFooter',
+  nodeLabel:       '$:/plugins/felixhayashi/tiddlymap/templates/nodeLabel',
   tempRoot:        '$:/temp/tmap',
   tempStates:      '$:/temp/tmap/state',
   tempPopups:      '$:/temp/tmap/state/popup',

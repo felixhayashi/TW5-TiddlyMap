@@ -10,9 +10,12 @@ module-type: library
 \*/
 /* @preserve TW-Guard */
 
+import vis from '$:/plugins/felixhayashi/vis/vis.js';
+
 const visConfig = {
 
-  locale: 'en',
+  // The locale is different depending on the vis library being used
+  locale: vis.locale || 'en-EN',
   clickToUse: false,
   autoResize: false,
   height: '100%',

@@ -15,7 +15,7 @@ import vis from '$:/plugins/felixhayashi/vis/vis.js';
 const visConfig = {
 
   // The locale is different depending on the vis library being used
-  locale: vis.locale || 'en-EN',
+  locale: vis.locale || 'en_EN',
   clickToUse: false,
   autoResize: false,
   height: '100%',

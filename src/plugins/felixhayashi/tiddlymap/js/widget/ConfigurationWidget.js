@@ -311,6 +311,7 @@ MapConfigWidget.prototype.getOptionFilter = function(mode) {
       },
       icon: true,
       labelHighlightBold: false,
+      physics: true,
       shadow: true,
       shape: true,
       shapeProperties: {
@@ -320,6 +321,7 @@ MapConfigWidget.prototype.getOptionFilter = function(mode) {
       size: true
     },
     edges: {
+      align: true,
       arrows: true,
       color: true,
       dashes: true,

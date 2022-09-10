@@ -11,7 +11,7 @@ caption: Styling
       name="module"
       value="edges"
       emptyValue="nodes">
-    [[visjs.org|http://visjs.org/docs/network/$(module)$]]
+    [[visjs.github.io|https://visjs.github.io/vis-network/docs/network/$(module)$]]
   </$set>
 \end
 
@@ -34,7 +34,7 @@ caption: Styling
 <fieldset><legend>Visjs styles</legend>
   <div class="tmap-flash-message tmap-info">
      &#32;
-     All visjs options below are documented at&#32;<<url>>.
+     All vis-network options below are documented at&#32;<<url>>.
   </div>
   <div class="tmap-flash-message tmap-info">
      &#32;

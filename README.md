@@ -8,6 +8,8 @@ TiddlyMap is a TiddlyWiki plugin that turns your favourite personal note taking 
 Demo
 ---------------------------------------------------------------------
 
+**WARNING:** The demo site is no longer being maintained. The latest version of TiddlyMap is only available here on git. Look to "Releases" on the right.
+
 A demo with several examples and explanations can be found at the project's website [tiddlymap.org](http://tiddlymap.org). While TiddlyMap also works with mobile devices, it is written for larger screens (>= 1440px width), since concept mapping requires space.
 
 Motivation

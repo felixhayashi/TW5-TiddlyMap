@@ -273,7 +273,7 @@ gulp.task('bundle the plugin', (cb) => {
   // write the json to the dist dir;
   // note: tw requires the json to be wrapped in an array, since
   // a collection of tiddlers are possible.
-  const outName = pluginName + '_' + pluginInfo.version + '.json';
+  const outName = pluginName + '.json';
   fs.writeFileSync(path.resolve(outPath.bundle, outName),
                    JSON.stringify([ plugin ], null, 2));
 

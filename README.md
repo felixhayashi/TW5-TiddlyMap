@@ -86,7 +86,7 @@ Now in every wiki you want TiddlyMap to appear in, you need to update the plugin
 Build
 ---------------------------------------------------------------------
 
-If you want to compile your own TiddlyMap plugin from souce, follow the steps below.
+If you want to compile your own TiddlyMap plugin from source, follow the steps below.
 
 **Note:** In case you want to contribute code to the project, make sure you read [Contributing to TiddlyMap](https://github.com/felixhayashi/TW5-TiddlyMap/blob/master/CONTRIBUTING.md) and signed the CLA before creating a pull request.
 
@@ -117,6 +117,6 @@ The build produces a few folders, i.e. `docs`, `bundle`, `dist`, in the local re
 
 **Some tips:**
 
-* For a quick test of the build result drag & drop the `tiddlymap.json` file residing in the `bundle` folder into one of your wikis to install the compiled plugin. Of course you *need to make sure(!)* that this wiki also has all the plugins installed TiddlyMap depends on (most importantly [TW5-Vis.js](https://github.com/felixhayashi/TW5-Vis.js)). So for testing purposes, you could drag your compiled plugin into http://tiddlymap.org, which satisfies all dependencies already.
+* For a quick test of the build result drag & drop the `tiddlymap.json` file residing in the `bundle` folder into one of your wikis to install the compiled plugin. Of course you *need to make sure(!)* that this wiki also has all the plugins installed TiddlyMap depends on (most importantly [tw5-vis-network](https://github.com/flibbles/tw5-vis-network)). So for testing purposes, you could drag your compiled plugin into http://tiddlymap.org, which satisfies all dependencies already.
 * If you need to build and test TiddlyMap often, it makes sense to consider setting up "Option 2" (see installation instructions) using symlinks. So in your `tiddlywiki/plugins/` directory create symlinks to your local repository's dist folder.
 * To have the source code documentation displayed as website, open the `index.html` inside the `docs` folder. Please note: docs may be outdated or incomplete.

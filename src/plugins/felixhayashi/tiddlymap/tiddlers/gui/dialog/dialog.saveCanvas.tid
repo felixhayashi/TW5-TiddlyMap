@@ -5,10 +5,7 @@ subtitle: {{$:/core/images/options-button}} Save a snapshot image of view "<<vie
 \rules except wikilink
 
 \define preview()
-\whitespace trim
-<div class="tmap-save-canvas-preview">
-  <$transclude tiddler=<<snapshot>> /><br />
-</div>
+<div class="tmap-save-canvas-preview"><$transclude tiddler=<<snapshot>> /><br /></div>
 \end
 
 <table class="tmap-config-table">
@@ -33,7 +30,7 @@ subtitle: {{$:/core/images/options-button}} Save a snapshot image of view "<<vie
                     [[placeholder|Use as placeholder for this view]]"
       descr:"Save the image by downloading it to your computer or
               save it as a tiddler in your wiki.<br /><br />
-              A third option is to make TiddlyMap use this image as
+              A third option is to make&#32;<$text text=TiddlyMap/>&#32;use this image as
               placeholder for the current view. Placeholders are useful
               when the wiki is exported as static html
               or when editing a tiddler while having the preview

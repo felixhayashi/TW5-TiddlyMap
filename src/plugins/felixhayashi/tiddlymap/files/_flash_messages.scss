@@ -1,10 +1,10 @@
 .tmap-flash-message {
   
-  border: 1px solid lightgray;
+  border: 1px solid color(modal-footer-border);
   padding: 5px;
   margin: 6px 0;
   display: block;
-  color: #333333;
+  color: color(foreground);
   
   @mixin circled-i {
     &::before {
@@ -38,22 +38,22 @@
   }
   
   &.tmap-info, &.tmap-plain, &.tmap-neutral {
-    background: #F0F0F0;
+    background: color(modal-footer-background);
     @include circled-i;
   }
   
   &.tmap-valid, &.tmap-success {
-    background: #D1EED4;
+    background: color(message-background);
     @include circled-i;
   }
   
   &.tmap-warning {
-    background: #FFF6D1;
+    background: color(notification-background);
     @include triangle;
   }
   
   &.tmap-malformed, &.tmap-invalid, &.tmap-danger {
-    background: #EED5D1;
+    background: color(alert-background);
     @include triangle;
   }
 }

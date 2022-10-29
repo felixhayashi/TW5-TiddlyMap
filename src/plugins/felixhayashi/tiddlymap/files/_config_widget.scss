@@ -1,5 +1,5 @@
 .tmap-config-widget {
-  background: #F0F0F0;
+  background: color(table-header-background);
   padding: 5px;
   margin: 5px 0;
   box-sizing: border-box;
@@ -34,7 +34,7 @@
 
       &.tmap-vis-config-item-active .vis-config-label::after {
         @include marker;
-        content: "✔";
+        content: "✓";
         color: green;
         font-weight: bold;
         font-size: 15px;

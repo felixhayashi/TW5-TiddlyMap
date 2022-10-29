@@ -1,10 +1,10 @@
 .tmap-widget {
-  background: #FFFFFF;
+  background: color(tiddler-background);
   width: auto;
   position: relative;
   border: 1px dotted lightgray;
   padding: 2px;
-  color: $tw-text-color;
+  color: color(foreground);
   display: block; // sometimes tw puts us into a span
 
   .tmap-download-canvas {
@@ -64,7 +64,8 @@
   &.tmap-advanced-editor {
 
     .tmap-topbar {
-      background: #d6d9d8;
+      background: color(sidebar-tab-background);
+      color: color(sidebar-tab-foreground);
 
       .tmap-active-button {
         color: #488DCD;
@@ -140,7 +141,12 @@
 
     button {
       line-height: inherit;
-      color: $tw-text-color;
+      color: color(sidebar-tab-foreground);
+      fill: color(sidebar-tab-foreground);
+    }
+
+    a {
+      color: color(sidebar-tab-foreground);
     }
 
      > * {
@@ -263,8 +269,8 @@
 
   .vis-manipulation {
     height: 34px;
-    border-top: 1px solid #d6d9d8;
-    background: rgba(245, 245, 245, 0.7);
+    border-top: 1px solid color(sidebar-tab-border);
+    background: color(sidebar-foreground-shadow);
 
   }
 

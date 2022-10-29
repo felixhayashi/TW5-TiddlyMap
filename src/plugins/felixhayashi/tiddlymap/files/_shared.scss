@@ -1,10 +1,10 @@
 table.tmap-table {
   tr {
     &:nth-child(odd) {
-      background-color: #F0F0F0;
+      background-color: color(table-header-background);
     }
     &:nth-child(even) {
-      background-color: #FFFFFF;
+      background-color: color(background);
     }
 /*
     &:hover {
@@ -16,9 +16,9 @@ table.tmap-table {
 
 .tmap-save-canvas-preview {
   text-align: center;
-  background: lightgray;
+  background: color(tab-divider);
   img {
-    background-color: white;
+    background-color: color(tiddler-background);
     max-width: 100%;
     max-height: 100px;
     border: 1px solid red;
@@ -27,10 +27,10 @@ table.tmap-table {
 
 .tmap-list-separator {
   display: block;
-  background-color: rgb(239, 239, 239);
+  background-color: color(sidebar-tab-divider);
   margin: 10px 0 5px 0;
   cursor: default;
-  border-bottom: 1px dotted gray;
+  border-bottom: 1px dotted color(sidebar-tab-border);
   font-weight: bold;
   font-size: 0.8em,
 }
@@ -39,7 +39,7 @@ table.tmap-table {
   width: 1em;
   display: inline-block;
   text-align: center;
-  color: black;
+  color: color(foreground);
 }
 
 html { // used to increase css importance
@@ -117,7 +117,7 @@ html { // used to increase css importance
     z-index: 1010; // fix this in core?
 
     .tc-modal {
-      boder: 1px solid #999999;
+      boder: 1px solid color(modal-border);
       left: calc(50% - 400px);
       width: 802px;
     }

@@ -22,7 +22,7 @@
   }
   
   :not(pre) > code {
-    color: $tw-text-color;
+    color: color(tab-foreground);
   }
 
   .tc-tab-set {
@@ -86,11 +86,12 @@
   &.tmap-key-value-table {
     th {
       width: 30%;
-      background-color: #F0F0F0;
+      background-color: color(modal-footer-background);
     }
   }
         
   &.tmap-config-table {
+    background-color: color(table-header-background);
     @extend .tmap-table;
     
     &.tmap-large-input {

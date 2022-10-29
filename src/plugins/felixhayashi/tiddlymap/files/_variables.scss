@@ -3,8 +3,16 @@ $default-input-width: 140px;
 $padding : 5px;
 
 // defaults in TW5 v5.1.10
-$tw-text-color: #666666;
 $tw-story-river-padding-left: 42px;
+
+/**
+ * Returns a color for the given palette key
+ */
+@function color($key) {
+
+  @return unquote('<<color #{$key}>>');
+
+}
 
 /**
  * Returns a makedatauri macro

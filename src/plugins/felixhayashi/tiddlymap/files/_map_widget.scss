@@ -374,7 +374,7 @@
 /*** Fullscreen ****************************************************/
 
 @mixin fillSpace() {
-  background: white !important;
+  background: color(tiddler-background) !important;
   height: 100% !important;
   width: 100% !important;
   position: fixed !important;

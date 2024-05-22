@@ -63,7 +63,10 @@ class AbstractRefEdgeTypeSubscriber extends AbstractEdgeTypeSubscriber {
         }
 
         const id = type.id + $tw.utils.hashString(fromTRef + toTRef);
-        edges[id] = new Edge(fromId, idByT[toTRef], type.id, id);
+        // See https://github.com/felixhayashi/TW5-TiddlyMap/issues/443
+        // If for some odd reason there is no tmap.id for this tiddler, we must make one.
+        const toId = idByT[toTRef] || $tm.tracker.assignId($tw.wiki.getTiddler(toTRef));
+        edges[id] = new Edge(fromId, toId, type.id, id);
       }
     }
 

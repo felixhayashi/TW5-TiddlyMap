@@ -120,10 +120,24 @@ export const convert = (col, outputType) => {
 export const getDataUri = (tiddler, type, isForceBase64) => {
 
   const imgTObj = wikiUtils.getTiddler(tiddler);
-  type = type || imgTObj.fields.type || 'image/svg+xml';
-  let body = imgTObj.fields.text;
-  let encoding = $tw.config.contentTypeInfo[type].encoding;
+  type = type || imgTObj.fields.type || 'text/vnd.tiddlywiki';
+  let body;
 
+  if (type === 'text/vnd.tiddlywiki') {
+
+    // See issue #218
+    // Some tiddlywiki files don't directly translate into svg anymore.
+    // We need to process them.
+    // We have to do this roundabout thing because \parameters don't work sometimes when rendered directly, depending on the TW version.
+    body = $tw.wiki.renderText("text/html", "text/vnd.tiddlywiki", "\\define currentTiddler()" + imgTObj.fields.title + "\n<$transclude mode=inline/>\n");
+    type = 'image/svg+xml';
+
+  } else {
+
+    body = imgTObj.fields.text;
+
+  }
+  let encoding = $tw.config.contentTypeInfo[type].encoding;
   if (type === 'image/svg+xml') {
 
     // see http://stackoverflow.com/questions/10768451/inline-svg-in-css

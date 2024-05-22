@@ -2,7 +2,7 @@
 /*\
 
 title: $:/plugins/felixhayashi/tiddlymap/js/lib/SelectionRectangle
-type: application/SelectionRectangle
+type: application/javascript
 module-type: library
 
 @preserve

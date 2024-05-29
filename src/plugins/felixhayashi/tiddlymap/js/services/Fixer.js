@@ -79,7 +79,8 @@ class Fixer {
     // issue debug message
     this.logger('debug', `Upgrading data structure to ${toVersion}`);
     // execute fix
-    const msg = upgrade();
+    // See issue #455. Some upgraders require "this" to be valid.
+    const msg = upgrade.call(this);
     // update meta
     utils.setEntry(env.ref.sysMeta, 'dataStructureState', toVersion);
 

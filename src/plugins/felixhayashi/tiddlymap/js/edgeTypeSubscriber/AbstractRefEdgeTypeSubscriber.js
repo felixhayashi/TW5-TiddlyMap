@@ -46,12 +46,12 @@ class AbstractRefEdgeTypeSubscriber extends AbstractEdgeTypeSubscriber {
     for (let typeId in refsByType) {
 
       const toRefs = refsByType[typeId];
+      const type = allETy[typeId];
 
-      if (!toRefs) {
+      if (!toRefs || !type) {
         continue;
       }
 
-      const type = allETy[typeId];
       for (let i = toRefs.length; i--;) {
         const toTRef = toRefs[i];
 

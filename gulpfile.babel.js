@@ -76,7 +76,8 @@ import beep from 'beepbeep';
 import gulp from 'gulp';
 import gulpif from 'gulp-if';
 import babel from 'gulp-babel';
-import sass from 'gulp-sass';
+import nodeSass from 'node-sass';
+import gulpSass from 'gulp-sass';
 import replace from 'gulp-replace';
 import terser from 'gulp-terser';
 import jsdoc from 'gulp-jsdoc3';
@@ -86,6 +87,7 @@ import bump from 'gulp-bump';
 
 /**** Preprocessing ************************************************/
 
+const sass = gulpSass(nodeSass);
 const pluginSrc = './src/plugins/';
 const pluginNamespace = `${authorName}/${pluginName}`; // no trailing slash!
 const pluginTiddler = `$:/plugins/${pluginNamespace}`;

@@ -60,7 +60,7 @@
     "is-there": "^4.3.1",
     "node-sass": "^9.0.0",
     "semver": "^5.1.0",
-    "tiddlywiki": "^5.3.0",
+    "tiddlywiki": "^5.1.20",
     "yargs": "^14.0.0"
   },
   "scripts": {

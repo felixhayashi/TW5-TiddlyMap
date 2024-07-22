@@ -1,0 +1,5 @@
+title: $:/plugins/felixhayashi/tiddlymap/graph/edgeTypes/tw-body:transclude
+description: A transclusion that is contained in the tiddler's body referencing another resource.
+style: {"color":{"color":"darkgreen"}, "dashes":true}
+label: transcludes
+

@@ -102,7 +102,7 @@ export const filter = {
   nodeTypes: `[prefix[${path.nodeTypes}]]`,
   edgeTypes: `[prefix[${path.edgeTypes}]]`,
   views: `[${config.sys.field.viewMarker}[true]]`,
-  defaultEdgeTypeFilter: '-[prefix[_]] -[[tw-body:link]] -[[tw-list:tags]] -[[tw-list:list]]'
+  defaultEdgeTypeFilter: '-[prefix[_]] -[[tw-body:link]] -[[tw-body:transclude]] -[[tw-list:tags]] -[[tw-list:list]]'
 };
 
 const allSelector = '[all[tiddlers+shadows]!has[draft.of]]';

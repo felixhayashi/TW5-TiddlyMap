@@ -9,7 +9,6 @@
   "type": "application/json",
   "plugin-type": "plugin",
   "list": "readme license",
-  "dependents": "$:/plugins/felixhayashi/vis",
-  "depends": "$:/plugins/felixhayashi/vis",
+  "dependents": ["$:/plugins/felixhayashi/vis", "$:/plugins/Gk0Wk/focused-tiddler"],
   "suggested": "$:/plugins/felixhayashi/topstoryview"
 }

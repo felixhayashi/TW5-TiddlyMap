@@ -25,6 +25,7 @@ By using this plugin you agree to the product's [[License Terms|$:/plugins/felix
     tmVer={{$:/plugins/felixhayashi/tiddlymap!!version}}
     visVer={{$:/plugins/felixhayashi/vis!!version}}
     hzVer={{$:/plugins/felixhayashi/hotzone!!version}}
+    ftVer={{$:/plugins/Gk0Wk/focused-tiddler!!version}}
     tsvVer={{$:/plugins/felixhayashi/topstoryview!!version}}>
 
 # Get yourself an empty copy of TiddlyWiki at [[tiddlywiki.com|http://tiddlywiki.com]].
@@ -34,8 +35,11 @@ By using this plugin you agree to the product's [[License Terms|$:/plugins/felix
 #: This is the core TiddlyMap plugin.
 #; [[TW5-Vis.js|$:/plugins/felixhayashi/vis]] @@.ver (v<<visVer>>)@@
 #: This plugin will install vis.js which is required for the graph's rendering.
-#; [[TW5-HotZone|$:/plugins/felixhayashi/hotzone]] @@.ver (v<<hzVer>>)@@
-#: This plugin is necessary when you want to use the //live view//.
+#; [[Focused Tiddler|$:/plugins/Gk0Wk/focused-tiddler]] @@.ver (v<<ftVer>>)@@ or [[TW5-HotZone|$:/plugins/felixhayashi/hotzone]] @@.ver (v<<hzVer>>)@@
+#: One of these plugins is necessary when you want to use the //live view//.
+#:* Only install one of them.
+#:* TW5-HotZone is created by author of TiddlyMap, is consider stable and native to TiddlyMap.
+#:* Focused Tiddler is more widely adapted, other community plugins may already installed it on your wiki.
 #; [[TW5-TopStoryView|$:/plugins/felixhayashi/topstoryview]] @@.ver (v<<tsvVer>>)@@
 #: Unless you are using the //zoomin// or //stacked// story view, install this plugin to achieve a better live view experience.
 # Maybe you also want to install [[Font Awesome for TiddlyWiki]]
